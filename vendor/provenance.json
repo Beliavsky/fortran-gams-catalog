@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/Beliavsky/fortran-playground",
+  "commit": "3e9ab77b8d38d5a8ce12b65ad4035ab4d63aab13",
+  "path": "catalog_export.py",
+  "sha256": "47f456c1c6dfd6d408c4f8babb75c0b88822174723c718acf5a3f9727e7b1c24",
+  "purpose": "Vendored version-1 feed validator and layered merger. Its playground export function is unused here."
+}
