@@ -6367,12 +6367,138 @@
             ],
             "notes": "The README distinguishes a bounded-interval scalar function solver and an nth-degree polynomial-root routine. Author test programs and advertised precision options have not been checked in this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "0a145fc5da74b021faf3b8576ac499e54025e439",
+            "reviewed_on": "2026-11-04",
+            "notes": "The public fun_zero implementation combines secant proposals with bisection for a scalar function supplied by procedure pointer. The inspected body does not implement inverse quadratic interpolation, despite the Brent wording in its header. It requires strictly opposite endpoint signs: endpoint zeros are rejected by the initial product >= 0 test. Optional controls set absolute tolerance, iteration budget and printing. Initial NaNs have a status path, but the interior NaN check is inside the show_iterations branch. This is a nonpolynomial single-equation mapping, not an all-roots guarantee or a numerical validation.",
+            "evidence": [
+              {
+                "path": "modules/MOD_Roots.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/modules/MOD_Roots.f90",
+                "sha256": "9db962412b815e778a74fdb1fd88e990be188bdb4ade28d3c69391fd7a6b56b5"
+              },
+              {
+                "path": "modules/MOD_Select_Kind.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/modules/MOD_Select_Kind.f90",
+                "sha256": "2b9bef2527c62e78e8433f2672e623bd43a8fa410be6f6277f385d223b86e2df"
+              },
+              {
+                "path": "src/test.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/src/test.f90",
+                "sha256": "7f50cab88890031d9dfcb382ff5ceaca72ec95149db6a0ea6f576b6788aa811f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fun_zero",
+                "role": "public-entry-point",
+                "summary": "Supply an associated procedure(sv_function) pointer and a two-element real(pv) bracket. Check status before reading root. Optional niter and fun_zero_options control reporting and stopping; pv comes from MOD_Select_Kind.",
+                "signature": "CALL fun_zero(f_pointer, bounds, status, root, niter, f0_options)",
+                "declarations": [
+                  {
+                    "path": "modules/MOD_Roots.f90",
+                    "line_start": 57,
+                    "line_end": 62
+                  },
+                  {
+                    "path": "modules/MOD_Roots.f90",
+                    "line_start": 14,
+                    "line_end": 33
+                  }
+                ],
+                "path": "modules/MOD_Roots.f90",
+                "line_start": 36,
+                "line_end": 234,
+                "module": "MOD_Roots",
+                "examples": [
+                  {
+                    "path": "src/test.f90",
+                    "line_start": 18,
+                    "line_end": 34
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": "F1a",
+            "level": "source-reviewed",
+            "revision": "0a145fc5da74b021faf3b8576ac499e54025e439",
+            "reviewed_on": "2026-11-04",
+            "notes": "poly_roots builds a real companion matrix from descending-power coefficients, dividing by the leading coefficient, balances it and obtains real or complex-conjugate roots through its private real Hessenberg double-QR iteration. Degree <= 0 and zero leading coefficients have explicit error statuses; QR exhaustion also returns failure. The optional accuracy_hint is a machine-epsilon/degree/iteration/norm heuristic, not a certified root error bound. The source path establishes polynomial-root scope; repeated roots, conditioning and accuracy were not checked by execution.",
+            "evidence": [
+              {
+                "path": "modules/MOD_Roots.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/modules/MOD_Roots.f90",
+                "sha256": "9db962412b815e778a74fdb1fd88e990be188bdb4ade28d3c69391fd7a6b56b5"
+              },
+              {
+                "path": "modules/MOD_Select_Kind.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/modules/MOD_Select_Kind.f90",
+                "sha256": "2b9bef2527c62e78e8433f2672e623bd43a8fa410be6f6277f385d223b86e2df"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poly_roots",
+                "role": "public-entry-point",
+                "summary": "Pass degree+1 real(pv) coefficients, highest power first, and a degree-element complex(pv) output array. The polynomial need not be monic. Check status_flag; optional accuracy_hint is only a heuristic.",
+                "signature": "CALL poly_roots(degree, coeffs, roots, status_flag, accuracy_hint)",
+                "declarations": [
+                  {
+                    "path": "modules/MOD_Roots.f90",
+                    "line_start": 292,
+                    "line_end": 300
+                  }
+                ],
+                "path": "modules/MOD_Roots.f90",
+                "line_start": 252,
+                "line_end": 382,
+                "module": "MOD_Roots"
+              },
+              {
+                "procedure": "build_companion_matrix",
+                "role": "implementation-helper",
+                "path": "modules/MOD_Roots.f90",
+                "line_start": 385,
+                "line_end": 445
+              },
+              {
+                "procedure": "hqr_eigen_hessenberg",
+                "role": "implementation-helper",
+                "path": "modules/MOD_Roots.f90",
+                "line_start": 660,
+                "line_end": 961
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "0a145fc5da74b021faf3b8576ac499e54025e439",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license or copying file was present in the pinned root tree, and no license grant was identified in the inspected README or roots module. This is a scoped absence finding, not permission to redistribute or a conclusion about all historical versions.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/README.md",
+              "sha256": "f447a9ea105ab8ad7b2659eb0ddc0d7f6d5b7fbce5e555844620ce5b5cc07445"
+            },
+            {
+              "path": "modules/MOD_Roots.f90",
+              "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/modules/MOD_Roots.f90",
+              "sha256": "9db962412b815e778a74fdb1fd88e990be188bdb4ade28d3c69391fd7a6b56b5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -6911,12 +7037,86 @@
             ],
             "notes": "The README distinguishes methods with and without supplied derivatives. Its exhaustive range search does not establish that every root can be found for an arbitrary function and step size.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "ba82e48ffeb27a6a334e9de50da891bd790b515e",
+            "reviewed_on": "2026-11-04",
+            "notes": "The public real32 scalar solvers hybridD and hybridSA implement Newton/bisection and accelerated-secant/quadratic-candidate/bisection branches respectively. Their callbacks are pure scalar functions; hybridD also requires a derivative. Source findings prevent treating these as checked solvers: hybridD updates the bracket using fx0*fx1 rather than the newly evaluated midpoint value; hybridSA tests f0*f2 when accepting x3 rather than f0*f3. Both use relative step tests that divide by the candidate root, print on bracket failure without returning a status, and expose no explicit convergence flag. The separate range-scan routine root_searchD skips the first scanning segment and refers to optional max_iters without consistently using its local default. No all-roots or correctness guarantee is recorded, and no program was run.",
+            "evidence": [
+              {
+                "path": "roots.f90",
+                "url": "https://github.com/physicsfan/GetRootsF/blob/ba82e48ffeb27a6a334e9de50da891bd790b515e/roots.f90",
+                "sha256": "70da6315bf233ac6885caba3fa6b46fecfa18a1b766552066e77f66e1a2a297a"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/physicsfan/GetRootsF/blob/ba82e48ffeb27a6a334e9de50da891bd790b515e/README.md",
+                "sha256": "f615baec364ba28571932490230ab13ac4a3da74d7eb545d076daae8df4659fb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hybridD",
+                "role": "public-entry-point",
+                "summary": "real32 endpoints and root are INOUT, tolerance is real32, iterations is output and max_iterations is required. Supply pure real32 value and derivative functions. Printing is built in; independently check residual and termination because no status is returned.",
+                "signature": "CALL hybridD(lbound, rbound, root, tolerance, iterations, max_iterations, f, df)",
+                "declarations": [
+                  {
+                    "path": "roots.f90",
+                    "line_start": 123,
+                    "line_end": 140
+                  }
+                ],
+                "path": "roots.f90",
+                "line_start": 113,
+                "line_end": 208,
+                "module": "roots"
+              },
+              {
+                "procedure": "hybridSA",
+                "role": "public-entry-point",
+                "summary": "Derivative-free real32 scalar interface with a pure real32 value callback. Bounds and root are INOUT. The quadratic discriminant and candidate-root divisions need care; no convergence status or certified error bound is supplied.",
+                "signature": "CALL hybridSA(lbound, rbound, root, tolerance, iterations, max_iterations, f)",
+                "declarations": [
+                  {
+                    "path": "roots.f90",
+                    "line_start": 301,
+                    "line_end": 312
+                  }
+                ],
+                "path": "roots.f90",
+                "line_start": 291,
+                "line_end": 411,
+                "module": "roots"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "ba82e48ffeb27a6a334e9de50da891bd790b515e",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned tree has no license/copying file, and the inspected README and roots module contain no identified license grant. This finding is limited to the reviewed material and does not establish redistribution rights.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/physicsfan/GetRootsF/blob/ba82e48ffeb27a6a334e9de50da891bd790b515e/README.md",
+              "sha256": "f615baec364ba28571932490230ab13ac4a3da74d7eb545d076daae8df4659fb"
+            },
+            {
+              "path": "roots.f90",
+              "url": "https://github.com/physicsfan/GetRootsF/blob/ba82e48ffeb27a6a334e9de50da891bd790b515e/roots.f90",
+              "sha256": "70da6315bf233ac6885caba3fa6b46fecfa18a1b766552066e77f66e1a2a297a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -7090,12 +7290,101 @@
             ],
             "notes": "The README identifies the collection as work in progress and documents RK4/adaptive RK4. Advertised precision options and error control have not been reproduced in this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "a5e52899a189308ce78874bd55a1ec300884be83",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected public fixed-step solver implements the classical four-stage explicit RK4 formula. The adaptive solver compares one full RK4 step with two half steps and accepts using an unscaled absolute maximum component difference, then adjusts the step with a fifth-root rule. Both solve a callback-defined first-order initial-value system. The fixed interface stores time/state by rows, whereas the adaptive output stores time/state by columns. The fixed routine does not guard a one-column solution buffer before dividing by n_steps-1; the adaptive routine requires a forward interval and a positive meaningful tolerance. Its discrepancy test is not a certified global error bound. I1a1a records one-step nonstiff scope. The separate VSS routine and stiff-system claims are not included in this review.",
+            "evidence": [
+              {
+                "path": "modules/MOD_ODE_Toolbox.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-ODE-Toolbox/blob/a5e52899a189308ce78874bd55a1ec300884be83/modules/MOD_ODE_Toolbox.f90",
+                "sha256": "1c60254f67d8aae9346d41a5e8ccd0359914f058da3b6b232a86a42d418bcfdb"
+              },
+              {
+                "path": "modules/MOD_Select_Kind.f90",
+                "url": "https://github.com/bryand4140/FORTRAN-ODE-Toolbox/blob/a5e52899a189308ce78874bd55a1ec300884be83/modules/MOD_Select_Kind.f90",
+                "sha256": "f93f139cd8daa51e8f457e1d40aa753b183b56a1d994c93e7769b4c6c213c469"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ODE_Numerical_Solve_RK4",
+                "role": "public-entry-point",
+                "summary": "Supply an associated procedure(ODE_System) pointer with callback (n,t,x,dx_dt). Preallocate solution_matrix(n_sys+1,n_steps) with n_steps >= 2; row 1 is time and the remaining rows are states. Check status. Compile MOD_Select_Kind first.",
+                "signature": "CALL ODE_Numerical_Solve_RK4(indp_var_span, n_sys, initial_conds, ODE_System_ptr, solution_matrix, status)",
+                "declarations": [
+                  {
+                    "path": "modules/MOD_ODE_Toolbox.f90",
+                    "line_start": 303,
+                    "line_end": 312
+                  },
+                  {
+                    "path": "modules/MOD_ODE_Toolbox.f90",
+                    "line_start": 25,
+                    "line_end": 33
+                  }
+                ],
+                "path": "modules/MOD_ODE_Toolbox.f90",
+                "line_start": 282,
+                "line_end": 363,
+                "module": "MOD_ODE_Toolbox"
+              },
+              {
+                "procedure": "ODE_Numerical_Solve_RK4_Adaptive",
+                "role": "public-entry-point",
+                "summary": "Supply the same callback, a forward time span and positive absolute tolerance. solution_matrix must be an allocatable real(pv) array; the routine allocates it. Column 1 is time and later columns are states, unlike the fixed-step output. Check status before consuming results.",
+                "signature": "CALL ODE_Numerical_Solve_RK4_Adaptive(indp_var_span, n_sys, initial_conds, ODE_System_ptr, solution_matrix, status, tolerance)",
+                "declarations": [
+                  {
+                    "path": "modules/MOD_ODE_Toolbox.f90",
+                    "line_start": 389,
+                    "line_end": 397
+                  },
+                  {
+                    "path": "modules/MOD_ODE_Toolbox.f90",
+                    "line_start": 25,
+                    "line_end": 33
+                  }
+                ],
+                "path": "modules/MOD_ODE_Toolbox.f90",
+                "line_start": 366,
+                "line_end": 540,
+                "module": "MOD_ODE_Toolbox"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "a5e52899a189308ce78874bd55a1ec300884be83",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned root LICENSE contains GNU GPL version 3. No inspected project-specific notice resolves version-3-only versus or-later selection, so an SPDX expression is not asserted. This review covers the root license and inspected module, not all bundled materials.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/bryand4140/FORTRAN-ODE-Toolbox/blob/a5e52899a189308ce78874bd55a1ec300884be83/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/bryand4140/FORTRAN-ODE-Toolbox/blob/a5e52899a189308ce78874bd55a1ec300884be83/README.md",
+              "sha256": "be706dbcd87ed19efa3f3d601bf133065e32763b0179c04626b2d847c748f83a"
+            },
+            {
+              "path": "modules/MOD_ODE_Toolbox.f90",
+              "url": "https://github.com/bryand4140/FORTRAN-ODE-Toolbox/blob/a5e52899a189308ce78874bd55a1ec300884be83/modules/MOD_ODE_Toolbox.f90",
+              "sha256": "1c60254f67d8aae9346d41a5e8ccd0359914f058da3b6b232a86a42d418bcfdb"
+            }
+          ]
         }
       },
       "imports": {}
