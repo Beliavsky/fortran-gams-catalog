@@ -162,7 +162,7 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('documentation reviewed', expokit)
             self.assertIn('Not built or run', expokit)
             self.assertNotIn('<h2>Checked hosted drivers</h2>', expokit)
-            acrs = (destination/'projects/DerivativeFreeLibrary/ACRS/index.html').read_text(encoding='utf-8')
+            acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)
             self.assertIn('source reviewed', acrs)
