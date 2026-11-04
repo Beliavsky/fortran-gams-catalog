@@ -4013,6 +4013,1873 @@
         }
       },
       "imports": {}
+    },
+    {
+      "id": "github:michel-heinz/audito",
+      "local": {
+        "name": "Audito",
+        "description": "Operator-overloaded automatic differentiation for gradients, Hessians and Laplacians.",
+        "repository": {
+          "host": "github",
+          "owner": "Michel-Heinz",
+          "name": "Audito",
+          "url": "https://github.com/Michel-Heinz/Audito"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "automatic-differentiation",
+          "gradients",
+          "hessian",
+          "laplacian"
+        ],
+        "classifications": [
+          {
+            "code": "H1",
+            "level": "documentation-reviewed",
+            "revision": "32693b0ae345ef0bf54f00219a894b6bd00c05ce",
+            "evidence": [
+              {
+                "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/README.md",
+                "path": "README.md",
+                "sha256": "bb84a3648d495d557fd4a372e9efc6f213326d53eec259070a615e932a6d73a4"
+              }
+            ],
+            "notes": "The README distinguishes FG, FGL and FGH modules and states that the AD types currently use 64-bit reals. Operations accepting other scalar kinds do not establish full AD-type support at every precision.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:zoziha/auto-diff",
+      "local": {
+        "name": "Auto-Diff",
+        "description": "Experimental reverse-mode automatic differentiation in modern Fortran.",
+        "repository": {
+          "host": "github",
+          "owner": "zoziha",
+          "name": "Auto-Diff",
+          "url": "https://github.com/zoziha/Auto-Diff"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "automatic-differentiation",
+          "reverse-mode"
+        ],
+        "classifications": [
+          {
+            "code": "H1",
+            "level": "documentation-reviewed",
+            "revision": "35e62246675cbe6dcd04ce25a81f7885653feabe",
+            "evidence": [
+              {
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/README.md",
+                "path": "README.md",
+                "sha256": "a541f1c59f17fd0b92a09f810d66d95de6d930829fbdec740b2ee318907729cc"
+              }
+            ],
+            "notes": "The README explicitly calls this a toy/experimental project, notes gfortran-only availability and possible memory leaks, and points to Fazang as an alternative. It is not presented as a production-ready AD system.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fpenunuri/dnaoad",
+      "local": {
+        "name": "DNAOAD",
+        "description": "Dual-number automatic differentiation supporting arbitrary derivative order.",
+        "repository": {
+          "host": "github",
+          "owner": "fpenunuri",
+          "name": "DNAOAD",
+          "url": "https://github.com/fpenunuri/DNAOAD"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "shell-scripts",
+          "batch-scripts"
+        ],
+        "topics": [
+          "automatic-differentiation",
+          "dual-numbers",
+          "higher-derivatives"
+        ],
+        "classifications": [
+          {
+            "code": "H1",
+            "level": "documentation-reviewed",
+            "revision": "38f4c044a5336c72e64c6fc00390a69ff071ea7c",
+            "evidence": [
+              {
+                "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/README.md",
+                "path": "README.md",
+                "sha256": "4c0df096083b91e8065210e7c721e06e74017e2578917e50a3984f9bbc64da09"
+              }
+            ],
+            "notes": "The README identifies separate Intel and gfortran source arrangements and links a separate DNAOAD-FPM repository. This entry describes the original repository, not the independently cataloged FPM adaptation.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:giacrossi/follia",
+      "local": {
+        "name": "FOLLIA",
+        "description": "Object-oriented Lagrange interpolation on uniform and nonuniform one-dimensional grids.",
+        "repository": {
+          "host": "github",
+          "owner": "giacrossi",
+          "name": "FOLLIA",
+          "url": "https://github.com/giacrossi/FOLLIA"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "lagrange",
+          "polynomial-interpolation"
+        ],
+        "classifications": [
+          {
+            "code": "E1a",
+            "level": "documentation-reviewed",
+            "revision": "892d23aaaa36b2fa27dbd524cf79b282dc1e31bd",
+            "evidence": [
+              {
+                "url": "https://github.com/giacrossi/FOLLIA/blob/892d23aaaa36b2fa27dbd524cf79b282dc1e31bd/README.md",
+                "path": "README.md",
+                "sha256": "8b147763cc1e1739a1394a1a6baf0d2d6606feb8f0d03a2d25fed487e45211fe"
+              }
+            ],
+            "notes": "The README describes Lagrange coefficients and one-dimensional grid interpolation, with alpha status. No multidimensional API or independent accuracy verification is inferred.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ja72/fortranconsolespline",
+      "local": {
+        "name": "FortranConsoleSpline",
+        "description": "Cubic spline interpolation with natural or prescribed endpoint slopes and derivative evaluation.",
+        "repository": {
+          "host": "github",
+          "owner": "ja72",
+          "name": "FortranConsoleSpline",
+          "url": "https://github.com/ja72/FortranConsoleSpline"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "cubic-splines",
+          "derivatives"
+        ],
+        "classifications": [
+          {
+            "code": "E1a",
+            "level": "documentation-reviewed",
+            "revision": "88f138a0a8ad8e71c89237df5fc236097ab695cc",
+            "evidence": [
+              {
+                "url": "https://github.com/ja72/FortranConsoleSpline/blob/88f138a0a8ad8e71c89237df5fc236097ab695cc/README.md",
+                "path": "README.md",
+                "sha256": "e0e73f70d5f53e49d7792e489b66b948502b36c7b6b9c7459cb1735b716528cf"
+              }
+            ],
+            "notes": "The README documents value, first/second derivative and extremum interfaces, plus linear behavior outside the data range. Endpoint and extrapolation behavior have not been independently checked.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:christiansteger/grid_interpolation",
+      "local": {
+        "name": "grid_interpolation",
+        "description": "Interpolation between regular grids, scattered points and triangular meshes.",
+        "repository": {
+          "host": "github",
+          "owner": "ChristianSteger",
+          "name": "grid_interpolation",
+          "url": "https://github.com/ChristianSteger/grid_interpolation"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-f2py"
+        ],
+        "topics": [
+          "interpolation",
+          "barycentric",
+          "inverse-distance-weighting",
+          "bilinear"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "8d46f927432837cb379a2caa4d2eeb0b28ebadae",
+            "evidence": [
+              {
+                "url": "https://github.com/ChristianSteger/grid_interpolation/blob/8d46f927432837cb379a2caa4d2eeb0b28ebadae/README.md",
+                "path": "README.md",
+                "sha256": "91816573dfc92cfe3a2e06730110805726bafc49fecb6205e51c17f0d7c6b4d5"
+              }
+            ],
+            "notes": "The README separates inverse-distance weighting, triangle barycentric interpolation and bilinear interpolation. Its example shows larger boundary deviations; these methods are not treated as interchangeable or uniformly accurate.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:kernelyze/kernelyze-base",
+      "local": {
+        "name": "KernelyzeBase",
+        "description": "Low-rank approximation of bivariate kernel functions.",
+        "repository": {
+          "host": "github",
+          "owner": "kernelyze",
+          "name": "kernelyze-base",
+          "url": "https://github.com/kernelyze/kernelyze-base"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "approximation",
+          "low-rank",
+          "kernel-functions"
+        ],
+        "classifications": [
+          {
+            "code": "K",
+            "level": "documentation-reviewed",
+            "revision": "01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7",
+            "evidence": [
+              {
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/README.md",
+                "path": "README.md",
+                "sha256": "78ac7e8da99f548094b44732f8da3e7e7ec0685fa951fc08b8274c070de297a6"
+              }
+            ],
+            "notes": "The README describes separable rank-reduced representations and sign-regular kernels. Optimality and comparative error claims are author statements; the entry is classified as approximation rather than a generic interpolation solver.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jlm785/polynomial_interpolation",
+      "local": {
+        "name": "polynomial_interpolation",
+        "description": "Lagrange interpolation with derivative estimates and an interpolation-quality indicator.",
+        "repository": {
+          "host": "github",
+          "owner": "jlm785",
+          "name": "polynomial_interpolation",
+          "url": "https://github.com/jlm785/polynomial_interpolation"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "lagrange",
+          "derivatives",
+          "error-estimation"
+        ],
+        "classifications": [
+          {
+            "code": "E1a",
+            "level": "documentation-reviewed",
+            "revision": "5147f4797ce8f7278bcc34e8b1147f45e5283357",
+            "evidence": [
+              {
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/README.md",
+                "path": "README.md",
+                "sha256": "777bc715b2ede1511cc9fc465d1929335f5c3c87a3ffc9c9fb195ab47076575b"
+              }
+            ],
+            "notes": "The README documents arbitrary data points and an auxiliary grid-to-grid interpolation routine. An error indicator is not described as a rigorously certified error bound.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:brodeau/sosie",
+      "local": {
+        "name": "SOSIE",
+        "description": "Interpolation of scalar and vector fields between geophysical grids.",
+        "repository": {
+          "host": "github",
+          "owner": "brodeau",
+          "name": "sosie",
+          "url": "https://github.com/brodeau/sosie"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "interpolation",
+          "regridding",
+          "geophysical-data",
+          "netcdf"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "f59113007c8d546249936d3b06cd7d70b248028d",
+            "evidence": [
+              {
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/README.md",
+                "path": "README.md",
+                "sha256": "be5e747e8d530e67b120bfb1a96e3b618fc7e05777b75c160b9ab5afe2815492"
+              }
+            ],
+            "notes": "The README distinguishes scalar/vector interpolation and vector-component correction, with netCDF Fortran dependencies. The vector correction executable has a documented default ORCA-grid restriction.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ahbarnett/spharm-interp",
+      "local": {
+        "name": "spharm-interp",
+        "description": "Scattered-data fitting and interpolation on the sphere using spherical harmonic expansions.",
+        "repository": {
+          "host": "github",
+          "owner": "ahbarnett",
+          "name": "spharm-interp",
+          "url": "https://github.com/ahbarnett/spharm-interp"
+        },
+        "languages": [
+          "Fortran",
+          "MATLAB"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "interpolation",
+          "spherical-harmonics",
+          "scattered-data",
+          "least-squares"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320",
+            "evidence": [
+              {
+                "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/README.md",
+                "path": "README.md",
+                "sha256": "06035e51529c596fe108a52086e14da6d39473b9f4923e1f3831ef476cdc7145"
+              }
+            ],
+            "notes": "The README describes least-squares fitting followed by expansion evaluation. Drivers use MATLAB/Octave with Fortran MEX kernels; author demonstration errors are not catalog-verified results.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jlm785/spline_interpolation_fortran",
+      "local": {
+        "name": "spline_interpolation_fortran",
+        "description": "Modernized Fortran spline routines originating with Rondall E. Jones.",
+        "repository": {
+          "host": "github",
+          "owner": "jlm785",
+          "name": "spline_interpolation_fortran",
+          "url": "https://github.com/jlm785/spline_interpolation_fortran"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "splines",
+          "legacy-modernization"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "f6068b941876e9df2930eeae60017a5e9491780b",
+            "evidence": [
+              {
+                "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/README.md",
+                "path": "README.md",
+                "sha256": "42a5f1410fcd11eccac47f839435705a231c12439522800a5a68c1dbfde72399"
+              }
+            ],
+            "notes": "The brief README identifies the source lineage and Fortran 90 adaptation. Dimensionality, boundary options and derivative interfaces are left unclassified pending more detailed review.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:dongli/sprint",
+      "local": {
+        "name": "SPRINT",
+        "description": "Grid interpolation with bilinear interpolator interfaces and cached point weights.",
+        "repository": {
+          "host": "github",
+          "owner": "dongli",
+          "name": "sprint",
+          "url": "https://github.com/dongli/sprint"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "bilinear",
+          "curvilinear-grids"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "d43846f34cdb7e6960651830b1e18317d5afff3f",
+            "evidence": [
+              {
+                "url": "https://github.com/dongli/sprint/blob/d43846f34cdb7e6960651830b1e18317d5afff3f/src/bilinear_interpolator_mod.F90",
+                "path": "src/bilinear_interpolator_mod.F90",
+                "sha256": "04dffa46edbba02320b522ecb988b59fbc7574180f708fefea5b1ad9be427335"
+              }
+            ],
+            "notes": "The inspected source interface identifies regular and curvilinear grids and cached weights. Periodic boundary handling is explicitly a TODO; source-interface inspection is not a full implementation or numerical review.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:underworldcode/stripy",
+      "local": {
+        "name": "Stripy",
+        "description": "Python interfaces to Fortran planar/spherical triangulation and interpolation libraries.",
+        "repository": {
+          "host": "github",
+          "owner": "underworldcode",
+          "name": "stripy",
+          "url": "https://github.com/underworldcode/stripy"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "triangulation",
+          "interpolation",
+          "spherical-grids",
+          "computational-geometry"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "f87add7efe4db23165d820bfb5394c83596c18da",
+            "evidence": [
+              {
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/README.md",
+                "path": "README.md",
+                "sha256": "91e5e6fe296db7e63fc0d7d9d0781bad005995ca19d01e9ab4dd8402f8e1fdd9"
+              }
+            ],
+            "notes": "The README identifies TRIPACK/STRIPACK triangulation and SRFPACK/SSRFPACK interpolation/derivatives. These are Python-facing interfaces with Fortran kernels, not a standalone Python-free Fortran API.",
+            "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "f87add7efe4db23165d820bfb5394c83596c18da",
+            "evidence": [
+              {
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/README.md",
+                "path": "README.md",
+                "sha256": "91e5e6fe296db7e63fc0d7d9d0781bad005995ca19d01e9ab4dd8402f8e1fdd9"
+              }
+            ],
+            "notes": "The README identifies TRIPACK/STRIPACK triangulation and SRFPACK/SSRFPACK interpolation/derivatives. These are Python-facing interfaces with Fortran kernels, not a standalone Python-free Fortran API.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:savostyanov/ttcross",
+      "local": {
+        "name": "ttcross",
+        "description": "Tensor-train cross approximation with high-dimensional integration experiments.",
+        "repository": {
+          "host": "github",
+          "owner": "savostyanov",
+          "name": "ttcross",
+          "url": "https://github.com/savostyanov/ttcross"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "tensor-trains",
+          "low-rank",
+          "approximation",
+          "multidimensional-quadrature"
+        ],
+        "classifications": [
+          {
+            "code": "K",
+            "level": "documentation-reviewed",
+            "revision": "9254e826fd9b49fadba70519fc6a3b7ff4348b44",
+            "evidence": [
+              {
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/README.md",
+                "path": "README.md",
+                "sha256": "973e2eb77181272e542c6ed7be51258af71d356bb77f78c3e95382274d6b0e29"
+              }
+            ],
+            "notes": "The README documents tensor cross interpolation and separate MC/QMC/cross-integration experiments. Approximation and integration are distinct capabilities; no universal convergence or accuracy claim is made.",
+            "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2b",
+            "level": "documentation-reviewed",
+            "revision": "9254e826fd9b49fadba70519fc6a3b7ff4348b44",
+            "evidence": [
+              {
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/README.md",
+                "path": "README.md",
+                "sha256": "973e2eb77181272e542c6ed7be51258af71d356bb77f78c3e95382274d6b0e29"
+              }
+            ],
+            "notes": "The README documents tensor cross interpolation and separate MC/QMC/cross-integration experiments. Approximation and integration are distinct capabilities; no universal convergence or accuracy claim is made.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:mpimd-csc/flexiblas",
+      "local": {
+        "name": "FlexiBLAS",
+        "description": "BLAS/LAPACK wrapper with runtime-switchable numerical backends.",
+        "repository": {
+          "host": "github",
+          "owner": "mpimd-csc",
+          "name": "flexiblas",
+          "url": "https://github.com/mpimd-csc/flexiblas"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [],
+        "topics": [
+          "blas",
+          "lapack",
+          "linear-algebra",
+          "backend-selection"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "caaf9124abd735f393b2c96935138e55066d83e8",
+            "evidence": [
+              {
+                "url": "https://github.com/mpimd-csc/flexiblas/blob/caaf9124abd735f393b2c96935138e55066d83e8/README.md",
+                "path": "README.md",
+                "sha256": "e313a9eceafc9bdc39f7e943c7cba24ce6aa1b86c787c58a9a4fb13479bb84e9"
+              }
+            ],
+            "notes": "The README describes exchanging implementations without relinking and profiling support. This is backend infrastructure, not an independent implementation of every BLAS/LAPACK numerical algorithm.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ivan-pi/fortran_lsp",
+      "local": {
+        "name": "Fortran Least Squares Problems",
+        "description": "Lawson-Hanson least-squares routines including nonnegative and bounded-variable problems.",
+        "repository": {
+          "host": "github",
+          "owner": "ivan-pi",
+          "name": "fortran_lsp",
+          "url": "https://github.com/ivan-pi/fortran_lsp"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "least-squares",
+          "nonnegative-least-squares",
+          "bounded-least-squares"
+        ],
+        "classifications": [
+          {
+            "code": "D9",
+            "level": "documentation-reviewed",
+            "revision": "b8f44aba027093be485556e3cebd409c17050e82",
+            "evidence": [
+              {
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/README.md",
+                "path": "README.md",
+                "sha256": "8b3e3d6a289659d368c5af70eba8b091c2c6efda9d6cbd245751bea569fead8e"
+              }
+            ],
+            "notes": "The README documents HFTI, NNLS, BVLS and related routines and modern interfaces. Additional SVD/rotation utilities are noted but not all mapped to separate classes in this review.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cometscome/fortran_csr",
+      "local": {
+        "name": "fortran_csr",
+        "description": "Fortran compressed-sparse-row matrix construction and matrix-vector operations.",
+        "repository": {
+          "host": "github",
+          "owner": "cometscome",
+          "name": "fortran_csr",
+          "url": "https://github.com/cometscome/fortran_csr"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "sparse-matrices",
+          "csr",
+          "matrix-vector-products"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "0cbc34d368d4c2a563e5726719feba0c0efc1645",
+            "evidence": [
+              {
+                "url": "https://github.com/cometscome/fortran_csr/blob/0cbc34d368d4c2a563e5726719feba0c0efc1645/README.md",
+                "path": "README.md",
+                "sha256": "9b10ea5a080594bf44bb32c5929b7182e8786163c9e3892f132b9e2543e18cc4"
+              }
+            ],
+            "notes": "The README supplies complex CSR examples and an optional MKL build flag. Matrix storage and multiplication are not treated as evidence of a sparse linear-system solver.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nvidia/eigensolver_gpu",
+      "local": {
+        "name": "Eigensolver_gpu",
+        "description": "GPU generalized symmetric/Hermitian-definite eigensolver prototype for Quantum ESPRESSO.",
+        "repository": {
+          "host": "github",
+          "owner": "NVIDIA",
+          "name": "Eigensolver_gpu",
+          "url": "https://github.com/NVIDIA/Eigensolver_gpu"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "eigenvalues",
+          "generalized-eigenproblems",
+          "gpu",
+          "cuda"
+        ],
+        "classifications": [
+          {
+            "code": "D4",
+            "level": "documentation-reviewed",
+            "revision": "7c6d9f64b70f359cf79b57d738a697680cf23102",
+            "evidence": [
+              {
+                "url": "https://github.com/NVIDIA/Eigensolver_gpu/blob/7c6d9f64b70f359cf79b57d738a697680cf23102/README.md",
+                "path": "README.md",
+                "sha256": "f606cdf990fda4cb9d93dde12f53ee1ea38ec3efc9bf97183c2eac945066e67a"
+              }
+            ],
+            "notes": "The README restricts the solver to ITYPE=1, eigenvectors, an index-selected range and upper-triangle storage with positive-definite B. It requires the documented PGI/CUDA numerical libraries; general LAPACK configuration coverage is not claimed.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:neutrinomuon/pyintegral",
+      "local": {
+        "name": "PyIntegral",
+        "description": "Fortran numerical integration of tabulated arrays and functions with Python interfaces.",
+        "repository": {
+          "host": "github",
+          "owner": "neutrinomuon",
+          "name": "PyIntegral",
+          "url": "https://github.com/neutrinomuon/PyIntegral"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "quadrature",
+          "trapezoidal-rule",
+          "simpson-rule",
+          "gauss-legendre",
+          "integralall"
+        ],
+        "classifications": [
+          {
+            "code": "H2a",
+            "level": "documentation-reviewed",
+            "revision": "bab28287f29298c701e4c8bbc7d881f62c97fd4a",
+            "evidence": [
+              {
+                "url": "https://github.com/neutrinomuon/PyIntegral/blob/bab28287f29298c701e4c8bbc7d881f62c97fd4a/README.md",
+                "path": "README.md",
+                "sha256": "7ac78110fedbf06801d9a0efb1f6182caa8f7a28d1e8a8e0e3fadf7aae3db7a2"
+              }
+            ],
+            "notes": "The reviewed README lists trapezoidal, Simpson and Gaussian methods. The repository formerly listed as IntegralALL now resolves to PyIntegral; the catalog uses the current canonical repository identity.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/neutrinomuon/IntegralALL"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:hugomvale/daskr",
+      "local": {
+        "name": "DASKR modernization",
+        "description": "Differential-algebraic integration with event/root detection and direct or Krylov linear solves.",
+        "repository": {
+          "host": "github",
+          "owner": "HugoMVale",
+          "name": "daskr",
+          "url": "https://github.com/HugoMVale/daskr"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm",
+          "meson"
+        ],
+        "topics": [
+          "differential-algebraic-equations",
+          "dae",
+          "implicit-integration",
+          "event-detection"
+        ],
+        "classifications": [
+          {
+            "code": "I1",
+            "level": "documentation-reviewed",
+            "revision": "056a1ffabfa7668d76702f8d4b9094e0a5e08671",
+            "evidence": [
+              {
+                "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/README.md",
+                "path": "README.md",
+                "sha256": "11a057c88caf52b24955b297e04c19d71d6a0c13453012a5104b12ee374a0a28"
+              }
+            ],
+            "notes": "The README specifies G(t,y,ydot)=0 and says modernization of the library is still in progress. Root detection during integration is not classified as a standalone general nonlinear-system solver.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cbcoutinho/generic_rk",
+      "local": {
+        "name": "generic_rk",
+        "description": "Modular Runge-Kutta ODE integration with adaptive-timestep examples.",
+        "repository": {
+          "host": "github",
+          "owner": "cbcoutinho",
+          "name": "generic_rk",
+          "url": "https://github.com/cbcoutinho/generic_rk"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "ode",
+          "runge-kutta",
+          "adaptive-timestepping"
+        ],
+        "classifications": [
+          {
+            "code": "I1a",
+            "level": "documentation-reviewed",
+            "revision": "eebf44cc47e9f62adf19c093d59479afda1b88ce",
+            "evidence": [
+              {
+                "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/README.md",
+                "path": "README.md",
+                "sha256": "13a8e404dfe38e25030e4c349b96a2d09c9e41de4ad0205fa8cc73114d553fef"
+              }
+            ],
+            "notes": "The brief README describes modular ODE solvers and a Brusselator initial-value example. Method inventory, stiffness handling and error-control guarantees need source review.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jacobwilliams/rksuite",
+      "local": {
+        "name": "RKSUITE",
+        "description": "Runge-Kutta software for first-order ODE initial-value systems.",
+        "repository": {
+          "host": "github",
+          "owner": "jacobwilliams",
+          "name": "rksuite",
+          "url": "https://github.com/jacobwilliams/rksuite"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "ode",
+          "runge-kutta",
+          "initial-value-problems"
+        ],
+        "classifications": [
+          {
+            "code": "I1a",
+            "level": "documentation-reviewed",
+            "revision": "3adda0cb876b2cc0610eed9a5a789101e4203885",
+            "evidence": [
+              {
+                "url": "https://github.com/jacobwilliams/rksuite/blob/3adda0cb876b2cc0610eed9a5a789101e4203885/readme.txt",
+                "path": "readme.txt",
+                "sha256": "664e24643eb4e27d80216b393eb76e14c8d2b3d774399f3ce30d1e2d46df1284"
+              }
+            ],
+            "notes": "The original RKSUITE README documents the intended initial-value problem class. This pinned distribution is not assumed to have every modernization or compiler adaptation found in other forks.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jonasbreuling/dae4py",
+      "local": {
+        "name": "dae4py",
+        "description": "Python differential-algebraic solvers and wrappers for legacy Fortran integrators.",
+        "repository": {
+          "host": "github",
+          "owner": "JonasBreuling",
+          "name": "dae4py",
+          "url": "https://github.com/JonasBreuling/dae4py"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "differential-algebraic-equations",
+          "dae",
+          "radau",
+          "bdf"
+        ],
+        "classifications": [
+          {
+            "code": "I1",
+            "level": "documentation-reviewed",
+            "revision": "aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b",
+            "evidence": [
+              {
+                "url": "https://github.com/JonasBreuling/dae4py/blob/aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b/README.md",
+                "path": "README.md",
+                "sha256": "00d396a699f65550accebfea69fecbecb17b2a31b6303ea2eff518b485b30f8c"
+              }
+            ],
+            "notes": "The README distinguishes Python implementations and Fortran wrappers. DASKR and DASPK wrappers are marked not implemented yet; they are not advertised as existing functionality.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ralna/galahad",
+      "local": {
+        "name": "GALAHAD",
+        "description": "Modern Fortran optimization packages for constrained/unconstrained, linear/quadratic and least-squares problems.",
+        "repository": {
+          "host": "github",
+          "owner": "ralna",
+          "name": "GALAHAD",
+          "url": "https://github.com/ralna/GALAHAD"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "meson"
+        ],
+        "topics": [
+          "optimization",
+          "nonlinear-programming",
+          "quadratic-programming",
+          "least-squares"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "4275b98e4fdf9af1141d302f04ef944bcda23d32",
+            "evidence": [
+              {
+                "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/README.md",
+                "path": "README.md",
+                "sha256": "28fcb6f820d204402e4f9d4e6ff7b73d4ac065e2e219705d82a5f691f6f00f9a"
+              }
+            ],
+            "notes": "The README documents a broad collection and several language interfaces. Individual algorithms, optional linear solvers and problem subclasses need their own procedure reviews; availability of a release binary is not catalog verification.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jacobwilliams/dfo",
+      "local": {
+        "name": "DFO",
+        "description": "Derivative-free nonlinear optimization for relatively small expensive black-box problems.",
+        "repository": {
+          "host": "github",
+          "owner": "jacobwilliams",
+          "name": "dfo",
+          "url": "https://github.com/jacobwilliams/dfo"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "black-box",
+          "trust-region"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "b44e41bfdcb4d71838e2cd194f6201543b9dfbe9",
+            "evidence": [
+              {
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/README.md",
+                "path": "README.md",
+                "sha256": "ef22eb3456230c059b1828efaf70a7f98d5fcc802d288158f8eba48bd11efbf0"
+              }
+            ],
+            "notes": "The README targets fewer than roughly 100 variables and functions without efficiently available derivatives. This is the stated intended scale, not a tested hard limit or a claim of large-scale/global optimization capability.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:raullaasner/gadfit",
+      "local": {
+        "name": "GADfit",
+        "description": "Joint nonlinear curve fitting with shared parameters and automatic differentiation.",
+        "repository": {
+          "host": "github",
+          "owner": "raullaasner",
+          "name": "gadfit",
+          "url": "https://github.com/raullaasner/gadfit"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "nonlinear-least-squares",
+          "curve-fitting",
+          "automatic-differentiation"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "2f2e6b771290ad87f56a5ebf00fc8df6c9bca367",
+            "evidence": [
+              {
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/README.md",
+                "path": "README.md",
+                "sha256": "4a2d62b158bcb6143c8e53ac1bc67508a2fadb91dd25b5fa83d615022c8c0d10"
+              }
+            ],
+            "notes": "The README explicitly uses global fitting to mean fitting multiple datasets with shared parameters. It does not establish guaranteed global-minimum optimization; modified Levenberg-Marquardt is the documented fitting method.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:afniedermayer/fast_critical_line_algorithm",
+      "local": {
+        "name": "Fast Critical Line Algorithm",
+        "description": "Fortran implementation of Markowitz critical-line portfolio optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "afniedermayer",
+          "name": "fast_critical_line_algorithm",
+          "url": "https://github.com/afniedermayer/fast_critical_line_algorithm"
+        },
+        "languages": [
+          "Fortran",
+          "MATLAB"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "portfolio-optimization",
+          "critical-line-algorithm"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "de858ea58ce159feccf2a9d2f7b2072ed100fc1f",
+            "evidence": [
+              {
+                "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/README.md",
+                "path": "README.md",
+                "sha256": "adddc68664b16e384e1c4a1dceb00c6e4cea68873b88ad38d67d4da9963b3c77"
+              }
+            ],
+            "notes": "The README identifies historical MATLAB/Python bindings and explicitly warns that MEX tricks require adaptation for 64-bit systems. No modern MATLAB or compiler compatibility is implied.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nwukie/chidg",
+      "local": {
+        "name": "ChiDG",
+        "description": "Discontinuous Galerkin PDE framework with overset grids and implicit solution methods.",
+        "repository": {
+          "host": "github",
+          "owner": "nwukie",
+          "name": "ChiDG",
+          "url": "https://github.com/nwukie/ChiDG"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "discontinuous-galerkin",
+          "overset-grids"
+        ],
+        "classifications": [
+          {
+            "code": "I2",
+            "level": "documentation-reviewed",
+            "revision": "d096548ba3bd0a338a29f522fb00a669f0e33e9b",
+            "evidence": [
+              {
+                "url": "https://github.com/nwukie/ChiDG/blob/d096548ba3bd0a338a29f522fb00a669f0e33e9b/README.md",
+                "path": "README.md",
+                "sha256": "f83fba788190c388d7bc85fdd6744cb1b877f5bcf2bae82fab7ab1f7e86e698b"
+              }
+            ],
+            "notes": "The README lists time integrators, nonlinear/linear solvers and aerodynamics examples. It calls the project a prerelease and notes missing overset hole cutting; no complete CFD feature set is assumed.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:benmql/coral",
+      "local": {
+        "name": "Coral",
+        "description": "Spectral PDE solver for plane-layer geometries with text-defined equations.",
+        "repository": {
+          "host": "github",
+          "owner": "BenMql",
+          "name": "coral",
+          "url": "https://github.com/BenMql/coral"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "spectral-methods",
+          "plane-layer-geometry"
+        ],
+        "classifications": [
+          {
+            "code": "I2",
+            "level": "documentation-reviewed",
+            "revision": "e49784d9cc9751ef9a26881a8c22b54d45c2bfa3",
+            "evidence": [
+              {
+                "url": "https://github.com/BenMql/coral/blob/e49784d9cc9751ef9a26881a8c22b54d45c2bfa3/README.md",
+                "path": "README.md",
+                "sha256": "62e2c6a5fcc30bec094c2fe4fff20e5c685ebd3056288c29972fed5265e9bb91"
+              }
+            ],
+            "notes": "The README describes the geometry and equation-input mechanism. Large-grid scalability and user-friendliness are author statements, not independently reproduced benchmarks.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fortran-foss-programmers/foodie",
+      "local": {
+        "name": "FOODIE",
+        "description": "Object-oriented time integration with explicit, multistep and Runge-Kutta methods.",
+        "repository": {
+          "host": "github",
+          "owner": "Fortran-FOSS-Programmers",
+          "name": "FOODIE",
+          "url": "https://github.com/Fortran-FOSS-Programmers/FOODIE"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm",
+          "fobis"
+        ],
+        "topics": [
+          "ode",
+          "time-integration",
+          "runge-kutta",
+          "multistep-methods"
+        ],
+        "classifications": [
+          {
+            "code": "I1a",
+            "level": "documentation-reviewed",
+            "revision": "52487d49e1b2b47e2f1136e24fc4bc1a37a5001a",
+            "evidence": [
+              {
+                "url": "https://github.com/Fortran-FOSS-Programmers/FOODIE/blob/52487d49e1b2b47e2f1136e24fc4bc1a37a5001a/README.md",
+                "path": "README.md",
+                "sha256": "f5e3c5d49def7be3e476843d60dd24dc4b595ed153abe2c446954149d3037e14"
+              }
+            ],
+            "notes": "The README distinguishes implemented schemes and unfinished families. Time stepping may be used with spatially discretized PDEs; this entry does not imply a complete standalone spatial PDE discretization library.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:sourceryinstitute/morfeus-source",
+      "local": {
+        "name": "MORFEUS",
+        "description": "Modern Fortran PDE framework with finite-volume and finite-difference abstractions.",
+        "repository": {
+          "host": "github",
+          "owner": "sourceryinstitute",
+          "name": "MORFEUS-Source",
+          "url": "https://github.com/sourceryinstitute/MORFEUS-Source"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "finite-volume",
+          "finite-difference",
+          "multiphysics"
+        ],
+        "classifications": [
+          {
+            "code": "I2",
+            "level": "documentation-reviewed",
+            "revision": "38659b1097e89e3dea8f5e7e83acf98bfe6623bd",
+            "evidence": [
+              {
+                "url": "https://github.com/sourceryinstitute/MORFEUS-Source/blob/38659b1097e89e3dea8f5e7e83acf98bfe6623bd/README.md",
+                "path": "README.md",
+                "sha256": "47a75b02ccf16bd7a802217030d7dd9e4f03f1be0b92c63b02cff2942cfdb0b5"
+              }
+            ],
+            "notes": "The README distinguishes finite-volume and less-mature finite-difference approaches and identifies this GitHub repository as a mirror. Particular physics models and compiler configurations are not verified here.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jsspencer/dsfmt_f03_interface",
+      "local": {
+        "name": "dSFMT Fortran 2003 interface",
+        "description": "Fortran interfaces to the C double-precision SIMD-oriented Fast Mersenne Twister generator.",
+        "repository": {
+          "host": "github",
+          "owner": "jsspencer",
+          "name": "dSFMT_F03_interface",
+          "url": "https://github.com/jsspencer/dSFMT_F03_interface"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "random-number-generation",
+          "mersenne-twister",
+          "interoperability"
+        ],
+        "classifications": [
+          {
+            "code": "L6",
+            "level": "documentation-reviewed",
+            "revision": "d691baf1ac458b4719a060d6cd89cf272ea8b538",
+            "evidence": [
+              {
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/README.rst",
+                "path": "README.rst",
+                "sha256": "77afa40769c71728ae9b055dbb113b6a11851d124930c12374c742af88d59f89"
+              }
+            ],
+            "notes": "The README identifies the bundled dSFMT C code, memory-allocation helpers and stream-equivalence tests. Those tests have not been run for this catalog; interface inclusion does not establish independent-stream quality.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:daanvanvugt/sobseq",
+      "local": {
+        "name": "sobseq",
+        "description": "Sobol low-discrepancy sequence generation with continuous and strided traversal.",
+        "repository": {
+          "host": "github",
+          "owner": "DaanVanVugt",
+          "name": "sobseq",
+          "url": "https://github.com/DaanVanVugt/sobseq"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "sobol",
+          "low-discrepancy",
+          "quasi-monte-carlo"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "0f53525f14ddb7b51d2268be06a0ee3be613c2d6",
+            "evidence": [
+              {
+                "url": "https://github.com/DaanVanVugt/sobseq/blob/0f53525f14ddb7b51d2268be06a0ee3be613c2d6/README.md",
+                "path": "README.md",
+                "sha256": "00aed6935dcc57d8a5f124fcd56ce277e11ce2adb22fe160336e883fb5eebb6a"
+              }
+            ],
+            "notes": "The README documents direction-number initialization and strided generation. This is a deterministic low-discrepancy sequence, not a source of independent pseudorandom variates; no quadrature accuracy guarantee is inferred.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cottereau/randomfield",
+      "local": {
+        "name": "Random Fields Generation Library",
+        "description": "Spectral generation of random fields with prescribed marginal distributions and correlation structure.",
+        "repository": {
+          "host": "github",
+          "owner": "cottereau",
+          "name": "randomField",
+          "url": "https://github.com/cottereau/randomField"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "random-fields",
+          "stochastic-simulation",
+          "spectral-representation"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3",
+            "evidence": [
+              {
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/README.md",
+                "path": "README.md",
+                "sha256": "1e9b329d6e37de824df09e3b4fe52b8c79ade7a93d4025c70acd3ff0c7589997"
+              }
+            ],
+            "notes": "The README describes a spectral method and MPI/HDF5 build dependencies. Supported marginal/correlation combinations and statistical properties require separate tests.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:tranqv/mittag-leffler-function-and-its-derivative",
+      "local": {
+        "name": "Mittag-Leffler function and derivative",
+        "description": "Fortran evaluation of the Mittag-Leffler function and its derivative.",
+        "repository": {
+          "host": "github",
+          "owner": "tranqv",
+          "name": "Mittag-Leffler-function-and-its-derivative",
+          "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "shell-scripts"
+        ],
+        "topics": [
+          "special-functions",
+          "mittag-leffler",
+          "derivatives"
+        ],
+        "classifications": [
+          {
+            "code": "C19",
+            "level": "documentation-reviewed",
+            "revision": "54195cb599c9f5018a9fc912dc3fb31f5dfb2800",
+            "evidence": [
+              {
+                "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative/blob/54195cb599c9f5018a9fc912dc3fb31f5dfb2800/README.md",
+                "path": "README.md",
+                "sha256": "865fee3a4a99a40bc37f76156be34345cc01988c6f743fa615035ae4ff00f3d3"
+              }
+            ],
+            "notes": "The README identifies a translation of Garrappa MATLAB code and reference-data cases generated with the FM package. The author test corpus is not a catalog-verified driver or an independently reproduced accuracy result.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:b3dcmb/s2hat",
+      "local": {
+        "name": "S2HAT",
+        "description": "Parallel spherical-harmonic transforms between sampled maps and harmonic coefficients.",
+        "repository": {
+          "host": "github",
+          "owner": "B3Dcmb",
+          "name": "s2hat",
+          "url": "https://github.com/B3Dcmb/s2hat"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "spherical-harmonic-transform",
+          "integral-transforms",
+          "mpi"
+        ],
+        "classifications": [
+          {
+            "code": "J",
+            "level": "documentation-reviewed",
+            "revision": "985d64da2e2a79c4ef6f97c88e3bc04676fabf8b",
+            "evidence": [
+              {
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/README.md",
+                "path": "README.md",
+                "sha256": "141450ccab78b2a25c9ed7e8a90e22a318fa44be9f4ddfe129e7c98b6e4c5915"
+              },
+              {
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/examples/s2hat_example.f90",
+                "path": "examples/s2hat_example.f90",
+                "sha256": "90fb7e8bf892cb778bcfe7fa0a9e2ecb85c9bedbeafe2cdc7be839d74b149a7d"
+              }
+            ],
+            "notes": "The README documents MPI and FFTW/HEALPix dependencies; the author Fortran example uses map2alm/alm2map interfaces. No runtime verification, pixelization coverage or transform-accuracy result is claimed.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:bam-tools/bam",
+      "local": {
+        "name": "BaM",
+        "description": "Bayesian model estimation and prediction using MCMC posterior samples.",
+        "repository": {
+          "host": "github",
+          "owner": "BaM-tools",
+          "name": "BaM",
+          "url": "https://github.com/BaM-tools/BaM"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "bayesian-inference",
+          "mcmc",
+          "uncertainty-quantification",
+          "prediction"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "ea0140002fb06fa16b164e178a9cf71111633257",
+            "evidence": [
+              {
+                "url": "https://github.com/BaM-tools/BaM/blob/ea0140002fb06fa16b164e178a9cf71111633257/README.md",
+                "path": "README.md",
+                "sha256": "c2209b358da82a741953a6ba797260fa1a596fac1596825e1f32e7ace8b25dea"
+              }
+            ],
+            "notes": "The README documents a configuration-file-driven computational engine, optional R interface and dependencies on BMSL/miniDMSL. Configuration documentation is described as incomplete; no model-family or convergence guarantees are inferred.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:benrenard/bmsl",
+      "local": {
+        "name": "BMSL",
+        "description": "Mathematical and statistical utilities for environmental and hydrological applications.",
+        "repository": {
+          "host": "github",
+          "owner": "benRenard",
+          "name": "BMSL",
+          "url": "https://github.com/benRenard/BMSL"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "statistics",
+          "probability-distributions",
+          "hydrology"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3",
+            "evidence": [
+              {
+                "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/README.md",
+                "path": "README.md",
+                "sha256": "797a8fcd0afddb5787f3c316f68a11441919bdb9c7dc9a18963e87fa92834623"
+              },
+              {
+                "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/src/Distribution_tools.f90",
+                "path": "src/Distribution_tools.f90",
+                "sha256": "29ce8f06c2c662bac68434087f4659e75223a39dc495ff713b65a7215cb1809c"
+              }
+            ],
+            "notes": "The README gives the library scope; Distribution_tools source documentation lists density, distribution, quantile, moment and sampling interfaces. Its parameterization uses standard deviations/scales rather than variance/squared-scale conventions in DMSL; individual routines remain unchecked.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gfell/gf_solver",
+      "local": {
+        "name": "gfsolver",
+        "description": "Hybrid Newton-bisection root finding for scalar functions.",
+        "repository": {
+          "host": "github",
+          "owner": "gfell",
+          "name": "gf_solver",
+          "url": "https://github.com/gfell/gf_solver"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "root-finding",
+          "newton-method",
+          "bisection"
+        ],
+        "classifications": [
+          {
+            "code": "F1",
+            "level": "documentation-reviewed",
+            "revision": "0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432",
+            "evidence": [
+              {
+                "url": "https://github.com/gfell/gf_solver/blob/0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432/README.md",
+                "path": "README.md",
+                "sha256": "b6e0fbf261e47ba87fd213d044ea5b8a7859acc5d5a231f887cc2533ea522c13"
+              }
+            ],
+            "notes": "The brief README describes switching from basic Newton to a hybrid method after the iteration limit. Bracketing conditions, derivative callbacks and failure handling need further review.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:bryand4140/fortran-roots",
+      "local": {
+        "name": "FORTRAN-Roots",
+        "description": "Root finding for scalar functions and real/complex roots of polynomials.",
+        "repository": {
+          "host": "github",
+          "owner": "bryand4140",
+          "name": "FORTRAN-Roots",
+          "url": "https://github.com/bryand4140/FORTRAN-Roots"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make",
+          "fpm"
+        ],
+        "topics": [
+          "root-finding",
+          "polynomial-roots",
+          "scalar-equations"
+        ],
+        "classifications": [
+          {
+            "code": "F1",
+            "level": "documentation-reviewed",
+            "revision": "0a145fc5da74b021faf3b8576ac499e54025e439",
+            "evidence": [
+              {
+                "url": "https://github.com/bryand4140/FORTRAN-Roots/blob/0a145fc5da74b021faf3b8576ac499e54025e439/README.md",
+                "path": "README.md",
+                "sha256": "f447a9ea105ab8ad7b2659eb0ddc0d7f6d5b7fbce5e555844620ce5b5cc07445"
+              }
+            ],
+            "notes": "The README distinguishes a bounded-interval scalar function solver and an nth-degree polynomial-root routine. Author test programs and advertised precision options have not been checked in this catalog.",
+            "reviewed_on": "2026-11-03"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
     }
   ]
 }
