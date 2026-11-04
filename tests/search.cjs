@@ -3,19 +3,25 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const cards = [
-  {dataset:{search:'ffte certik fourier transform',collection:'independent'}},
-  {dataset:{search:'fortran-lapack perazz federico perini linear algebra',collection:'imported'}}
+  {dataset:{search:'ffte certik fourier transform',collection:'independent',fpm:'false'}},
+  {dataset:{search:'fortran-lapack perazz federico perini linear algebra',collection:'imported',fpm:'true'}},
+  {dataset:{search:'independent fpm sorting module',collection:'independent',fpm:'true'}}
 ];
 const query = {value:'',addEventListener:(event,handler)=>query.handler=handler};
 const collection = {value:'',addEventListener:(event,handler)=>collection.handler=handler};
+const excludeFpm = {checked:false,addEventListener:(event,handler)=>excludeFpm.handler=handler};
+const classCount = {dataset:{classCount:'3',withoutFpm:'1'}};
+function anchor(href) { return {getAttribute:()=>href,href}; }
+const links = [anchor('../classes/D/'),anchor('../projects/?keep=yes'),anchor('#content'),
+               anchor('../catalog.json'),anchor('https://example.org/playground/')];
 const matches = {};
 const form = {addEventListener:(event,handler)=>form.handler=handler};
 let saved;
 const context = {
   document: {
     querySelector:()=>form,
-    querySelectorAll:()=>cards,
-    getElementById:id=>({query,collection,matches})[id]
+    querySelectorAll:selector=>({'article[data-search]':cards,'[data-class-count]':[classCount],'a[href]':links})[selector],
+    getElementById:id=>({query,collection,matches,'exclude-fpm':excludeFpm})[id]
   },
   location: {href:'https://example.org/catalog/projects/?q=Federico&collection=imported&keep=yes',
              search:'?q=Federico&collection=imported&keep=yes'},
@@ -25,14 +31,45 @@ const context = {
 vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),context);
 assert.equal(cards[0].hidden,true);
 assert.equal(cards[1].hidden,false);
-assert.equal(matches.textContent,'1 of 2 repositories shown');
+assert.equal(matches.textContent,'1 of 3 repositories shown');
 query.value='FOURIER certik';collection.value='independent';query.handler();
 assert.equal(cards[0].hidden,false);assert.equal(cards[1].hidden,true);
 assert.equal(saved.searchParams.get('keep'),'yes');
 assert.equal(saved.searchParams.get('q'),'FOURIER certik');
 query.value='nonexistent';query.handler();
-assert.equal(matches.textContent,'0 of 2 repositories shown');
+assert.equal(matches.textContent,'0 of 3 repositories shown');
 query.value='';collection.value='';collection.handler();
-assert.equal(matches.textContent,'2 of 2 repositories shown');
+assert.equal(matches.textContent,'3 of 3 repositories shown');
 assert.equal(saved.searchParams.has('q'),false);
-console.log('Search: restored filters, owner names, multiple words, collection and empty results passed.');
+excludeFpm.checked=true;excludeFpm.handler();
+assert.deepEqual(cards.map(c=>c.hidden),[false,true,true]);
+assert.equal(matches.textContent,'1 of 3 repositories shown');
+assert.equal(saved.searchParams.get('exclude_fpm'),'1');
+assert.equal(classCount.textContent,'(1)');
+assert.equal(new URL(links[0].href).searchParams.get('exclude_fpm'),'1');
+assert.equal(new URL(links[1].href).searchParams.get('keep'),'yes');
+assert.equal(links[2].href,'#content');
+assert.equal(links[3].href,'../catalog.json');
+assert.equal(links[4].href,'https://example.org/playground/');
+collection.value='imported';collection.handler();
+assert.equal(matches.textContent,'0 of 3 repositories shown');
+excludeFpm.checked=false;excludeFpm.handler();
+assert.equal(matches.textContent,'1 of 3 repositories shown');
+assert.equal(classCount.textContent,'(3)');
+assert.equal(saved.searchParams.has('exclude_fpm'),false);
+assert.equal(new URL(links[0].href).searchParams.has('exclude_fpm'),false);
+
+// Taxonomy and project pages have the global toggle but no search form.
+const homeToggle={checked:false,addEventListener:(event,handler)=>homeToggle.handler=handler};
+const home={
+  ...context,
+  document:{querySelector:()=>null,
+    querySelectorAll:selector=>({'article[data-search]':[],'[data-class-count]':[classCount],'a[href]':links})[selector],
+    getElementById:id=>id==='exclude-fpm'?homeToggle:null},
+  location:{href:'https://example.org/catalog/?exclude_fpm=1',search:'?exclude_fpm=1'}
+};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),home);
+assert.equal(homeToggle.checked,true);
+assert.equal(classCount.textContent,'(1)');
+assert.equal(new URL(links[0].href).searchParams.get('exclude_fpm'),'1');
+console.log('Search: combined filters, FPM exclusions, taxonomy counts, navigation and restored state passed.');

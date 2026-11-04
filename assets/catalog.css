@@ -23,6 +23,9 @@ label { display:flex; flex-direction:column; gap:.3rem; }
 .search label:first-child { flex:1; min-width:15rem; }
 input,select,button { font:inherit; background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:.3rem; padding:.5rem .7rem; }
 input { width:100%; }
+.build-filter { margin-top:1rem; display:flex; flex-wrap:wrap; align-items:center; gap:.3rem 1rem; }
+.checkbox-label { flex-direction:row; align-items:center; gap:.5rem; }
+.checkbox-label input { width:auto; }
 button,summary { cursor:pointer; }
 details ul { padding-left:1.4rem; }
 code { font-size:.85rem; overflow-wrap:anywhere; }

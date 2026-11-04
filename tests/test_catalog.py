@@ -10,7 +10,7 @@ from urllib.parse import unquote, urlsplit
 
 from catalog import ROOT, assemble, belongs, matching_drivers, read, validate_local
 from vendor.catalog_export import merge_catalog, snapshot_id
-from xbuild import build
+from xbuild import build, supports_fpm
 from xrefresh import refresh
 from xreviews import render
 
@@ -103,6 +103,10 @@ class CatalogTests(unittest.TestCase):
             build(destination)
             index = (destination/'index.html').read_text(encoding='utf-8')
             self.assertIn('<h1>Fortran software by GAMS classification</h1>', index)
+            self.assertIn('id="exclude-fpm"', index)
+            self.assertIn('data-without-fpm=', index)
+            listing = (destination/'projects/index.html').read_text(encoding='utf-8')
+            self.assertEqual(listing.count('data-fpm="true"'), sum(supports_fpm(p) for p in self.projects))
             self.assertTrue((destination/'catalog.json').is_file())
             for page in destination.rglob('index.html'):
                 for url in Links(page.read_text(encoding='utf-8')).urls:
@@ -128,6 +132,13 @@ class CatalogTests(unittest.TestCase):
         for p in self.local['projects']:
             self.assertIn(p['local']['repository']['url'], document)
             self.assertIn(p['local']['classifications'][0]['revision'], document)
+
+    def test_fpm_status_uses_build_metadata_not_import_origin(self):
+        self.assertTrue(supports_fpm({'build_systems': ['cmake', 'FPM']}))
+        self.assertFalse(supports_fpm({'build_systems': ['cmake']}))
+        self.assertFalse(supports_fpm({}))
+        independent_fpm = [p for p in self.projects if not p.get('playground') and supports_fpm(p)]
+        self.assertTrue(independent_fpm)
 
     def test_classification_scope_does_not_turn_support_tools_into_solvers(self):
         records = {p['id']: p['local'] for p in self.local['projects']}

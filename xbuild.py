@@ -27,6 +27,10 @@ def specific_codes(tree, codes):
     return [c for c in codes if not any(c != other and belongs(tree, other, c) for other in codes)]
 
 
+def supports_fpm(project):
+    return any(system.casefold() == 'fpm' for system in project.get('build_systems', []))
+
+
 def build(destination, root=ROOT):
     destination, root = Path(destination), Path(root)
     tree, projects, merged = assemble(root)
@@ -51,7 +55,9 @@ def build(destination, root=ROOT):
 <body><a class="skip" href="#content">Skip to content</a><header>{link(prefix or './', TITLE)}
 <nav>{link(prefix+'projects/', 'Repositories')} · {link(prefix+'review/', 'Review policy')} ·
 {link('https://beliavsky.github.io/fortran-playground/gams/', 'Playground package catalog')} ·
-{link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav></header>
+{link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav>
+<div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
+<span class="muted" id="fpm-filter-help">Repositories with unreviewed build support remain included.</span></div></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
 {link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
@@ -91,15 +97,20 @@ def build(destination, root=ROOT):
             drivers = ''.join('<li>'+link(d['url'], d['gams_code']+' — '+d['name'])+'</li>'
                               for d in matching_drivers(tree, p, code))
             driver_links = '<details><summary>Checked drivers for this scope</summary><ul>'+drivers+'</ul></details>' if drivers else ''
-            cards.append(f'''<article data-search="{e(search.lower())}" data-collection="{collection}">
+            cards.append(f'''<article data-search="{e(search.lower())}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
 <p>{e(p['description'])}</p><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</article>''')
         return controls+''.join(cards)
 
     def class_links(parent, prefix):
         codes = [c for c in tree if tree[c]['parent'] == parent]
-        return '<ul class="classes">'+''.join('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
-                f' <span class="muted">({sum(any(belongs(tree, k, c) for k in p["codes"]) for p in projects)})</span></li>' for c in codes)+'</ul>'
+        rows = []
+        for c in codes:
+            members = [p for p in projects if any(belongs(tree, k, c) for k in p['codes'])]
+            without_fpm = sum(not supports_fpm(p) for p in members)
+            rows.append('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
+                        f' <span class="muted" data-class-count="{len(members)}" data-without-fpm="{without_fpm}">({len(members)})</span></li>')
+        return '<ul class="classes">'+''.join(rows)+'</ul>'
 
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'
          f'<p>{len(projects)} repositories: {sum(bool(p.get("playground")) for p in projects)} imported playground packages and '
