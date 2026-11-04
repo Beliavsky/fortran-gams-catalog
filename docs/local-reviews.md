@@ -973,6 +973,18 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## ACRS
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3. The reviewed Fortran solver header explicitly permits version 3 or any later version; GPL-3.0-or-later records those terms for this solver. Dependencies and separately supplied code require their own review.
+
+Reviewed 2026-11-04 at `a276a7e3a265cc334b70b1e6cbe4738aba462b4a`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[F90_src/ACRS.f90](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90)
+SHA-256 (normalized UTF-8/LF): `a9ad55377332777da9c83a79f1f75034a24130a332b678ebaf24e96a1a4694dd`.
+
 **G — documentation-reviewed**
 
 The README documents the Fortran 90 objective, dimension and bound callbacks, alongside separate C, Python and MATLAB versions. Only bound-constrained scope is assigned; stochastic reliability and global-solution claims were not checked.
@@ -5796,6 +5808,15 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 
 ## Fortran introsort
+
+**License: MIT**
+
+The root MIT license identifies Yuta SUZUKI as copyright holder. This records the reviewed repository license; separately supplied dependencies require their own review.
+
+Reviewed 2026-11-04 at `0907093a66f05f1c59bee70fb82ed9e40924416d`.
+
+[LICENSE](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/LICENSE)
+SHA-256 (normalized UTF-8/LF): `796cacd5170dd9db33716dcaf15394f5411e1db3ebd1d9497250f8fbe5b5cf64`.
 
 **N — documentation-reviewed**
 

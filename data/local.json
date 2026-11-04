@@ -34683,6 +34683,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "a276a7e3a265cc334b70b1e6cbe4738aba462b4a",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3. The reviewed Fortran solver header explicitly permits version 3 or any later version; GPL-3.0-or-later records those terms for this solver. Dependencies and separately supplied code require their own review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "F90_src/ACRS.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90",
+              "sha256": "a9ad55377332777da9c83a79f1f75034a24130a332b678ebaf24e96a1a4694dd"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36521,6 +36540,20 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "0907093a66f05f1c59bee70fb82ed9e40924416d",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root MIT license identifies Yuta SUZUKI as copyright holder. This records the reviewed repository license; separately supplied dependencies require their own review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/LICENSE",
+              "sha256": "796cacd5170dd9db33716dcaf15394f5411e1db3ebd1d9497250f8fbe5b5cf64"
+            }
+          ]
         }
       },
       "imports": {}

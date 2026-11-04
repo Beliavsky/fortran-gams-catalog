@@ -39,6 +39,27 @@ def source_codes(project):
                    for c in p['gams_codes']})
 
 
+def license_html(project, detailed=False):
+    data = project.get('license') or {}
+    label = data.get('spdx_expression') or data.get('label')
+    if not label:
+        return '<p>License: License not yet reviewed.</p>'
+    reviewed = bool(project['local'].get('license'))
+    if label.upper() in ('NOASSERTION', 'NONE', 'UNKNOWN'):
+        label = 'No license identified'
+    evidence = data.get('evidence', []) if reviewed else []
+    result = '<p>License: '+(link(evidence[0]['url'], label) if evidence else e(label))
+    if not reviewed:
+        result += ' <span class="muted">(imported metadata)</span>'
+    result += '</p>'
+    if detailed and reviewed:
+        result += '<p>'+e(data['notes'])+'</p><p>License reviewed '+e(data['reviewed_on'])+' at '+e(data['revision'])+'</p><ul>'
+        result += ''.join('<li>'+link(v['url'],v['path'])+' · SHA-256 <code>'+e(v['sha256'])+'</code></li>' for v in evidence)+'</ul>'
+    elif detailed:
+        result += '<p>The license label comes from the saved playground snapshot; its license files have not been independently reviewed here.</p>'
+    return result
+
+
 def build(destination, root=ROOT):
     destination, root = Path(destination), Path(root)
     tree, projects, merged = assemble(root)
@@ -144,7 +165,7 @@ def build(destination, root=ROOT):
                     prefix+project_path(p), 'Usage and full procedure evidence')+'</p></div>'
             cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
-<p>{e(p['description'])}</p><div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
+<p>{e(p['description'])}</p>{license_html(p)}<div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
 <div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div>{entry_html}</article>''')
         return controls+''.join(cards)
 
@@ -179,6 +200,7 @@ def build(destination, root=ROOT):
         body = '<h1>'+e(p['name'])+'</h1><p class="lede">'+e(p['description'])+'</p>'
         body += '<p>'+link(repo['url'], repo['owner']+'/'+repo['name'])+' · '+e(p['origin'])+'</p>'
         body += '<p>Repository owner: '+e(p['owner_label'])+'</p><p>Build systems: '+e(', '.join(p.get('build_systems', [])) or 'Not yet reviewed')+'</p>'
+        body += license_html(p, detailed=True)
         body += '<p>Topics: '+e(', '.join(p['topics']))+'</p>'
         if any(proc.get('role') for proc in p['procedures']):
             body += '<p><code>module_name::procedure_name</code> identifies a module procedure in this catalog; '

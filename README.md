@@ -30,6 +30,11 @@ declarations. Detail pages distinguish public generics, private helpers,
 callbacks and standalone programs, and include calling sketches or author
 examples where recorded. These are usage references, not new execution checks.
 
+Cards and detail pages also show **License**. Reviewed labels link to license
+evidence at a pinned commit; imported labels are marked as imported metadata.
+Entries without recorded terms say "License not yet reviewed". The review ledger
+records the evidence and scope of independent license reviews.
+
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
 Detailed numerical-method reviews include source-linked

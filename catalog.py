@@ -70,6 +70,21 @@ def validate_local(local, tree):
             if ('github:' + repo['owner'].lower() + '/' + repo['name'].lower() != identity
                     or repo['url'] != 'https://github.com/' + repo['owner'] + '/' + repo['name']):
                 raise ValueError('Repository and canonical identity disagree: ' + identity)
+        license_data = data.get('license')
+        if license_data is not None:
+            if (not isinstance(license_data, dict) or not isinstance(license_data.get('label'), str) or not license_data['label'].strip()
+                    or not re.fullmatch(r'[0-9a-f]{40}', license_data.get('revision', ''))
+                    or not license_data.get('reviewed_on') or not license_data.get('notes')
+                    or not license_data.get('evidence')):
+                raise ValueError('License reviews need a label, pin, date, notes and evidence: ' + identity)
+            expression = license_data.get('spdx_expression')
+            if expression is not None and (not isinstance(expression, str) or not expression.strip()):
+                raise ValueError('Invalid SPDX expression: ' + identity)
+            for evidence in license_data['evidence']:
+                https(evidence['url'])
+                if (not evidence.get('path') or '/blob/'+license_data['revision']+'/' not in evidence['url']
+                        or not re.fullmatch(r'[0-9a-f]{64}', evidence.get('sha256', ''))):
+                    raise ValueError('License evidence needs a pinned file and hash: ' + identity)
         for claim in data.get('classifications', []):
             if claim['code'] not in tree or claim['level'] not in LEVELS:
                 raise ValueError('Unknown class or review level: ' + identity)
@@ -130,7 +145,7 @@ def assemble(root=ROOT):
         imported = layered['imports'].get('fortran-playground', {})
         data = layered['local']
         effective = copy.deepcopy(imported)
-        for key in ('name', 'description', 'repository', 'languages', 'build_systems'):
+        for key in ('name', 'description', 'repository', 'languages', 'build_systems', 'license'):
             if key in data:
                 effective[key] = copy.deepcopy(data[key])
         if not all(effective.get(k) for k in ('name', 'description', 'repository')):

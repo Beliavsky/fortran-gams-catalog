@@ -17,6 +17,14 @@ def render(local):
     for project in projects:
         p = project['local']
         lines.extend(['', '## '+p['name'], ''])
+        if p.get('license'):
+            license_data = p['license']
+            lines.extend(['**License: '+(license_data.get('spdx_expression') or license_data['label'])+'**', '',
+                          license_data['notes'], '',
+                          f'Reviewed {license_data["reviewed_on"]} at `{license_data["revision"]}`.', ''])
+            for evidence in license_data['evidence']:
+                lines.extend([f'[{evidence["path"]}]({evidence["url"]})',
+                              f'SHA-256 (normalized UTF-8/LF): `{evidence["sha256"]}`.', ''])
         for claim in p.get('classifications', []):
             lines.extend([f'**{claim["code"]} — {claim["level"]}**', '', claim['notes'], '',
                           f'Reviewed {claim["reviewed_on"]} at `{claim["revision"]}`.', ''])

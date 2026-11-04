@@ -33,6 +33,24 @@ classification records need code, level, full revision, evidence URL/path/SHA-25
 review date and scope notes. Evidence hashes use UTF-8 text with LF line endings.
 Do not put imported records into this file.
 
+### Licenses
+
+Cards and repository details show **License**, separately from build support and
+compilation status. An imported label is marked as imported metadata; it is not
+an independent license-file review. Unknown imported identifiers such as
+`NOASSERTION` display as "No license identified". With no recorded label, display
+"License not yet reviewed" rather than inferring that no license exists.
+
+A catalog-owned `license` overrides the displayed imported label while preserving
+the imported record. Record `label`, optional `spdx_expression` (or null), full
+`revision`, `reviewed_on`, `notes` describing scope, and `evidence` objects with
+`path`, commit-pinned `url` and normalized UTF-8/LF `sha256`. The label links to
+the first evidence file; details and the Markdown ledger retain all evidence.
+Use an SPDX expression only when the reviewed terms establish it, including
+whether a GPL version is "only" or "or later". Custom/multiple-license cases
+retain descriptive labels and notes. A review of one component does not establish
+the terms for all bundled or external dependencies.
+
 Local descriptions replace imported descriptions. Local topics/classifications are
 added to imported ones. Original imported metadata remains intact in the download.
 Removing an incorrect imported claim requires correcting the publisher; local

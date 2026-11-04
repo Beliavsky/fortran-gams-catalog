@@ -10,7 +10,7 @@ from urllib.parse import unquote, urlsplit
 
 from catalog import ROOT, assemble, belongs, extend_taxonomy, matching_drivers, read, validate_local, procedure_label
 from vendor.catalog_export import merge_catalog, snapshot_id
-from xbuild import build, supports_fpm, source_codes
+from xbuild import build, supports_fpm, source_codes, license_html
 from xrefresh import refresh
 from xreviews import render
 
@@ -134,6 +134,31 @@ class CatalogTests(unittest.TestCase):
                 validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
         self.assertEqual(procedure_label({'module': 'mod_introsort', 'procedure': 'sort'}), 'mod_introsort::sort')
 
+    def test_licenses_distinguish_reviewed_imported_and_unknown_terms(self):
+        acrs = next(p for p in self.projects if p['id'] == 'github:derivativefreelibrary/acrs')
+        self.assertEqual(acrs['license']['spdx_expression'], 'GPL-3.0-or-later')
+        self.assertIn('/blob/'+acrs['license']['revision']+'/LICENSE', license_html(acrs))
+        self.assertNotIn('imported metadata', license_html(acrs))
+        self.assertIn('License not yet reviewed', license_html({'local': {}}))
+        self.assertIn('No license identified', license_html({'local': {}, 'license': {'label': 'NOASSERTION'}}))
+        imported = license_html({'local': {}, 'license': {'label': 'MIT', 'spdx_expression': None}}, detailed=True)
+        self.assertIn('MIT', imported)
+        self.assertIn('imported metadata', imported)
+        self.assertNotIn('<a ', imported)
+        custom = copy.deepcopy(acrs)
+        custom['license']['label'] = 'Custom license'
+        custom['license']['spdx_expression'] = None
+        self.assertIn('Custom license', license_html(custom))
+        original = next(p for p in self.local['projects'] if p['id'] == acrs['id'])
+        for change in ('missing-evidence', 'unpinned-url', 'bad-hash'):
+            record = copy.deepcopy(original)
+            license_data = record['local']['license']
+            if change == 'missing-evidence': license_data['evidence'] = []
+            elif change == 'unpinned-url': license_data['evidence'][0]['url'] = 'https://github.com/DerivativeFreeLibrary/ACRS/blob/main/LICENSE'
+            else: license_data['evidence'][0]['sha256'] = 'unknown'
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
+
     def test_local_taxonomy_extensions_and_procedures_are_searchable(self):
         extension = read(ROOT/'data/gams-extensions.json')
         self.assertTrue(belongs(self.tree, 'G2h3b2', 'G2h3b'))
@@ -190,8 +215,11 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('#L28-L84', acrs)
             self.assertIn('Implementation helper', acrs)
             self.assertIn('Author example: F90_src/main.f90:1', acrs)
+            self.assertIn('License: <a ', acrs)
+            self.assertIn('GPL-3.0-or-later', acrs)
             intro = (destination/'projects/suzuyuyuyu/fortran-introsort/index.html').read_text(encoding='utf-8')
             self.assertIn('mod_introsort::sort', intro)
+            self.assertIn('/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/LICENSE', intro)
             self.assertIn('Calling sketch (not a checked driver)', intro)
             geometry = (destination/'projects/johngardenghi/bglcovering/index.html').read_text(encoding='utf-8')
             self.assertIn('VorCells_Polygons::interCellBall', geometry)
