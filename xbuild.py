@@ -149,7 +149,7 @@ def build(destination, root=ROOT):
          '<li>Local checked driver: a recorded local build and numerical checks verify one problem/configuration.</li>'
          '<li>Hosted checked driver: the playground export links a checked problem-specific example.</li></ul>'
          '<p>Levels apply to individual claims and drivers. They are not a certification of an entire repository.</p><p>'
-         +link('../review-policy.md','Full policy and contribution format')+' · '+link('../local-reviews.md','Initial independent reviews')+'</p>')
+         +link('../review-policy.md','Full policy and contribution format')+' · '+link('../local-reviews.md','Independent reviews')+'</p>')
     return len(projects)
 
 

@@ -3,9 +3,9 @@
 A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
-The initial catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, then adds **six independent non-FPM
-repository reviews**. Counts describe the initial snapshot and change on refresh.
+The saved catalog imports **298 playground packages** and their classifications,
+procedure evidence and checked driver links, alongside **86 independent
+repository reviews**. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
 
@@ -59,10 +59,21 @@ vendored module is unused; builds do not depend on the playground's other tools.
 
 ## Add or review software
 
-See [review policy](docs/review-policy.md), [initial independent reviews](docs/local-reviews.md)
+See [review policy](docs/review-policy.md), [independent reviews](docs/local-reviews.md)
 and [driver requirements](drivers/README.md). Each new classification needs pinned
 evidence and scope notes. Build systems can be Make, CMake, custom scripts or
 unreviewed; FPM compatibility is not an inclusion criterion.
+
+The independent reviews cover differentiation, interpolation, linear algebra,
+multiple precision, nonlinear systems, quadrature, differential equations,
+optimization, random sampling, special functions and time-series methods. Some
+repositories use FPM and others use Make, CMake or other build arrangements.
+They are documentation-reviewed entries, not additional precompiled packages.
+After editing `data/local.json`, regenerate the review ledger:
+
+```powershell
+python xreviews.py
+```
 
 Discovery begins with [Fortran code on GitHub](https://beliavsky.github.io/Fortran-code-on-GitHub/).
 Entries are reviewed before classification; its section headings are not imported

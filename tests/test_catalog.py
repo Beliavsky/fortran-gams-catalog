@@ -12,6 +12,7 @@ from catalog import ROOT, assemble, belongs, matching_drivers, read, validate_lo
 from vendor.catalog_export import merge_catalog, snapshot_id
 from xbuild import build
 from xrefresh import refresh
+from xreviews import render
 
 
 class Links(HTMLParser):
@@ -123,9 +124,19 @@ class CatalogTests(unittest.TestCase):
 
     def test_seed_review_document_matches_catalog_owned_records(self):
         document = (ROOT/'docs/local-reviews.md').read_text(encoding='utf-8')
+        self.assertEqual(document, render(self.local))
         for p in self.local['projects']:
             self.assertIn(p['local']['repository']['url'], document)
             self.assertIn(p['local']['classifications'][0]['revision'], document)
+
+    def test_classification_scope_does_not_turn_support_tools_into_solvers(self):
+        records = {p['id']: p['local'] for p in self.local['projects']}
+        # These distinctions matter to somebody looking for a runnable algorithm.
+        self.assertEqual([c['code'] for c in records['github:ralna/cutest']['classifications']], ['S'])
+        self.assertEqual([c['code'] for c in records['github:imurray/chol-rev']['classifications']], ['H1'])
+        gamma = records['github:ckormanyos/gamma_f77']
+        self.assertIn('real Gamma', gamma['classifications'][0]['notes'])
+        self.assertIn('complex-argument', gamma['classifications'][0]['notes'])
 
     @unittest.skipUnless(shutil.which('node'), 'Optional JavaScript check needs Node.js')
     def test_browser_search_restores_and_combines_filters(self):
