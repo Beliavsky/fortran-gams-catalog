@@ -25,6 +25,11 @@ def render(local):
                               f'SHA-256 (normalized UTF-8/LF): `{evidence["sha256"]}`.', ''])
                 if evidence.get('source_encoding'):
                     lines.extend(['Original document encoding: '+evidence['source_encoding']+'.', ''])
+            for procedure in claim.get('procedures', []):
+                evidence = next(v for v in claim['evidence'] if v['path'] == procedure['path'])
+                start, end = procedure['line_start'], procedure['line_end']
+                lines.extend([f'Procedure `{procedure["procedure"]}`: '
+                              f'[{procedure["path"]}:{start}–{end}]({evidence["url"]}#L{start}-L{end}).', ''])
         if p.get('notes'):
             lines.extend([p['notes'], ''])
         if p.get('discovery'):

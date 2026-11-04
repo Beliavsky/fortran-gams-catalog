@@ -71,7 +71,7 @@ def build(destination, root=ROOT):
         if drivers:
             labels.append(f'{len(drivers)} checked hosted driver(s)')
         if procedures:
-            labels.append('Imported source-reviewed procedure evidence')
+            labels.append('Source-reviewed procedure evidence')
         if local:
             labels.extend(sorted(set(c['level'].replace('-', ' ') for c in local)))
         if not labels:
@@ -142,7 +142,16 @@ def build(destination, root=ROOT):
         for claim in p['local'].get('classifications', []):
             body += '<section><h2>'+e(claim['code']+' — '+claim['level'].replace('-', ' '))+'</h2><p>'+e(claim['notes'])+'</p>'
             body += '<p>Reviewed '+e(claim['reviewed_on'])+' at '+link(repo['url']+'/tree/'+claim['revision'], claim['revision'])+'</p><ul>'
-            body += ''.join('<li>'+link(v['url'], v['path'])+' · SHA-256 <code>'+e(v['sha256'])+'</code></li>' for v in claim['evidence'])+'</ul></section>'
+            body += ''.join('<li>'+link(v['url'], v['path'])+' · SHA-256 <code>'+e(v['sha256'])+'</code></li>' for v in claim['evidence'])+'</ul>'
+            if claim.get('procedures'):
+                body += '<h3>Reviewed procedures and source ranges</h3><ul>'
+                for procedure in claim['procedures']:
+                    evidence = next(v for v in claim['evidence'] if v['path'] == procedure['path'])
+                    start, end = procedure['line_start'], procedure['line_end']
+                    body += '<li><code>'+e(procedure['procedure'])+'</code> — '+link(
+                        evidence['url']+f'#L{start}-L{end}', procedure['path']+f':{start}–{end}')+'</li>'
+                body += '</ul>'
+            body += '</section>'
         if p['local'].get('notes'):
             body += '<p>'+e(p['local']['notes'])+'</p>'
         discovery = p['local'].get('discovery')

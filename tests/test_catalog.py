@@ -8,7 +8,7 @@ import shutil
 import subprocess
 from urllib.parse import unquote, urlsplit
 
-from catalog import ROOT, assemble, belongs, matching_drivers, read, validate_local
+from catalog import ROOT, assemble, belongs, extend_taxonomy, matching_drivers, read, validate_local
 from vendor.catalog_export import merge_catalog, snapshot_id
 from xbuild import build, supports_fpm
 from xrefresh import refresh
@@ -97,6 +97,40 @@ class CatalogTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_local(local, self.tree)
 
+    def test_source_reviews_require_matching_files_and_valid_line_ranges(self):
+        original = next(p for p in self.local['projects'] if p['id'] == 'github:derivativefreelibrary/acrs')
+        claim = next(c for c in original['local']['classifications'] if c['level'] == 'source-reviewed')
+        for change in ('missing', 'wrong-file', 'backwards', 'zero', 'noninteger'):
+            record = copy.deepcopy(original)
+            review = next(c for c in record['local']['classifications'] if c['level'] == 'source-reviewed')
+            if change == 'missing':
+                review.pop('procedures')
+            elif change == 'wrong-file':
+                review['procedures'][0]['path'] = 'unreviewed.f90'
+            elif change == 'backwards':
+                review['procedures'][0]['line_end'] = 1
+            elif change == 'zero':
+                review['procedures'][0]['line_start'] = 0
+            else:
+                review['procedures'][0]['line_start'] = True
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
+        self.assertEqual(claim['code'], 'G2i')
+
+    def test_local_taxonomy_extensions_and_procedures_are_searchable(self):
+        extension = read(ROOT/'data/gams-extensions.json')
+        self.assertTrue(belongs(self.tree, 'G2h3b2', 'G2h3b'))
+        self.assertEqual(extend_taxonomy(self.tree, extension), self.tree)
+        for parent in ('MISSING', 'G2h3b2'):
+            broken = copy.deepcopy(extension)
+            broken['classes']['G2h3b2']['parent'] = parent
+            with self.assertRaises(ValueError):
+                extend_taxonomy(self.tree, broken)
+        acrs = next(p for p in self.projects if p['id'] == 'github:derivativefreelibrary/acrs')
+        self.assertIn('PRICE_BASE_ITERATION', [p['procedure'] for p in acrs['procedures']])
+        self.assertEqual(acrs['drivers'], [])
+        self.assertIn('G2i', acrs['codes'])
+
     def test_generated_pages_have_resolving_relative_links_and_scoped_drivers(self):
         with tempfile.TemporaryDirectory() as folder:
             destination = Path(folder)
@@ -125,6 +159,13 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('documentation reviewed', expokit)
             self.assertIn('Not built or run', expokit)
             self.assertNotIn('<h2>Checked hosted drivers</h2>', expokit)
+            acrs = (destination/'projects/DerivativeFreeLibrary/ACRS/index.html').read_text(encoding='utf-8')
+            self.assertIn('PRICE_BASE_ITERATION', acrs)
+            self.assertIn('#L424-L660', acrs)
+            self.assertIn('source reviewed', acrs)
+            self.assertNotIn('<h2>Checked hosted drivers</h2>', acrs)
+            self.assertIn('price_base_iteration', listing)
+            self.assertTrue((destination/'classes/G2h3b2/index.html').is_file())
 
     def test_seed_review_document_matches_catalog_owned_records(self):
         document = (ROOT/'docs/local-reviews.md').read_text(encoding='utf-8')

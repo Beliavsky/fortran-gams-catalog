@@ -34598,9 +34598,54 @@
             ],
             "notes": "The README documents the Fortran 90 objective, dimension and bound callbacks, alongside separate C, Python and MATLAB versions. Only bound-constrained scope is assigned; stochastic reliability and global-solution claims were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "a276a7e3a265cc334b70b1e6cbe4738aba462b4a",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90",
+                "path": "F90_src/ACRS.f90",
+                "sha256": "a9ad55377332777da9c83a79f1f75034a24130a332b678ebaf24e96a1a4694dd"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90",
+                "path": "F90_src/main.f90",
+                "sha256": "03f885fe1ba55bb11be311bda84a13d9f5523089f259a423e0bec34596f26b87"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ACRS",
+                "path": "F90_src/ACRS.f90",
+                "line_start": 28,
+                "line_end": 134
+              },
+              {
+                "procedure": "ACRS",
+                "path": "F90_src/ACRS.f90",
+                "line_start": 169,
+                "line_end": 283
+              },
+              {
+                "procedure": "PRICE_BASE_ITERATION",
+                "path": "F90_src/ACRS.f90",
+                "line_start": 424,
+                "line_end": 660
+              },
+              {
+                "procedure": "acrs_main / funct_acrs",
+                "path": "F90_src/main.f90",
+                "line_start": 1,
+                "line_end": 43
+              }
+            ],
+            "notes": "The ACRS interface accepts finite lower/upper bounds and an objective-value callback, with no gradient or Hessian callback. Its Price iteration randomly selects working-set points, computes a weighted centroid/reflection, projects onto the box and replaces a worse objective value. G2i describes this global nonconvex search; there is no finer GAMS subclass here. Bounds are restricted by implementation checks (lower bounds must exceed -1e6 and upper bounds must be below 1e16). Termination by objective spread, iteration count or CPU budget does not certify global optimality. The supplied acrs_main/FUNCT_ACRS example is a possible future driver starting point; it was not run.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -34645,9 +34690,66 @@
             ],
             "notes": "The Fortran 90 usage guide documents problem dimension, bounds and objective callbacks. A known global value is optional input, not independently established by this review. Cooling behavior, convergence and example results were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "054c1335805b8f6c3b745f6c8e44b8f71aec468b",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90",
+                "path": "MainGlob.f90",
+                "sha256": "ffd7f7000dc445e3e92278d1a8427a31b743b6d874e9c6ec9e6cf71a3d449e6c"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/lsrch_box.f90",
+                "path": "lsrch_box.f90",
+                "sha256": "f2451722ef7a9bd35affc4ce57f857ba48e2178869e9dea2057e7ba56bc4fa8e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SENZADERGLOB",
+                "path": "MainGlob.f90",
+                "line_start": 51,
+                "line_end": 106
+              },
+              {
+                "procedure": "SENZADERGLOB",
+                "path": "MainGlob.f90",
+                "line_start": 181,
+                "line_end": 199
+              },
+              {
+                "procedure": "SENZADERGLOB",
+                "path": "MainGlob.f90",
+                "line_start": 400,
+                "line_end": 463
+              },
+              {
+                "procedure": "SENZADERGLOB",
+                "path": "MainGlob.f90",
+                "line_start": 520,
+                "line_end": 568
+              },
+              {
+                "procedure": "RICERCA_LUNGO_ASSI",
+                "path": "MainGlob.f90",
+                "line_start": 1139,
+                "line_end": 1190
+              },
+              {
+                "procedure": "linesearchbox_cont",
+                "path": "lsrch_box.f90",
+                "line_start": 1,
+                "line_end": 236
+              }
+            ],
+            "notes": "SENZADERGLOB constructs bounded random trial points and uses an exponential acceptance threshold before derivative-free local searches. RICERCA_LUNGO_ASSI delegates to box-search kernels; linesearchbox_cont enforces bounds and sufficient objective decrease using only function values. This supports global nonconvex optimization (G2i), not a requirement to provide derivatives. The inspected routine is a working-set implementation; its title does not establish an MPI/distributed-memory interface. Evaluation/step limits and comparisons with a supplied fglob are stopping criteria, not proofs of a global minimum. The upstream MAIN_GLOB driver and repeated-run statistics were not executed.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -34692,9 +34794,104 @@
             ],
             "notes": "The usage guide specifies objective, equality and inequality callbacks, initial point and variable bounds. This supports constrained optimization without assuming arbitrary constraint regularity or guaranteed global solutions. Feasibility and termination behavior were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "3776d1d4e71abf371f2f143493ab48cb1affaadc",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90",
+                "path": "DIRDFN.f90",
+                "sha256": "2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4ef0ccbeddb83caaaa"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90",
+                "path": "main_test.f90",
+                "sha256": "5a4215036f0918f10d87ec800d2b25c5af7a37f47784da7e7d0921978c93e374"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dirdfn",
+                "path": "DIRDFN.f90",
+                "line_start": 22,
+                "line_end": 176
+              },
+              {
+                "procedure": "nuovoglobale",
+                "path": "DIRDFN.f90",
+                "line_start": 694,
+                "line_end": 804
+              },
+              {
+                "procedure": "funct_pen / funct_vinc",
+                "path": "DIRDFN.f90",
+                "line_start": 204,
+                "line_end": 264
+              },
+              {
+                "procedure": "main_test",
+                "path": "main_test.f90",
+                "line_start": 1,
+                "line_end": 42
+              }
+            ],
+            "notes": "dirdfn combines a DIRECT-type global partition search with CS-DFN local minimizations. The inspected nuovoglobale block invokes sd_box and subdivides potentially optimal rectangles; objective and feasibility are tracked separately through value-only callbacks. Finite lower and upper bounds are required, as the author driver explicitly warns. This global constrained search maps to the G2i leaf; finite evaluation/interval budgets and a supplied target fglob do not certify a global optimum or feasibility. The author main_test/problem example is available as a future driver candidate, not a checked example.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3b2",
+            "level": "source-reviewed",
+            "revision": "3776d1d4e71abf371f2f143493ab48cb1affaadc",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90",
+                "path": "DFNcon.f90",
+                "sha256": "e5540edcd4b760c148920627c5d5b10521a55aa65b47573b693dfd24579df3c3"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90",
+                "path": "DIRDFN.f90",
+                "sha256": "2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4ef0ccbeddb83caaaa"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/problem.f90",
+                "path": "problem.f90",
+                "sha256": "e68209a1f5da7332d7e43e7e34a1547a9b44aa147df2874ff81e97e36815bd4e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sd_box",
+                "path": "DFNcon.f90",
+                "line_start": 1,
+                "line_end": 155
+              },
+              {
+                "procedure": "sd_box",
+                "path": "DFNcon.f90",
+                "line_start": 183,
+                "line_end": 245
+              },
+              {
+                "procedure": "funct_pen / funct_vinc",
+                "path": "DIRDFN.f90",
+                "line_start": 204,
+                "line_end": 264
+              },
+              {
+                "procedure": "fconstreq / fconstrin",
+                "path": "problem.f90",
+                "line_start": 43,
+                "line_end": 78
+              }
+            ],
+            "notes": "The local sd_box implementation is explicitly CS-DFN for nonsmooth nonlinear programming. It uses coordinate/dense search directions and value-only objective/constraint evaluation, while funct_pen adds positive inequality violations and absolute equality violations. funct_vinc calls both fconstrin and fconstreq. This supports G2h3b2, the leaf for general nonlinear functions with equality and inequality constraints without a smoothness assumption. Nonsmooth does not establish convergence for arbitrary discontinuities: regularity assumptions, penalty updates and numerical convergence remain unverified. The supplied problem contains nonlinear polynomial equalities; its existence is not a successful solve.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -34739,9 +34936,55 @@
             ],
             "notes": "The README distinguishes the supplied 74-problem collection from a user-defined objective and documents interval, evaluation and line-search controls. Its known-global-value stopping test is not an accuracy certificate for an unknown problem. Evaluation-budget overshoot is explicitly described upstream; results were not reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "1912e7165288d60d3b5e23d0e44b91a41555ed3f",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90",
+                "path": "CODE/mainSUB.f90",
+                "sha256": "20de0417484777949de00713e2ceeff93ece89ab283c0a94a09a1d2508c0cdaf",
+                "source_encoding": "cp1252"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90",
+                "path": "CODE/SD-box_discr.f90",
+                "sha256": "0ce4372378b3a3454996fc933263b3144cb69625d96dc20c454a5a9ba6ddc99f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "nuovoglobale",
+                "path": "CODE/mainSUB.f90",
+                "line_start": 26,
+                "line_end": 201
+              },
+              {
+                "procedure": "nuovoglobale",
+                "path": "CODE/mainSUB.f90",
+                "line_start": 286,
+                "line_end": 363
+              },
+              {
+                "procedure": "sd_box",
+                "path": "CODE/SD-box_discr.f90",
+                "line_start": 26,
+                "line_end": 114
+              },
+              {
+                "procedure": "sd_box",
+                "path": "CODE/SD-box_discr.f90",
+                "line_start": 142,
+                "line_end": 227
+              }
+            ],
+            "notes": "nuovoglobale evaluates an objective-value callback on a bounded domain, selects potentially optimal rectangles and triggers sd_box local searches after the configured trigLS budget fraction. The local kernel projects its starting point onto bounds and uses function-value line searches; no user derivative interface is present in the inspected path. G2i is the most specific GAMS global nonconvex class. Internal discrete-search branches in the shared local-search source are not enough to advertise an integer-programming solver: index_int is initialized to zero. Known fglob and resource limits are termination conditions rather than global-optimality certificates. No benchmark or driver was run.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -34786,9 +35029,77 @@
             ],
             "notes": "The Fortran 90 guide documents variable bounds, vector objectives and inequalities g(x)<=0, and separate MODIR/DFMO evaluation budgets. Equality constraints and guaranteed recovery of a complete Pareto front are not established. Hybrid behavior and examples were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "3896605a13c7467f15052e150621d44d55e3fc0d",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main_MODIRECT.f90",
+                "path": "CODE/main_MODIRECT.f90",
+                "sha256": "709446d4494804a4eaf1fe56b72511c4e7d0654df53b700257d77c5fb5460c0d"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90",
+                "path": "CODE/mainSUB.f90",
+                "sha256": "90c49f94d4946f123d33cc06d447a1fbc08cf8b1c49b3eea1b7dfcbc5440708c",
+                "source_encoding": "cp1252"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90",
+                "path": "CODE/subroutines_RACCORDO.f90",
+                "sha256": "95fb4a74732c39c14486310cb916d1e19436c647d0eade532be30c908c072924"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main.f90",
+                "path": "CODE/main.f90",
+                "sha256": "6777a610005c4ca894119d611ffed0cea208c6dc1c434aa5663cb982cac7543e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "main_MODIRECT",
+                "path": "CODE/main_MODIRECT.f90",
+                "line_start": 1,
+                "line_end": 154
+              },
+              {
+                "procedure": "nuovoglobale",
+                "path": "CODE/mainSUB.f90",
+                "line_start": 220,
+                "line_end": 255
+              },
+              {
+                "procedure": "nuovoglobale",
+                "path": "CODE/mainSUB.f90",
+                "line_start": 380,
+                "line_end": 410
+              },
+              {
+                "procedure": "nuovoglobale",
+                "path": "CODE/mainSUB.f90",
+                "line_start": 566,
+                "line_end": 591
+              },
+              {
+                "procedure": "wrapper",
+                "path": "CODE/subroutines_RACCORDO.f90",
+                "line_start": 175,
+                "line_end": 285
+              },
+              {
+                "procedure": "main",
+                "path": "CODE/main.f90",
+                "line_start": 1,
+                "line_end": 14
+              }
+            ],
+            "notes": "The multiobjective DIRECT path keeps vector objective values and nondominated-point sets, evaluates rectangle centers and selects/subdivides rectangles. G2i is used for this global nonconvex search, with the multiobjective/Pareto scope explicit; the taxonomy supplies no separate multiobjective child here. The wrapper can combine MODIRECT and DFMO through separately budgeted phases. Crucially, the pinned CODE/main.f90 sets maxnf_MODIR=0, so the supplied main skips the global phase unless edited; this mapping describes an implemented optional path, not the default execution. Bounds and inequality-value callbacks are documented; no equality interface or complete Pareto-front guarantee is claimed. No phase was executed.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

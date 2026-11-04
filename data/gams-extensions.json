@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "classes": {
+    "G2h3b2": {
+      "label": "General function and constraints (no smoothness assumed)",
+      "parent": "G2h3b",
+      "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2h3b2",
+      "reviewed_on": "2026-11-04"
+    }
+  }
+}

@@ -22,6 +22,24 @@ def https(url):
     return url
 
 
+def extend_taxonomy(tree, extension):
+    """Add independently reviewed NIST classes without editing the imported feed."""
+    result = copy.deepcopy(tree)
+    if extension.get('schema_version') != 1:
+        raise ValueError('Expected a version 1 taxonomy extension.')
+    for code, info in extension['classes'].items():
+        definition = {'label': info['label'], 'parent': info['parent']}
+        https(info['source'])
+        if code in result and result[code] != definition:
+            raise ValueError('Conflicting taxonomy definition: ' + code)
+        result[code] = definition
+    for code in result:
+        if result[code]['parent'] is not None and result[code]['parent'] not in result:
+            raise ValueError('Missing taxonomy parent: ' + code)
+        lineage(result, code)
+    return result
+
+
 def validate_local(local, tree):
     if local.get('schema_version') != 1 or not isinstance(local.get('projects'), list):
         raise ValueError('Expected a version 1 local catalog.')
@@ -52,6 +70,16 @@ def validate_local(local, tree):
                     raise ValueError('Evidence URL must identify the reviewed commit.')
                 if not re.fullmatch(r'[0-9a-f]{64}', evidence.get('sha256', '')):
                     raise ValueError('Each evidence document needs a SHA-256 digest.')
+            if claim['level'] == 'source-reviewed':
+                if not claim.get('procedures'):
+                    raise ValueError('Source reviews need named procedures and line ranges.')
+                paths = {v['path'] for v in claim['evidence']}
+                for procedure in claim['procedures']:
+                    start, end = procedure.get('line_start'), procedure.get('line_end')
+                    if (not procedure.get('procedure') or procedure.get('path') not in paths
+                            or type(start) is not int or type(end) is not int
+                            or start < 1 or end < start):
+                        raise ValueError('Invalid source procedure evidence: ' + identity)
     return local
 
 
@@ -59,6 +87,9 @@ def assemble(root=ROOT):
     root = Path(root)
     feed = read(root/'data/imports/fortran-playground.json')
     tree = feed['taxonomies']['gams']['classes']
+    extensions = root/'data/gams-extensions.json'
+    if extensions.exists():
+        tree = extend_taxonomy(tree, read(extensions))
     local = validate_local(read(root/'data/local.json'), tree)
     merged = merge_catalog(local, feed)
     projects = []
@@ -80,7 +111,11 @@ def assemble(root=ROOT):
                                         + imported.get('github', {}).get('topics', [])))
         effective['codes'] = sorted(set(curation.get('gams_codes', [])
                                        + [c['code'] for c in data.get('classifications', [])]))
-        effective['procedures'] = curation.get('procedures', [])
+        effective['procedures'] = copy.deepcopy(curation.get('procedures', []))
+        for claim in data.get('classifications', []):
+            for procedure in claim.get('procedures', []):
+                effective['procedures'].append({**procedure, 'gams_codes': [claim['code']],
+                                                'origin': 'local'})
         package_id = imported.get('playground', {}).get('package_id')
         effective['drivers'] = [d for d in feed.get('demonstrations', [])
                                 if package_id and d['package_id'] == package_id]

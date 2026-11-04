@@ -39,10 +39,22 @@ Removing an incorrect imported claim requires correcting the publisher; local
 additions do not silently erase upstream claims. Repository transfers/renames need
 an explicit identity migration rather than creating duplicate entries.
 
-The initial independent records are documentation reviews. The site currently
-renders their evidence and the imported source/procedure/driver records. Extend the
-local record validator and renderer together when adding local procedures or
-verified drivers; do not label notes as verification.
+Independent records may retain a broad documentation review alongside deeper
+source reviews. Each `source-reviewed` classification must include `procedures`:
+objects with `procedure`, `path`, `line_start` and `line_end`. The path must match
+a hashed evidence file at the claim's pinned revision. Ranges identify the
+inspected implementation or interface portions, not necessarily the complete
+procedure body. Standalone programs and callback adapters may also be identified
+when they explain usage. They are not checked drivers unless built and tested.
+Procedure names participate in site search, and the site and Markdown ledger
+link directly to their source ranges.
+
+Additional NIST classes absent from the imported snapshot belong in
+`data/gams-extensions.json`, with their official label, parent, source URL and
+review date. These extend the local taxonomy without modifying the imported
+feed. Conflicting definitions and parent cycles are rejected. Extend the local
+validator and renderer together before adding locally verified drivers; do not
+label source inspection as numerical verification.
 
 ## Imports and ownership
 
