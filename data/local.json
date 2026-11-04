@@ -34758,44 +34758,86 @@
                 "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/lsrch_box.f90",
                 "path": "lsrch_box.f90",
                 "sha256": "f2451722ef7a9bd35affc4ce57f857ba48e2178869e9dea2057e7ba56bc4fa8e"
+              },
+              {
+                "path": "README.txt",
+                "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/README.txt",
+                "sha256": "ae32aa8bd93c28f1af0d7ba5817c43ba6885310ac89c3ce3f2dfc256a95ffcb5"
               }
             ],
             "procedures": [
               {
+                "procedure": "MAIN_GLOB",
+                "role": "program-entry-point",
+                "path": "MainGlob.f90",
+                "line_start": 23,
+                "line_end": 49,
+                "summary": "Supplied executable entry point. The author README instructs editing problem.f90, building with make and running ./ddfsa on Unix. MAIN_GLOB opens risultato.tex and invokes a ten-run benchmark harness. Adapting this program is the reviewed route to a new problem; no generic library interface or checked run is claimed.",
+                "examples": [
+                  {
+                    "path": "README.txt",
+                    "line_start": 13,
+                    "line_end": 28
+                  }
+                ]
+              },
+              {
                 "procedure": "SENZADERGLOB",
                 "path": "MainGlob.f90",
                 "line_start": 51,
-                "line_end": 106
+                "line_end": 106,
+                "role": "implementation-helper",
+                "summary": "External benchmark/driver harness called by MAIN_GLOB, not a general problem-data solver API. It loads n and bounds through linked NINIT/FUNCTINIT, uses ten runs and source-fixed controls, and writes to the supplied TABELLA unit.",
+                "signature": "CALL SENZADERGLOB(TABELLA, iok)",
+                "declarations": [
+                  {
+                    "path": "MainGlob.f90",
+                    "line_start": 51,
+                    "line_end": 62
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "MainGlob.f90",
+                    "line_start": 23,
+                    "line_end": 49
+                  }
+                ]
               },
               {
                 "procedure": "SENZADERGLOB",
                 "path": "MainGlob.f90",
                 "line_start": 181,
-                "line_end": 199
+                "line_end": 199,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "SENZADERGLOB",
                 "path": "MainGlob.f90",
                 "line_start": 400,
-                "line_end": 463
+                "line_end": 463,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "SENZADERGLOB",
                 "path": "MainGlob.f90",
                 "line_start": 520,
-                "line_end": 568
+                "line_end": 568,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "RICERCA_LUNGO_ASSI",
                 "path": "MainGlob.f90",
                 "line_start": 1139,
-                "line_end": 1190
+                "line_end": 1190,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "linesearchbox_cont",
                 "path": "lsrch_box.f90",
                 "line_start": 1,
-                "line_end": 236
+                "line_end": 236,
+                "role": "implementation-helper"
               }
             ],
             "notes": "SENZADERGLOB constructs bounded random trial points and uses an exponential acceptance threshold before derivative-free local searches. RICERCA_LUNGO_ASSI delegates to box-search kernels; linesearchbox_cont enforces bounds and sufficient objective decrease using only function values. This supports global nonconvex optimization (G2i), not a requirement to provide derivatives. The inspected routine is a working-set implementation; its title does not establish an MPI/distributed-memory interface. Evaluation/step limits and comparisons with a supplied fglob are stopping criteria, not proofs of a global minimum. The upstream MAIN_GLOB driver and repeated-run statistics were not executed.",
@@ -34806,6 +34848,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "054c1335805b8f6c3b745f6c8e44b8f71aec468b",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3 and the DDFSA source header explicitly permits version 3 or any later version. This records the reviewed solver-source terms, not a license audit of separately linked code.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "MainGlob.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90",
+              "sha256": "ffd7f7000dc445e3e92278d1a8427a31b743b6d874e9c6ec9e6cf71a3d449e6c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35085,6 +35146,11 @@
                 "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90",
                 "path": "CODE/SD-box_discr.f90",
                 "sha256": "0ce4372378b3a3454996fc933263b3144cb69625d96dc20c454a5a9ba6ddc99f"
+              },
+              {
+                "path": "CODE/mainMAIN.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainMAIN.f90",
+                "sha256": "7b2ce01ae0abc5ed512d065dd696f8724ccf408e1fc282f75ed8e0818a927f09"
               }
             ],
             "procedures": [
@@ -35092,25 +35158,52 @@
                 "procedure": "nuovoglobale",
                 "path": "CODE/mainSUB.f90",
                 "line_start": 26,
-                "line_end": 201
+                "line_end": 201,
+                "role": "public-entry-point",
+                "summary": "External DIRECT/local-search subroutine for finite box bounds. It uses separately linked funct and shared modules rather than a callback argument. xbest and fbest hold the current best point/value; the interface also returns search counts and interval diagnostics. xmin(n,100) and fmin(100) are fixed-shape arrays, not arbitrary-length work buffers.",
+                "signature": "CALL nuovoglobale(n, lbb, ubb, xbest, fbest, nf, nminloc, fglob, &\n                 maxint, maxnf, iprint, trovato, nint, mindiam, &\n                 maxdiam, maxL, xmin, fmin, imin, jmin, &\n                 alfa_stop, tolglob, trigLS)",
+                "declarations": [
+                  {
+                    "path": "CODE/mainSUB.f90",
+                    "line_start": 129,
+                    "line_end": 145
+                  },
+                  {
+                    "path": "CODE/mainSUB.f90",
+                    "line_start": 26,
+                    "line_end": 35
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "CODE/mainMAIN.f90",
+                    "line_start": 204,
+                    "line_end": 219
+                  }
+                ],
+                "usage": "! Use the author mainNuovoGLOB setup for shared modules and storage.\n! Supply funct and initialize finite bounds and search controls.\ncall nuovoglobale(n, lbb, ubb, xbest, fbest, nf, nminloc, fglob, &\n                 maxint, maxnf, iprint, trovato, nint, mindiam, &\n                 maxdiam, maxL, xmin, fmin, imin, jmin, &\n                 alfa_stop, tolglob, trigLS)",
+                "usage_notes": "Calling sketch only. This is the external nuovoglobale in DIRMIN, not similarly named routines in other repositories. Follow CODE/mainMAIN.f90 for allocation and shared-state initialization, including module bounds, globxbest, evaluation counters and budgets. The supplied driver reads nomefun and DIRECT_params.txt and may need problem-specific files. This is not a self-contained or stateless API; no new run or global-optimum check was made."
               },
               {
                 "procedure": "nuovoglobale",
                 "path": "CODE/mainSUB.f90",
                 "line_start": 286,
-                "line_end": 363
+                "line_end": 363,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "sd_box",
                 "path": "CODE/SD-box_discr.f90",
                 "line_start": 26,
-                "line_end": 114
+                "line_end": 114,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "sd_box",
                 "path": "CODE/SD-box_discr.f90",
                 "line_start": 142,
-                "line_end": 227
+                "line_end": 227,
+                "role": "implementation-helper"
               }
             ],
             "notes": "nuovoglobale evaluates an objective-value callback on a bounded domain, selects potentially optimal rectangles and triggers sd_box local searches after the configured trigLS budget fraction. The local kernel projects its starting point onto bounds and uses function-value line searches; no user derivative interface is present in the inspected path. G2i is the most specific GAMS global nonconvex class. Internal discrete-search branches in the shared local-search source are not enough to advertise an integer-programming solver: index_int is initialized to zero. Known fglob and resource limits are termination conditions rather than global-optimality certificates. No benchmark or driver was run.",
@@ -35121,6 +35214,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "1912e7165288d60d3b5e23d0e44b91a41555ed3f",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3. The reviewed DIRMIN solver header expressly permits version 3 or any later version. This records the solver-source terms; separately supplied dependencies are outside this license review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "CODE/mainSUB.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90",
+              "sha256": "20de0417484777949de00713e2ceeff93ece89ab283c0a94a09a1d2508c0cdaf"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35192,40 +35304,71 @@
             ],
             "procedures": [
               {
+                "procedure": "wrapper",
+                "path": "CODE/subroutines_RACCORDO.f90",
+                "line_start": 29,
+                "line_end": 40,
+                "role": "public-entry-point",
+                "summary": "External high-level driver wrapper for MODIR/DFMO. Its two default-integer arguments are separate function-evaluation budgets. It obtains problem dimensions, bounds, objectives and inequalities from linked routines, manages shared solver state, and writes nondominated solutions to out_nondom.txt rather than returning a solution array.",
+                "signature": "CALL wrapper(maxnf_MODIR, maxnf_DFMO)",
+                "declarations": [
+                  {
+                    "path": "CODE/subroutines_RACCORDO.f90",
+                    "line_start": 73,
+                    "line_end": 84
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "CODE/main.f90",
+                    "line_start": 1,
+                    "line_end": 14
+                  }
+                ],
+                "usage": "! Link the upstream modules and your problem.f90 definitions.\n! Choose budgets explicitly; enable MODIR with a positive budget.\nmaxnf_MODIR = 500*n\nmaxnf_DFMO = 0\ncall wrapper(maxnf_MODIR, maxnf_DFMO)",
+                "usage_notes": "Calling sketch only; initialize n with the problem dimension before choosing budgets. The supplied main sets maxnf_MODIR=0, so running it unchanged does not exercise the global MODIR phase. Follow the README problem interfaces and upstream build/configuration files. main_MODIRECT is a lower-level phase routine requiring shared state and an initialized partition structure; it is retained as implementation evidence rather than recommended as the first call. No Pareto-front or execution check was performed here."
+              },
+              {
                 "procedure": "main_MODIRECT",
                 "path": "CODE/main_MODIRECT.f90",
                 "line_start": 1,
-                "line_end": 154
+                "line_end": 154,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "nuovoglobale",
                 "path": "CODE/mainSUB.f90",
                 "line_start": 220,
-                "line_end": 255
+                "line_end": 255,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "nuovoglobale",
                 "path": "CODE/mainSUB.f90",
                 "line_start": 380,
-                "line_end": 410
+                "line_end": 410,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "nuovoglobale",
                 "path": "CODE/mainSUB.f90",
                 "line_start": 566,
-                "line_end": 591
+                "line_end": 591,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "wrapper",
                 "path": "CODE/subroutines_RACCORDO.f90",
                 "line_start": 175,
-                "line_end": 285
+                "line_end": 285,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "main",
                 "path": "CODE/main.f90",
                 "line_start": 1,
-                "line_end": 14
+                "line_end": 14,
+                "role": "program-entry-point"
               }
             ],
             "notes": "The multiobjective DIRECT path keeps vector objective values and nondominated-point sets, evaluates rectangle centers and selects/subdivides rectangles. G2i is used for this global nonconvex search, with the multiobjective/Pareto scope explicit; the taxonomy supplies no separate multiobjective child here. The wrapper can combine MODIRECT and DFMO through separately budgeted phases. Crucially, the pinned CODE/main.f90 sets maxnf_MODIR=0, so the supplied main skips the global phase unless edited; this mapping describes an implemented optional path, not the default execution. Bounds and inequality-value callbacks are documented; no equality interface or complete Pareto-front guarantee is claimed. No phase was executed.",
@@ -35236,6 +35379,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "3896605a13c7467f15052e150621d44d55e3fc0d",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3. The reviewed MODIR wrapper header explicitly permits version 3 or any later version. This records the solver-source notice; bundled or separately supplied components require their own review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "CODE/subroutines_RACCORDO.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90",
+              "sha256": "95fb4a74732c39c14486310cb916d1e19436c647d0eade532be30c908c072924"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35308,37 +35470,61 @@
                 "procedure": "minmax",
                 "path": "CODE/main.f90",
                 "line_start": 1,
-                "line_end": 57
+                "line_end": 57,
+                "role": "program-entry-point"
               },
               {
                 "procedure": "functmu",
                 "path": "CODE/main.f90",
                 "line_start": 62,
-                "line_end": 96
+                "line_end": 96,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "MAINBOX",
                 "path": "CODE/SDMINMAX.f",
                 "line_start": 22,
-                "line_end": 90
+                "line_end": 90,
+                "role": "public-entry-point",
+                "summary": "External finite-minimax search routine. x is the initial REAL*8 point and is overwritten; mu is the smoothing parameter set/adapted by the routine. The caller allocates scratch vectors and matrices, including FSTOP(n+1), XFSTOP(n,n+1) and FINIT(n,2). Linked FUNCTMU/FUNCTS and COMMON blocks provide objective data; no callback argument, bounds or linear-constraint matrix is present despite the MAINBOX name.",
+                "signature": "CALL MAINBOX(N, X, D, D1, Z, Z1, XOLD, NUM_ITER, DOLDALFA, &\n             IPRINT, DCONV, FSTOP, XFSTOP, FINIT, mu)",
+                "declarations": [
+                  {
+                    "path": "CODE/SDMINMAX.f",
+                    "line_start": 22,
+                    "line_end": 45
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "CODE/main.f90",
+                    "line_start": 1,
+                    "line_end": 46
+                  }
+                ],
+                "usage": "! Follow program minmax for problem/COMMON initialization and allocation.\n! Initialize X through your problem STARTP before entering MAINBOX.\ncall MAINBOX(N, X, D, D1, Z, Z1, XOLD, NUM_ITER, DOLDALFA, &\n             IPRINT, DCONV, FSTOP, XFSTOP, FINIT, mu)",
+                "usage_notes": "Calling sketch only. Supply the separately linked set_dimension, STARTP and FUNCTS problem routines and retain the FUNCTMU smoothing adapter from CODE/main.f90 (or extract it when writing a new main program). Preserve COMMON-block types and layout; allocate workspace exactly as in the driver. The name MAINBOX does not establish a bound-constrained API. The supplied rational-approximation example and smoothing accuracy remain untested."
               },
               {
                 "procedure": "MAINBOX",
                 "path": "CODE/SDMINMAX.f",
                 "line_start": 112,
-                "line_end": 156
+                "line_end": 156,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "MAINBOX",
                 "path": "CODE/SDMINMAX.f",
                 "line_start": 298,
-                "line_end": 325
+                "line_end": 325,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "functs",
                 "path": "CODE/problem.f",
                 "line_start": 35,
-                "line_end": 52
+                "line_end": 52,
+                "role": "callback"
               }
             ],
             "notes": "The inspected executable minimizes a finite maximum of component functions, a generally nonsmooth multivariate objective. functmu builds a log-sum-exp smoothing from value-only functs callbacks, and MAINBOX performs derivative-free line searches while adapting the smoothing parameter. This supports the G1b2 leaf. Despite the linearly constrained minimax paper cited in the header, the inspected interface exposes neither bounds nor a general linear-constraint callback or matrix; no G2h2 claim is inferred from the citation. Exponent clipping and a small-sum floor are implementation safeguards, not a checked stable log-sum-exp algorithm for every magnitude. The supplied Hald-Madsen rational-approximation problem can encounter denominator issues; its reported optimum was not reproduced. No convergence, minimax accuracy or example execution was checked.",
@@ -35349,6 +35535,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "27a938c530b5a8b4bddc3f6c3dc56ab655e90870",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3 and the reviewed SDMINMAX source header explicitly permits version 3 or any later version. This records the solver-source notice without assigning terms to separately supplied dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "CODE/SDMINMAX.f",
+              "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f",
+              "sha256": "9729d55f653ded96cb3f3a90f181aa50f04454c0133e4c37afe615dd8b84146f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35677,62 +35882,98 @@
                 "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90",
                 "path": "toyprob.f90",
                 "sha256": "63e675a1521df6167680a2392c66cdd90e9f10f327d8b377e674bd9a341ad0a8"
+              },
+              {
+                "path": "runeng.f90",
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/runeng.f90",
+                "sha256": "b77f80968fe10011d8320c70823fd0aaff06f3a2bd91f5ad56d3daa9c210c2b5"
               }
             ],
             "procedures": [
               {
-                "procedure": "skinny::SK_RESTTYPE / sksolve",
+                "procedure": "SK_RESTTYPE / sksolve",
                 "path": "skinny.f90",
                 "line_start": 22,
-                "line_end": 25
+                "line_end": 25,
+                "role": "module-interface",
+                "module": "skinny"
               },
               {
-                "procedure": "skinny::sksolve",
+                "procedure": "sksolve",
                 "path": "skinny.f90",
                 "line_start": 94,
-                "line_end": 181
+                "line_end": 181,
+                "role": "public-entry-point",
+                "module": "skinny",
+                "summary": "Public module subroutine for constrained minimization with relaxed constraints. x is an in-place REAL(8) point, l/u are bounds and m is the constraint count. The interface returns f, maxinfeas, evaluation counts and a flag. Problem evaluators are separately linked routines, not callback arguments in this call.",
+                "signature": "CALL sksolve(n, x, l, u, m, feas, opti, gammadec, reffort, delta, &\n             sfactor, verbose, uoptmtype, f, maxinfeas, fcnt, gcnt, flag)",
+                "declarations": [
+                  {
+                    "path": "skinny.f90",
+                    "line_start": 181,
+                    "line_end": 200
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "runeng.f90",
+                    "line_start": 105,
+                    "line_end": 131
+                  }
+                ],
+                "usage": "use skinny, only: sksolve\n! Link your evalobjfun/evalconstr and initialization routines.\n! Initialize x, bounds, relaxation controls and method selection.\ncall sksolve(n, x, l, u, m, feas, opti, gammadec, reffort, delta, &\n             sfactor, verbose, uoptmtype, f, maxinfeas, fcnt, gcnt, flag)",
+                "usage_notes": "Calling sketch only. Follow runeng.f90 and the problem interfaces in toyprob.f90, but do not treat the toy signed-constraint example as a verified equality-constraint driver. The pinned SK_RESTTYPE default selects compass restoration. Several advertised solver branches contain stubs/commented implementations, so changing a selector does not establish that the requested optimizer works. Check flag and maxinfeas. Not built or run for this catalog."
               },
               {
-                "procedure": "skinny::sksolve",
+                "procedure": "sksolve",
                 "path": "skinny.f90",
                 "line_start": 447,
-                "line_end": 461
+                "line_end": 461,
+                "role": "implementation-evidence",
+                "module": "skinny"
               },
               {
-                "procedure": "skinny::sksolve",
+                "procedure": "sksolve",
                 "path": "skinny.f90",
                 "line_start": 499,
-                "line_end": 622
+                "line_end": 622,
+                "role": "implementation-evidence",
+                "module": "skinny"
               },
               {
                 "procedure": "restoration",
                 "path": "restoration.f90",
                 "line_start": 101,
-                "line_end": 149
+                "line_end": 149,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "callfrest",
                 "path": "restoration.f90",
                 "line_start": 164,
-                "line_end": 212
+                "line_end": 212,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "exbarr",
                 "path": "extremebarrier.f90",
                 "line_start": 8,
-                "line_end": 100
+                "line_end": 100,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "initializes / evalconstr",
                 "path": "toyprob.f90",
                 "line_start": 1,
-                "line_end": 32
+                "line_end": 32,
+                "role": "callback"
               },
               {
                 "procedure": "evalconstr",
                 "path": "toyprob.f90",
                 "line_start": 125,
-                "line_end": 147
+                "line_end": 147,
+                "role": "callback"
               }
             ],
             "notes": "sksolve relaxes nonlinear inequalities g(x)<=gamma, restores feasibility and reduces gamma while searching within variable bounds. Equalities require an appropriate inequality encoding; the inspected public interface has no separate equality count or equality flag. The pinned source selects SK_RESTTYPE=2, a function-value compass restoration; the ALGENCAN branch returns with instructions to uncomment code, so it is not active merely by changing that selector. Compass and SDS improvement paths are active; Nelder-Mead, BOBYQA and DFO branches return before commented implementations. G2h3b is the supported nonlinear-constraint scope. A smooth or fully general nonsmooth leaf is withheld because the reviewed material does not establish a matching regularity contract for all active paths; derivative-free alone does not imply nonsmooth convergence. The toy file describes HS6 as an equality but exposes one signed constraint value, so its encoding must be checked before reuse as an equality driver. No program was run.",
@@ -35743,6 +35984,20 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "7d3f57d39de38bfb687a551fef26a86700a8ab7f",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root MIT license names F. N. C. Sobral. This is the reviewed project license; optional or separately supplied optimization solvers and other dependencies retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/LICENSE",
+              "sha256": "2be689d423c775519fa73826421ee521d923f552522031af75b00b49158a8997"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36157,6 +36412,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No project-wide license identified",
+          "spdx_expression": null,
+          "revision": "f97119df01ae48e396f881ad2d2e25085338282b",
+          "reviewed_on": "2026-11-04",
+          "notes": "No project-wide license grant was identified in the reviewed README or VorCells_Polygons source, and the pinned tree has no separately named LICENSE/COPYING file. The README identifies bundled geometry/GEOMPACK and external ALGENCAN, HSL and BLAS components; their own notices do not by themselves establish reuse terms for the covering and polygon code. This is a scoped license finding, not a complete audit of every bundled routine.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/README.md",
+              "sha256": "9248f082458ce75984a73c7bcbd1c0b48e5ed54f51a77b9169c247f0ddd7bf2c"
+            },
+            {
+              "path": "vorintpols.f90",
+              "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90",
+              "sha256": "104c715d69f1a445ae31f1089d2479d27977e97530bbedf1ec84f858dd64e7ea"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36473,34 +36747,69 @@
             ],
             "procedures": [
               {
-                "procedure": "Extrapolation_Integration::extrapol_rdp",
+                "procedure": "extrapolation",
+                "module": "Extrapolation_Integration",
+                "path": "src/Extrapolation_Integration.F90",
+                "line_start": 1,
+                "line_end": 15,
+                "role": "public-entry-point",
+                "summary": "Public generic array-reduction function. The inspected REAL(dp) binding accepts an assumed-shape vector and returns a scalar of the same kind; extrapol_rdp and its nested helpers are private implementation details. Supply equally spaced samples with 2**m+1 entries for the reviewed extrapolation path, and multiply the normalized result by the physical interval length.",
+                "signature": "result = extrapolation(array)",
+                "declarations": [
+                  {
+                    "path": "src/Extrapolation_Integration.F90",
+                    "line_start": 287,
+                    "line_end": 299
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "example/Integral_of_SINC.F90",
+                    "line_start": 1,
+                    "line_end": 38
+                  }
+                ],
+                "usage": "use Extrapolation_Integration_Kinds, only: dp\nuse Extrapolation_Integration, only: extrapolation\n! array is REAL(dp) with 2**m+1 equally spaced samples on [a,b].\nresult = (b - a) * extrapolation(array)",
+                "usage_notes": "Calling sketch only. Initialize the samples and interval endpoints with compatible kinds. This function takes sampled values, not an integrand callback or error tolerance. The inspected non-dyadic fallback has the endpoint-weight discrepancy documented in the source review; the sketch deliberately uses the dyadic path. No accuracy or execution check was performed here. Other real/complex bindings are not newly certified by this interface review."
+              },
+              {
+                "procedure": "extrapol_rdp",
                 "path": "src/Extrapolation_Integration.F90",
                 "line_start": 287,
-                "line_end": 330
+                "line_end": 330,
+                "role": "implementation-helper",
+                "module": "Extrapolation_Integration"
               },
               {
-                "procedure": "Extrapolation_Integration::extrapol_rdp::trap_rdp",
+                "procedure": "extrapol_rdp::trap_rdp",
                 "path": "src/Extrapolation_Integration.F90",
                 "line_start": 334,
-                "line_end": 354
+                "line_end": 354,
+                "role": "implementation-helper",
+                "module": "Extrapolation_Integration"
               },
               {
-                "procedure": "Extrapolation_Integration::extrapol_rdp::org_dt_rdp",
+                "procedure": "extrapol_rdp::org_dt_rdp",
                 "path": "src/Extrapolation_Integration.F90",
                 "line_start": 356,
-                "line_end": 384
+                "line_end": 384,
+                "role": "implementation-helper",
+                "module": "Extrapolation_Integration"
               },
               {
-                "procedure": "Extrapolation_Integration::extrapol_rdp::extrapol_driver_rdp",
+                "procedure": "extrapol_rdp::extrapol_driver_rdp",
                 "path": "src/Extrapolation_Integration.F90",
                 "line_start": 386,
-                "line_end": 417
+                "line_end": 417,
+                "role": "implementation-helper",
+                "module": "Extrapolation_Integration"
               },
               {
                 "procedure": "Integral_of_SINC",
                 "path": "example/Integral_of_SINC.F90",
                 "line_start": 15,
-                "line_end": 51
+                "line_end": 51,
+                "role": "program-entry-point"
               }
             ],
             "notes": "The reviewed real(dp) extrapol_rdp path accepts equally spaced samples rather than an integrand callback, error tolerance or adaptive sampling request. It reorders 2^m+1 samples with endpoints first, constructs nested trapezoidal approximations and applies Richardson extrapolation. H2a1b2 is the nonautomatic finite-interval grid-quadrature leaf. The reduction is normalized to [0,1]; multiply by (b-a) for samples on [a,b], as the author sinc example does. A material fallback discrepancy was found by source inspection: non-dyadic sample counts are sent directly to trap_rdp, which half-weights array(1) and array(2), not the first and last samples in natural order. For [0,1/3,2/3,1] the displayed formula predicts 11/18 instead of the trapezoidal result 1/2; this is an arithmetic consequence of the source, not a compiled result. Singleton/two-point cases have separate branches; empty input and all accuracy claims remain unverified. No checked driver is supplied.",
@@ -36511,6 +36820,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3",
+          "spdx_expression": null,
+          "revision": "5472eb6f2b85c5ff2337f3e52acd2d689335c078",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3 and fpm.toml reports GNU General Public License v3.0. The reviewed manifest, README and module do not separately resolve a version-only versus or-later grant, so no SPDX expression is asserted. This label records the identified project license without extending it to development dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/fpm.toml",
+              "sha256": "1ab73b2e66508038da4beaa1cc7e95c5339e22cf1c786a74c8858fe12c503155"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37267,6 +37595,16 @@
                 "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/gksvd2.F90",
                 "path": "src/ksvd2/gksvd2.F90",
                 "sha256": "120479979d51d22d422e21c644e51fc150057fdc55f0b099bafd66dc9ffaf3f5"
+              },
+              {
+                "path": "src/test/dksvd0x.F90",
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/dksvd0x.F90",
+                "sha256": "fcb656350b9e4c94a087eb7dab7961d0ff2fd7d55afeb718e88ba5376c103ac5"
+              },
+              {
+                "path": "src/test/gksvd0x.F90",
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/gksvd0x.F90",
+                "sha256": "d2f6ac721cd8408aa27fca4cf22fec50abacbd4f8001202e6435de3378bbd037"
               }
             ],
             "procedures": [
@@ -37274,37 +37612,74 @@
                 "procedure": "DKSVD0",
                 "path": "src/blksvd/dksvd0.F90",
                 "line_start": 1,
-                "line_end": 113
+                "line_end": 113,
+                "role": "public-entry-point",
+                "summary": "External REAL64 square-matrix SVD subroutine. G is overwritten; SV holds the singular values and JOB controls the pivot strategy and initialization/accumulation of U and V. All leading dimensions, schedule/work arrays and INFO must be prepared explicitly. INFO is an input step budget (with sign-dependent mode) and an output status/sweep count, not solely a LAPACK-style output error code.",
+                "signature": "CALL DKSVD0(JOB, N, G, LDG, U, LDU, V, LDV, SV, W, O, R, INFO)",
+                "declarations": [
+                  {
+                    "path": "src/blksvd/dksvd0.F90",
+                    "line_start": 78,
+                    "line_end": 89
+                  },
+                  {
+                    "path": "src/test/dksvd0x.F90",
+                    "line_start": 25,
+                    "line_end": 39
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "src/test/gksvd0x.F90",
+                    "line_start": 64,
+                    "line_end": 105
+                  }
+                ],
+                "usage": "! Follow the author DKSVD0X driver for JOB, INFO and workspace setup.\n! Initialize G, leading dimensions, U/V as required, and the schedule O.\ncall DKSVD0(JOB, N, G, LDG, U, LDU, V, LDV, SV, W, O, R, INFO)",
+                "usage_notes": "Calling sketch only. Use the exact declarations and preprocessed sources at this pin, including the shared included bodies. The driver allocates W(MAX(6,3*M)), generates the schedule with JSWEEP, and prepares O and R for its padded matrix size M; these requirements depend on the chosen strategy. Do not pass uninitialized INFO. The libpvn kernel boundary remains a dependency, and the source mapping covers the reviewed real square cyclic/quasi-cyclic path, not every compiler option, precision or rectangular variant. Not compiled or run here."
               },
               {
                 "procedure": "DKSVD0 (shared included body)",
                 "path": "src/blksvd/gksvd0.F90",
                 "line_start": 1,
-                "line_end": 54
+                "line_end": 54,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "DKSVD0 (shared included body)",
                 "path": "src/blksvd/gksvd0.F90",
                 "line_start": 212,
-                "line_end": 335
+                "line_end": 335,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "DKSVD0 (shared included body)",
                 "path": "src/blksvd/gksvd0.F90",
                 "line_start": 429,
-                "line_end": 469
+                "line_end": 469,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "DKSVD2",
                 "path": "src/ksvd2/dksvd2.F90",
                 "line_start": 1,
-                "line_end": 23
+                "line_end": 23,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "DKSVD2 (shared included body)",
                 "path": "src/ksvd2/gksvd2.F90",
                 "line_start": 1,
-                "line_end": 11
+                "line_end": 11,
+                "role": "implementation-helper"
+              },
+              {
+                "procedure": "DKSVD0X",
+                "role": "program-entry-point",
+                "path": "src/test/dksvd0x.F90",
+                "line_start": 1,
+                "line_end": 40,
+                "summary": "Author SVD test program. Its included shared body parses strategy, matrix dimension and an input basename, initializes arrays/schedule and invokes DKSVD0. This catalog has not supplied its matrix input files or run the driver."
               }
             ],
             "notes": "The real64 DKSVD0 interface and its included gksvd0 body implement a two-sided Kogbetliantz SVD of a square N-by-N matrix. The body generates index pairs, extracts 2-by-2 pivots, applies left/right rotations, optionally accumulates U and V, and extracts singular values from the transformed diagonal. D6 is already a GAMS leaf, with no separate cyclic or precision subclass. This review follows the cyclic/quasi-cyclic real64 path, not every blocked, dynamic, complex or higher-precision variant. Some strategies require even N. DKSVD2 is a Fortran wrapper around the external libpvn PVN_DLJSV2 kernel; it is not an independent local implementation of that 2-by-2 algorithm. INFO carries an input step budget/accuracy mode and an output sweep count or limit, rather than a universal zero-success convention. Scaling, rounding assumptions, reconstruction, orthogonality and parallel performance were not tested; no rectangular-matrix claim is inferred from the repository title.",
@@ -37315,6 +37690,20 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "c852e6d85355b5e7f3efb58b86cbe0c043cecd7d",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root MIT license names Vedran Novakovic, with an unless-noted-otherwise qualification. This records the reviewed project license; bundled exceptions and external components such as libpvn require their own license review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/LICENSE",
+              "sha256": "e2d914b622d07031cecf0f1f39d974e2b374cbdf1a8e06eda1a0a38814d09d29"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37392,52 +37781,116 @@
             ],
             "procedures": [
               {
-                "procedure": "dnadmod::dual / ndv",
+                "procedure": "sin",
+                "module": "dnadmod",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 457,
+                "line_end": 461,
+                "role": "public-entry-point",
+                "summary": "Public overloaded sin generic for the inspected real dual-number type. The dual result carries the value in %x and first derivatives in %dx. The specific sin_d implementation is private. Set the input derivative seeds explicitly; the derivative-vector length is tied to user_input::N at this pin.",
+                "signature": "y = sin(u)",
+                "declarations": [
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                    "line_start": 1917,
+                    "line_end": 1919
+                  },
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                    "line_start": 116,
+                    "line_end": 135
+                  }
+                ],
+                "usage": "use dnadmod, only: dual, sin\ntype(dual) :: u, y\nu%x = 0.5\nu%dx = 0.0\nu%dx(1) = 1.0\ny = sin(u)\n! Inspect y%x and y%dx(1) for the value and seeded derivative.",
+                "usage_notes": "Calling sketch only. Build a compatible user_input module with positive N before dnadmod; ndv is N*2 and is private. Value and derivative components use default REAL, so use consistent precision flags across all dependent modules. This demonstrates the inspected real dual binding; it does not certify all overloads or the complex implementation. The fork-specific configuration differs from the inherited header instructions. Not compiled or run here."
+              },
+              {
+                "procedure": "exp",
+                "module": "dnadmod",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 381,
+                "line_end": 385,
+                "role": "public-entry-point",
+                "summary": "Public overloaded exp generic for the inspected real dual-number type. The dual result carries the value in %x and first derivatives in %dx. The specific exp_d implementation is private. Set the input derivative seeds explicitly; the derivative-vector length is tied to user_input::N at this pin.",
+                "signature": "y = exp(u)",
+                "declarations": [
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                    "line_start": 1603,
+                    "line_end": 1605
+                  },
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                    "line_start": 116,
+                    "line_end": 135
+                  }
+                ],
+                "usage": "use dnadmod, only: dual, exp\ntype(dual) :: u, y\nu%x = 0.5\nu%dx = 0.0\nu%dx(1) = 1.0\ny = exp(u)\n! Inspect y%x and y%dx(1) for the value and seeded derivative.",
+                "usage_notes": "Calling sketch only. Build a compatible user_input module with positive N before dnadmod; ndv is N*2 and is private. Value and derivative components use default REAL, so use consistent precision flags across all dependent modules. This demonstrates the inspected real dual binding; it does not certify all overloads or the complex implementation. The fork-specific configuration differs from the inherited header instructions. Not compiled or run here."
+              },
+              {
+                "procedure": "dual / ndv",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 116,
-                "line_end": 145
+                "line_end": 145,
+                "role": "module-interface",
+                "module": "dnadmod"
               },
               {
-                "procedure": "dnadmod::assign_dr",
+                "procedure": "assign_dr",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 566,
-                "line_end": 573
+                "line_end": 573,
+                "role": "implementation-helper",
+                "module": "dnadmod"
               },
               {
-                "procedure": "dnadmod::mult_dd",
+                "procedure": "mult_dd",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 785,
-                "line_end": 792
+                "line_end": 792,
+                "role": "implementation-helper",
+                "module": "dnadmod"
               },
               {
-                "procedure": "dnadmod::div_dd",
+                "procedure": "div_dd",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 870,
-                "line_end": 880
+                "line_end": 880,
+                "role": "implementation-helper",
+                "module": "dnadmod"
               },
               {
-                "procedure": "dnadmod::exp_d",
+                "procedure": "exp_d",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 1603,
-                "line_end": 1613
+                "line_end": 1613,
+                "role": "implementation-helper",
+                "module": "dnadmod"
               },
               {
-                "procedure": "dnadmod::sin_d",
+                "procedure": "sin_d",
                 "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
                 "line_start": 1917,
-                "line_end": 1924
+                "line_end": 1924,
+                "role": "implementation-helper",
+                "module": "dnadmod"
               },
               {
-                "procedure": "BAND_mod::auto_fill",
+                "procedure": "auto_fill",
                 "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
                 "line_start": 140,
-                "line_end": 160
+                "line_end": 160,
+                "role": "implementation-helper",
+                "module": "BAND_mod"
               },
               {
-                "procedure": "BAND_mod::auto_fill::c_to_dual / dcdx_to_dual",
+                "procedure": "auto_fill::c_to_dual / dcdx_to_dual",
                 "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
                 "line_start": 168,
-                "line_end": 196
+                "line_end": 196,
+                "role": "implementation-helper",
+                "module": "BAND_mod"
               }
             ],
             "notes": "The real dual-number path propagates first derivatives in a dx(ndv) vector through overloaded multiplication, division, exponential and sine operations. The inspected product, quotient and chain-rule formulas operate on values and derivative vectors, without finite-difference steps. auto_fill seeds identity derivatives separately for concentration and spatial-gradient variables, then extracts flux/reaction/accumulation Jacobian entries. This supports H1, already a GAMS leaf including automatic differentiation. It is forward first-order differentiation, not a Hessian or reverse-mode implementation. In this fork ndv=2*N depends on user_input, and the scalar real kind follows the build configuration; it is not a standalone precision-generic package without adaptation. The reviewed path does not establish correctness of every overload, complex extensions or nondifferentiable branches. The README credits inherited DNAD by Wenbin Yu/Maxwell Blair and the upstream fork; those components are not newly attributed to this repository. No derivative check or program was executed.",
@@ -37467,6 +37920,11 @@
                 "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
                 "path": "ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
                 "sha256": "b7cec8940690bda57e3f04c27b1212ad9313a5ed0ff62945b9662a83b90fb372"
+              },
+              {
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "sha256": "d00d7ce0839c32078e6a94326e650fa31fe5b943ccc64871e5e2f9c7f9c56464"
               }
             ],
             "procedures": [
@@ -37474,25 +37932,75 @@
                 "procedure": "BAND_mod (included solver wiring)",
                 "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
                 "line_start": 14,
-                "line_end": 24
+                "line_end": 24,
+                "role": "module-interface"
               },
               {
-                "procedure": "BAND_mod::ABDGXY",
+                "procedure": "ABDGXY",
                 "path": "ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95",
                 "line_start": 29,
-                "line_end": 62
+                "line_end": 62,
+                "role": "public-entry-point",
+                "module": "BAND_mod",
+                "summary": "Public BAND_mod assembly stage. It reads model coefficients from variables and writes the current block-band matrices for spatial node j. It must follow auto_fill(j); it is not an independent matrix-assembly API with explicit array arguments.",
+                "signature": "CALL ABDGXY(j)",
+                "declarations": [
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95",
+                    "line_start": 29,
+                    "line_end": 35
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                    "line_start": 262,
+                    "line_end": 276
+                  }
+                ]
               },
               {
-                "procedure": "BAND_mod::BAND",
+                "procedure": "BAND",
                 "path": "ExampleModels/Core_Subs_Mods/sub_BAND.f95",
                 "line_start": 38,
-                "line_end": 99
+                "line_end": 99,
+                "role": "public-entry-point",
+                "module": "BAND_mod",
+                "summary": "Public BAND_mod block-elimination/back-substitution stage for the model state at spatial node j. It reads and overwrites shared variables arrays and depends on sequential calls from j=1 through NJ after model assembly; it is not a general solver that accepts a matrix as an argument.",
+                "signature": "CALL BAND(j)",
+                "declarations": [
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/sub_BAND.f95",
+                    "line_start": 38,
+                    "line_end": 44
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                    "line_start": 262,
+                    "line_end": 276
+                  }
+                ],
+                "usage": "use BAND_mod, only: auto_fill, ABDGXY, BAND\n! Model modules, mesh, initial conditions and work arrays are initialized.\ndo j = 1, NJ\n   call auto_fill(j)\n   call ABDGXY(j)\n   call BAND(j)\nend do",
+                "usage_notes": "Calling sketch only. Adapt the absolute include paths in both the model and BAND_MOD.f95 and compile modules in dependency order. N/NJ and variables arrays come from the selected model; the final spatial call performs back substitution. Singularity handling prints diagnostics and is not a robust solve-status API. The block system is not a scalar tridiagonal interface. No build, residual or PDE accuracy check was made."
               },
               {
-                "procedure": "BAND_mod::MATINV",
+                "procedure": "MATINV",
                 "path": "ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
                 "line_start": 8,
-                "line_end": 89
+                "line_end": 89,
+                "role": "public-entry-point",
+                "module": "BAND_mod",
+                "summary": "Public module routine used internally by BAND. It applies elimination to shared B and D arrays from variables, with N rows and M right-hand sides; DETERM is a default-real output diagnostic. The arrays are not dummy arguments, so this entry is exposed only for users adapting the model engine, not as a standalone inverse routine.",
+                "signature": "CALL MATINV(N, M, DETERM)",
+                "declarations": [
+                  {
+                    "path": "ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
+                    "line_start": 8,
+                    "line_end": 14
+                  }
+                ]
               }
             ],
             "notes": "ABDGXY assembles neighboring real blocks and BAND performs forward block elimination followed by back substitution, including special boundary couplings through X and Y. Each block solve delegates to MATINV, which applies Gaussian/Gauss-Jordan row operations to B and the multiple right-hand sides in D. The supported GAMS scope is real nonsymmetric banded linear systems (D2a2). Block tridiagonal structure is not generally scalar tridiagonal, and boundary terms can reach an additional neighboring block, so the D2a2a leaf would overstate the structure. This is an inherited Newman BAND-style specialized solver using module-global arrays, not a general LAPACK-compatible band-storage interface. NJ must accommodate the referenced neighboring nodes, and the routine assumes compatible block/boundary assembly. Singular-block diagnostics print and continue in BAND; conditioning, pivot robustness, residuals and larger systems were not checked. No complex or symmetric-positive-definite specialization is inferred.",
@@ -37524,43 +38032,54 @@
                 "procedure": "user_input (diffusion example)",
                 "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
                 "line_start": 9,
-                "line_end": 37
+                "line_end": 37,
+                "role": "module-interface"
               },
               {
-                "procedure": "GOV_EQNS::FLUX / RXN / ACCUM",
+                "procedure": "FLUX / RXN / ACCUM",
                 "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
                 "line_start": 124,
-                "line_end": 194
+                "line_end": 194,
+                "role": "callback",
+                "module": "GOV_EQNS"
               },
               {
-                "procedure": "GOV_EQNS::Boundary_WEST / Boundary_EAST",
+                "procedure": "Boundary_WEST / Boundary_EAST",
                 "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
                 "line_start": 207,
-                "line_end": 231
+                "line_end": 231,
+                "role": "callback",
+                "module": "GOV_EQNS"
               },
               {
                 "procedure": "unsteady",
                 "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
-                "line_start": 238,
-                "line_end": 288
+                "line_start": 245,
+                "line_end": 288,
+                "role": "program-entry-point",
+                "summary": "Author one-dimensional diffusion program. It initializes model state, loops over spatial nodes through auto_fill/ABDGXY/BAND, then updates cprev and time. Absolute include paths in the example and BAND_MOD.f95 require adaptation. This is a standalone model, not a generic PDE-solver subroutine."
               },
               {
                 "procedure": "initial_condition",
                 "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
                 "line_start": 295,
-                "line_end": 330
+                "line_end": 330,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "BAND_mod (included solver wiring)",
                 "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
                 "line_start": 14,
-                "line_end": 24
+                "line_end": 24,
+                "role": "module-interface"
               },
               {
-                "procedure": "BAND_mod::auto_fill",
+                "procedure": "auto_fill",
                 "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
                 "line_start": 140,
-                "line_end": 160
+                "line_end": 160,
+                "role": "implementation-helper",
+                "module": "BAND_mod"
               }
             ],
             "notes": "This mapping is restricted to the simple rectangular diffusion example, not the repository collection of physical applications. The author program sets one dependent variable, one spatial grid and a positive constant diffusivity; FLUX=-diff*dc/dx, RXN=0 and ACCUM=c/delT describe the one-dimensional parabolic diffusion initial-boundary problem. auto_fill forms finite-volume flux/accumulation derivatives; unsteady loops over spatial nodes through auto_fill/ABDGXY/BAND and updates the solution in time, with prescribed end concentrations. I2a1a is the GAMS leaf for parabolic PDEs in one spatial dimension. The example uses absolute author-machine include paths, and BAND_MOD uses another absolute path, so it is a source example requiring path adaptation rather than a portable checked driver. The included core wiring is inspected, but boundary compatibility, time accuracy, stability and mesh convergence were not checked. No general nonlinear iteration-convergence guarantee or multidimensional PDE mapping is added.",
@@ -37571,6 +38090,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom component terms (DNAD module)",
+          "spdx_expression": null,
+          "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+          "reviewed_on": "2026-11-04",
+          "notes": "The inherited DNAD header contains Joshua Hodson and Wenbin Yu notices expressly permitting copying, modification and translation. No standard SPDX identifier is asserted for these custom component notices. The pinned tree has no separately named LICENSE/COPYING file; this record does not establish project-wide terms for the Newman BAND engine, examples or other components. The README records the separate provenance of those components.",
+          "evidence": [
+            {
+              "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+              "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95",
+              "sha256": "85b420c9227a372e7277a75a51ade365508ea990d0a38f3cab5bafcadd961f99"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/README.md",
+              "sha256": "d6cc122c75902cbf886e67ce1ba3c6878ab0c227f7c3498c174099b5fb654ed3"
+            }
+          ]
         }
       },
       "imports": {}

@@ -13,26 +13,46 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Eight repository cards now identify public entry points, link their usage lines
-to pinned argument declarations, and distinguish implementation helpers on the
-detail pages. Module names and procedure names are stored separately. These are
-source-inspected calling interfaces, not new compilation or numerical checks.
+Fifteen repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A sixteenth, DDFSA, identifies the supplied
+program entry point and keeps its benchmark harness among implementation helpers.
+Detail pages distinguish these roles. Module names and procedure names are stored
+separately. All sixteen independently source-reviewed repositories now have an
+entry-point annotation and a scoped license finding. These are source-inspected
+interfaces, not new compilation or numerical checks or complete public-API audits.
 
 | Repository | Entry points | Recorded license |
 | --- | --- | --- |
 | ACRS | `ACRS` (external subroutine) | GPL-3.0-or-later |
+| DDFSA | `MAIN_GLOB` (program); `SENZADERGLOB` is a linked-problem benchmark harness | GPL-3.0-or-later |
 | DIRDFN | `dirdfn` (external subroutine; linked problem routines and shared state) | GPL-3.0-or-later |
+| DIRMIN | `nuovoglobale` (external subroutine; shared-state setup required) | GPL-3.0-or-later |
+| MODIR | `wrapper` (external coordinator; separate MODIR/DFMO budgets and linked problem routines) | GPL-3.0-or-later |
+| SDMINMAX | `MAINBOX` (external finite-minimax routine; workspace and COMMON setup required) | GPL-3.0-or-later |
 | FIRD | `fird` (external wrapper; objective, constraint and constraint-Jacobian callbacks) | MIT |
+| Skinny | `skinny::sksolve` (linked problem evaluators; some solver branches are stubs) | MIT |
 | AR4 | `arp::arp_load`, `arp::arp_solve` | Multiple licenses; root GPL v3 and separate ALGENCAN notice |
 | Accelerated DF-SANE | `bmdfsaneacc::dfsaneacc` | No license identified in reviewed Fortran material |
 | Fortran introsort | `mod_introsort::sort`, `mod_introsort::apply_permutation` | MIT |
 | Fortran mergesort | `merge_sort_mod::sort`, `merge_sort_mod::rearrange` | No license identified in reviewed material |
-| Minimum-radius ball covering | `VorCells_Polygons::VorCellInterConvPol`, `VorCells_Polygons::interCellBall` | Not yet reviewed |
+| Extrapolation Integration | `Extrapolation_Integration::extrapolation` (public generic function; inspected REAL(dp) binding) | GNU GPL version 3; version-only versus or-later scope unresolved |
+| KogAcc | `DKSVD0` (external real64 square SVD; schedule/workspace initialization required) | MIT, unless noted otherwise |
+| Fortran_DNAD | `dnadmod::exp`, `dnadmod::sin`; model-dependent `BAND_mod::ABDGXY`, `BAND_mod::BAND`, `BAND_mod::MATINV`; diffusion program `unsteady` | Custom DNAD component notices; project-wide terms unresolved |
+| Minimum-radius ball covering | `VorCells_Polygons::VorCellInterConvPol`, `VorCells_Polygons::interCellBall` | No project-wide license identified in reviewed material |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
 implementation names are not promoted as public APIs. The mergesort descending
 history issue below remains unresolved; the calling sketches use ascending sorts.
+The integration sketch uses dyadic samples and retains the non-dyadic fallback
+finding below. DDFSA's program writes `risultato.tex` and uses ten runs; it is not
+presented as a general callback-driven library routine. KogAcc's `INFO` needs input
+initialization as a step-budget/mode control, unlike an output-only error code.
+MODIR's supplied main disables the global phase with a zero budget; the calling
+sketch enables it explicitly. SDMINMAX's `MAINBOX` name does not imply bounds or
+linear constraints. DNAD's specific `exp_d` and `sin_d` routines remain private;
+cards show their public generics. Its model engine still requires the selected
+model's shared arrays, module ordering and adapted absolute include paths.
 
 ## Source mappings
 

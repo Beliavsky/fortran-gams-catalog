@@ -3590,6 +3590,18 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## DDFSA
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3 and the DDFSA source header explicitly permits version 3 or any later version. This records the reviewed solver-source terms, not a license audit of separately linked code.
+
+Reviewed 2026-11-04 at `054c1335805b8f6c3b745f6c8e44b8f71aec468b`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[MainGlob.f90](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90)
+SHA-256 (normalized UTF-8/LF): `ffd7f7000dc445e3e92278d1a8427a31b743b6d874e9c6ec9e6cf71a3d449e6c`.
+
 **G — documentation-reviewed**
 
 The Fortran 90 usage guide documents problem dimension, bounds and objective callbacks. A known global value is optional input, not independently established by this review. Cooling behavior, convergence and example results were not checked.
@@ -3611,17 +3623,38 @@ SHA-256 (normalized UTF-8/LF): `ffd7f7000dc445e3e92278d1a8427a31b743b6d874e9c6ec
 [lsrch_box.f90](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/lsrch_box.f90)
 SHA-256 (normalized UTF-8/LF): `f2451722ef7a9bd35affc4ce57f857ba48e2178869e9dea2057e7ba56bc4fa8e`.
 
-Procedure `SENZADERGLOB`: [MainGlob.f90:51–106](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L51-L106).
+[README.txt](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/README.txt)
+SHA-256 (normalized UTF-8/LF): `ae32aa8bd93c28f1af0d7ba5817c43ba6885310ac89c3ce3f2dfc256a95ffcb5`.
 
-Procedure `SENZADERGLOB`: [MainGlob.f90:181–199](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L181-L199).
+Program entry point `MAIN_GLOB`: [MainGlob.f90:23–49](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L23-L49).
 
-Procedure `SENZADERGLOB`: [MainGlob.f90:400–463](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L400-L463).
+Supplied executable entry point. The author README instructs editing problem.f90, building with make and running ./ddfsa on Unix. MAIN_GLOB opens risultato.tex and invokes a ten-run benchmark harness. Adapting this program is the reviewed route to a new problem; no generic library interface or checked run is claimed.
 
-Procedure `SENZADERGLOB`: [MainGlob.f90:520–568](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L520-L568).
+Author example (not run): [README.txt:13–28](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/README.txt#L13-L28).
 
-Procedure `RICERCA_LUNGO_ASSI`: [MainGlob.f90:1139–1190](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L1139-L1190).
+Implementation helper `SENZADERGLOB`: [MainGlob.f90:51–106](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L51-L106).
 
-Procedure `linesearchbox_cont`: [lsrch_box.f90:1–236](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/lsrch_box.f90#L1-L236).
+External benchmark/driver harness called by MAIN_GLOB, not a general problem-data solver API. It loads n and bounds through linked NINIT/FUNCTINIT, uses ten runs and source-fixed controls, and writes to the supplied TABELLA unit.
+
+Usage:
+
+```fortran
+CALL SENZADERGLOB(TABELLA, iok)
+```
+
+Argument declarations: [MainGlob.f90:51–62](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L51-L62).
+
+Author example (not run): [MainGlob.f90:23–49](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L23-L49).
+
+Implementation evidence `SENZADERGLOB`: [MainGlob.f90:181–199](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L181-L199).
+
+Implementation evidence `SENZADERGLOB`: [MainGlob.f90:400–463](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L400-L463).
+
+Implementation evidence `SENZADERGLOB`: [MainGlob.f90:520–568](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L520-L568).
+
+Implementation helper `RICERCA_LUNGO_ASSI`: [MainGlob.f90:1139–1190](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/MainGlob.f90#L1139-L1190).
+
+Implementation helper `linesearchbox_cont`: [lsrch_box.f90:1–236](https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/lsrch_box.f90#L1-L236).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -3894,6 +3927,18 @@ Not built or run for this catalog. Source-reviewed mappings identify the inspect
 
 ## DIRMIN
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3. The reviewed DIRMIN solver header expressly permits version 3 or any later version. This records the solver-source terms; separately supplied dependencies are outside this license review.
+
+Reviewed 2026-11-04 at `1912e7165288d60d3b5e23d0e44b91a41555ed3f`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[CODE/mainSUB.f90](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90)
+SHA-256 (normalized UTF-8/LF): `20de0417484777949de00713e2ceeff93ece89ab283c0a94a09a1d2508c0cdaf`.
+
 **G — documentation-reviewed**
 
 The README distinguishes the supplied 74-problem collection from a user-defined objective and documents interval, evaluation and line-search controls. Its known-global-value stopping test is not an accuracy certificate for an unknown problem. Evaluation-budget overshoot is explicitly described upstream; results were not reproduced.
@@ -3917,13 +3962,46 @@ Original document encoding: cp1252.
 [CODE/SD-box_discr.f90](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90)
 SHA-256 (normalized UTF-8/LF): `0ce4372378b3a3454996fc933263b3144cb69625d96dc20c454a5a9ba6ddc99f`.
 
-Procedure `nuovoglobale`: [CODE/mainSUB.f90:26–201](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L26-L201).
+[CODE/mainMAIN.f90](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainMAIN.f90)
+SHA-256 (normalized UTF-8/LF): `7b2ce01ae0abc5ed512d065dd696f8724ccf408e1fc282f75ed8e0818a927f09`.
 
-Procedure `nuovoglobale`: [CODE/mainSUB.f90:286–363](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L286-L363).
+Public entry point `nuovoglobale`: [CODE/mainSUB.f90:26–201](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L26-L201).
 
-Procedure `sd_box`: [CODE/SD-box_discr.f90:26–114](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90#L26-L114).
+External DIRECT/local-search subroutine for finite box bounds. It uses separately linked funct and shared modules rather than a callback argument. xbest and fbest hold the current best point/value; the interface also returns search counts and interval diagnostics. xmin(n,100) and fmin(100) are fixed-shape arrays, not arbitrary-length work buffers.
 
-Procedure `sd_box`: [CODE/SD-box_discr.f90:142–227](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90#L142-L227).
+Usage:
+
+```fortran
+CALL nuovoglobale(n, lbb, ubb, xbest, fbest, nf, nminloc, fglob, &
+                 maxint, maxnf, iprint, trovato, nint, mindiam, &
+                 maxdiam, maxL, xmin, fmin, imin, jmin, &
+                 alfa_stop, tolglob, trigLS)
+```
+
+Argument declarations: [CODE/mainSUB.f90:129–145](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L129-L145).
+
+Argument declarations: [CODE/mainSUB.f90:26–35](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L26-L35).
+
+Author example (not run): [CODE/mainMAIN.f90:204–219](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainMAIN.f90#L204-L219).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Use the author mainNuovoGLOB setup for shared modules and storage.
+! Supply funct and initialize finite bounds and search controls.
+call nuovoglobale(n, lbb, ubb, xbest, fbest, nf, nminloc, fglob, &
+                 maxint, maxnf, iprint, trovato, nint, mindiam, &
+                 maxdiam, maxL, xmin, fmin, imin, jmin, &
+                 alfa_stop, tolglob, trigLS)
+```
+
+Calling sketch only. This is the external nuovoglobale in DIRMIN, not similarly named routines in other repositories. Follow CODE/mainMAIN.f90 for allocation and shared-state initialization, including module bounds, globxbest, evaluation counters and budgets. The supplied driver reads nomefun and DIRECT_params.txt and may need problem-specific files. This is not a self-contained or stateless API; no new run or global-optimum check was made.
+
+Implementation evidence `nuovoglobale`: [CODE/mainSUB.f90:286–363](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/mainSUB.f90#L286-L363).
+
+Implementation helper `sd_box`: [CODE/SD-box_discr.f90:26–114](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90#L26-L114).
+
+Implementation helper `sd_box`: [CODE/SD-box_discr.f90:142–227](https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/CODE/SD-box_discr.f90#L142-L227).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -4012,6 +4090,18 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## DNAD with Newman BAND
 
+**License: Custom component terms (DNAD module)**
+
+The inherited DNAD header contains Joshua Hodson and Wenbin Yu notices expressly permitting copying, modification and translation. No standard SPDX identifier is asserted for these custom component notices. The pinned tree has no separately named LICENSE/COPYING file; this record does not establish project-wide terms for the Newman BAND engine, examples or other components. The README records the separate provenance of those components.
+
+Reviewed 2026-11-04 at `7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c`.
+
+[ExampleModels/Core_Subs_Mods/dnadmod.f95](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95)
+SHA-256 (normalized UTF-8/LF): `85b420c9227a372e7277a75a51ade365508ea990d0a38f3cab5bafcadd961f99`.
+
+[README.md](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/README.md)
+SHA-256 (normalized UTF-8/LF): `d6cc122c75902cbf886e67ce1ba3c6878ab0c227f7c3498c174099b5fb654ed3`.
+
 **H — documentation-reviewed**
 
 The README combines inherited DNAD, Newman BAND and fillmat components and describes a general core with diffusion/reaction example equations. Scope here is that reusable differentiation/discretization framework, not cataloging the battery or fluid applications. Machine-precision and performance claims were not independently checked; attribution to inherited components is preserved.
@@ -4045,21 +4135,77 @@ SHA-256 (normalized UTF-8/LF): `85b420c9227a372e7277a75a51ade365508ea990d0a38f3c
 [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95)
 SHA-256 (normalized UTF-8/LF): `6e7c599b1032c800ee19482c3342692b0de21cc0ce847ef0b875e016256e82cf`.
 
-Procedure `dnadmod::dual / ndv`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:116–145](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L116-L145).
+Public entry point `dnadmod::sin`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:457–461](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L457-L461).
 
-Procedure `dnadmod::assign_dr`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:566–573](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L566-L573).
+Public overloaded sin generic for the inspected real dual-number type. The dual result carries the value in %x and first derivatives in %dx. The specific sin_d implementation is private. Set the input derivative seeds explicitly; the derivative-vector length is tied to user_input::N at this pin.
 
-Procedure `dnadmod::mult_dd`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:785–792](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L785-L792).
+Usage:
 
-Procedure `dnadmod::div_dd`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:870–880](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L870-L880).
+```fortran
+y = sin(u)
+```
 
-Procedure `dnadmod::exp_d`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1603–1613](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1603-L1613).
+Argument declarations: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1917–1919](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1917-L1919).
 
-Procedure `dnadmod::sin_d`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1917–1924](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1917-L1924).
+Argument declarations: [ExampleModels/Core_Subs_Mods/dnadmod.f95:116–135](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L116-L135).
 
-Procedure `BAND_mod::auto_fill`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:140–160](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L140-L160).
+Calling sketch (not a checked driver):
 
-Procedure `BAND_mod::auto_fill::c_to_dual / dcdx_to_dual`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:168–196](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L168-L196).
+```fortran
+use dnadmod, only: dual, sin
+type(dual) :: u, y
+u%x = 0.5
+u%dx = 0.0
+u%dx(1) = 1.0
+y = sin(u)
+! Inspect y%x and y%dx(1) for the value and seeded derivative.
+```
+
+Calling sketch only. Build a compatible user_input module with positive N before dnadmod; ndv is N*2 and is private. Value and derivative components use default REAL, so use consistent precision flags across all dependent modules. This demonstrates the inspected real dual binding; it does not certify all overloads or the complex implementation. The fork-specific configuration differs from the inherited header instructions. Not compiled or run here.
+
+Public entry point `dnadmod::exp`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:381–385](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L381-L385).
+
+Public overloaded exp generic for the inspected real dual-number type. The dual result carries the value in %x and first derivatives in %dx. The specific exp_d implementation is private. Set the input derivative seeds explicitly; the derivative-vector length is tied to user_input::N at this pin.
+
+Usage:
+
+```fortran
+y = exp(u)
+```
+
+Argument declarations: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1603–1605](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1603-L1605).
+
+Argument declarations: [ExampleModels/Core_Subs_Mods/dnadmod.f95:116–135](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L116-L135).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use dnadmod, only: dual, exp
+type(dual) :: u, y
+u%x = 0.5
+u%dx = 0.0
+u%dx(1) = 1.0
+y = exp(u)
+! Inspect y%x and y%dx(1) for the value and seeded derivative.
+```
+
+Calling sketch only. Build a compatible user_input module with positive N before dnadmod; ndv is N*2 and is private. Value and derivative components use default REAL, so use consistent precision flags across all dependent modules. This demonstrates the inspected real dual binding; it does not certify all overloads or the complex implementation. The fork-specific configuration differs from the inherited header instructions. Not compiled or run here.
+
+Module interface `dnadmod::dual / ndv`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:116–145](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L116-L145).
+
+Implementation helper `dnadmod::assign_dr`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:566–573](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L566-L573).
+
+Implementation helper `dnadmod::mult_dd`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:785–792](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L785-L792).
+
+Implementation helper `dnadmod::div_dd`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:870–880](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L870-L880).
+
+Implementation helper `dnadmod::exp_d`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1603–1613](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1603-L1613).
+
+Implementation helper `dnadmod::sin_d`: [ExampleModels/Core_Subs_Mods/dnadmod.f95:1917–1924](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95#L1917-L1924).
+
+Implementation helper `BAND_mod::auto_fill`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:140–160](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L140-L160).
+
+Implementation helper `BAND_mod::auto_fill::c_to_dual / dcdx_to_dual`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:168–196](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L168-L196).
 
 **D2a2 — source-reviewed**
 
@@ -4079,13 +4225,64 @@ SHA-256 (normalized UTF-8/LF): `876e8163e8c74bcf5162b9d2aacffd8396fdced26de6d5f7
 [ExampleModels/Core_Subs_Mods/sub_MATINV.f95](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95)
 SHA-256 (normalized UTF-8/LF): `b7cec8940690bda57e3f04c27b1212ad9313a5ed0ff62945b9662a83b90fb372`.
 
-Procedure `BAND_mod (included solver wiring)`: [ExampleModels/Core_Subs_Mods/BAND_MOD.f95:14–24](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95#L14-L24).
+[ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95)
+SHA-256 (normalized UTF-8/LF): `d00d7ce0839c32078e6a94326e650fa31fe5b943ccc64871e5e2f9c7f9c56464`.
 
-Procedure `BAND_mod::ABDGXY`: [ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95:29–62](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95#L29-L62).
+Module interface `BAND_mod (included solver wiring)`: [ExampleModels/Core_Subs_Mods/BAND_MOD.f95:14–24](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95#L14-L24).
 
-Procedure `BAND_mod::BAND`: [ExampleModels/Core_Subs_Mods/sub_BAND.f95:38–99](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_BAND.f95#L38-L99).
+Public entry point `BAND_mod::ABDGXY`: [ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95:29–62](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95#L29-L62).
 
-Procedure `BAND_mod::MATINV`: [ExampleModels/Core_Subs_Mods/sub_MATINV.f95:8–89](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95#L8-L89).
+Public BAND_mod assembly stage. It reads model coefficients from variables and writes the current block-band matrices for spatial node j. It must follow auto_fill(j); it is not an independent matrix-assembly API with explicit array arguments.
+
+Usage:
+
+```fortran
+CALL ABDGXY(j)
+```
+
+Argument declarations: [ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95:29–35](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95#L29-L35).
+
+Author example (not run): [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:262–276](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L262-L276).
+
+Public entry point `BAND_mod::BAND`: [ExampleModels/Core_Subs_Mods/sub_BAND.f95:38–99](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_BAND.f95#L38-L99).
+
+Public BAND_mod block-elimination/back-substitution stage for the model state at spatial node j. It reads and overwrites shared variables arrays and depends on sequential calls from j=1 through NJ after model assembly; it is not a general solver that accepts a matrix as an argument.
+
+Usage:
+
+```fortran
+CALL BAND(j)
+```
+
+Argument declarations: [ExampleModels/Core_Subs_Mods/sub_BAND.f95:38–44](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_BAND.f95#L38-L44).
+
+Author example (not run): [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:262–276](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L262-L276).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use BAND_mod, only: auto_fill, ABDGXY, BAND
+! Model modules, mesh, initial conditions and work arrays are initialized.
+do j = 1, NJ
+   call auto_fill(j)
+   call ABDGXY(j)
+   call BAND(j)
+end do
+```
+
+Calling sketch only. Adapt the absolute include paths in both the model and BAND_MOD.f95 and compile modules in dependency order. N/NJ and variables arrays come from the selected model; the final spatial call performs back substitution. Singularity handling prints diagnostics and is not a robust solve-status API. The block system is not a scalar tridiagonal interface. No build, residual or PDE accuracy check was made.
+
+Public entry point `BAND_mod::MATINV`: [ExampleModels/Core_Subs_Mods/sub_MATINV.f95:8–89](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95#L8-L89).
+
+Public module routine used internally by BAND. It applies elimination to shared B and D arrays from variables, with N rows and M right-hand sides; DETERM is a default-real output diagnostic. The arrays are not dummy arguments, so this entry is exposed only for users adapting the model engine, not as a standalone inverse routine.
+
+Usage:
+
+```fortran
+CALL MATINV(N, M, DETERM)
+```
+
+Argument declarations: [ExampleModels/Core_Subs_Mods/sub_MATINV.f95:8–14](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95#L8-L14).
 
 **I2a1a — source-reviewed**
 
@@ -4102,19 +4299,21 @@ SHA-256 (normalized UTF-8/LF): `4014b55716a867ea4d710839b197a559e0e35c292f8dfcf8
 [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95)
 SHA-256 (normalized UTF-8/LF): `6e7c599b1032c800ee19482c3342692b0de21cc0ce847ef0b875e016256e82cf`.
 
-Procedure `user_input (diffusion example)`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:9–37](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L9-L37).
+Module interface `user_input (diffusion example)`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:9–37](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L9-L37).
 
-Procedure `GOV_EQNS::FLUX / RXN / ACCUM`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:124–194](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L124-L194).
+Callback `GOV_EQNS::FLUX / RXN / ACCUM`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:124–194](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L124-L194).
 
-Procedure `GOV_EQNS::Boundary_WEST / Boundary_EAST`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:207–231](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L207-L231).
+Callback `GOV_EQNS::Boundary_WEST / Boundary_EAST`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:207–231](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L207-L231).
 
-Procedure `unsteady`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:238–288](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L238-L288).
+Program entry point `unsteady`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:245–288](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L245-L288).
 
-Procedure `initial_condition`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:295–330](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L295-L330).
+Author one-dimensional diffusion program. It initializes model state, loops over spatial nodes through auto_fill/ABDGXY/BAND, then updates cprev and time. Absolute include paths in the example and BAND_MOD.f95 require adaptation. This is a standalone model, not a generic PDE-solver subroutine.
 
-Procedure `BAND_mod (included solver wiring)`: [ExampleModels/Core_Subs_Mods/BAND_MOD.f95:14–24](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95#L14-L24).
+Implementation helper `initial_condition`: [ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95:295–330](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95#L295-L330).
 
-Procedure `BAND_mod::auto_fill`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:140–160](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L140-L160).
+Module interface `BAND_mod (included solver wiring)`: [ExampleModels/Core_Subs_Mods/BAND_MOD.f95:14–24](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95#L14-L24).
+
+Implementation helper `BAND_mod::auto_fill`: [ExampleModels/Core_Subs_Mods/sub_auto_fill.f95:140–160](https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95#L140-L160).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -4905,6 +5104,18 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## Extrapolation Integration
 
+**License: GNU GPL version 3**
+
+The root LICENSE contains GPL version 3 and fpm.toml reports GNU General Public License v3.0. The reviewed manifest, README and module do not separately resolve a version-only versus or-later grant, so no SPDX expression is asserted. This label records the identified project license without extending it to development dependencies.
+
+Reviewed 2026-11-04 at `5472eb6f2b85c5ff2337f3e52acd2d689335c078`.
+
+[LICENSE](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[fpm.toml](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/fpm.toml)
+SHA-256 (normalized UTF-8/LF): `1ab73b2e66508038da4beaa1cc7e95c5339e22cf1c786a74c8858fe12c503155`.
+
 **H — documentation-reviewed**
 
 The README specifies equally spaced real/complex samples and returns the integral divided by the interval length, so callers must supply interval scaling themselves. Extrapolation requires 2^M+1 samples; other lengths use trapezoidal reduction, and a singleton is returned unchanged. Stated error orders and edge cases were not independently checked.
@@ -4929,15 +5140,40 @@ SHA-256 (normalized UTF-8/LF): `d56e2869a2f00a94c2cb0c7b658d05a16875c359afca14d9
 [example/Integral_of_SINC.F90](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/example/Integral_of_SINC.F90)
 SHA-256 (normalized UTF-8/LF): `62774233d7dfdc6d233cdd6bff2fb7c7bd0e2ebe76b6fc517270e69b6d99e7a2`.
 
-Procedure `Extrapolation_Integration::extrapol_rdp`: [src/Extrapolation_Integration.F90:287–330](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L287-L330).
+Public entry point `Extrapolation_Integration::extrapolation`: [src/Extrapolation_Integration.F90:1–15](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L1-L15).
 
-Procedure `Extrapolation_Integration::extrapol_rdp::trap_rdp`: [src/Extrapolation_Integration.F90:334–354](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L334-L354).
+Public generic array-reduction function. The inspected REAL(dp) binding accepts an assumed-shape vector and returns a scalar of the same kind; extrapol_rdp and its nested helpers are private implementation details. Supply equally spaced samples with 2**m+1 entries for the reviewed extrapolation path, and multiply the normalized result by the physical interval length.
 
-Procedure `Extrapolation_Integration::extrapol_rdp::org_dt_rdp`: [src/Extrapolation_Integration.F90:356–384](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L356-L384).
+Usage:
 
-Procedure `Extrapolation_Integration::extrapol_rdp::extrapol_driver_rdp`: [src/Extrapolation_Integration.F90:386–417](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L386-L417).
+```fortran
+result = extrapolation(array)
+```
 
-Procedure `Integral_of_SINC`: [example/Integral_of_SINC.F90:15–51](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/example/Integral_of_SINC.F90#L15-L51).
+Argument declarations: [src/Extrapolation_Integration.F90:287–299](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L287-L299).
+
+Author example (not run): [example/Integral_of_SINC.F90:1–38](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/example/Integral_of_SINC.F90#L1-L38).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use Extrapolation_Integration_Kinds, only: dp
+use Extrapolation_Integration, only: extrapolation
+! array is REAL(dp) with 2**m+1 equally spaced samples on [a,b].
+result = (b - a) * extrapolation(array)
+```
+
+Calling sketch only. Initialize the samples and interval endpoints with compatible kinds. This function takes sampled values, not an integrand callback or error tolerance. The inspected non-dyadic fallback has the endpoint-weight discrepancy documented in the source review; the sketch deliberately uses the dyadic path. No accuracy or execution check was performed here. Other real/complex bindings are not newly certified by this interface review.
+
+Implementation helper `Extrapolation_Integration::extrapol_rdp`: [src/Extrapolation_Integration.F90:287–330](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L287-L330).
+
+Implementation helper `Extrapolation_Integration::extrapol_rdp::trap_rdp`: [src/Extrapolation_Integration.F90:334–354](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L334-L354).
+
+Implementation helper `Extrapolation_Integration::extrapol_rdp::org_dt_rdp`: [src/Extrapolation_Integration.F90:356–384](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L356-L384).
+
+Implementation helper `Extrapolation_Integration::extrapol_rdp::extrapol_driver_rdp`: [src/Extrapolation_Integration.F90:386–417](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90#L386-L417).
+
+Program entry point `Integral_of_SINC`: [example/Integral_of_SINC.F90:15–51](https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/example/Integral_of_SINC.F90#L15-L51).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -8398,6 +8634,15 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## KogAcc
 
+**License: MIT**
+
+The root MIT license names Vedran Novakovic, with an unless-noted-otherwise qualification. This records the reviewed project license; bundled exceptions and external components such as libpvn require their own license review.
+
+Reviewed 2026-11-04 at `c852e6d85355b5e7f3efb58b86cbe0c043cecd7d`.
+
+[LICENSE](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/LICENSE)
+SHA-256 (normalized UTF-8/LF): `e2d914b622d07031cecf0f1f39d974e2b374cbdf1a8e06eda1a0a38814d09d29`.
+
 **D — documentation-reviewed**
 
 The README distinguishes cyclic, dynamic and blocked methods, requires libpvn and documents little-endian gfortran/ifx configurations, REAL128 requirements and accuracy/reliability modes. Some routines are only wrappers around libpvn; complex routines are explicitly less tested. No decomposition, rounding or parallel-performance claims were verified.
@@ -8425,17 +8670,51 @@ SHA-256 (normalized UTF-8/LF): `6304b9aa426d8ae8a1dc48357efc6ee1e060eb3ba7a73c7c
 [src/ksvd2/gksvd2.F90](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/gksvd2.F90)
 SHA-256 (normalized UTF-8/LF): `120479979d51d22d422e21c644e51fc150057fdc55f0b099bafd66dc9ffaf3f5`.
 
-Procedure `DKSVD0`: [src/blksvd/dksvd0.F90:1–113](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/dksvd0.F90#L1-L113).
+[src/test/dksvd0x.F90](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/dksvd0x.F90)
+SHA-256 (normalized UTF-8/LF): `fcb656350b9e4c94a087eb7dab7961d0ff2fd7d55afeb718e88ba5376c103ac5`.
 
-Procedure `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:1–54](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L1-L54).
+[src/test/gksvd0x.F90](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/gksvd0x.F90)
+SHA-256 (normalized UTF-8/LF): `d2f6ac721cd8408aa27fca4cf22fec50abacbd4f8001202e6435de3378bbd037`.
 
-Procedure `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:212–335](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L212-L335).
+Public entry point `DKSVD0`: [src/blksvd/dksvd0.F90:1–113](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/dksvd0.F90#L1-L113).
 
-Procedure `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:429–469](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L429-L469).
+External REAL64 square-matrix SVD subroutine. G is overwritten; SV holds the singular values and JOB controls the pivot strategy and initialization/accumulation of U and V. All leading dimensions, schedule/work arrays and INFO must be prepared explicitly. INFO is an input step budget (with sign-dependent mode) and an output status/sweep count, not solely a LAPACK-style output error code.
 
-Procedure `DKSVD2`: [src/ksvd2/dksvd2.F90:1–23](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/dksvd2.F90#L1-L23).
+Usage:
 
-Procedure `DKSVD2 (shared included body)`: [src/ksvd2/gksvd2.F90:1–11](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/gksvd2.F90#L1-L11).
+```fortran
+CALL DKSVD0(JOB, N, G, LDG, U, LDU, V, LDV, SV, W, O, R, INFO)
+```
+
+Argument declarations: [src/blksvd/dksvd0.F90:78–89](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/dksvd0.F90#L78-L89).
+
+Argument declarations: [src/test/dksvd0x.F90:25–39](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/dksvd0x.F90#L25-L39).
+
+Author example (not run): [src/test/gksvd0x.F90:64–105](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/gksvd0x.F90#L64-L105).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Follow the author DKSVD0X driver for JOB, INFO and workspace setup.
+! Initialize G, leading dimensions, U/V as required, and the schedule O.
+call DKSVD0(JOB, N, G, LDG, U, LDU, V, LDV, SV, W, O, R, INFO)
+```
+
+Calling sketch only. Use the exact declarations and preprocessed sources at this pin, including the shared included bodies. The driver allocates W(MAX(6,3*M)), generates the schedule with JSWEEP, and prepares O and R for its padded matrix size M; these requirements depend on the chosen strategy. Do not pass uninitialized INFO. The libpvn kernel boundary remains a dependency, and the source mapping covers the reviewed real square cyclic/quasi-cyclic path, not every compiler option, precision or rectangular variant. Not compiled or run here.
+
+Implementation helper `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:1–54](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L1-L54).
+
+Implementation helper `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:212–335](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L212-L335).
+
+Implementation helper `DKSVD0 (shared included body)`: [src/blksvd/gksvd0.F90:429–469](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90#L429-L469).
+
+Implementation helper `DKSVD2`: [src/ksvd2/dksvd2.F90:1–23](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/dksvd2.F90#L1-L23).
+
+Implementation helper `DKSVD2 (shared included body)`: [src/ksvd2/gksvd2.F90:1–11](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/gksvd2.F90#L1-L11).
+
+Program entry point `DKSVD0X`: [src/test/dksvd0x.F90:1–40](https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/test/dksvd0x.F90#L1-L40).
+
+Author SVD test program. Its included shared body parses strategy, matrix dimension and an input basename, initializes arrays/schedule and invokes DKSVD0. This catalog has not supplied its matrix input files or run the driver.
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -9653,6 +9932,18 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## Minimum-radius ball covering
 
+**License: No project-wide license identified**
+
+No project-wide license grant was identified in the reviewed README or VorCells_Polygons source, and the pinned tree has no separately named LICENSE/COPYING file. The README identifies bundled geometry/GEOMPACK and external ALGENCAN, HSL and BLAS components; their own notices do not by themselves establish reuse terms for the covering and polygon code. This is a scoped license finding, not a complete audit of every bundled routine.
+
+Reviewed 2026-11-04 at `f97119df01ae48e396f881ad2d2e25085338282b`.
+
+[README.md](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/README.md)
+SHA-256 (normalized UTF-8/LF): `9248f082458ce75984a73c7bcbd1c0b48e5ed54f51a77b9169c247f0ddd7bf2c`.
+
+[vorintpols.f90](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90)
+SHA-256 (normalized UTF-8/LF): `104c715d69f1a445ae31f1089d2479d27977e97530bbedf1ec84f858dd64e7ea`.
+
 **G — documentation-reviewed**
 
 The README documents minimum-radius coverings, polygon generation, Voronoi cells, Sutherland-Hodgman clipping and convex-polygon/circle intersections. It requires ALGENCAN, BLAS and HSL, with bundled GEOMETRY/GEOMPACK sources. These are generic geometric optimization problems; optimality, intersection degeneracies and paper results were not checked.
@@ -10047,6 +10338,18 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## MODIR and MODIR+DFMO
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3. The reviewed MODIR wrapper header explicitly permits version 3 or any later version. This records the solver-source notice; bundled or separately supplied components require their own review.
+
+Reviewed 2026-11-04 at `3896605a13c7467f15052e150621d44d55e3fc0d`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[CODE/subroutines_RACCORDO.f90](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90)
+SHA-256 (normalized UTF-8/LF): `95fb4a74732c39c14486310cb916d1e19436c647d0eade532be30c908c072924`.
+
 **G — documentation-reviewed**
 
 The Fortran 90 guide documents variable bounds, vector objectives and inequalities g(x)<=0, and separate MODIR/DFMO evaluation budgets. Equality constraints and guaranteed recovery of a complete Pareto front are not established. Hybrid behavior and examples were not checked.
@@ -10076,17 +10379,43 @@ SHA-256 (normalized UTF-8/LF): `95fb4a74732c39c14486310cb916d1e19436c647d0eade53
 [CODE/main.f90](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main.f90)
 SHA-256 (normalized UTF-8/LF): `6777a610005c4ca894119d611ffed0cea208c6dc1c434aa5663cb982cac7543e`.
 
-Procedure `main_MODIRECT`: [CODE/main_MODIRECT.f90:1–154](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main_MODIRECT.f90#L1-L154).
+Public entry point `wrapper`: [CODE/subroutines_RACCORDO.f90:29–40](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90#L29-L40).
 
-Procedure `nuovoglobale`: [CODE/mainSUB.f90:220–255](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L220-L255).
+External high-level driver wrapper for MODIR/DFMO. Its two default-integer arguments are separate function-evaluation budgets. It obtains problem dimensions, bounds, objectives and inequalities from linked routines, manages shared solver state, and writes nondominated solutions to out_nondom.txt rather than returning a solution array.
 
-Procedure `nuovoglobale`: [CODE/mainSUB.f90:380–410](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L380-L410).
+Usage:
 
-Procedure `nuovoglobale`: [CODE/mainSUB.f90:566–591](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L566-L591).
+```fortran
+CALL wrapper(maxnf_MODIR, maxnf_DFMO)
+```
 
-Procedure `wrapper`: [CODE/subroutines_RACCORDO.f90:175–285](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90#L175-L285).
+Argument declarations: [CODE/subroutines_RACCORDO.f90:73–84](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90#L73-L84).
 
-Procedure `main`: [CODE/main.f90:1–14](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main.f90#L1-L14).
+Author example (not run): [CODE/main.f90:1–14](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main.f90#L1-L14).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Link the upstream modules and your problem.f90 definitions.
+! Choose budgets explicitly; enable MODIR with a positive budget.
+maxnf_MODIR = 500*n
+maxnf_DFMO = 0
+call wrapper(maxnf_MODIR, maxnf_DFMO)
+```
+
+Calling sketch only; initialize n with the problem dimension before choosing budgets. The supplied main sets maxnf_MODIR=0, so running it unchanged does not exercise the global MODIR phase. Follow the README problem interfaces and upstream build/configuration files. main_MODIRECT is a lower-level phase routine requiring shared state and an initialized partition structure; it is retained as implementation evidence rather than recommended as the first call. No Pareto-front or execution check was performed here.
+
+Implementation helper `main_MODIRECT`: [CODE/main_MODIRECT.f90:1–154](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main_MODIRECT.f90#L1-L154).
+
+Implementation helper `nuovoglobale`: [CODE/mainSUB.f90:220–255](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L220-L255).
+
+Implementation helper `nuovoglobale`: [CODE/mainSUB.f90:380–410](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L380-L410).
+
+Implementation helper `nuovoglobale`: [CODE/mainSUB.f90:566–591](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/mainSUB.f90#L566-L591).
+
+Implementation helper `wrapper`: [CODE/subroutines_RACCORDO.f90:175–285](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/subroutines_RACCORDO.f90#L175-L285).
+
+Program entry point `main`: [CODE/main.f90:1–14](https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/CODE/main.f90#L1-L14).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -12973,6 +13302,18 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## SDMINMAX
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3 and the reviewed SDMINMAX source header explicitly permits version 3 or any later version. This records the solver-source notice without assigning terms to separately supplied dependencies.
+
+Reviewed 2026-11-04 at `27a938c530b5a8b4bddc3f6c3dc56ab655e90870`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[CODE/SDMINMAX.f](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f)
+SHA-256 (normalized UTF-8/LF): `9729d55f653ded96cb3f3a90f181aa50f04454c0133e4c37afe615dd8b84146f`.
+
 **G — documentation-reviewed**
 
 The usage guide is supplemented by pinned source-header documentation naming nonlinear finite minimax optimization and its linearly constrained algorithm reference. This does not establish a general nonlinear-constraint interface. Component functions, stopping tests and numerical results need later individual review.
@@ -13000,17 +13341,41 @@ SHA-256 (normalized UTF-8/LF): `9729d55f653ded96cb3f3a90f181aa50f04454c0133e4c37
 [CODE/problem.f](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/problem.f)
 SHA-256 (normalized UTF-8/LF): `ba3a2f1f553d91b4fc6a8bf18aa1700ad7148d2906f155553767da7f63d43cac`.
 
-Procedure `minmax`: [CODE/main.f90:1–57](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90#L1-L57).
+Program entry point `minmax`: [CODE/main.f90:1–57](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90#L1-L57).
 
-Procedure `functmu`: [CODE/main.f90:62–96](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90#L62-L96).
+Implementation helper `functmu`: [CODE/main.f90:62–96](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90#L62-L96).
 
-Procedure `MAINBOX`: [CODE/SDMINMAX.f:22–90](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L22-L90).
+Public entry point `MAINBOX`: [CODE/SDMINMAX.f:22–90](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L22-L90).
 
-Procedure `MAINBOX`: [CODE/SDMINMAX.f:112–156](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L112-L156).
+External finite-minimax search routine. x is the initial REAL*8 point and is overwritten; mu is the smoothing parameter set/adapted by the routine. The caller allocates scratch vectors and matrices, including FSTOP(n+1), XFSTOP(n,n+1) and FINIT(n,2). Linked FUNCTMU/FUNCTS and COMMON blocks provide objective data; no callback argument, bounds or linear-constraint matrix is present despite the MAINBOX name.
 
-Procedure `MAINBOX`: [CODE/SDMINMAX.f:298–325](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L298-L325).
+Usage:
 
-Procedure `functs`: [CODE/problem.f:35–52](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/problem.f#L35-L52).
+```fortran
+CALL MAINBOX(N, X, D, D1, Z, Z1, XOLD, NUM_ITER, DOLDALFA, &
+             IPRINT, DCONV, FSTOP, XFSTOP, FINIT, mu)
+```
+
+Argument declarations: [CODE/SDMINMAX.f:22–45](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L22-L45).
+
+Author example (not run): [CODE/main.f90:1–46](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90#L1-L46).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Follow program minmax for problem/COMMON initialization and allocation.
+! Initialize X through your problem STARTP before entering MAINBOX.
+call MAINBOX(N, X, D, D1, Z, Z1, XOLD, NUM_ITER, DOLDALFA, &
+             IPRINT, DCONV, FSTOP, XFSTOP, FINIT, mu)
+```
+
+Calling sketch only. Supply the separately linked set_dimension, STARTP and FUNCTS problem routines and retain the FUNCTMU smoothing adapter from CODE/main.f90 (or extract it when writing a new main program). Preserve COMMON-block types and layout; allocate workspace exactly as in the driver. The name MAINBOX does not establish a bound-constrained API. The supplied rational-approximation example and smoothing accuracy remain untested.
+
+Implementation evidence `MAINBOX`: [CODE/SDMINMAX.f:112–156](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L112-L156).
+
+Implementation evidence `MAINBOX`: [CODE/SDMINMAX.f:298–325](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f#L298-L325).
+
+Callback `functs`: [CODE/problem.f:35–52](https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/problem.f#L35-L52).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -13235,6 +13600,15 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## Skinny
 
+**License: MIT**
+
+The root MIT license names F. N. C. Sobral. This is the reviewed project license; optional or separately supplied optimization solvers and other dependencies retain their own terms.
+
+Reviewed 2026-11-04 at `7d3f57d39de38bfb687a551fef26a86700a8ab7f`.
+
+[LICENSE](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/LICENSE)
+SHA-256 (normalized UTF-8/LF): `2be689d423c775519fa73826421ee521d923f552522031af75b00b49158a8997`.
+
 **G — documentation-reviewed**
 
 The README requires the objective outside the feasible region because the method enlarges and shrinks that region. It identifies ALGENCAN 2.4 compatibility, while 3.1 support is described as development work. Equality-constraint handling and published results were not independently checked.
@@ -13262,23 +13636,51 @@ SHA-256 (normalized UTF-8/LF): `4b8c0a12bf29fd776502c8f9786cd9cb99082548c332028d
 [toyprob.f90](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90)
 SHA-256 (normalized UTF-8/LF): `63e675a1521df6167680a2392c66cdd90e9f10f327d8b377e674bd9a341ad0a8`.
 
-Procedure `skinny::SK_RESTTYPE / sksolve`: [skinny.f90:22–25](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L22-L25).
+[runeng.f90](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/runeng.f90)
+SHA-256 (normalized UTF-8/LF): `b77f80968fe10011d8320c70823fd0aaff06f3a2bd91f5ad56d3daa9c210c2b5`.
 
-Procedure `skinny::sksolve`: [skinny.f90:94–181](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L94-L181).
+Module interface `skinny::SK_RESTTYPE / sksolve`: [skinny.f90:22–25](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L22-L25).
 
-Procedure `skinny::sksolve`: [skinny.f90:447–461](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L447-L461).
+Public entry point `skinny::sksolve`: [skinny.f90:94–181](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L94-L181).
 
-Procedure `skinny::sksolve`: [skinny.f90:499–622](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L499-L622).
+Public module subroutine for constrained minimization with relaxed constraints. x is an in-place REAL(8) point, l/u are bounds and m is the constraint count. The interface returns f, maxinfeas, evaluation counts and a flag. Problem evaluators are separately linked routines, not callback arguments in this call.
 
-Procedure `restoration`: [restoration.f90:101–149](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/restoration.f90#L101-L149).
+Usage:
 
-Procedure `callfrest`: [restoration.f90:164–212](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/restoration.f90#L164-L212).
+```fortran
+CALL sksolve(n, x, l, u, m, feas, opti, gammadec, reffort, delta, &
+             sfactor, verbose, uoptmtype, f, maxinfeas, fcnt, gcnt, flag)
+```
 
-Procedure `exbarr`: [extremebarrier.f90:8–100](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/extremebarrier.f90#L8-L100).
+Argument declarations: [skinny.f90:181–200](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L181-L200).
 
-Procedure `initializes / evalconstr`: [toyprob.f90:1–32](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90#L1-L32).
+Author example (not run): [runeng.f90:105–131](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/runeng.f90#L105-L131).
 
-Procedure `evalconstr`: [toyprob.f90:125–147](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90#L125-L147).
+Calling sketch (not a checked driver):
+
+```fortran
+use skinny, only: sksolve
+! Link your evalobjfun/evalconstr and initialization routines.
+! Initialize x, bounds, relaxation controls and method selection.
+call sksolve(n, x, l, u, m, feas, opti, gammadec, reffort, delta, &
+             sfactor, verbose, uoptmtype, f, maxinfeas, fcnt, gcnt, flag)
+```
+
+Calling sketch only. Follow runeng.f90 and the problem interfaces in toyprob.f90, but do not treat the toy signed-constraint example as a verified equality-constraint driver. The pinned SK_RESTTYPE default selects compass restoration. Several advertised solver branches contain stubs/commented implementations, so changing a selector does not establish that the requested optimizer works. Check flag and maxinfeas. Not built or run for this catalog.
+
+Implementation evidence `skinny::sksolve`: [skinny.f90:447–461](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L447-L461).
+
+Implementation evidence `skinny::sksolve`: [skinny.f90:499–622](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90#L499-L622).
+
+Implementation helper `restoration`: [restoration.f90:101–149](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/restoration.f90#L101-L149).
+
+Implementation helper `callfrest`: [restoration.f90:164–212](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/restoration.f90#L164-L212).
+
+Implementation helper `exbarr`: [extremebarrier.f90:8–100](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/extremebarrier.f90#L8-L100).
+
+Callback `initializes / evalconstr`: [toyprob.f90:1–32](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90#L1-L32).
+
+Callback `evalconstr`: [toyprob.f90:125–147](https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90#L125-L147).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
