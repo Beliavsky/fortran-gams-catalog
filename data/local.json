@@ -28230,6 +28230,1944 @@
         }
       },
       "imports": {}
+    },
+    {
+      "id": "github:cosmoglobe/commander",
+      "local": {
+        "name": "Commander",
+        "description": "Fortran Gibbs sampling and posterior exploration for cosmic microwave background inference.",
+        "repository": {
+          "host": "github",
+          "owner": "Cosmoglobe",
+          "name": "Commander",
+          "url": "https://github.com/Cosmoglobe/Commander"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake",
+          "make"
+        ],
+        "topics": [
+          "gibbs-sampling",
+          "mcmc",
+          "bayesian-inference",
+          "cosmic-microwave-background"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "f760333ae646aacd251d0772aff2c2f5903892ee",
+            "evidence": [
+              {
+                "url": "https://github.com/Cosmoglobe/Commander/blob/f760333ae646aacd251d0772aff2c2f5903892ee/README.md",
+                "path": "README.md",
+                "sha256": "62b5b9bd93954819098b016b2a1cf3078ff34dc04077488c182399f2408d6394"
+              }
+            ],
+            "notes": "The README identifies Commander3 and distinguishes its installation from older incarnations. This is application-specific sky/instrument inference with substantial external numerical dependencies, not a new implementation of every linked solver. Posterior convergence, instrument models and reported HPC performance were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "f760333ae646aacd251d0772aff2c2f5903892ee",
+            "evidence": [
+              {
+                "url": "https://github.com/Cosmoglobe/Commander/blob/f760333ae646aacd251d0772aff2c2f5903892ee/README.md",
+                "path": "README.md",
+                "sha256": "62b5b9bd93954819098b016b2a1cf3078ff34dc04077488c182399f2408d6394"
+              }
+            ],
+            "notes": "The README identifies Commander3 and distinguishes its installation from older incarnations. This is application-specific sky/instrument inference with substantial external numerical dependencies, not a new implementation of every linked solver. Posterior convergence, instrument models and reported HPC performance were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:spice-herald/darklim",
+      "local": {
+        "name": "DarkLim",
+        "description": "Fortran-backed Python statistical tools for dark-matter exclusion limits and sensitivity estimates.",
+        "repository": {
+          "host": "github",
+          "owner": "spice-herald",
+          "name": "DarkLim",
+          "url": "https://github.com/spice-herald/DarkLim"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "statistics",
+          "exclusion-limits",
+          "sensitivity-analysis",
+          "dark-matter",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "f5e53627441eeb08db538574d1617436491c6769",
+            "evidence": [
+              {
+                "url": "https://github.com/spice-herald/DarkLim/blob/f5e53627441eeb08db538574d1617436491c6769/README.md",
+                "path": "README.md",
+                "sha256": "43098fa2ea0f9772c25532c4ac0006876d8dbe39c125f336a85c5f26f7995f17"
+              }
+            ],
+            "notes": "The README describes statistical limit/sensitivity tools and a Fortran compiler requirement for source builds. Specific confidence constructions and their coverage require individual review; installation instructions do not establish statistical calibration or physical model validity.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cosmotool/eclipse",
+      "local": {
+        "name": "ECLIPSE",
+        "description": "Fortran quadratic maximum-likelihood estimation of CMB intensity and polarization power spectra.",
+        "repository": {
+          "host": "github",
+          "owner": "CosmoTool",
+          "name": "ECLIPSE",
+          "url": "https://github.com/CosmoTool/ECLIPSE"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "maximum-likelihood",
+          "power-spectrum-estimation",
+          "cosmic-microwave-background"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "8f31fd90bd0ed324a446cc3d71e5a16d95aee6e9",
+            "evidence": [
+              {
+                "url": "https://github.com/CosmoTool/ECLIPSE/blob/8f31fd90bd0ed324a446cc3d71e5a16d95aee6e9/README.md",
+                "path": "README.md",
+                "sha256": "35594ed3278d48222dfc3451d400d317872f04cfa7ecb76762c759289fdc8c32"
+              }
+            ],
+            "notes": "The README identifies the estimator and Fortran variants for different intensity/polarization combinations, with platform compilation scripts. This supports statistical estimation, not an unrestricted Fourier-transform library. Estimator bias, covariance assumptions and speed claims were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:dynamics-of-stellar-systems/dynamite",
+      "local": {
+        "name": "DYNAMITE",
+        "description": "Orbit-based stellar-system modeling with constrained orbit-weight optimization and legacy Fortran components.",
+        "repository": {
+          "host": "github",
+          "owner": "dynamics-of-stellar-systems",
+          "name": "dynamite",
+          "url": "https://github.com/dynamics-of-stellar-systems/dynamite"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "make",
+          "python-packaging"
+        ],
+        "topics": [
+          "optimization",
+          "orbit-modeling",
+          "nonnegative-least-squares",
+          "stellar-dynamics"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "0bd10a9586936bf6b9bcfdcd3679477d812a01d0",
+            "evidence": [
+              {
+                "url": "https://github.com/dynamics-of-stellar-systems/dynamite/blob/0bd10a9586936bf6b9bcfdcd3679477d812a01d0/README.md",
+                "path": "README.md",
+                "sha256": "f89997d2b113b9fce883c4309c5515f568c619ed0cba15c941a28edb3812dd45"
+              },
+              {
+                "url": "https://github.com/dynamics-of-stellar-systems/dynamite/blob/0bd10a9586936bf6b9bcfdcd3679477d812a01d0/docs/getting_started/code_overview.rst",
+                "path": "docs/getting_started/code_overview.rst",
+                "sha256": "b559dc4262603f922b02388b2ec9ecfbd8ae4c543e9390438dc9b4ec919bda5d"
+              }
+            ],
+            "notes": "The README and code overview distinguish legacy Fortran/Galahad components from Python NNLS backends and document weight-solver limitations. The broad optimization mapping covers the mixed-language workflow, not an assertion that every backend is Fortran or interchangeable. Orbit fits and solver-version caveats were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:oscaribv/exotrending",
+      "local": {
+        "name": "EXOTRENDING",
+        "description": "Fortran/Python detrending of exoplanet transit light curves.",
+        "repository": {
+          "host": "github",
+          "owner": "oscaribv",
+          "name": "exotrending",
+          "url": "https://github.com/oscaribv/exotrending"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "time-series",
+          "detrending",
+          "light-curves",
+          "exoplanets",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "84bab46e655e6d9be4b941cae316bcf3b4bd12be",
+            "evidence": [
+              {
+                "url": "https://github.com/oscaribv/exotrending/blob/84bab46e655e6d9be4b941cae316bcf3b4bd12be/README.md",
+                "path": "README.md",
+                "sha256": "652eabcce405b4dc9d9d616a64721b19613520b4ca33333b8a183018a82929b7"
+              }
+            ],
+            "notes": "The README describes transit-centered detrending with user-supplied ephemerides and a compiled Fortran component. Reported Kepler/K2 use does not establish validity for every light curve, preservation of transit parameters or a general-purpose time-series modeling library.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:neutrinomuon/pyfluxconserving",
+      "local": {
+        "name": "PyFluxconserving",
+        "description": "Legacy Fortran spectral resampling and interpolation with Python interfaces.",
+        "repository": {
+          "host": "github",
+          "owner": "neutrinomuon",
+          "name": "PyFluxconserving",
+          "url": "https://github.com/neutrinomuon/PyFluxconserving"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "interpolation",
+          "spectral-resampling",
+          "flux-conservation",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "baa2789e0607b063737e4d52759fa21c3e1ef9a7",
+            "evidence": [
+              {
+                "url": "https://github.com/neutrinomuon/PyFluxconserving/blob/baa2789e0607b063737e4d52759fa21c3e1ef9a7/README.md",
+                "path": "README.md",
+                "sha256": "26e39c42d04a0505cb91ab617441d7854b34490a5bedf9df7011145019da44a0"
+              }
+            ],
+            "notes": "The README describes legacy Fortran routines for flux-conserving rebinning and accompanying interpolation helpers. SpectRes is explicitly a separate comparison package, not bundled functionality. Conservation accuracy, edge cases and comparison results were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "baa2789e0607b063737e4d52759fa21c3e1ef9a7",
+            "evidence": [
+              {
+                "url": "https://github.com/neutrinomuon/PyFluxconserving/blob/baa2789e0607b063737e4d52759fa21c3e1ef9a7/README.md",
+                "path": "README.md",
+                "sha256": "26e39c42d04a0505cb91ab617441d7854b34490a5bedf9df7011145019da44a0"
+              }
+            ],
+            "notes": "The README describes legacy Fortran routines for flux-conserving rebinning and accompanying interpolation helpers. SpectRes is explicitly a separate comparison package, not bundled functionality. Conservation accuracy, edge cases and comparison results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/neutrinomuon/FluxConserving"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:aarondotter/iso",
+      "local": {
+        "name": "MESA track and isochrone interpolation",
+        "description": "Fortran conversion and interpolation of MESA stellar tracks on equivalent evolutionary points.",
+        "repository": {
+          "host": "github",
+          "owner": "aarondotter",
+          "name": "iso",
+          "url": "https://github.com/aarondotter/iso"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "interpolation",
+          "stellar-tracks",
+          "isochrones",
+          "mesa"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "ed6ef0588664de62df39564fb02e3e0e32d5b2eb",
+            "evidence": [
+              {
+                "url": "https://github.com/aarondotter/iso/blob/ed6ef0588664de62df39564fb02e3e0e32d5b2eb/README.md",
+                "path": "README.md",
+                "sha256": "117542638972e120e7714dab5dc373a90d5fab027cb01bbf1b953089fa49e9a7"
+              }
+            ],
+            "notes": "The README requires MESA numerical libraries, specified history columns and EEP-aligned tracks; optional synthetic color diagrams need external correction tables. This is interpolation over precomputed evolution, not an independent stellar-structure solver. Interpolation errors and applicability across stellar phases were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:teammetisse/metisse",
+      "local": {
+        "name": "METISSE",
+        "description": "Rapid stellar-evolution estimates by interpolation within precomputed evolutionary tracks.",
+        "repository": {
+          "host": "github",
+          "owner": "TeamMETISSE",
+          "name": "METISSE",
+          "url": "https://github.com/TeamMETISSE/METISSE"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "stellar-evolution",
+          "equivalent-evolutionary-points"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "f54cdd0168b422f4476778af8cc0e1b1e496d015",
+            "evidence": [
+              {
+                "url": "https://github.com/TeamMETISSE/METISSE/blob/f54cdd0168b422f4476778af8cc0e1b1e496d015/README.md",
+                "path": "README.md",
+                "sha256": "7dd0cdc18e234f1949b45a4417cd8360ac36e323682a5cefaaa29942b4c7fdbf"
+              }
+            ],
+            "notes": "The README requires input tracks whose equivalent evolutionary points align by row and distinguishes standalone use from coupling to population models. Speed and physical fidelity depend on the supplied tracks; no independent stellar evolution or binary-interaction solver is inferred solely from possible integrations.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:davidacunningham/libqist",
+      "local": {
+        "name": "QIST",
+        "description": "Fortran state-transition integration and second-order relative-trajectory propagation around SPICE ephemerides.",
+        "repository": {
+          "host": "github",
+          "owner": "DavidACunningham",
+          "name": "libqist",
+          "url": "https://github.com/DavidACunningham/libqist"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "trajectory-propagation",
+          "state-transition",
+          "celestial-mechanics"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "b9deedae2cd56bf1423908528eb6eb169183b18a",
+            "evidence": [
+              {
+                "url": "https://github.com/DavidACunningham/libqist/blob/b9deedae2cd56bf1423908528eb6eb169183b18a/README.md",
+                "path": "README.md",
+                "sha256": "d8d911372583dadbab8034c46060f14ca858b293747a2b96b0c05c19a37a52bb"
+              }
+            ],
+            "notes": "The README documents numerical integration of state-transition matrices/tensors and quadratic relative propagation. The package and build system are marked beta/prototype, require SPICE and contain user-path setup caveats. Covariance propagation does not establish a complete statistical estimator or global accuracy for arbitrary offsets.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jacobwilliams/moonframe",
+      "local": {
+        "name": "moonframe",
+        "description": "Fortran spline interpolation of precomputed lunar body-frame orientation angles.",
+        "repository": {
+          "host": "github",
+          "owner": "jacobwilliams",
+          "name": "moonframe",
+          "url": "https://github.com/jacobwilliams/moonframe"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "interpolation",
+          "splines",
+          "lunar-orientation",
+          "reference-frames"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "b9fe79250fad7b26d44efd7fe4bbc166e81bbc15",
+            "evidence": [
+              {
+                "url": "https://github.com/jacobwilliams/moonframe/blob/b9fe79250fad7b26d44efd7fe4bbc166e81bbc15/README.md",
+                "path": "README.md",
+                "sha256": "e2018964b4575f0e2b6c87d17cd3e3c8923352a4c53f2c50ffa2030af1242b3d"
+              }
+            ],
+            "notes": "The README distinguishes using precomputed spline coefficients without SPICE from generating coefficients and running comparison tests, which require SPICELIB. This is a specific lunar frame approximation rather than a replacement for all SPICE ephemerides. Time-span limits and orientation accuracy were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:rhdtownsend/msg",
+      "local": {
+        "name": "MSG multidimensional stellar grids",
+        "description": "Interpolation of precomputed stellar atmosphere grids to synthesize spectra and photometric colors.",
+        "repository": {
+          "host": "github",
+          "owner": "rhdtownsend",
+          "name": "msg",
+          "url": "https://github.com/rhdtownsend/msg"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "interpolation",
+          "spectral-grids",
+          "stellar-atmospheres",
+          "photometry"
+        ],
+        "classifications": [
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "24c7e1d318264e62b3377e6f5e2f4e2da9860f63",
+            "evidence": [
+              {
+                "url": "https://github.com/rhdtownsend/msg/blob/24c7e1d318264e62b3377e6f5e2f4e2da9860f63/README.rst",
+                "path": "README.rst",
+                "sha256": "19005cf2fba0817ed8d4e79e3af6edbc8105d47bf0130747e5537766250fb17a"
+              }
+            ],
+            "notes": "The README describes interpolation from atmospheric parameters to emergent intensities and filter convolution. This uses precomputed grids rather than solving stellar atmospheres from first principles. Supported grid families, interpolation/extrapolation limits and photometric errors need individual review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:smirik/mercury",
+      "local": {
+        "name": "Mercury N-body integrator",
+        "description": "Fortran celestial N-body integration using Bulirsch-Stoer, Everhart and related methods.",
+        "repository": {
+          "host": "github",
+          "owner": "smirik",
+          "name": "mercury",
+          "url": "https://github.com/smirik/mercury"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "n-body-integration",
+          "celestial-mechanics",
+          "planetary-systems"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "aee9e0f6b8e4d359a9ed3607ee12e34a2e2dafac",
+            "evidence": [
+              {
+                "url": "https://github.com/smirik/mercury/blob/aee9e0f6b8e4d359a9ed3607ee12e34a2e2dafac/README.md",
+                "path": "README.md",
+                "sha256": "86ce6603bf0060f7767d32ea0b0a22cb2eff7e17d7d42e1481e9eddbbf90d3e1"
+              }
+            ],
+            "notes": "The README identifies Chambers heritage, sample integrations and GNU Fortran builds. Sample energy/angular-momentum errors are author-supplied output rather than new verification. Collision behavior, long-term conservation and applicability to arbitrary star systems were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nworbde/dstar",
+      "local": {
+        "name": "dStar",
+        "description": "Fortran neutron-star structure and evolution modules, including TOV differential-equation integration.",
+        "repository": {
+          "host": "github",
+          "owner": "nworbde",
+          "name": "dStar",
+          "url": "https://github.com/nworbde/dStar"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "ode",
+          "neutron-stars",
+          "tov-equations",
+          "stellar-structure",
+          "mesa"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "9f5df0c7ccd52203d9560373a105b6937f350601",
+            "evidence": [
+              {
+                "url": "https://github.com/nworbde/dStar/blob/9f5df0c7ccd52203d9560373a105b6937f350601/README.md",
+                "path": "README.md",
+                "sha256": "95dae2acb1e6c7de7a12904ff1527f3eb1537bbac6c80eaf19eaf9875c1e123d"
+              },
+              {
+                "url": "https://github.com/nworbde/dStar/blob/9f5df0c7ccd52203d9560373a105b6937f350601/MRcurve/private/dStar_core_tov.f",
+                "path": "MRcurve/private/dStar_core_tov.f",
+                "sha256": "00764dd24a6fb104109f6bd0f9ce7a4bf36ea953a60bc29847387b489f4a45fe"
+              }
+            ],
+            "notes": "The README is supplemented by the documented TOV module, which uses pressure as the independent variable. MESA numerical/equation-of-state dependencies and specific tested versions are documented. Neither dense-matter physics nor stellar evolution outputs are validated by this broad mapping.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:marc-joos/dumses-hybrid",
+      "local": {
+        "name": "DUMSES hybrid",
+        "description": "Three-dimensional Godunov hydrodynamic and magnetohydrodynamic simulations in Fortran.",
+        "repository": {
+          "host": "github",
+          "owner": "marc-joos",
+          "name": "dumses-hybrid",
+          "url": "https://github.com/marc-joos/dumses-hybrid"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "autotools"
+        ],
+        "topics": [
+          "pde",
+          "magnetohydrodynamics",
+          "godunov",
+          "finite-volume",
+          "openacc"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "37d829733e587f314a05de61a13fc77e7f12b635",
+            "evidence": [
+              {
+                "url": "https://github.com/marc-joos/dumses-hybrid/blob/37d829733e587f314a05de61a13fc77e7f12b635/README.md",
+                "path": "README.md",
+                "sha256": "69d132bfd2acc71296f2cd25bad47ec1a509650ebf1ccac35577afed9b6db85b"
+              }
+            ],
+            "notes": "The README describes Cartesian, spherical and cylindrical coordinates with MPI/OpenMP or OpenACC builds. OpenACC disables OpenMP, and CUDA-aware MPI is not automatically verified by the build. Physical models, parallel combinations and numerical accuracy were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/marcjoos-cea/dumses-hybrid"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:chenshihelio/laps",
+      "local": {
+        "name": "LAPS",
+        "description": "Fortran Fourier pseudo-spectral Hall-MHD simulations with an expanding-box model.",
+        "repository": {
+          "host": "github",
+          "owner": "chenshihelio",
+          "name": "LAPS",
+          "url": "https://github.com/chenshihelio/LAPS"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "hall-mhd",
+          "pseudospectral",
+          "plasma-physics"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a625806931a82ba3342f35906955e6806081d219",
+            "evidence": [
+              {
+                "url": "https://github.com/chenshihelio/LAPS/blob/a625806931a82ba3342f35906955e6806081d219/README.md",
+                "path": "README.md",
+                "sha256": "8feeaaab3461a3c0d9b8adbe7598dda3b85dda3c3df26c9ddfc1b50b04780e8a"
+              }
+            ],
+            "notes": "The README documents separate compressible/incompressible and 2D/3D source configurations with FFTW/MPI. Use of Fourier transforms inside a PDE solver is not a claim of a standalone general transform library. Model assumptions, numerical conservation and compiler-specific flags were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:amrex-astro/maestro",
+      "local": {
+        "name": "MAESTRO legacy Fortran",
+        "description": "Low-Mach stellar hydrodynamics with reactions and thermal diffusion.",
+        "repository": {
+          "host": "github",
+          "owner": "AMReX-Astro",
+          "name": "MAESTRO",
+          "url": "https://github.com/AMReX-Astro/MAESTRO"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "low-mach",
+          "hydrodynamics",
+          "stellar-modeling"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "70eb811e64c411237fc02b709d771a81cdb9c91d",
+            "evidence": [
+              {
+                "url": "https://github.com/AMReX-Astro/MAESTRO/blob/70eb811e64c411237fc02b709d771a81cdb9c91d/README.md",
+                "path": "README.md",
+                "sha256": "de579de5d15bebc5b87098115dd0f26d7e06bb1f13f4eeb431d77e193bc3eecd"
+              }
+            ],
+            "notes": "The README explicitly says this repository is no longer actively developed and directs users to MAESTROeX. This entry retains the listed legacy implementation with FBoxLib and optional external microphysics dependencies, without attributing successor capabilities or current platform support to it. Scaling claims and physical outputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:eleeastro/mini_chem",
+      "local": {
+        "name": "Mini-chem",
+        "description": "Reduced atmospheric chemical-kinetics ODE networks with standalone solver variants.",
+        "repository": {
+          "host": "github",
+          "owner": "ELeeAstro",
+          "name": "mini_chem",
+          "url": "https://github.com/ELeeAstro/mini_chem"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "chemical-kinetics",
+          "stiff-solvers",
+          "atmospheric-chemistry"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "d5de23a405760672feabd1833ef178ca85170401",
+            "evidence": [
+              {
+                "url": "https://github.com/ELeeAstro/mini_chem/blob/d5de23a405760672feabd1833ef178ca85170401/README.md",
+                "path": "README.md",
+                "sha256": "72f11a5a0d0da8e64a978483a69447c17048f48b00d0236a9b370104cb8f8bc2"
+              }
+            ],
+            "notes": "The README recommends the DLSODE variant, distinguishes alternative/experimental backends and warns of low-temperature errors below 300 K and unverified thread safety. These limitations are retained; not every variant is considered equally mature. Network reduction, solver results and compensated-summation performance claims were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:legolas-project/legolas",
+      "local": {
+        "name": "Legolas",
+        "description": "Fortran linearized MHD differential equations discretized into complex non-Hermitian eigenproblems.",
+        "repository": {
+          "host": "github",
+          "owner": "legolas-project",
+          "name": "legolas",
+          "url": "https://github.com/legolas-project/legolas"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "eigenvalue-problems",
+          "magnetohydrodynamics",
+          "finite-elements"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "710f91b8c85e478842b38128e721e454f51ee105",
+            "evidence": [
+              {
+                "url": "https://github.com/legolas-project/legolas/blob/710f91b8c85e478842b38128e721e454f51ee105/README.md",
+                "path": "README.md",
+                "sha256": "642b060b2b76d4eae1d65fbf021a0636d4dd7bc15a279425f762ee5eaf2eaab4"
+              }
+            ],
+            "notes": "The README limits equilibrium variation to one dimension in Cartesian or cylindrical geometry with Fourier modes in the other coordinates. BLAS/LAPACK/ARPACK provide algebraic backends; this is not a fully nonlinear general 3D MHD simulation. Eigenfunctions, spectra and scaling claims were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "710f91b8c85e478842b38128e721e454f51ee105",
+            "evidence": [
+              {
+                "url": "https://github.com/legolas-project/legolas/blob/710f91b8c85e478842b38128e721e454f51ee105/README.md",
+                "path": "README.md",
+                "sha256": "642b060b2b76d4eae1d65fbf021a0636d4dd7bc15a279425f762ee5eaf2eaab4"
+              }
+            ],
+            "notes": "The README limits equilibrium variation to one dimension in Cartesian or cylindrical geometry with Fourier modes in the other coordinates. BLAS/LAPACK/ARPACK provide algebraic backends; this is not a fully nonlinear general 3D MHD simulation. Eigenfunctions, spectra and scaling claims were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/n-claes/legolas"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:michielmin/mcmax3d",
+      "local": {
+        "name": "MCMax3D",
+        "description": "Fortran Monte Carlo photon radiative transfer with ray-traced observables.",
+        "repository": {
+          "host": "github",
+          "owner": "michielmin",
+          "name": "MCMax3D",
+          "url": "https://github.com/michielmin/MCMax3D"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "monte-carlo",
+          "photon-transport",
+          "radiative-transfer"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "f3ec3fe5c2e8787b2abf9962c145e8c3703e9332",
+            "evidence": [
+              {
+                "url": "https://github.com/michielmin/MCMax3D/blob/f3ec3fe5c2e8787b2abf9962c145e8c3703e9332/MCMax3D.f",
+                "path": "MCMax3D.f",
+                "sha256": "ef62f7dfc8294cbcb481f2450002771a6fcc82f1e97a774c9f026442b4046d0b"
+              },
+              {
+                "url": "https://github.com/michielmin/MCMax3D/blob/f3ec3fe5c2e8787b2abf9962c145e8c3703e9332/RadiativeTransfer.f",
+                "path": "RadiativeTransfer.f",
+                "sha256": "e5a39011ed917e17e6ef77f4d49d0566b44fe920f1367242be3d9c68faa6d1a0"
+              }
+            ],
+            "notes": "No README is present at this revision. The main-program messages and radiative-transfer interfaces document photon emission/transport and output; random optical-depth/direction sampling is visible in the same pinned file. The main program states publication/coauthorship terms, so public source does not establish unrestricted reuse. Models, convergence and observables were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:pau-amaro-seoane/messy",
+      "local": {
+        "name": "MESSY stellar dynamics",
+        "description": "Henon-style Monte Carlo simulations of spherical stellar clusters and galactic nuclei.",
+        "repository": {
+          "host": "github",
+          "owner": "pau-amaro-seoane",
+          "name": "MESSY",
+          "url": "https://github.com/pau-amaro-seoane/MESSY"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "monte-carlo",
+          "stellar-dynamics",
+          "spherical-clusters"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "295e568c6340158d4f3fc29ced6b26a164edd4cc",
+            "evidence": [
+              {
+                "url": "https://github.com/pau-amaro-seoane/MESSY/blob/295e568c6340158d4f3fc29ced6b26a164edd4cc/README.md",
+                "path": "README.md",
+                "sha256": "ab674139779602902904cc8c034517f9562a1bf647bc41c5a5350518daf33a66"
+              }
+            ],
+            "notes": "The README describes legacy Fortran source, GNU Make/zsh assumptions and separate initial-condition data. It explicitly notes required Numerical Recipes routines are not distributed and have separate licensing. The catalog does not imply an out-of-the-box build, unrestricted dependency redistribution or verified dynamical results.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cosmic-popsynth/cosmic",
+      "local": {
+        "name": "COSMIC binary population synthesis",
+        "description": "Monte Carlo binary-population sampling coupled to Fortran BSE stellar-evolution components.",
+        "repository": {
+          "host": "github",
+          "owner": "COSMIC-PopSynth",
+          "name": "COSMIC",
+          "url": "https://github.com/COSMIC-PopSynth/COSMIC"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "monte-carlo",
+          "population-synthesis",
+          "binary-stars",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "963bf282f5532a37077aa28b7cb1eedf74998fd9",
+            "evidence": [
+              {
+                "url": "https://github.com/COSMIC-PopSynth/COSMIC/blob/963bf282f5532a37077aa28b7cb1eedf74998fd9/README.md",
+                "path": "README.md",
+                "sha256": "4a26576eac2842dfdf19ff22af5bb3ac2acb9a25f7d7ecf3d1bf9b558a4f0144"
+              },
+              {
+                "url": "https://github.com/COSMIC-PopSynth/COSMIC/blob/963bf282f5532a37077aa28b7cb1eedf74998fd9/docs/pages/tutorials/sample/independent.rst",
+                "path": "docs/pages/tutorials/sample/independent.rst",
+                "sha256": "310e345b7816914b0e9107533d8220e6b0c1ff2f643a6a95ac3d43b4c745524d"
+              }
+            ],
+            "notes": "The README and independent-sampler guide distinguish Python population sampling from inherited and modified Fortran binary-evolution code. Statistical sampling is a workflow capability, not a claim that the sampler itself is Fortran. Distribution assumptions, evolutionary prescriptions and compact-object rates were not validated.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gronki/aquila",
+      "local": {
+        "name": "Aquila astrophotography processing",
+        "description": "Fortran image stacking, calibration and multi-filter color compositing for astronomical images.",
+        "repository": {
+          "host": "github",
+          "owner": "gronki",
+          "name": "aquila",
+          "url": "https://github.com/gronki/aquila"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "image-processing",
+          "image-stacking",
+          "fits",
+          "astrophotography"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "bb61524b83b8b3e2cf6bf885dd4b337d765b17da",
+            "evidence": [
+              {
+                "url": "https://github.com/gronki/aquila/blob/bb61524b83b8b3e2cf6bf885dd4b337d765b17da/README.md",
+                "path": "README.md",
+                "sha256": "fc1ba0c7101b9c8599fb1c0d060daa81bd90dce08151602f8b8cf2ec31a9ade3"
+              }
+            ],
+            "notes": "The README documents calibration/alignment, sigma clipping and LRGB compositing with a scripting interface. Source-build instructions and packaged distributions are distinguished. Image quality, photometric preservation and platform-specific display capabilities were not tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "bb61524b83b8b3e2cf6bf885dd4b337d765b17da",
+            "evidence": [
+              {
+                "url": "https://github.com/gronki/aquila/blob/bb61524b83b8b3e2cf6bf885dd4b337d765b17da/README.md",
+                "path": "README.md",
+                "sha256": "fc1ba0c7101b9c8599fb1c0d060daa81bd90dce08151602f8b8cf2ec31a9ade3"
+              }
+            ],
+            "notes": "The README documents calibration/alignment, sigma clipping and LRGB compositing with a scripting interface. Source-build instructions and packaged distributions are distinguished. Image quality, photometric preservation and platform-specific display capabilities were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nicocardiel/cleanest",
+      "local": {
+        "name": "cleanest",
+        "description": "Interactive and automatic cosmic-ray pixel detection/removal in astronomical images.",
+        "repository": {
+          "host": "github",
+          "owner": "nicocardiel",
+          "name": "cleanest",
+          "url": "https://github.com/nicocardiel/cleanest"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "autotools",
+          "make"
+        ],
+        "topics": [
+          "image-processing",
+          "cosmic-ray-removal",
+          "outlier-detection",
+          "fits"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "d41172d2738561f4ecefac5d9b7d2b7f45e0ec4e",
+            "evidence": [
+              {
+                "url": "https://github.com/nicocardiel/cleanest/blob/d41172d2738561f4ecefac5d9b7d2b7f45e0ec4e/README.md",
+                "path": "README.md",
+                "sha256": "b9bb5ee1eb25e6fa141f39ac8d4e6da06f75e51577ed17a944da50cf6947a20a"
+              },
+              {
+                "url": "https://github.com/nicocardiel/cleanest/blob/d41172d2738561f4ecefac5d9b7d2b7f45e0ec4e/docs/using_the_program.rst",
+                "path": "docs/using_the_program.rst",
+                "sha256": "1a90d1f9dcdab18466d9da46915e2759be5dfa4a234bc311fb6c826fc5892c37"
+              }
+            ],
+            "notes": "The root README is supplemented by the usage guide describing neighborhood means/rms, thresholds and percentile-restricted refinement. Pixel cleaning is data processing, not a general statistical-inference library; false detections and preservation of real astronomical features were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jchelly/gadgetviewer",
+      "local": {
+        "name": "Gadgetviewer",
+        "description": "Fortran/C visualization and particle selection for Gadget-like simulation snapshots.",
+        "repository": {
+          "host": "github",
+          "owner": "jchelly",
+          "name": "gadgetviewer",
+          "url": "https://github.com/jchelly/gadgetviewer"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "autotools",
+          "make"
+        ],
+        "topics": [
+          "scientific-visualization",
+          "particle-data",
+          "gadget",
+          "hdf5"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "1ec3f7dea37e13902c4f4c82b0af96ccf1d088de",
+            "evidence": [
+              {
+                "url": "https://github.com/jchelly/gadgetviewer/blob/1ec3f7dea37e13902c4f4c82b0af96ccf1d088de/README.md",
+                "path": "README.md",
+                "sha256": "6d10b6ec81df3dddf2cc549378bfb9e19cee83d789c54c6437f8d033b4e4a562"
+              }
+            ],
+            "notes": "The README documents interactive snapshot views, particle tracking and optional movie/screenshot output with GTK and optional HDF5/libpng. It visualizes simulations rather than computing their N-body dynamics. Format variants, smoothing and platform/display dependencies were not tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "1ec3f7dea37e13902c4f4c82b0af96ccf1d088de",
+            "evidence": [
+              {
+                "url": "https://github.com/jchelly/gadgetviewer/blob/1ec3f7dea37e13902c4f4c82b0af96ccf1d088de/README.md",
+                "path": "README.md",
+                "sha256": "6d10b6ec81df3dddf2cc549378bfb9e19cee83d789c54c6437f8d033b4e4a562"
+              }
+            ],
+            "notes": "The README documents interactive snapshot views, particle tracking and optional movie/screenshot output with GTK and optional HDF5/libpng. It visualizes simulations rather than computing their N-body dynamics. Format variants, smoothing and platform/display dependencies were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:astroumd/miriad",
+      "local": {
+        "name": "MIRIAD BIMA/CARMA lineage",
+        "description": "Fortran/C radio-interferometry image reconstruction, analysis and display tools.",
+        "repository": {
+          "host": "github",
+          "owner": "astroumd",
+          "name": "miriad",
+          "url": "https://github.com/astroumd/miriad"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "radio-interferometry",
+          "image-processing",
+          "scientific-visualization",
+          "carma"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "11289bf96936b971bdbef5dbaf425a09877703e9",
+            "evidence": [
+              {
+                "url": "https://github.com/astroumd/miriad/blob/11289bf96936b971bdbef5dbaf425a09877703e9/README.md",
+                "path": "README.md",
+                "sha256": "87cdacfd10a15b9c3a8d9ff8927a3b3b33a53ce28c5234a8275cca1375d5c071"
+              }
+            ],
+            "notes": "The README identifies the original BIMA/CARMA lineage and explicitly notes divergent telescope-specific versions. This is kept distinct from the separately listed CSIRO/ATCA repository. Broad analysis/display scope does not establish identical task sets, instrument calibration or current builds across the forks.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "11289bf96936b971bdbef5dbaf425a09877703e9",
+            "evidence": [
+              {
+                "url": "https://github.com/astroumd/miriad/blob/11289bf96936b971bdbef5dbaf425a09877703e9/README.md",
+                "path": "README.md",
+                "sha256": "87cdacfd10a15b9c3a8d9ff8927a3b3b33a53ce28c5234a8275cca1375d5c071"
+              }
+            ],
+            "notes": "The README identifies the original BIMA/CARMA lineage and explicitly notes divergent telescope-specific versions. This is kept distinct from the separately listed CSIRO/ATCA repository. Broad analysis/display scope does not establish identical task sets, instrument calibration or current builds across the forks.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:csiro/miriad",
+      "local": {
+        "name": "MIRIAD CSIRO/ATCA lineage",
+        "description": "Fortran radio-interferometry calibration, imaging, analysis and plotting for ATCA.",
+        "repository": {
+          "host": "github",
+          "owner": "csiro",
+          "name": "miriad",
+          "url": "https://github.com/csiro/miriad"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "radio-interferometry",
+          "image-processing",
+          "atca",
+          "scientific-visualization"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "1ef2e6e1cd56cfdbac23d8bf4c7162c1e673a73d",
+            "evidence": [
+              {
+                "url": "https://github.com/csiro/miriad/blob/1ef2e6e1cd56cfdbac23d8bf4c7162c1e673a73d/README.md",
+                "path": "README.md",
+                "sha256": "66c849dc3a26e3b23ce3982cbe861857b7546d98b12f08862aa311e7b7fe08e8"
+              }
+            ],
+            "notes": "The README explicitly identifies the ATCA-oriented version and CMake with bundled plotting/format libraries. Large-N mode changes internal limits and is not a universal upgrade. Shared MIRIAD heritage does not make this repository identical to the BIMA/CARMA lineage; results and platform support were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "1ef2e6e1cd56cfdbac23d8bf4c7162c1e673a73d",
+            "evidence": [
+              {
+                "url": "https://github.com/csiro/miriad/blob/1ef2e6e1cd56cfdbac23d8bf4c7162c1e673a73d/README.md",
+                "path": "README.md",
+                "sha256": "66c849dc3a26e3b23ce3982cbe861857b7546d98b12f08862aa311e7b7fe08e8"
+              }
+            ],
+            "notes": "The README explicitly identifies the ATCA-oriented version and CMake with bundled plotting/format libraries. Large-N mode changes internal limits and is not a universal upgrade. Shared MIRIAD heritage does not make this repository identical to the BIMA/CARMA lineage; results and platform support were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:karolusz/pointkinetics",
+      "local": {
+        "name": "PointKinetics",
+        "description": "Fortran time stepping of reactor point-kinetics neutron and delayed-precursor equations.",
+        "repository": {
+          "host": "github",
+          "owner": "karolusz",
+          "name": "PointKinetics",
+          "url": "https://github.com/karolusz/PointKinetics"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "ode",
+          "point-kinetics",
+          "neutron-kinetics",
+          "time-integration"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a51672eb574690ab1891beacbbe9cdbf0780e319",
+            "evidence": [
+              {
+                "url": "https://github.com/karolusz/PointKinetics/blob/a51672eb574690ab1891beacbbe9cdbf0780e319/README.md",
+                "path": "README.md",
+                "sha256": "27f9172f32cc4906f493ee94d15b988f777fb7c72bff4f1bb16757db5cd0e4c2"
+              },
+              {
+                "url": "https://github.com/karolusz/PointKinetics/blob/a51672eb574690ab1891beacbbe9cdbf0780e319/src/pk_methods.f90",
+                "path": "src/pk_methods.f90",
+                "sha256": "8cc5a1b6736893ec6698b708067feb7e6110f40fc8d1e953c1727550c11407da"
+              }
+            ],
+            "notes": "The short README is supplemented by pk_methods interface documentation, including one-step integration and backward-Euler precursor treatment. The README lists unfinished methodology/user documentation. Numerical accuracy and reactor models were not checked; this broad mapping does not imply suitability for design calculations.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/KarolLuszczek/PointKinetics"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:msleigh/snes",
+      "local": {
+        "name": "Simple Neutron-Transport Equation Solver",
+        "description": "One-dimensional Fortran discrete-ordinates transport with diamond-difference and linear-discontinuous variants.",
+        "repository": {
+          "host": "github",
+          "owner": "msleigh",
+          "name": "snes",
+          "url": "https://github.com/msleigh/snes"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "neutron-transport",
+          "discrete-ordinates",
+          "educational-software"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "136547c095892885a5d13d8e8df8e88eab2297e0",
+            "evidence": [
+              {
+                "url": "https://github.com/msleigh/snes/blob/136547c095892885a5d13d8e8df8e88eab2297e0/README.md",
+                "path": "README.md",
+                "sha256": "b6c4a30517d09d3c40ce57b2f2a83a379e3c155d0e11d3f288a026487a6fa137"
+              }
+            ],
+            "notes": "The README identifies separate solver/test builds and instructs cleaning when switching variants. Its bundled verification plots and tests were not rerun; multidimensional transport or arbitrary nuclear-data support is not inferred.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:imronuke/komodo",
+      "local": {
+        "name": "KOMODO",
+        "description": "Fortran nodal neutron-diffusion simulation with transient integration and BiCGSTAB linear solves.",
+        "repository": {
+          "host": "github",
+          "owner": "imronuke",
+          "name": "KOMODO",
+          "url": "https://github.com/imronuke/KOMODO"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "neutron-diffusion",
+          "nodal-methods",
+          "bicgstab",
+          "reactor-physics"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "b70d4ee262dcbd2547993302f6f86bef6d4dca00",
+            "evidence": [
+              {
+                "url": "https://github.com/imronuke/KOMODO/blob/b70d4ee262dcbd2547993302f6f86bef6d4dca00/README.md",
+                "path": "README.md",
+                "sha256": "b0a4edeebe6bb3a6ac29d716327bfb4fcb5bb4fc9e376dde9f58ff7aa3d1101f"
+              }
+            ],
+            "notes": "The README documents Cartesian 1D/2D/3D static/transient problems, nodal kernels and CMFD acceleration. GPU support is explicitly partial, and application capabilities depend on input/cross-section models. The mapping does not establish physical validation, all feedback configurations or complete GPU execution.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "b70d4ee262dcbd2547993302f6f86bef6d4dca00",
+            "evidence": [
+              {
+                "url": "https://github.com/imronuke/KOMODO/blob/b70d4ee262dcbd2547993302f6f86bef6d4dca00/README.md",
+                "path": "README.md",
+                "sha256": "b0a4edeebe6bb3a6ac29d716327bfb4fcb5bb4fc9e376dde9f58ff7aa3d1101f"
+              }
+            ],
+            "notes": "The README documents Cartesian 1D/2D/3D static/transient problems, nodal kernels and CMFD acceleration. GPU support is explicitly partial, and application capabilities depend on input/cross-section models. The mapping does not establish physical validation, all feedback configurations or complete GPU execution.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:misa-scd/misa-scd",
+      "local": {
+        "name": "MISA-SCD",
+        "description": "Parallel Fortran stochastic cluster-dynamics simulation for irradiation defects and thermal aging.",
+        "repository": {
+          "host": "github",
+          "owner": "MISA-SCD",
+          "name": "misa-scd",
+          "url": "https://github.com/MISA-SCD/misa-scd"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "stochastic-simulation",
+          "cluster-dynamics",
+          "irradiation-defects",
+          "monte-carlo"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "ac71a050a20d7890f999585f07dca8e4d3bf360d",
+            "evidence": [
+              {
+                "url": "https://github.com/MISA-SCD/misa-scd/blob/ac71a050a20d7890f999585f07dca8e4d3bf360d/README.md",
+                "path": "README.md",
+                "sha256": "b268f8f5af24e88532c8382892a82e2fa662fe76fb8a8fb91c8e70cd17d5480d"
+              }
+            ],
+            "notes": "The README describes Monte Carlo versus explicit cascade implantation and restrictions on adaptive meshing for Frenkel pairs. Material parameters and input formats constrain the model. Statistical convergence, defect kinetics and parallel scaling were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:rabieomar92/trimon",
+      "local": {
+        "name": "TRIMON",
+        "description": "Fortran Monte Carlo reactor calculations with neutron flight and collision sampling.",
+        "repository": {
+          "host": "github",
+          "owner": "rabieomar92",
+          "name": "trimon",
+          "url": "https://github.com/rabieomar92/trimon"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "monte-carlo",
+          "neutron-transport",
+          "reactor-physics",
+          "triga"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "e0d0187765a3c0afacb197ab3f1bd655cdb85c50",
+            "evidence": [
+              {
+                "url": "https://github.com/rabieomar92/trimon/blob/e0d0187765a3c0afacb197ab3f1bd655cdb85c50/README.md",
+                "path": "README.md",
+                "sha256": "e2405087db2ee3ea18360163a040faf78b873d81cf3dbd4183b0b7b029a08e77"
+              },
+              {
+                "url": "https://github.com/rabieomar92/trimon/blob/e0d0187765a3c0afacb197ab3f1bd655cdb85c50/NeutronTrack.for",
+                "path": "NeutronTrack.for",
+                "sha256": "5a974e89592b2b97ba34d60bc0ece00cccbef5c33dded016b9aa50ef80ed5df1"
+              }
+            ],
+            "notes": "The README is supplemented by NeutronTrack documentation of reaction selection, flight paths and collision distances. Its source header asserts proprietary rights and restricts redistribution; inclusion provides links and does not grant reuse rights. Neutron histories, nuclear data and reactor results were not validated.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fest3d/fest-3d",
+      "local": {
+        "name": "FEST-3D",
+        "description": "Structured multiblock finite-volume Navier-Stokes simulation in Fortran.",
+        "repository": {
+          "host": "github",
+          "owner": "FEST3D",
+          "name": "FEST-3D",
+          "url": "https://github.com/FEST3D/FEST-3D"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "pde",
+          "navier-stokes",
+          "finite-volume",
+          "compressible-flow"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "5a21a4d1486746270afe429d289cf6c157e3f26a",
+            "evidence": [
+              {
+                "url": "https://github.com/FEST3D/FEST-3D/blob/5a21a4d1486746270afe429d289cf6c157e3f26a/README.md",
+                "path": "README.md",
+                "sha256": "259d7d02eb6624f2c03c88e7ed0acffb288edd0fe7cd5788949fa63da4ab8678"
+              }
+            ],
+            "notes": "The README describes compressible aerodynamic flow with MPI and an external C++ component. Automated installer behavior and claimed tests are not catalog verification; turbulence models, boundary conditions and numerical convergence need later problem-specific review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ackirby88/eulerfv",
+      "local": {
+        "name": "EulerFV",
+        "description": "Two-dimensional unstructured finite-volume Euler-equation solver.",
+        "repository": {
+          "host": "github",
+          "owner": "ackirby88",
+          "name": "EulerFV",
+          "url": "https://github.com/ackirby88/EulerFV"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "euler-equations",
+          "finite-volume",
+          "unstructured-grids"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "e725171cc2e2d7fb23dad4b9a6207cb4b1f221af",
+            "evidence": [
+              {
+                "url": "https://github.com/ackirby88/EulerFV/blob/e725171cc2e2d7fb23dad4b9a6207cb4b1f221af/README.md",
+                "path": "README.md",
+                "sha256": "6e9617aa99d0d67198f2b5f8e3192a051c11842c8abf6ff6ad2af3f0ed589fd2"
+              }
+            ],
+            "notes": "The pinned README gives a concise solver description and the tree contains Fortran implementation files. Only broad Euler/PDE coverage is assigned; numerical flux choices, boundaries, stability, build dependencies and validation require individual review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:noahlopezgit/2deulersolver",
+      "local": {
+        "name": "2D Euler Solver experiment",
+        "description": "Experimental Fortran finite-volume channel-flow Euler solver using a Jameson scheme.",
+        "repository": {
+          "host": "github",
+          "owner": "NoahLopezGit",
+          "name": "2DEulerSolver",
+          "url": "https://github.com/NoahLopezGit/2DEulerSolver"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "euler-equations",
+          "finite-volume",
+          "experimental-software"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "f4954139df12c64f77f0c42f24308872bbfad42c",
+            "evidence": [
+              {
+                "url": "https://github.com/NoahLopezGit/2DEulerSolver/blob/f4954139df12c64f77f0c42f24308872bbfad42c/OLD/README.md",
+                "path": "OLD/README.md",
+                "sha256": "37a95f831dfbc3090bcda516019617e9ea1b256428082af6829d095c63e27fc6"
+              }
+            ],
+            "notes": "The reviewed OLD/README explicitly says the solution is unstable and does not converge, with dissipation changes planned. The classification records implemented experimental scope, not a working checked solver. Other source directories at this revision are not assumed to fix those limitations without further review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/FrostyNip/2DEulerSolver"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:andreacaldiroli/ates-code",
+      "local": {
+        "name": "ATES",
+        "description": "Fortran exoplanet atmospheric hydrodynamics with photoionization equilibrium solves.",
+        "repository": {
+          "host": "github",
+          "owner": "AndreaCaldiroli",
+          "name": "ATES-Code",
+          "url": "https://github.com/AndreaCaldiroli/ATES-Code"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "atmospheric-escape",
+          "hydrodynamics",
+          "nonlinear-equations",
+          "minpack"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a7a0e7854849ca31c340d09d0dea815fab233a75",
+            "evidence": [
+              {
+                "url": "https://github.com/AndreaCaldiroli/ATES-Code/blob/a7a0e7854849ca31c340d09d0dea815fab233a75/README.md",
+                "path": "README.md",
+                "sha256": "64c16d82ceda69495bbf1c91680c0dda484939c6b3da599c1bc98f37036a6d1c"
+              }
+            ],
+            "notes": "The README documents hydrodynamic mass-loss simulation and a nonlinear-system module using MINPACK for photoionization equilibrium. Python interfaces/diagnostics and a transmission module are separate components. Irradiation assumptions, steady states and spectra were not validated; this is not a general atmospheric forecast model.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F",
+            "level": "documentation-reviewed",
+            "revision": "a7a0e7854849ca31c340d09d0dea815fab233a75",
+            "evidence": [
+              {
+                "url": "https://github.com/AndreaCaldiroli/ATES-Code/blob/a7a0e7854849ca31c340d09d0dea815fab233a75/README.md",
+                "path": "README.md",
+                "sha256": "64c16d82ceda69495bbf1c91680c0dda484939c6b3da599c1bc98f37036a6d1c"
+              }
+            ],
+            "notes": "The README documents hydrodynamic mass-loss simulation and a nonlinear-system module using MINPACK for photoionization equilibrium. Python interfaces/diagnostics and a transmission module are separate components. Irradiation assumptions, steady states and spectra were not validated; this is not a general atmospheric forecast model.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:predsci/conflow",
+      "local": {
+        "name": "ConFlow",
+        "description": "Synthetic solar convection velocity maps from analytical poloidal/toroidal spectra and advection.",
+        "repository": {
+          "host": "github",
+          "owner": "predsci",
+          "name": "ConFlow",
+          "url": "https://github.com/predsci/ConFlow"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "synthetic-flow-fields",
+          "solar-convection",
+          "spherical-maps"
+        ],
+        "classifications": [
+          {
+            "code": "Z",
+            "level": "documentation-reviewed",
+            "revision": "e0e496d9b93184d5fc491e0c4048aa6ef75dcf81",
+            "evidence": [
+              {
+                "url": "https://github.com/predsci/ConFlow/blob/e0e496d9b93184d5fc491e0c4048aa6ef75dcf81/README.md",
+                "path": "README.md",
+                "sha256": "f145fb03d8721787afcad248ac280d6033f74a75a34e3aaa2c318d9efd67e328"
+              }
+            ],
+            "notes": "The README describes a problem-specific flow-field generator with binary/HDF5 maps for downstream transport models. It does not establish a general PDE solver, stochastic sampling engine or standalone spherical-harmonic transform library. Broad application-level coverage is retained until the mathematical kernels are reviewed.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ecmwf-ifs/dwarf-p-cloudsc",
+      "local": {
+        "name": "CLOUDSC dwarf",
+        "description": "Fortran cloud-microphysics mini-app variants for testing, reference comparison and performance experiments.",
+        "repository": {
+          "host": "github",
+          "owner": "ecmwf-ifs",
+          "name": "dwarf-p-cloudsc",
+          "url": "https://github.com/ecmwf-ifs/dwarf-p-cloudsc"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "ecbuild"
+        ],
+        "topics": [
+          "benchmarking",
+          "cloud-microphysics",
+          "mini-app",
+          "openacc",
+          "cuda-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "f7ba9f85ebd91c710496c680db037f3d46f8e82b",
+            "evidence": [
+              {
+                "url": "https://github.com/ecmwf-ifs/dwarf-p-cloudsc/blob/f7ba9f85ebd91c710496c680db037f3d46f8e82b/README.md",
+                "path": "README.md",
+                "sha256": "7f6d2ccb888d3b9f7d5bd9aa2ef035c1ac2cbfb3187f6101fe9d1fb6e5b0f37a"
+              }
+            ],
+            "notes": "The README explicitly positions this as a research test of the IFS CLOUDSC scheme and describes Fortran, translated and GPU variants. It is classified as testing/support software rather than a complete weather model or general numerical solver. Reference comparisons, variant equivalence and benchmark results were not reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:mgimond/aomc",
+      "local": {
+        "name": "Aquatic Optics Monte Carlo",
+        "description": "Fortran Monte Carlo light propagation in shallow vertically heterogeneous aquatic media.",
+        "repository": {
+          "host": "github",
+          "owner": "mgimond",
+          "name": "aomc",
+          "url": "https://github.com/mgimond/aomc"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "monte-carlo",
+          "radiative-transfer",
+          "aquatic-optics",
+          "photon-transport"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "4b4ea73d5ff4c1b01c6503438bba1eb6cc523781",
+            "evidence": [
+              {
+                "url": "https://github.com/mgimond/aomc/blob/4b4ea73d5ff4c1b01c6503438bba1eb6cc523781/README.md",
+                "path": "README.md",
+                "sha256": "92ad2f88d84d8fe5c00a1caa24ac325938ed976880a793341a277fabbbf1f7ca"
+              }
+            ],
+            "notes": "The README identifies the medium assumptions and a Fortran 90 implementation driven by input files. A supplied build script and default inputs are not proof of numerical or physical validation; optical parameters, sampling error and outputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
     }
   ]
 }
