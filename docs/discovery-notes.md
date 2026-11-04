@@ -52,6 +52,27 @@ compiler or playground service was used for these reviews.
 | [CDE at ScottHabershon](https://github.com/ScottHabershon/cde) | Include under its current organization | GitHub redirects to [HabershonLab/cde](https://github.com/HabershonLab/cde). The pinned evidence uses the canonical address, while discovery metadata preserves the original account. |
 | [EPOCH at Warwick-Plasma](https://github.com/Warwick-Plasma/epoch) | Include under its current organization | GitHub redirects to [epochpic/epoch](https://github.com/epochpic/epoch). The canonical identity is recorded once. The README build guide is supplemented by pinned EPOCH1D documentation of its particle-pusher and field-solver heritage. |
 
+## Numerical-method discovery scope
+
+Further broad discovery focuses on reusable numerical methods, such as
+quadrature, optimization, equation solving, sorting and linear algebra.
+Scientific application repositories are not added merely because they use
+numerical algorithms. Previously reviewed application records remain available.
+
+The latest numerical review added 20 repositories with pinned evidence. TESTGO,
+TESTMO, the MGH derivative testset and the golden-section callback experiment
+are classified as software-testing support (S), rather than presented as new
+optimization solvers. Fortran_DNAD is included for its reusable differentiation
+and finite-volume framework; its scientific examples are not separately mapped.
+These are documentation reviews, not compilation or numerical verification.
+
+| Candidate | Decision | Reason |
+| --- | --- | --- |
+| [madrigal](https://github.com/octoflar/madrigal) | Defer | The public Git URL did not resolve during this review. An available source and its own documentation are needed before classification. No compilation was attempted. |
+| [vkpss](https://github.com/fsobral/vkpss) | Defer pending distinction from TRDF | Its short README describes sampling-based trust-region models, but its [pinned tutorial](https://github.com/fsobral/vkpss/blob/0d50767dc05c384cbf5692907006124be08d7add/doc/readme.tex) describes TRDF, already cataloged at fsobral/trdf. A later source review should establish what this variant changes before adding a separate record. No identity equivalence is assumed. |
+| [FM Algorithm 786](https://github.com/toms-algo/786-fm-1997) and [FM Algorithm 911](https://github.com/toms-algo/911-fm-2010) | Defer additional historical versions | Their pinned READMEs describe FM 1.1 and 1.3, respectively, from the same multiple-precision family as the existing Algorithm 814 record. The later version adds exponential-integral-related functions, so these are not declared duplicates; decide how to represent version lineage before adding overlapping records. |
+| [NNLS_NNT_MEM](https://github.com/johanschott/NNLS_NNT_MEM) | Leave outside this numerical-method batch | The README presents an analytical-continuation application using NNLS, nonnegative Tikhonov and maximum entropy methods. A separate reusable numerical interface has not been established by this documentation review. |
+
 The discovery source was the [pinned Fortran code on GitHub list](https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md).
 Repository descriptions can become outdated, so new entries are checked against
 their own pinned documentation or source interfaces before classification.

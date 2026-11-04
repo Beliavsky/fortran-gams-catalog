@@ -34560,6 +34560,960 @@
         }
       },
       "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/acrs",
+      "local": {
+        "name": "ACRS",
+        "description": "Controlled random search for bound-constrained global optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "ACRS",
+          "url": "https://github.com/DerivativeFreeLibrary/ACRS"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "global-optimization",
+          "controlled-random-search"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "a276a7e3a265cc334b70b1e6cbe4738aba462b4a",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/README.md",
+                "path": "README.md",
+                "sha256": "5d39d98ac3e668e32d04b8bd338d27674231fd079c6989d7ffd106f0999383d0"
+              }
+            ],
+            "notes": "The README documents the Fortran 90 objective, dimension and bound callbacks, alongside separate C, Python and MATLAB versions. Only bound-constrained scope is assigned; stochastic reliability and global-solution claims were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/ddfsa",
+      "local": {
+        "name": "DDFSA",
+        "description": "Derivative-free simulated annealing for bound-constrained global optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "DDFSA",
+          "url": "https://github.com/DerivativeFreeLibrary/DDFSA"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "simulated-annealing",
+          "global-optimization"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "054c1335805b8f6c3b745f6c8e44b8f71aec468b",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DDFSA/blob/054c1335805b8f6c3b745f6c8e44b8f71aec468b/README.txt",
+                "path": "README.txt",
+                "sha256": "ae32aa8bd93c28f1af0d7ba5817c43ba6885310ac89c3ce3f2dfc256a95ffcb5"
+              }
+            ],
+            "notes": "The Fortran 90 usage guide documents problem dimension, bounds and objective callbacks. A known global value is optional input, not independently established by this review. Cooling behavior, convergence and example results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/dirdfn",
+      "local": {
+        "name": "DIRDFN",
+        "description": "Derivative-free constrained global nonlinear optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "DIRDFN",
+          "url": "https://github.com/DerivativeFreeLibrary/DIRDFN"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "nonlinear-programming",
+          "global-optimization"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "3776d1d4e71abf371f2f143493ab48cb1affaadc",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/README.txt",
+                "path": "README.txt",
+                "sha256": "a6ef40150af7ab1d09684e9db031fa16bf72f9e3e39dea88f53d66e12fe10f27"
+              }
+            ],
+            "notes": "The usage guide specifies objective, equality and inequality callbacks, initial point and variable bounds. This supports constrained optimization without assuming arbitrary constraint regularity or guaranteed global solutions. Feasibility and termination behavior were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/dirmin",
+      "local": {
+        "name": "DIRMIN",
+        "description": "Derivative-free bound-constrained global optimization with local line searches.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "DIRMIN",
+          "url": "https://github.com/DerivativeFreeLibrary/DIRMIN"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "global-optimization",
+          "line-search"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "1912e7165288d60d3b5e23d0e44b91a41555ed3f",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/DIRMIN/blob/1912e7165288d60d3b5e23d0e44b91a41555ed3f/README.txt",
+                "path": "README.txt",
+                "sha256": "a7b3863f1ac0eb2748cf4dde1441a8bf645644940279aa44ea08363a4ebad509"
+              }
+            ],
+            "notes": "The README distinguishes the supplied 74-problem collection from a user-defined objective and documents interval, evaluation and line-search controls. Its known-global-value stopping test is not an accuracy certificate for an unknown problem. Evaluation-budget overshoot is explicitly described upstream; results were not reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/modir",
+      "local": {
+        "name": "MODIR and MODIR+DFMO",
+        "description": "Derivative-free inequality-constrained multiobjective global optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "MODIR",
+          "url": "https://github.com/DerivativeFreeLibrary/MODIR"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "multiobjective-optimization",
+          "constrained-optimization"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "3896605a13c7467f15052e150621d44d55e3fc0d",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/MODIR/blob/3896605a13c7467f15052e150621d44d55e3fc0d/README.txt",
+                "path": "README.txt",
+                "sha256": "a736ad7813da21ca55e31d75415359379cf6be011ddb0bd65d679d8d70fa95c6"
+              }
+            ],
+            "notes": "The Fortran 90 guide documents variable bounds, vector objectives and inequalities g(x)<=0, and separate MODIR/DFMO evaluation budgets. Equality constraints and guaranteed recovery of a complete Pareto front are not established. Hybrid behavior and examples were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/sdminmax",
+      "local": {
+        "name": "SDMINMAX",
+        "description": "Derivative-free finite minimax optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "SDMINMAX",
+          "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "minimax"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "27a938c530b5a8b4bddc3f6c3dc56ab655e90870",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/README.txt",
+                "path": "README.txt",
+                "sha256": "f431b642df3861534bf03bd63c756d6bb01abc3fcc1a640df0ccf3d1e8a9bb35"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f",
+                "path": "CODE/SDMINMAX.f",
+                "sha256": "9729d55f653ded96cb3f3a90f181aa50f04454c0133e4c37afe615dd8b84146f"
+              }
+            ],
+            "notes": "The usage guide is supplemented by pinned source-header documentation naming nonlinear finite minimax optimization and its linearly constrained algorithm reference. This does not establish a general nonlinear-constraint interface. Component functions, stopping tests and numerical results need later individual review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/testgo",
+      "local": {
+        "name": "TESTGO",
+        "description": "Fortran test-problem collection for bound-constrained global optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "TESTGO",
+          "url": "https://github.com/DerivativeFreeLibrary/TESTGO"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization-benchmarks",
+          "test-functions",
+          "global-optimization"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "41b73d58c8c230aa2f8814ffa82dadac3227c873",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/TESTGO/blob/41b73d58c8c230aa2f8814ffa82dadac3227c873/README.txt",
+                "path": "README.txt",
+                "sha256": "f193c3caf9f68f1d2f53c14174f1ff6c4f16160c4319a327fa0641f0b47793e0"
+              }
+            ],
+            "notes": "The guide describes a simple evaluator for 74 problems, known objective values and bounds. This is a benchmark collection rather than an optimization solver; only software-testing support is mapped. Known minima and all problem definitions were not independently verified.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:derivativefreelibrary/testmo",
+      "local": {
+        "name": "TESTMO",
+        "description": "Fortran multiobjective optimization benchmark problem definitions.",
+        "repository": {
+          "host": "github",
+          "owner": "DerivativeFreeLibrary",
+          "name": "TESTMO",
+          "url": "https://github.com/DerivativeFreeLibrary/TESTMO"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization-benchmarks",
+          "test-functions",
+          "multiobjective-optimization"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "2b9d8860af046f841edd2f2cff0fc5bd84322949",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/TESTMO/blob/2b9d8860af046f841edd2f2cff0fc5bd84322949/PROBLEMS/ZDT1.f90",
+                "path": "PROBLEMS/ZDT1.f90",
+                "sha256": "5c1bd5bbc27c091d055cccb38e1acfc6df08d5493cbee5050142ecaafbcd9d39",
+                "source_encoding": "cp1252"
+              }
+            ],
+            "notes": "The pinned ZDT1 source comments document its multiobjective benchmark lineage and the file supplies problem dimensions, bounds and objective callbacks. That representative evidence does not validate every other problem in the collection. No optimizer or Pareto-front accuracy is inferred.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fsobral/fird",
+      "local": {
+        "name": "FIRD",
+        "description": "Filter inexact-restoration derivative-free constrained optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "fsobral",
+          "name": "fird",
+          "url": "https://github.com/fsobral/fird"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "inexact-restoration",
+          "filter-methods"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "16ef79b194358c20e5ffb3554c6362742de1018c",
+            "evidence": [
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/README.md",
+                "path": "README.md",
+                "sha256": "6848d08d05e96a30bb79d8d7780b286227b706b2b8cdc879a01564d787f05174"
+              }
+            ],
+            "notes": "The README identifies a modified TRDF for trust-region models and ALGENCAN for subproblems, with configurable advanced phases. Those dependencies are not replaced by a standalone implementation here. Feasibility, convergence and supplied Hock-Schittkowski examples were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fsobral/skinny",
+      "local": {
+        "name": "Skinny",
+        "description": "Pseudo-random direct search for constrained optimization on thin domains.",
+        "repository": {
+          "host": "github",
+          "owner": "fsobral",
+          "name": "skinny",
+          "url": "https://github.com/fsobral/skinny"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "derivative-free",
+          "equality-constraints",
+          "direct-search"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "7d3f57d39de38bfb687a551fef26a86700a8ab7f",
+            "evidence": [
+              {
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/README.md",
+                "path": "README.md",
+                "sha256": "4bad2896767a478fb2ecffd7451e8f790689be84fe98cbc9abb0ba0105ca1172"
+              }
+            ],
+            "notes": "The README requires the objective outside the feasible region because the method enlarges and shrinks that region. It identifies ALGENCAN 2.4 compatibility, while 3.1 support is described as development work. Equality-constraint handling and published results were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:johngardenghi/ar4",
+      "local": {
+        "name": "AR4",
+        "description": "Third-order models with fourth-order regularization for unconstrained optimization.",
+        "repository": {
+          "host": "github",
+          "owner": "johngardenghi",
+          "name": "ar4",
+          "url": "https://github.com/johngardenghi/ar4"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "unconstrained-optimization",
+          "high-order-methods",
+          "regularization"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/README.md",
+                "path": "README.md",
+                "sha256": "aa4ddb9d92c20f5d00679542f4c1d54852edbc4d6069a60bbd9a1f92309330eb"
+              }
+            ],
+            "notes": "The README documents MGH and packing drivers and bundled ALGENCAN 3.1.1. Reproducing the paper requires additional HSL MA57 and BLAS routines, which are not mandatory for every ALGENCAN build. Derivative requirements, regularization parameters and convergence results need later review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:johngardenghi/bglcovering",
+      "local": {
+        "name": "Minimum-radius ball covering",
+        "description": "Optimization of equal-radius ball coverings with planar polygon and Voronoi geometry.",
+        "repository": {
+          "host": "github",
+          "owner": "johngardenghi",
+          "name": "bglcovering",
+          "url": "https://github.com/johngardenghi/bglcovering"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "covering-problems",
+          "computational-geometry",
+          "polygon-clipping"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "f97119df01ae48e396f881ad2d2e25085338282b",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/README.md",
+                "path": "README.md",
+                "sha256": "9248f082458ce75984a73c7bcbd1c0b48e5ed54f51a77b9169c247f0ddd7bf2c"
+              }
+            ],
+            "notes": "The README documents minimum-radius coverings, polygon generation, Voronoi cells, Sutherland-Hodgman clipping and convex-polygon/circle intersections. It requires ALGENCAN, BLAS and HSL, with bundled GEOMETRY/GEOMPACK sources. These are generic geometric optimization problems; optimality, intersection degeneracies and paper results were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "f97119df01ae48e396f881ad2d2e25085338282b",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/README.md",
+                "path": "README.md",
+                "sha256": "9248f082458ce75984a73c7bcbd1c0b48e5ed54f51a77b9169c247f0ddd7bf2c"
+              }
+            ],
+            "notes": "The README documents minimum-radius coverings, polygon generation, Voronoi cells, Sutherland-Hodgman clipping and convex-polygon/circle intersections. It requires ALGENCAN, BLAS and HSL, with bundled GEOMETRY/GEOMPACK sources. These are generic geometric optimization problems; optimality, intersection degeneracies and paper results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:johngardenghi/dfsaneacc",
+      "local": {
+        "name": "Accelerated DF-SANE",
+        "description": "Accelerated derivative-free sequential-residual methods for large nonlinear systems.",
+        "repository": {
+          "host": "github",
+          "owner": "johngardenghi",
+          "name": "dfsaneacc",
+          "url": "https://github.com/johngardenghi/dfsaneacc"
+        },
+        "languages": [
+          "Fortran",
+          "R"
+        ],
+        "build_systems": [],
+        "topics": [
+          "nonlinear-equations",
+          "spectral-residual",
+          "secant-acceleration"
+        ],
+        "classifications": [
+          {
+            "code": "F",
+            "level": "documentation-reviewed",
+            "revision": "2e879f8b0baf7de75de8382e65d619b02bc5c7b6",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/README.md",
+                "path": "README.md",
+                "sha256": "541c51c7dd170072bbd93b2a646a20cb9ec32667682583a4c71ad77affbc5942"
+              }
+            ],
+            "notes": "The README explicitly separates a Fortran implementation from the R package and CUTEst experiment infrastructure. R parameter defaults are not assumed to be the Fortran interface. Only nonlinear-system solving is mapped; residual accuracy and published comparisons were not reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:johngardenghi/mgh",
+      "local": {
+        "name": "MGH testset with third derivatives",
+        "description": "Fortran 90 More-Garbow-Hillstrom optimization benchmarks with third-order derivatives.",
+        "repository": {
+          "host": "github",
+          "owner": "johngardenghi",
+          "name": "mgh",
+          "url": "https://github.com/johngardenghi/mgh"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization-benchmarks",
+          "test-functions",
+          "third-derivatives"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "484c4213a4253f2b6accc76dc57b2d9a3bbef5ee",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/mgh/blob/484c4213a4253f2b6accc76dc57b2d9a3bbef5ee/README.md",
+                "path": "README.md",
+                "sha256": "49410fc486d6b5387808db39dea083faf502078ba979a6709f5cb50e68d828e2"
+              }
+            ],
+            "notes": "The short README identifies an updated Fortran 90 MGH testset and added third derivatives. This is test infrastructure, not a new minimizer or a general automatic-differentiation library. Individual derivative formulas and benchmark completeness require later source review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:huijunchen9260/gssfortran",
+      "local": {
+        "name": "Golden-section callback experiment",
+        "description": "Fortran golden-section examples comparing generic objective callbacks with specialized code.",
+        "repository": {
+          "host": "github",
+          "owner": "HuijunChen9260",
+          "name": "gssFortran",
+          "url": "https://github.com/HuijunChen9260/gssFortran"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization-benchmarks",
+          "golden-section-search",
+          "generic-interfaces"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "3c965b5fa9a7cf6e5e58361d30d343384e720115",
+            "evidence": [
+              {
+                "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/README.md",
+                "path": "README.md",
+                "sha256": "ddbcbbf5badc2b90003a289de846aaaf45baa21cb60051dd3d621650fc310159"
+              }
+            ],
+            "notes": "The README frames this repository as a class(*) interface-efficiency experiment and discusses allocatable derived-type storage. It is cataloged as experimental software-testing support rather than a validated general minimization package. Timing conclusions and example correctness were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:irukoa/extrapolation_integration",
+      "local": {
+        "name": "Extrapolation Integration",
+        "description": "Sampled-data quadrature with Richardson extrapolation and trapezoidal fallback.",
+        "repository": {
+          "host": "github",
+          "owner": "irukoa",
+          "name": "Extrapolation_Integration",
+          "url": "https://github.com/irukoa/Extrapolation_Integration"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "quadrature",
+          "richardson-extrapolation",
+          "sampled-data",
+          "numerical-integration"
+        ],
+        "classifications": [
+          {
+            "code": "H",
+            "level": "documentation-reviewed",
+            "revision": "5472eb6f2b85c5ff2337f3e52acd2d689335c078",
+            "evidence": [
+              {
+                "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/README.md",
+                "path": "README.md",
+                "sha256": "b1877e726065257766909b178c0a80815b890c52f79b18d92b9d4d4cd02bc3ba"
+              }
+            ],
+            "notes": "The README specifies equally spaced real/complex samples and returns the integral divided by the interval length, so callers must supply interval scaling themselves. Extrapolation requires 2^M+1 samples; other lengths use trapezoidal reduction, and a singleton is returned unchanged. Stated error orders and edge cases were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:suzuyuyuyu/fortran-introsort",
+      "local": {
+        "name": "Fortran introsort",
+        "description": "Fortran introspective sorting with optional reverse order.",
+        "repository": {
+          "host": "github",
+          "owner": "suzuyuyuyu",
+          "name": "Fortran-introsort",
+          "url": "https://github.com/suzuyuyuyu/Fortran-introsort"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "sorting",
+          "introsort",
+          "data-handling"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "0907093a66f05f1c59bee70fb82ed9e40924416d",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/README.md",
+                "path": "README.md",
+                "sha256": "dc947682a4db64adddb9bf3166f53a297e662273f3e80474ae08801bc4c28465"
+              }
+            ],
+            "notes": "The README documents intro_sort_mod and its sort interface with optional reverse order, CMake presets and example builds. Supported element kinds, worst-case behavior, stability and edge cases require source-level review. No timings or sorted-output checks were run.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:suzuyuyuyu/fortran-mergesort",
+      "local": {
+        "name": "Fortran mergesort",
+        "description": "Fortran merge sorting with permutation history and two-dimensional array examples.",
+        "repository": {
+          "host": "github",
+          "owner": "suzuyuyuyu",
+          "name": "Fortran-mergesort",
+          "url": "https://github.com/suzuyuyuyu/Fortran-mergesort"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "sorting",
+          "mergesort",
+          "permutations",
+          "data-handling"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "fb8d241576af567597f357cd1b2491f7b3b16dba",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/README.md",
+                "path": "README.md",
+                "sha256": "59e4f1a08b66af7b4bb1ef9b74a5fa6eace8c1746b66c4f0141cbecf2df61908"
+              }
+            ],
+            "notes": "The README demonstrates sorting, reverse order, history-based rearrangement and selection of a reference line for 2D arrays. The documented Make defaults use ifx and llvm-ar but are configurable. Stability, supported kinds and permutation correctness were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:venovako/kogacc",
+      "local": {
+        "name": "KogAcc",
+        "description": "Pointwise and blocked Kogbetliantz-type singular-value decomposition.",
+        "repository": {
+          "host": "github",
+          "owner": "venovako",
+          "name": "KogAcc",
+          "url": "https://github.com/venovako/KogAcc"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "linear-algebra",
+          "svd",
+          "kogbetliantz",
+          "jacobi-methods"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "c852e6d85355b5e7f3efb58b86cbe0c043cecd7d",
+            "evidence": [
+              {
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/README.md",
+                "path": "README.md",
+                "sha256": "2f23b71ac36346fdf987a5cac81ae761aff5a285363465b863edf3b60d681974"
+              }
+            ],
+            "notes": "The README distinguishes cyclic, dynamic and blocked methods, requires libpvn and documents little-endian gfortran/ifx configurations, REAL128 requirements and accuracy/reliability modes. Some routines are only wrappers around libpvn; complex routines are explicitly less tested. No decomposition, rounding or parallel-performance claims were verified.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nickbrady/fortran_dnad",
+      "local": {
+        "name": "DNAD with Newman BAND",
+        "description": "Dual-number differentiation coupled to a general finite-volume nonlinear PDE framework.",
+        "repository": {
+          "host": "github",
+          "owner": "nickbrady",
+          "name": "Fortran_DNAD",
+          "url": "https://github.com/nickbrady/Fortran_DNAD"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "automatic-differentiation",
+          "dual-numbers",
+          "finite-volume",
+          "pde"
+        ],
+        "classifications": [
+          {
+            "code": "H",
+            "level": "documentation-reviewed",
+            "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+            "evidence": [
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/README.md",
+                "path": "README.md",
+                "sha256": "d6cc122c75902cbf886e67ce1ba3c6878ab0c227f7c3498c174099b5fb654ed3"
+              }
+            ],
+            "notes": "The README combines inherited DNAD, Newman BAND and fillmat components and describes a general core with diffusion/reaction example equations. Scope here is that reusable differentiation/discretization framework, not cataloging the battery or fluid applications. Machine-precision and performance claims were not independently checked; attribution to inherited components is preserved.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+            "evidence": [
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/README.md",
+                "path": "README.md",
+                "sha256": "d6cc122c75902cbf886e67ce1ba3c6878ab0c227f7c3498c174099b5fb654ed3"
+              }
+            ],
+            "notes": "The README combines inherited DNAD, Newman BAND and fillmat components and describes a general core with diffusion/reaction example equations. Scope here is that reusable differentiation/discretization framework, not cataloging the battery or fluid applications. Machine-precision and performance claims were not independently checked; attribution to inherited components is preserved.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
     }
   ]
 }
