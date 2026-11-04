@@ -12,7 +12,7 @@ def render(local):
              '| Repository | GAMS | Scope |', '| --- | --- | --- |']
     for project in projects:
         p = project['local']
-        codes = ', '.join(c['code'] for c in p.get('classifications', []))
+        codes = ', '.join(dict.fromkeys(c['code'] for c in p.get('classifications', [])))
         lines.append(f'| [{p["name"]}]({p["repository"]["url"]}) | {codes} | {p["description"].replace("|", "&#124;")} |')
     for project in projects:
         p = project['local']

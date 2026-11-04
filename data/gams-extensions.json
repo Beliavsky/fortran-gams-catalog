@@ -1,6 +1,24 @@
 {
   "schema_version": 1,
   "classes": {
+    "I2a": {
+      "label": "Initial boundary value problems",
+      "parent": "I2",
+      "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/I2a",
+      "reviewed_on": "2026-11-04"
+    },
+    "I2a1": {
+      "label": "Parabolic",
+      "parent": "I2a",
+      "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/I2a1",
+      "reviewed_on": "2026-11-04"
+    },
+    "I2a1a": {
+      "label": "One spatial dimension",
+      "parent": "I2a1",
+      "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/I2a1a",
+      "reviewed_on": "2026-11-04"
+    },
     "N6a2a": {
       "label": "Integer",
       "parent": "N6a2",

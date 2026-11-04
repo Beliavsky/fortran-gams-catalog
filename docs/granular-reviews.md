@@ -5,8 +5,8 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Fourteen repositories now have nineteen additional source-reviewed
-mappings, seventeen at leaf classes. Full commit pins, file hashes, procedure names
+Reviewed on 2026-11-04. Sixteen repositories now have twenty-four source-reviewed
+mappings, twenty at leaf classes. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
 The original broad documentation reviews remain available.
@@ -27,6 +27,8 @@ The original broad documentation reviews remain available.
 | [KogAcc](https://github.com/venovako/KogAcc) | D6 | Real64 square-matrix cyclic/quasi-cyclic Kogbetliantz SVD and the libpvn 2-by-2 kernel boundary | D6 is already a leaf. This mapping does not certify rectangular, blocked, dynamic or complex variants. INFO has step-budget/sweep-count semantics, and the small kernel is an external dependency. |
 | [Fortran introsort](https://github.com/suzuyuyuyu/Fortran-introsort) | N6a2a; N6a2b; N8 | Active integer/real sorting via partition, insertion and heap paths, plus companion-array permutations | The actual module is mod_introsort. History is caller-initialized; it does not make the sort passive. Empty inputs, stability, NaNs and performance were not checked. |
 | [Fortran mergesort](https://github.com/suzuyuyuyu/Fortran-mergesort) | N6a2a; N6a2b; N8 | Active integer/real vector and matrix-column sorting, plus gather permutations | Descending wrappers reverse data without reversing history. A matrix sort uses one reference row to move complete columns. No passive-rank API is claimed. |
+| [Fortran_DNAD](https://github.com/nickbrady/Fortran_DNAD) | H1; D2a2; I2a1a | Forward first-derivative propagation, concentration/gradient seeds, block-band elimination and a one-dimensional diffusion example | Derivative count is tied to user_input. Block tridiagonal does not mean scalar tridiagonal. The example and module wiring contain absolute author-machine include paths and require adaptation before compiling. Scientific application models are outside this review. |
+| [Minimum-radius ball covering](https://github.com/johngardenghi/bglcovering) | G2h3; P | Radius objective, covered-area constraint, derivative callbacks, Voronoi/polygon clipping and polygon/circle intersections | Optimization delegates to external ALGENCAN/HSL/BLAS. Smoothness-specific and equality/inequality branches remain pending review of geometric regularity and the external solver convention. P itself has no finer GAMS classes. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -41,6 +43,10 @@ problem definitions are recorded as possible future driver starting points.
 GAMS's derivative-specific leaves do not cover every mixed derivative interface.
 Keep a parent class when a leaf would misstate requirements. A function-value
 interface alone also does not establish convergence on nonsmooth functions.
+Likewise, a block-tridiagonal solver with wider scalar bandwidth and special
+boundary couplings remains under D2a2 rather than scalar-tridiagonal D2a2a.
+H1 and P are already leaves: specific procedures provide useful detail even
+where the official taxonomy has no further subdivisions.
 
 ## Source findings to follow up
 
@@ -62,7 +68,7 @@ They do not change the classification of the mathematical problem implemented.
   `[2,1]` with history `[2,1]`, which no longer indexes the original data into
   that order. This remains an inspection finding pending a compiled check.
 
-Next numerical reviews: DNAD's reusable differentiation/discretization core,
-the minimum-radius ball-covering routines, and other independently reviewed
-numerical libraries. Benchmark collections remain separate from implemented
-solvers.
+Next numerical reviews move to other independently reviewed linear-algebra,
+quadrature and differential-equation libraries. Benchmark collections remain
+separate from implemented solvers. The ball-covering derivative callbacks and
+DNAD examples remain candidates for later compiled checks, not checked drivers.

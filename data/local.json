@@ -35740,9 +35740,130 @@
             ],
             "notes": "The README documents minimum-radius coverings, polygon generation, Voronoi cells, Sutherland-Hodgman clipping and convex-polygon/circle intersections. It requires ALGENCAN, BLAS and HSL, with bundled GEOMETRY/GEOMPACK sources. These are generic geometric optimization problems; optimality, intersection degeneracies and paper results were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3",
+            "level": "source-reviewed",
+            "revision": "f97119df01ae48e396f881ad2d2e25085338282b",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/covering.f90",
+                "path": "covering.f90",
+                "sha256": "242f154d34134878795d4a829e531e4ee5afa574b38a58d2e20291c5a7bd17a4"
+              },
+              {
+                "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/Makefile",
+                "path": "Makefile",
+                "sha256": "f03a6b2cd713650601299f7d85fa3b25c2a0f463a3a09451df6ac69051f43ea6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "algencama",
+                "path": "covering.f90",
+                "line_start": 285,
+                "line_end": 341
+              },
+              {
+                "procedure": "algencama::evalf / evalg",
+                "path": "covering.f90",
+                "line_start": 1647,
+                "line_end": 1692
+              },
+              {
+                "procedure": "algencama::evalc",
+                "path": "covering.f90",
+                "line_start": 1743,
+                "line_end": 1756
+              },
+              {
+                "procedure": "algencama::evalc",
+                "path": "covering.f90",
+                "line_start": 1924,
+                "line_end": 1959
+              },
+              {
+                "procedure": "algencama::evalj",
+                "path": "covering.f90",
+                "line_start": 2020,
+                "line_end": 2059
+              },
+              {
+                "procedure": "algencama::evalj",
+                "path": "covering.f90",
+                "line_start": 2157,
+                "line_end": 2209
+              },
+              {
+                "procedure": "algencama::evalhl",
+                "path": "covering.f90",
+                "line_start": 2274,
+                "line_end": 2307
+              },
+              {
+                "procedure": "algencama::evalhl",
+                "path": "covering.f90",
+                "line_start": 2747,
+                "line_end": 2775
+              }
+            ],
+            "notes": "The main program minimizes x(n), the common ball radius, through an external bmalgencan::algencan call. evalc computes the uncovered-area constraint as total polygon area minus covered area, while evalg, evalj and evalhl supply objective gradient, geometric constraint derivatives and sparse Lagrangian-Hessian entries. The objective Hessian is explicitly zero. This establishes a specialized nonlinear constrained optimization implementation (G2h3), not a generic optimizer implemented in this repository. A smoothness-specific leaf is withheld: the geometry includes tolerances, deterministic small center perturbations, topology changes and zero-derivative fallbacks for invalid configurations. Merely exposing derivative callbacks does not establish a global C2 contract; a later review must also resolve the external solver constraint convention before selecting the equality/inequality branch. The Makefile requires external ALGENCAN 4, HSL and BLAS; its single driver and restart/initialization heuristics do not certify a global minimum. No solve, derivative formula or asymptotic bound was verified.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "f97119df01ae48e396f881ad2d2e25085338282b",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90",
+                "path": "vorintpols.f90",
+                "sha256": "104c715d69f1a445ae31f1089d2479d27977e97530bbedf1ec84f858dd64e7ea"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "VorCells_Polygons (public interface)",
+                "path": "vorintpols.f90",
+                "line_start": 1,
+                "line_end": 8
+              },
+              {
+                "procedure": "VorCells_Polygons::VorCellInterConvPol",
+                "path": "vorintpols.f90",
+                "line_start": 575,
+                "line_end": 607
+              },
+              {
+                "procedure": "VorCells_Polygons::interCellBall",
+                "path": "vorintpols.f90",
+                "line_start": 845,
+                "line_end": 890
+              },
+              {
+                "procedure": "VorCells_Polygons::interCellBall",
+                "path": "vorintpols.f90",
+                "line_start": 892,
+                "line_end": 976
+              },
+              {
+                "procedure": "VorCells_Polygons::SutherlandHodgman",
+                "path": "vorintpols.f90",
+                "line_start": 979,
+                "line_end": 1039
+              },
+              {
+                "procedure": "VorCells_Polygons::edgeClipping",
+                "path": "vorintpols.f90",
+                "line_start": 1042,
+                "line_end": 1151
+              }
+            ],
+            "notes": "The VorCells_Polygons module exposes Voronoi-cell/polygon intersections and convex-polygon/circle intersections used by the area constraint. VorCellInterConvPol dispatches to a Sutherland-Hodgman half-plane clipping implementation; edgeClipping classifies edges with visibility tests and constructs intersections. interCellBall combines segment-circle intersections with polygon vertices and curved-edge identifiers. This source review strengthens the existing P documentation mapping: P itself is a GAMS leaf, so no invented polygon/Voronoi subclasses are introduced. Private clipping helpers are recorded as implementation evidence, not claimed as public APIs. The module delegates geometric primitives to bundled GEOMETRY/GEOMPACK routines; those entire inherited libraries are not audited here. Tolerance-sensitive degeneracies, collinear paths and exact-predicate robustness remain unverified. No clipping, area or coverage driver was run.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -36655,9 +36776,206 @@
             ],
             "notes": "The README combines inherited DNAD, Newman BAND and fillmat components and describes a general core with diffusion/reaction example equations. Scope here is that reusable differentiation/discretization framework, not cataloging the battery or fluid applications. Machine-precision and performance claims were not independently checked; attribution to inherited components is preserved.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+            "evidence": [
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/README.md",
+                "path": "README.md",
+                "sha256": "d6cc122c75902cbf886e67ce1ba3c6878ab0c227f7c3498c174099b5fb654ed3"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "sha256": "85b420c9227a372e7277a75a51ade365508ea990d0a38f3cab5bafcadd961f99"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "sha256": "6e7c599b1032c800ee19482c3342692b0de21cc0ce847ef0b875e016256e82cf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dnadmod::dual / ndv",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 116,
+                "line_end": 145
+              },
+              {
+                "procedure": "dnadmod::assign_dr",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 566,
+                "line_end": 573
+              },
+              {
+                "procedure": "dnadmod::mult_dd",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 785,
+                "line_end": 792
+              },
+              {
+                "procedure": "dnadmod::div_dd",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 870,
+                "line_end": 880
+              },
+              {
+                "procedure": "dnadmod::exp_d",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 1603,
+                "line_end": 1613
+              },
+              {
+                "procedure": "dnadmod::sin_d",
+                "path": "ExampleModels/Core_Subs_Mods/dnadmod.f95",
+                "line_start": 1917,
+                "line_end": 1924
+              },
+              {
+                "procedure": "BAND_mod::auto_fill",
+                "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "line_start": 140,
+                "line_end": 160
+              },
+              {
+                "procedure": "BAND_mod::auto_fill::c_to_dual / dcdx_to_dual",
+                "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "line_start": 168,
+                "line_end": 196
+              }
+            ],
+            "notes": "The real dual-number path propagates first derivatives in a dx(ndv) vector through overloaded multiplication, division, exponential and sine operations. The inspected product, quotient and chain-rule formulas operate on values and derivative vectors, without finite-difference steps. auto_fill seeds identity derivatives separately for concentration and spatial-gradient variables, then extracts flux/reaction/accumulation Jacobian entries. This supports H1, already a GAMS leaf including automatic differentiation. It is forward first-order differentiation, not a Hessian or reverse-mode implementation. In this fork ndv=2*N depends on user_input, and the scalar real kind follows the build configuration; it is not a standalone precision-generic package without adaptation. The reviewed path does not establish correctness of every overload, complex extensions or nondifferentiable branches. The README credits inherited DNAD by Wenbin Yu/Maxwell Blair and the upstream fork; those components are not newly attributed to this repository. No derivative check or program was executed.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a2",
+            "level": "source-reviewed",
+            "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+            "evidence": [
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "sha256": "4014b55716a867ea4d710839b197a559e0e35c292f8dfcf8de671f1c4695574e"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95",
+                "path": "ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95",
+                "sha256": "74cec268733da4fececc1831ea5146c29d884423177a2dbef4c0df0b7aae690a"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_BAND.f95",
+                "path": "ExampleModels/Core_Subs_Mods/sub_BAND.f95",
+                "sha256": "876e8163e8c74bcf5162b9d2aacffd8396fdced26de6d5f772f3e21c41ff4ab3"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
+                "path": "ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
+                "sha256": "b7cec8940690bda57e3f04c27b1212ad9313a5ed0ff62945b9662a83b90fb372"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BAND_mod (included solver wiring)",
+                "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "line_start": 14,
+                "line_end": 24
+              },
+              {
+                "procedure": "BAND_mod::ABDGXY",
+                "path": "ExampleModels/Core_Subs_Mods/sub_ABDGXY.f95",
+                "line_start": 29,
+                "line_end": 62
+              },
+              {
+                "procedure": "BAND_mod::BAND",
+                "path": "ExampleModels/Core_Subs_Mods/sub_BAND.f95",
+                "line_start": 38,
+                "line_end": 99
+              },
+              {
+                "procedure": "BAND_mod::MATINV",
+                "path": "ExampleModels/Core_Subs_Mods/sub_MATINV.f95",
+                "line_start": 8,
+                "line_end": 89
+              }
+            ],
+            "notes": "ABDGXY assembles neighboring real blocks and BAND performs forward block elimination followed by back substitution, including special boundary couplings through X and Y. Each block solve delegates to MATINV, which applies Gaussian/Gauss-Jordan row operations to B and the multiple right-hand sides in D. The supported GAMS scope is real nonsymmetric banded linear systems (D2a2). Block tridiagonal structure is not generally scalar tridiagonal, and boundary terms can reach an additional neighboring block, so the D2a2a leaf would overstate the structure. This is an inherited Newman BAND-style specialized solver using module-global arrays, not a general LAPACK-compatible band-storage interface. NJ must accommodate the referenced neighboring nodes, and the routine assumes compatible block/boundary assembly. Singular-block diagnostics print and continue in BAND; conditioning, pivot robustness, residuals and larger systems were not checked. No complex or symmetric-positive-definite specialization is inferred.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "I2a1a",
+            "level": "source-reviewed",
+            "revision": "7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c",
+            "evidence": [
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "sha256": "d00d7ce0839c32078e6a94326e650fa31fe5b943ccc64871e5e2f9c7f9c56464"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "sha256": "4014b55716a867ea4d710839b197a559e0e35c292f8dfcf8de671f1c4695574e"
+              },
+              {
+                "url": "https://github.com/nickbrady/Fortran_DNAD/blob/7ea007d42d1beeb0d0bd3c78e561c6f62d77f27c/ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "sha256": "6e7c599b1032c800ee19482c3342692b0de21cc0ce847ef0b875e016256e82cf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "user_input (diffusion example)",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "line_start": 9,
+                "line_end": 37
+              },
+              {
+                "procedure": "GOV_EQNS::FLUX / RXN / ACCUM",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "line_start": 124,
+                "line_end": 194
+              },
+              {
+                "procedure": "GOV_EQNS::Boundary_WEST / Boundary_EAST",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "line_start": 207,
+                "line_end": 231
+              },
+              {
+                "procedure": "unsteady",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "line_start": 238,
+                "line_end": 288
+              },
+              {
+                "procedure": "initial_condition",
+                "path": "ExampleModels/01_Diffusion/Rectangular/Diffusion_1Specie_DNAD.f95",
+                "line_start": 295,
+                "line_end": 330
+              },
+              {
+                "procedure": "BAND_mod (included solver wiring)",
+                "path": "ExampleModels/Core_Subs_Mods/BAND_MOD.f95",
+                "line_start": 14,
+                "line_end": 24
+              },
+              {
+                "procedure": "BAND_mod::auto_fill",
+                "path": "ExampleModels/Core_Subs_Mods/sub_auto_fill.f95",
+                "line_start": 140,
+                "line_end": 160
+              }
+            ],
+            "notes": "This mapping is restricted to the simple rectangular diffusion example, not the repository collection of physical applications. The author program sets one dependent variable, one spatial grid and a positive constant diffusivity; FLUX=-diff*dc/dx, RXN=0 and ACCUM=c/delT describe the one-dimensional parabolic diffusion initial-boundary problem. auto_fill forms finite-volume flux/accumulation derivatives; unsteady loops over spatial nodes through auto_fill/ABDGXY/BAND and updates the solution in time, with prescribed end concentrations. I2a1a is the GAMS leaf for parabolic PDEs in one spatial dimension. The example uses absolute author-machine include paths, and BAND_MOD uses another absolute path, so it is a source example requiring path adaptation rather than a portable checked driver. The included core wiring is inspected, but boundary compatibility, time accuracy, stability and mesh convergence were not checked. No general nonlinear iteration-convergence guarantee or multidimensional PDE mapping is added.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
