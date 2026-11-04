@@ -34620,25 +34620,59 @@
                 "procedure": "ACRS",
                 "path": "F90_src/ACRS.f90",
                 "line_start": 28,
-                "line_end": 134
+                "line_end": 134,
+                "role": "public-entry-point",
+                "summary": "External subroutine for bound-constrained global minimization using objective values. No module USE statement is needed. Supply a subroutine callback FUNCT(X,N,F), double-precision bounds/work arrays and default-real CPU limits; inspect the pinned declarations and author driver for setup and exit codes.",
+                "signature": "CALL ACRS(N, LB, UB, M, S, FVAL, FUNCT, cpu_limit, maxtgen, &\n          maxiter, prnlev, tol, IOUT, XSOL, FOUT, iter, nftot, &\n          iexit, diff_initial, omega)",
+                "declarations": [
+                  {
+                    "path": "F90_src/ACRS.f90",
+                    "line_start": 28,
+                    "line_end": 84
+                  },
+                  {
+                    "path": "F90_src/ACRS.f90",
+                    "line_start": 137,
+                    "line_end": 145
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "F90_src/main.f90",
+                    "line_start": 1,
+                    "line_end": 43
+                  }
+                ]
               },
               {
                 "procedure": "ACRS",
                 "path": "F90_src/ACRS.f90",
                 "line_start": 169,
-                "line_end": 283
+                "line_end": 283,
+                "role": "implementation-evidence"
               },
               {
                 "procedure": "PRICE_BASE_ITERATION",
                 "path": "F90_src/ACRS.f90",
                 "line_start": 424,
-                "line_end": 660
+                "line_end": 660,
+                "role": "implementation-helper"
               },
               {
-                "procedure": "acrs_main / funct_acrs",
+                "procedure": "acrs_main",
                 "path": "F90_src/main.f90",
                 "line_start": 1,
-                "line_end": 43
+                "line_end": 33,
+                "role": "program-entry-point",
+                "summary": "Author driver program; adapt the problem routines and limits before reuse. This is an executable, not a callable library routine."
+              },
+              {
+                "procedure": "funct_acrs",
+                "role": "callback",
+                "path": "F90_src/main.f90",
+                "line_start": 35,
+                "line_end": 43,
+                "summary": "Author callback adapter translates ACRS FUNCT(X,N,F) argument order to the problem routine FUNCT(N,X,F)."
               }
             ],
             "notes": "The ACRS interface accepts finite lower/upper bounds and an objective-value callback, with no gradient or Hessian callback. Its Price iteration randomly selects working-set points, computes a weighted centroid/reflection, projects onto the box and replaces a worse objective value. G2i describes this global nonconvex search; there is no finer GAMS subclass here. Bounds are restricted by implementation checks (lower bounds must exceed -1e6 and upper bounds must be below 1e16). Termination by objective spread, iteration count or CPU budget does not certify global optimality. The supplied acrs_main/FUNCT_ACRS example is a possible future driver starting point; it was not run.",
@@ -35826,37 +35860,70 @@
                 "procedure": "VorCells_Polygons (public interface)",
                 "path": "vorintpols.f90",
                 "line_start": 1,
-                "line_end": 8
+                "line_end": 8,
+                "role": "module-interface"
               },
               {
-                "procedure": "VorCells_Polygons::VorCellInterConvPol",
+                "procedure": "VorCellInterConvPol",
                 "path": "vorintpols.f90",
                 "line_start": 575,
-                "line_end": 607
+                "line_end": 607,
+                "module": "VorCells_Polygons",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine intersecting a convex polygon and a Voronoi cell. center is a real(kind=8) vector of length two; convPol and cell have type Polygon, and vor_cell has type VoronoiCell. The routine allocates the output polygon components.",
+                "signature": "CALL VorCellInterConvPol(center, convPol, vor_cell, cell)",
+                "declarations": [
+                  {
+                    "path": "vorintpols.f90",
+                    "line_start": 575,
+                    "line_end": 586
+                  }
+                ],
+                "usage": "use VorCells_Polygons, only: VorCellInterConvPol, Polygon, VoronoiCell\n! center, convPol and vor_cell are initialized upstream data.\ncall VorCellInterConvPol(center, convPol, vor_cell, cell)",
+                "usage_notes": "Calling sketch, not a complete program. Construct the polygon and Voronoi-cell data structures using the upstream conventions before calling. Dependencies on upstream geometry routines remain; this is not a standalone source file or a checked driver."
               },
               {
-                "procedure": "VorCells_Polygons::interCellBall",
+                "procedure": "interCellBall",
                 "path": "vorintpols.f90",
                 "line_start": 845,
-                "line_end": 890
+                "line_end": 890,
+                "module": "VorCells_Polygons",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine intersecting a convex polygon with a two-dimensional ball (disk), returning a CurvilinearPolygon. center(2) and radius r are real(kind=8); cell is a Polygon. The routine allocates output components.",
+                "signature": "CALL interCellBall(center, r, cell, curv_pol)",
+                "declarations": [
+                  {
+                    "path": "vorintpols.f90",
+                    "line_start": 845,
+                    "line_end": 858
+                  }
+                ],
+                "usage": "use VorCells_Polygons, only: interCellBall, Polygon, CurvilinearPolygon\n! center, r and cell are initialized upstream data.\ncall interCellBall(center, r, cell, curv_pol)",
+                "usage_notes": "Calling sketch only. Use the upstream polygon vertex/edge conventions and dependency sources. No geometric result, degenerate-case behavior or numerical robustness was verified by execution."
               },
               {
-                "procedure": "VorCells_Polygons::interCellBall",
+                "procedure": "interCellBall",
                 "path": "vorintpols.f90",
                 "line_start": 892,
-                "line_end": 976
+                "line_end": 976,
+                "module": "VorCells_Polygons",
+                "role": "implementation-evidence"
               },
               {
-                "procedure": "VorCells_Polygons::SutherlandHodgman",
+                "procedure": "SutherlandHodgman",
                 "path": "vorintpols.f90",
                 "line_start": 979,
-                "line_end": 1039
+                "line_end": 1039,
+                "module": "VorCells_Polygons",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "VorCells_Polygons::edgeClipping",
+                "procedure": "edgeClipping",
                 "path": "vorintpols.f90",
                 "line_start": 1042,
-                "line_end": 1151
+                "line_end": 1151,
+                "module": "VorCells_Polygons",
+                "role": "implementation-helper"
               }
             ],
             "notes": "The VorCells_Polygons module exposes Voronoi-cell/polygon intersections and convex-polygon/circle intersections used by the area constraint. VorCellInterConvPol dispatches to a Sutherland-Hodgman half-plane clipping implementation; edgeClipping classifies edges with visibility tests and constructs intersections. interCellBall combines segment-circle intersections with polygon vertices and curved-edge identifiers. This source review strengthens the existing P documentation mapping: P itself is a GAMS leaf, so no invented polygon/Voronoi subclasses are introduced. Private clipping helpers are recorded as implementation evidence, not claimed as public APIs. The module delegates geometric primitives to bundled GEOMETRY/GEOMPACK routines; those entire inherited libraries are not audited here. Tolerance-sensitive degeneracies, collinear paths and exact-predicate robustness remain unverified. No clipping, area or coverage driver was run.",
@@ -36229,34 +36296,60 @@
             ],
             "procedures": [
               {
-                "procedure": "mod_introsort::sort (generic integer bindings)",
+                "procedure": "sort",
                 "path": "src/intro-sort.F90",
                 "line_start": 15,
-                "line_end": 39
+                "line_end": 39,
+                "module": "mod_introsort",
+                "role": "public-entry-point",
+                "summary": "Public generic for active, in-place integer sorting. The optional reverse argument requests descending order. The history overload carries caller-initialized labels along with the values; it is not passive ranking. Specific implementation procedures are private.",
+                "signature": "CALL sort(arr, reverse)\nCALL sort(arr, history, reverse)",
+                "declarations": [
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 176,
+                    "line_end": 184
+                  },
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 533,
+                    "line_end": 541
+                  }
+                ],
+                "usage": "use mod_introsort, only: sort\n! arr is an initialized, nonempty array of a supported kind.\ncall sort(arr)\n! Alternatively: call sort(arr, reverse=.true.)",
+                "usage_notes": "Calling sketch only. reverse is optional in both signatures; history is present only in the second overload and uses DEFAULT_INT indices. Its initial values must be supplied by the caller. The linked declarations show the int32 bindings; other kinds are listed in the generic interface. No new execution check was made."
               },
               {
-                "procedure": "mod_introsort::introsort_int32 / introsort_recurs_int32",
+                "procedure": "introsort_int32 / introsort_recurs_int32",
                 "path": "src/intro-sort.F90",
                 "line_start": 176,
-                "line_end": 225
+                "line_end": 225,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::introsort / introsort_recurs (template)",
+                "procedure": "introsort / introsort_recurs (template)",
                 "path": "src/intro-sort.fypp",
                 "line_start": 74,
-                "line_end": 123
+                "line_end": 123,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::hsort_recurs / sift_down (template)",
+                "procedure": "hsort_recurs / sift_down (template)",
                 "path": "src/hsort.fypp",
                 "line_start": 32,
-                "line_end": 86
+                "line_end": 86,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::partition (template)",
+                "procedure": "partition (template)",
                 "path": "src/partition.fypp",
                 "line_start": 14,
-                "line_end": 39
+                "line_end": 39,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               }
             ],
             "notes": "The sort generic dispatches to integer int8/int16/int32/int64 routines that overwrite arr, so this is active internal integer sorting (N6a2a), not passive ranking. The inspected int32 implementation and shared templates partition around a pivot, switch to binary insertion sorting for short ranges and to heapsort at the depth limit. History-enabled variants carry caller-provided labels along with moved values; they still sort arr actively. The actual module name at this pin is mod_introsort, differing from the README usage snippet. The wrapper computes log(size(arr)) before handling empty input; zero-length behavior, stability, concurrency of module max_depth and performance were not checked. No external/file sorting or character/complex-key interface is claimed.",
@@ -36285,22 +36378,44 @@
             ],
             "procedures": [
               {
-                "procedure": "mod_introsort::sort (generic real bindings)",
+                "procedure": "sort",
                 "path": "src/intro-sort.F90",
                 "line_start": 24,
-                "line_end": 39
+                "line_end": 39,
+                "module": "mod_introsort",
+                "role": "public-entry-point",
+                "summary": "Public generic for active, in-place real sorting. The optional reverse argument requests descending order. The history overload carries caller-initialized labels along with the values; it is not passive ranking. Specific implementation procedures are private.",
+                "signature": "CALL sort(arr, reverse)\nCALL sort(arr, history, reverse)",
+                "declarations": [
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 329,
+                    "line_end": 337
+                  },
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 686,
+                    "line_end": 694
+                  }
+                ],
+                "usage": "use mod_introsort, only: sort\n! arr is an initialized, nonempty array of a supported kind.\ncall sort(arr)\n! Alternatively: call sort(arr, reverse=.true.)",
+                "usage_notes": "Calling sketch only. reverse is optional in both signatures; history is present only in the second overload and uses DEFAULT_INT indices. Its initial values must be supplied by the caller. The linked declarations show the real64 bindings; other kinds are listed in the generic interface. No new execution check was made."
               },
               {
-                "procedure": "mod_introsort::introsort_real64 / introsort_recurs_real64",
+                "procedure": "introsort_real64 / introsort_recurs_real64",
                 "path": "src/intro-sort.F90",
                 "line_start": 329,
-                "line_end": 378
+                "line_end": 378,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::partition (template)",
+                "procedure": "partition (template)",
                 "path": "src/partition.fypp",
                 "line_start": 14,
-                "line_end": 39
+                "line_end": 39,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               }
             ],
             "notes": "The generated real32/real64/real128 sort bindings and inspected real64 body use the same in-memory partition/insertion/heap strategy, overwriting the data. This supports the active internal real-sorting leaf N6a2b. The presence of a history array does not turn these routines into a passive rank-only operation. Real128 availability depends on the compiler; comparisons do not establish a defined NaN ordering or numerical total order. Stability, empty arrays and all kinds were not independently tested.",
@@ -36329,40 +36444,73 @@
             ],
             "procedures": [
               {
-                "procedure": "mod_introsort::apply_permutation (generic)",
+                "procedure": "apply_permutation",
                 "path": "src/intro-sort.F90",
                 "line_start": 59,
-                "line_end": 68
+                "line_end": 68,
+                "module": "mod_introsort",
+                "role": "public-entry-point",
+                "summary": "Public generic subroutine that gathers a companion array using an output-to-input permutation. The array is overwritten. Indices use DEFAULT_INT (int32 unless changed at preprocessing); callers must provide a valid permutation.",
+                "signature": "CALL apply_permutation(corresp, permutation)",
+                "declarations": [
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 3668,
+                    "line_end": 3676
+                  },
+                  {
+                    "path": "src/intro-sort.F90",
+                    "line_start": 3713,
+                    "line_end": 3721
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "tests/main.F90",
+                    "line_start": 66,
+                    "line_end": 99
+                  }
+                ],
+                "usage": "use mod_introsort, only: apply_permutation\n! corresp and permutation are already initialized.\ncall apply_permutation(corresp, permutation)",
+                "usage_notes": "Calling sketch only; select a supported array kind and matching index kind. The author example initializes identity labels, sorts keys and permutes companion data. Not compiled or run for this catalog."
               },
               {
-                "procedure": "mod_introsort::apply_permutation_int32",
+                "procedure": "apply_permutation_int32",
                 "path": "src/intro-sort.F90",
                 "line_start": 3668,
-                "line_end": 3682
+                "line_end": 3682,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::apply_permutation_real64",
+                "procedure": "apply_permutation_real64",
                 "path": "src/intro-sort.F90",
                 "line_start": 3713,
-                "line_end": 3727
+                "line_end": 3727,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
-                "procedure": "mod_introsort::apply_permutation (template)",
+                "procedure": "apply_permutation (template)",
                 "path": "src/apply-permutation.fypp",
                 "line_start": 1,
-                "line_end": 17
+                "line_end": 17,
+                "module": "mod_introsort",
+                "role": "implementation-helper"
               },
               {
                 "procedure": "main",
                 "path": "tests/main.F90",
                 "line_start": 10,
-                "line_end": 41
+                "line_end": 41,
+                "role": "program-entry-point"
               },
               {
                 "procedure": "main",
                 "path": "tests/main.F90",
                 "line_start": 66,
-                "line_end": 99
+                "line_end": 99,
+                "role": "program-entry-point"
               }
             ],
             "notes": "The public apply_permutation generic rearranges integer/real companion data by gathering temp(permutation(:)) into the output array. The inspected int32 and real64 bodies and common template support the N8 permuting leaf independently of the sorting operation. The permutation must already have the desired output-to-input convention; history arrays supplied to sort must be initialized by the caller, as the author test initializes identity labels. SAFE_MODE checks matching lengths but does not establish that entries form a valid bijection. This is not a passive ranking API or a permutation validator. No permutation or history round trip was executed.",

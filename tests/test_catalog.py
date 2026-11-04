@@ -8,7 +8,7 @@ import shutil
 import subprocess
 from urllib.parse import unquote, urlsplit
 
-from catalog import ROOT, assemble, belongs, extend_taxonomy, matching_drivers, read, validate_local
+from catalog import ROOT, assemble, belongs, extend_taxonomy, matching_drivers, read, validate_local, procedure_label
 from vendor.catalog_export import merge_catalog, snapshot_id
 from xbuild import build, supports_fpm, source_codes
 from xrefresh import refresh
@@ -117,6 +117,23 @@ class CatalogTests(unittest.TestCase):
                 validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
         self.assertEqual(claim['code'], 'G2i')
 
+    def test_entry_point_usage_requires_pinned_argument_declarations(self):
+        original = next(p for p in self.local['projects'] if p['id'] == 'github:derivativefreelibrary/acrs')
+        for change in ('unknown-role', 'bad-module', 'no-summary', 'no-declarations', 'unhashed-file', 'reversed-range', 'sketch-without-notes'):
+            record = copy.deepcopy(original)
+            claim = next(c for c in record['local']['classifications'] if c['level'] == 'source-reviewed')
+            procedure = claim['procedures'][0]
+            if change == 'unknown-role': procedure['role'] = 'callable-maybe'
+            elif change == 'bad-module': procedure['module'] = 'module::routine'
+            elif change == 'no-summary': procedure.pop('summary')
+            elif change == 'no-declarations': procedure.pop('declarations')
+            elif change == 'unhashed-file': procedure['declarations'][0]['path'] = 'other.f90'
+            elif change == 'reversed-range': procedure['declarations'][0]['line_end'] = 1
+            else: procedure['usage'] = 'call acrs(...)'
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
+        self.assertEqual(procedure_label({'module': 'mod_introsort', 'procedure': 'sort'}), 'mod_introsort::sort')
+
     def test_local_taxonomy_extensions_and_procedures_are_searchable(self):
         extension = read(ROOT/'data/gams-extensions.json')
         self.assertTrue(belongs(self.tree, 'G2h3b2', 'G2h3b'))
@@ -168,6 +185,26 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('source reviewed', acrs)
             self.assertNotIn('<h2>Checked hosted drivers</h2>', acrs)
             self.assertIn('price_base_iteration', listing)
+            self.assertIn('Reviewed entry points:', listing)
+            self.assertIn('Usage (click for argument declarations)', acrs)
+            self.assertIn('#L28-L84', acrs)
+            self.assertIn('Implementation helper', acrs)
+            self.assertIn('Author example: F90_src/main.f90:1', acrs)
+            intro = (destination/'projects/suzuyuyuyu/fortran-introsort/index.html').read_text(encoding='utf-8')
+            self.assertIn('mod_introsort::sort', intro)
+            self.assertIn('Calling sketch (not a checked driver)', intro)
+            geometry = (destination/'projects/johngardenghi/bglcovering/index.html').read_text(encoding='utf-8')
+            self.assertIn('VorCells_Polygons::interCellBall', geometry)
+            self.assertIn('#L845-L858', geometry)
+            sorting_cards = (destination/'classes/N6a2a/index.html').read_text(encoding='utf-8')
+            # Only entry points for the current problem belong on a class card.
+            import re
+            intro_card = next(c for c in re.findall(r'<article .*?</article>', sorting_cards, re.S)
+                              if 'suzuyuyuyu/Fortran-introsort' in c)
+            entries = intro_card.split('class="entry-points"', 1)[1]
+            self.assertIn('mod_introsort::sort', entries)
+            self.assertNotIn('apply_permutation', entries)
+            self.assertNotIn('introsort_recurs', entries)
             # A reviewed BLAS mapping must not qualify an unreviewed
             # linear-system classification in the same repository.
             linear_systems = (destination/'classes/D2/index.html').read_text(encoding='utf-8')

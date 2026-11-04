@@ -29,6 +29,8 @@ input { width:100%; }
 button,summary { cursor:pointer; }
 details ul { padding-left:1.4rem; }
 code { font-size:.85rem; overflow-wrap:anywhere; }
+pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:.7rem; border:1px solid var(--line); border-radius:.3rem; }
+.entry-points { font-size:.94rem; }
 footer { border-top:1px solid var(--line); margin-top:2rem; }
 .skip { position:absolute; left:-10000px; }
 .skip:focus { position:static; }

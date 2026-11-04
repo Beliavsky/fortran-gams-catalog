@@ -9,6 +9,19 @@ from vendor.catalog_export import merge_catalog, owner_display_name
 
 ROOT = Path(__file__).resolve().parent
 LEVELS = {'documentation-reviewed', 'source-reviewed'}
+PROCEDURE_ROLES = {
+    'public-entry-point': 'Public entry point',
+    'implementation-helper': 'Implementation helper',
+    'program-entry-point': 'Program entry point',
+    'callback': 'Callback',
+    'implementation-evidence': 'Implementation evidence',
+    'module-interface': 'Module interface',
+}
+
+
+def procedure_label(procedure):
+    module = procedure.get('module')
+    return (module + '::' if module else '') + procedure['procedure']
 
 
 def read(path):
@@ -80,6 +93,24 @@ def validate_local(local, tree):
                             or type(start) is not int or type(end) is not int
                             or start < 1 or end < start):
                         raise ValueError('Invalid source procedure evidence: ' + identity)
+                    if 'role' in procedure and procedure['role'] not in PROCEDURE_ROLES:
+                        raise ValueError('Unknown procedure role: ' + identity)
+                    if 'module' in procedure and not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*', procedure['module']):
+                        raise ValueError('Invalid module name: ' + identity)
+                    if procedure.get('role') == 'public-entry-point' and not procedure.get('summary'):
+                        raise ValueError('Public entry points need a usage summary: ' + identity)
+                    for field in ('summary', 'signature', 'usage', 'usage_notes'):
+                        if field in procedure and (not isinstance(procedure[field], str) or not procedure[field].strip()):
+                            raise ValueError('Invalid procedure '+field+': ' + identity)
+                    if 'usage' in procedure and not procedure.get('usage_notes'):
+                        raise ValueError('Calling sketches need usage notes: ' + identity)
+                    for example in procedure.get('examples', []) + procedure.get('declarations', []):
+                        first, last = example.get('line_start'), example.get('line_end')
+                        if (example.get('path') not in paths or type(first) is not int
+                                or type(last) is not int or first < 1 or last < first):
+                            raise ValueError('Procedure links need pinned evidence and valid ranges: ' + identity)
+                    if 'signature' in procedure and not procedure.get('declarations'):
+                        raise ValueError('Usage signatures need pinned argument declarations: ' + identity)
     return local
 
 

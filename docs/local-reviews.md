@@ -994,13 +994,35 @@ SHA-256 (normalized UTF-8/LF): `a9ad55377332777da9c83a79f1f75034a24130a332b678eb
 [F90_src/main.f90](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90)
 SHA-256 (normalized UTF-8/LF): `03f885fe1ba55bb11be311bda84a13d9f5523089f259a423e0bec34596f26b87`.
 
-Procedure `ACRS`: [F90_src/ACRS.f90:28–134](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L28-L134).
+Public entry point `ACRS`: [F90_src/ACRS.f90:28–134](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L28-L134).
 
-Procedure `ACRS`: [F90_src/ACRS.f90:169–283](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L169-L283).
+External subroutine for bound-constrained global minimization using objective values. No module USE statement is needed. Supply a subroutine callback FUNCT(X,N,F), double-precision bounds/work arrays and default-real CPU limits; inspect the pinned declarations and author driver for setup and exit codes.
 
-Procedure `PRICE_BASE_ITERATION`: [F90_src/ACRS.f90:424–660](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L424-L660).
+Usage:
 
-Procedure `acrs_main / funct_acrs`: [F90_src/main.f90:1–43](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90#L1-L43).
+```fortran
+CALL ACRS(N, LB, UB, M, S, FVAL, FUNCT, cpu_limit, maxtgen, &
+          maxiter, prnlev, tol, IOUT, XSOL, FOUT, iter, nftot, &
+          iexit, diff_initial, omega)
+```
+
+Argument declarations: [F90_src/ACRS.f90:28–84](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L28-L84).
+
+Argument declarations: [F90_src/ACRS.f90:137–145](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L137-L145).
+
+Author example (not run): [F90_src/main.f90:1–43](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90#L1-L43).
+
+Implementation evidence `ACRS`: [F90_src/ACRS.f90:169–283](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L169-L283).
+
+Implementation helper `PRICE_BASE_ITERATION`: [F90_src/ACRS.f90:424–660](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/ACRS.f90#L424-L660).
+
+Program entry point `acrs_main`: [F90_src/main.f90:1–33](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90#L1-L33).
+
+Author driver program; adapt the problem routines and limits before reuse. This is an executable, not a callable library routine.
+
+Callback `funct_acrs`: [F90_src/main.f90:35–43](https://github.com/DerivativeFreeLibrary/ACRS/blob/a276a7e3a265cc334b70b1e6cbe4738aba462b4a/F90_src/main.f90#L35-L43).
+
+Author callback adapter translates ACRS FUNCT(X,N,F) argument order to the problem routine FUNCT(N,X,F).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -5802,15 +5824,39 @@ SHA-256 (normalized UTF-8/LF): `3a864916313b00b6ed15d38b145c16d8f1b16466c65802e6
 [src/partition.fypp](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp)
 SHA-256 (normalized UTF-8/LF): `9f604f4b6e5b6f60b0ca656d3e0f17219af1c2c8c1441b72910fa0fdc15145b1`.
 
-Procedure `mod_introsort::sort (generic integer bindings)`: [src/intro-sort.F90:15–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L15-L39).
+Public entry point `mod_introsort::sort`: [src/intro-sort.F90:15–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L15-L39).
 
-Procedure `mod_introsort::introsort_int32 / introsort_recurs_int32`: [src/intro-sort.F90:176–225](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L176-L225).
+Public generic for active, in-place integer sorting. The optional reverse argument requests descending order. The history overload carries caller-initialized labels along with the values; it is not passive ranking. Specific implementation procedures are private.
 
-Procedure `mod_introsort::introsort / introsort_recurs (template)`: [src/intro-sort.fypp:74–123](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.fypp#L74-L123).
+Usage:
 
-Procedure `mod_introsort::hsort_recurs / sift_down (template)`: [src/hsort.fypp:32–86](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/hsort.fypp#L32-L86).
+```fortran
+CALL sort(arr, reverse)
+CALL sort(arr, history, reverse)
+```
 
-Procedure `mod_introsort::partition (template)`: [src/partition.fypp:14–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp#L14-L39).
+Argument declarations: [src/intro-sort.F90:176–184](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L176-L184).
+
+Argument declarations: [src/intro-sort.F90:533–541](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L533-L541).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use mod_introsort, only: sort
+! arr is an initialized, nonempty array of a supported kind.
+call sort(arr)
+! Alternatively: call sort(arr, reverse=.true.)
+```
+
+Calling sketch only. reverse is optional in both signatures; history is present only in the second overload and uses DEFAULT_INT indices. Its initial values must be supplied by the caller. The linked declarations show the int32 bindings; other kinds are listed in the generic interface. No new execution check was made.
+
+Implementation helper `mod_introsort::introsort_int32 / introsort_recurs_int32`: [src/intro-sort.F90:176–225](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L176-L225).
+
+Implementation helper `mod_introsort::introsort / introsort_recurs (template)`: [src/intro-sort.fypp:74–123](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.fypp#L74-L123).
+
+Implementation helper `mod_introsort::hsort_recurs / sift_down (template)`: [src/hsort.fypp:32–86](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/hsort.fypp#L32-L86).
+
+Implementation helper `mod_introsort::partition (template)`: [src/partition.fypp:14–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp#L14-L39).
 
 **N6a2b — source-reviewed**
 
@@ -5827,11 +5873,35 @@ SHA-256 (normalized UTF-8/LF): `076d3255c8c2ea18713a35e9aec1de14049640579a83caa0
 [src/partition.fypp](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp)
 SHA-256 (normalized UTF-8/LF): `9f604f4b6e5b6f60b0ca656d3e0f17219af1c2c8c1441b72910fa0fdc15145b1`.
 
-Procedure `mod_introsort::sort (generic real bindings)`: [src/intro-sort.F90:24–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L24-L39).
+Public entry point `mod_introsort::sort`: [src/intro-sort.F90:24–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L24-L39).
 
-Procedure `mod_introsort::introsort_real64 / introsort_recurs_real64`: [src/intro-sort.F90:329–378](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L329-L378).
+Public generic for active, in-place real sorting. The optional reverse argument requests descending order. The history overload carries caller-initialized labels along with the values; it is not passive ranking. Specific implementation procedures are private.
 
-Procedure `mod_introsort::partition (template)`: [src/partition.fypp:14–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp#L14-L39).
+Usage:
+
+```fortran
+CALL sort(arr, reverse)
+CALL sort(arr, history, reverse)
+```
+
+Argument declarations: [src/intro-sort.F90:329–337](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L329-L337).
+
+Argument declarations: [src/intro-sort.F90:686–694](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L686-L694).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use mod_introsort, only: sort
+! arr is an initialized, nonempty array of a supported kind.
+call sort(arr)
+! Alternatively: call sort(arr, reverse=.true.)
+```
+
+Calling sketch only. reverse is optional in both signatures; history is present only in the second overload and uses DEFAULT_INT indices. Its initial values must be supplied by the caller. The linked declarations show the real64 bindings; other kinds are listed in the generic interface. No new execution check was made.
+
+Implementation helper `mod_introsort::introsort_real64 / introsort_recurs_real64`: [src/intro-sort.F90:329–378](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L329-L378).
+
+Implementation helper `mod_introsort::partition (template)`: [src/partition.fypp:14–39](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp#L14-L39).
 
 **N8 — source-reviewed**
 
@@ -5848,17 +5918,41 @@ SHA-256 (normalized UTF-8/LF): `a432bb266dfbe1952a7dfd809db8526141d2552252d66784
 [tests/main.F90](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90)
 SHA-256 (normalized UTF-8/LF): `48ca8013559e2e69005ee903f2e67c2d3122d6bc67798ef47b043c708e8c636d`.
 
-Procedure `mod_introsort::apply_permutation (generic)`: [src/intro-sort.F90:59–68](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L59-L68).
+Public entry point `mod_introsort::apply_permutation`: [src/intro-sort.F90:59–68](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L59-L68).
 
-Procedure `mod_introsort::apply_permutation_int32`: [src/intro-sort.F90:3668–3682](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3668-L3682).
+Public generic subroutine that gathers a companion array using an output-to-input permutation. The array is overwritten. Indices use DEFAULT_INT (int32 unless changed at preprocessing); callers must provide a valid permutation.
 
-Procedure `mod_introsort::apply_permutation_real64`: [src/intro-sort.F90:3713–3727](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3713-L3727).
+Usage:
 
-Procedure `mod_introsort::apply_permutation (template)`: [src/apply-permutation.fypp:1–17](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/apply-permutation.fypp#L1-L17).
+```fortran
+CALL apply_permutation(corresp, permutation)
+```
 
-Procedure `main`: [tests/main.F90:10–41](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90#L10-L41).
+Argument declarations: [src/intro-sort.F90:3668–3676](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3668-L3676).
 
-Procedure `main`: [tests/main.F90:66–99](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90#L66-L99).
+Argument declarations: [src/intro-sort.F90:3713–3721](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3713-L3721).
+
+Author example (not run): [tests/main.F90:66–99](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90#L66-L99).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use mod_introsort, only: apply_permutation
+! corresp and permutation are already initialized.
+call apply_permutation(corresp, permutation)
+```
+
+Calling sketch only; select a supported array kind and matching index kind. The author example initializes identity labels, sorts keys and permutes companion data. Not compiled or run for this catalog.
+
+Implementation helper `mod_introsort::apply_permutation_int32`: [src/intro-sort.F90:3668–3682](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3668-L3682).
+
+Implementation helper `mod_introsort::apply_permutation_real64`: [src/intro-sort.F90:3713–3727](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90#L3713-L3727).
+
+Implementation helper `mod_introsort::apply_permutation (template)`: [src/apply-permutation.fypp:1–17](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/apply-permutation.fypp#L1-L17).
+
+Program entry point `main`: [tests/main.F90:10–41](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90#L10-L41).
+
+Program entry point `main`: [tests/main.F90:66–99](https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90#L66-L99).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -9284,17 +9378,57 @@ Reviewed 2026-11-04 at `f97119df01ae48e396f881ad2d2e25085338282b`.
 [vorintpols.f90](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90)
 SHA-256 (normalized UTF-8/LF): `104c715d69f1a445ae31f1089d2479d27977e97530bbedf1ec84f858dd64e7ea`.
 
-Procedure `VorCells_Polygons (public interface)`: [vorintpols.f90:1–8](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L1-L8).
+Module interface `VorCells_Polygons (public interface)`: [vorintpols.f90:1–8](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L1-L8).
 
-Procedure `VorCells_Polygons::VorCellInterConvPol`: [vorintpols.f90:575–607](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L575-L607).
+Public entry point `VorCells_Polygons::VorCellInterConvPol`: [vorintpols.f90:575–607](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L575-L607).
 
-Procedure `VorCells_Polygons::interCellBall`: [vorintpols.f90:845–890](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L845-L890).
+Public module subroutine intersecting a convex polygon and a Voronoi cell. center is a real(kind=8) vector of length two; convPol and cell have type Polygon, and vor_cell has type VoronoiCell. The routine allocates the output polygon components.
 
-Procedure `VorCells_Polygons::interCellBall`: [vorintpols.f90:892–976](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L892-L976).
+Usage:
 
-Procedure `VorCells_Polygons::SutherlandHodgman`: [vorintpols.f90:979–1039](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L979-L1039).
+```fortran
+CALL VorCellInterConvPol(center, convPol, vor_cell, cell)
+```
 
-Procedure `VorCells_Polygons::edgeClipping`: [vorintpols.f90:1042–1151](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L1042-L1151).
+Argument declarations: [vorintpols.f90:575–586](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L575-L586).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use VorCells_Polygons, only: VorCellInterConvPol, Polygon, VoronoiCell
+! center, convPol and vor_cell are initialized upstream data.
+call VorCellInterConvPol(center, convPol, vor_cell, cell)
+```
+
+Calling sketch, not a complete program. Construct the polygon and Voronoi-cell data structures using the upstream conventions before calling. Dependencies on upstream geometry routines remain; this is not a standalone source file or a checked driver.
+
+Public entry point `VorCells_Polygons::interCellBall`: [vorintpols.f90:845–890](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L845-L890).
+
+Public module subroutine intersecting a convex polygon with a two-dimensional ball (disk), returning a CurvilinearPolygon. center(2) and radius r are real(kind=8); cell is a Polygon. The routine allocates output components.
+
+Usage:
+
+```fortran
+CALL interCellBall(center, r, cell, curv_pol)
+```
+
+Argument declarations: [vorintpols.f90:845–858](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L845-L858).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use VorCells_Polygons, only: interCellBall, Polygon, CurvilinearPolygon
+! center, r and cell are initialized upstream data.
+call interCellBall(center, r, cell, curv_pol)
+```
+
+Calling sketch only. Use the upstream polygon vertex/edge conventions and dependency sources. No geometric result, degenerate-case behavior or numerical robustness was verified by execution.
+
+Implementation evidence `VorCells_Polygons::interCellBall`: [vorintpols.f90:892–976](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L892-L976).
+
+Implementation helper `VorCells_Polygons::SutherlandHodgman`: [vorintpols.f90:979–1039](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L979-L1039).
+
+Implementation helper `VorCells_Polygons::edgeClipping`: [vorintpols.f90:1042–1151](https://github.com/johngardenghi/bglcovering/blob/f97119df01ae48e396f881ad2d2e25085338282b/vorintpols.f90#L1042-L1151).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 

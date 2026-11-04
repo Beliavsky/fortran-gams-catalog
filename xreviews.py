@@ -1,5 +1,5 @@
 """Generate the human-readable review ledger from catalog-owned metadata."""
-from catalog import ROOT, read
+from catalog import ROOT, read, procedure_label, PROCEDURE_ROLES
 
 
 def render(local):
@@ -28,8 +28,20 @@ def render(local):
             for procedure in claim.get('procedures', []):
                 evidence = next(v for v in claim['evidence'] if v['path'] == procedure['path'])
                 start, end = procedure['line_start'], procedure['line_end']
-                lines.extend([f'Procedure `{procedure["procedure"]}`: '
+                role = PROCEDURE_ROLES.get(procedure.get('role'), 'Procedure')
+                lines.extend([f'{role} `{procedure_label(procedure)}`: '
                               f'[{procedure["path"]}:{start}–{end}]({evidence["url"]}#L{start}-L{end}).', ''])
+                if procedure.get('summary'):
+                    lines.extend([procedure['summary'], ''])
+                if procedure.get('signature'):
+                    lines.extend(['Usage:', '', '```fortran', procedure['signature'], '```', ''])
+                for name, label in (('declarations', 'Argument declarations'), ('examples', 'Author example (not run)')):
+                    for reference in procedure.get(name, []):
+                        source = next(v for v in claim['evidence'] if v['path'] == reference['path'])
+                        first, last = reference['line_start'], reference['line_end']
+                        lines.extend([f'{label}: [{reference["path"]}:{first}–{last}]({source["url"]}#L{first}-L{last}).', ''])
+                if procedure.get('usage'):
+                    lines.extend(['Calling sketch (not a checked driver):', '', '```fortran', procedure['usage'], '```', '', procedure['usage_notes'], ''])
         if p.get('notes'):
             lines.extend([p['notes'], ''])
         if p.get('discovery'):

@@ -49,6 +49,29 @@ when they explain usage. They are not checked drivers unless built and tested.
 Procedure names participate in site search, and the site and Markdown ledger
 link directly to their source ranges.
 
+Where the calling interface has been inspected, add a `role`: `public-entry-point`,
+`implementation-helper`, `program-entry-point`, `callback`, `implementation-evidence`
+or `module-interface`. Leave it absent where the role is unreviewed; a source
+mapping alone does not establish that a procedure is public. Store `module` and
+`procedure` separately. Public module generics should use the generic name,
+with private implementations recorded as helpers. A module qualifier is catalog
+notation, not Fortran call syntax.
+
+A public entry point needs a `summary`. Optional `signature` text supplies the
+Fortran usage line (including `CALL` for a subroutine). It must have `declarations`:
+objects with `path`, `line_start` and `line_end` pointing to hashed evidence in the
+same claim. Clicking the usage line opens the first argument-declaration range;
+additional links can cover other inspected generic bindings. Optional `examples`
+use the same format to link author usage. `usage` supplies a calling sketch and
+requires `usage_notes` explaining initialization, dependencies and limits. These
+sketches and linked author examples are not checked drivers.
+
+Cards show at most three reviewed public/program entry points that match the
+current GAMS scope, with module names, source paths, line numbers and clickable
+usage lines where recorded. Details retain helper and callback evidence alongside
+the entry points, summaries, argument declarations and calling sketches. Module
+names and source paths participate in search.
+
 Additional NIST classes absent from the imported snapshot belong in
 `data/gams-extensions.json`, with their official label, parent, source URL and
 review date. These extend the local taxonomy without modifying the imported

@@ -6,7 +6,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import quote
 
-from catalog import ROOT, assemble, belongs, lineage, matching_drivers
+from catalog import ROOT, assemble, belongs, lineage, matching_drivers, procedure_label, PROCEDURE_ROLES
 
 TITLE = 'Fortran software by GAMS classification'
 
@@ -99,7 +99,8 @@ def build(destination, root=ROOT):
             codes = p['codes']
             search = ' '.join([p['name'], p['description'], repo['owner'], p['owner_label'],
                                *p['topics'], *codes, *(tree[c]['label'] for c in codes),
-                               *(proc['procedure'] for proc in p['procedures'])])
+                               *(procedure_label(proc)+' '+proc['path'] if proc.get('origin') == 'local'
+                                 else procedure_label(proc) for proc in p['procedures'])])
             collection = 'imported' if p.get('playground') else 'independent'
             leaves = specific_codes(tree, codes)
             labels = ' · '.join(link(prefix+'classes/'+c+'/', c) for c in leaves[:8])
@@ -112,17 +113,39 @@ def build(destination, root=ROOT):
             source_match = any(belongs(tree, c, code) for c in reviewed)
             source_search = ' '.join([p['name'], p['description'], repo['owner'], p['owner_label'],
                                       *p['topics'], *reviewed, *(tree[c]['label'] for c in reviewed),
-                                      *(proc['procedure'] for proc in p['procedures']
+                                      *(procedure_label(proc)+' '+proc.get('path', '') for proc in p['procedures']
                                         if proc.get('origin') == 'local' or proc.get('review_level') == 'source-reviewed')])
             reviewed_leaves = specific_codes(tree, reviewed)
             source_labels = ' · '.join(link(prefix+'classes/'+c+'/', c)
                                         for c in reviewed_leaves[:8])
             if len(reviewed_leaves) > 8:
                 source_labels += ' · '+link(prefix+project_path(p), f'{len(reviewed_leaves)-8} more reviewed classes')
+            entries = {}
+            for claim in p['local'].get('classifications', []):
+                if claim['level'] != 'source-reviewed' or not belongs(tree, claim['code'], code):
+                    continue
+                for proc in claim.get('procedures', []):
+                    if proc.get('role') in ('public-entry-point', 'program-entry-point'):
+                        entries.setdefault((procedure_label(proc), proc['path']), (claim, proc))
+            entry_html = ''
+            for claim, proc in list(entries.values())[:3]:
+                evidence = next(v for v in claim['evidence'] if v['path'] == proc['path'])
+                source_url = evidence['url']+f'#L{proc["line_start"]}-L{proc["line_end"]}'
+                entry_html += '<li><code>'+e(procedure_label(proc))+'</code> — '+link(
+                    source_url, proc['path']+':'+str(proc['line_start']))+' ('+e(PROCEDURE_ROLES[proc['role']].lower())+')'
+                if proc.get('signature'):
+                    declaration = proc['declarations'][0]
+                    source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
+                    url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
+                    entry_html += '<p>Usage (argument declarations):</p><pre><code>'+link(url, proc['signature'])+'</code></pre>'
+                entry_html += '</li>'
+            if entries:
+                entry_html = '<div class="entry-points"><p>Reviewed entry points:</p><ul>'+entry_html+'</ul><p>'+link(
+                    prefix+project_path(p), 'Usage and full procedure evidence')+'</p></div>'
             cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
 <p>{e(p['description'])}</p><div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
-<div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div></article>''')
+<div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div>{entry_html}</article>''')
         return controls+''.join(cards)
 
     def class_links(parent, prefix):
@@ -156,7 +179,12 @@ def build(destination, root=ROOT):
         body = '<h1>'+e(p['name'])+'</h1><p class="lede">'+e(p['description'])+'</p>'
         body += '<p>'+link(repo['url'], repo['owner']+'/'+repo['name'])+' · '+e(p['origin'])+'</p>'
         body += '<p>Repository owner: '+e(p['owner_label'])+'</p><p>Build systems: '+e(', '.join(p.get('build_systems', [])) or 'Not yet reviewed')+'</p>'
-        body += '<p>Topics: '+e(', '.join(p['topics']))+'</p><h2>Classifications</h2><ul>'
+        body += '<p>Topics: '+e(', '.join(p['topics']))+'</p>'
+        if any(proc.get('role') for proc in p['procedures']):
+            body += '<p><code>module_name::procedure_name</code> identifies a module procedure in this catalog; '
+            body += 'in Fortran, import it with <code>use module_name, only: procedure_name</code> and call the procedure name. '
+            body += 'Entry points and helpers are distinguished only where the interface has been reviewed.</p>'
+        body += '<h2>Classifications</h2><ul>'
         specific = specific_codes(tree, p['codes'])
         body += ''.join('<li>'+link(prefix+'classes/'+c+'/', c+' — '+tree[c]['label'])+'</li>' for c in specific[:8])+'</ul>'
         remaining = [c for c in p['codes'] if c not in specific[:8]]
@@ -172,8 +200,28 @@ def build(destination, root=ROOT):
                 for procedure in claim['procedures']:
                     evidence = next(v for v in claim['evidence'] if v['path'] == procedure['path'])
                     start, end = procedure['line_start'], procedure['line_end']
-                    body += '<li><code>'+e(procedure['procedure'])+'</code> — '+link(
-                        evidence['url']+f'#L{start}-L{end}', procedure['path']+f':{start}–{end}')+'</li>'
+                    role = PROCEDURE_ROLES.get(procedure.get('role'), 'Reviewed procedure; interface role not yet reviewed')
+                    body += '<li><strong>'+e(role)+'</strong>: <code>'+e(procedure_label(procedure))+'</code> — '+link(
+                        evidence['url']+f'#L{start}-L{end}', procedure['path']+f':{start}–{end}')
+                    if procedure.get('summary'):
+                        body += '<p>'+e(procedure['summary'])+'</p>'
+                    if procedure.get('signature'):
+                        declaration = procedure['declarations'][0]
+                        source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
+                        url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
+                        body += '<p>Usage (click for argument declarations):</p><pre><code>'+link(url, procedure['signature'])+'</code></pre>'
+                        for declaration in procedure['declarations']:
+                            source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
+                            body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',
+                                              'Argument declarations: '+declaration['path']+':'+str(declaration['line_start']))+'</p>'
+                    if procedure.get('usage'):
+                        body += '<p>Calling sketch (not a checked driver):</p><pre><code>'+e(procedure['usage'])+'</code></pre>'
+                        body += '<p>'+e(procedure['usage_notes'])+'</p>'
+                    for example in procedure.get('examples', []):
+                        source = next(v for v in claim['evidence'] if v['path'] == example['path'])
+                        body += '<p>'+link(source['url']+f'#L{example["line_start"]}-L{example["line_end"]}',
+                                          'Author example: '+example['path']+':'+str(example['line_start']))+' (not run for this catalog).</p>'
+                    body += '</li>'
                 body += '</ul>'
             body += '</section>'
         if p['local'].get('notes'):

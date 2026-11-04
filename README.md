@@ -23,6 +23,13 @@ descendant. Combine it with the other filters or share `?source_reviewed=1`;
 the selection follows catalog links. Repository detail pages retain the full
 evidence record. Source review does not imply compilation or numerical testing.
 
+For entries whose calling interfaces have been reviewed, cards identify public
+entry points using `module_name::procedure_name` where applicable, with pinned
+source paths and line numbers. Click a usage line to open the argument
+declarations. Detail pages distinguish public generics, private helpers,
+callbacks and standalone programs, and include calling sketches or author
+examples where recorded. These are usage references, not new execution checks.
+
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
 Detailed numerical-method reviews include source-linked
