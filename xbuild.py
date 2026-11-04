@@ -205,6 +205,7 @@ def build(destination, root=ROOT):
         if any(proc.get('role') for proc in p['procedures']):
             body += '<p><code>module_name::procedure_name</code> identifies a module procedure in this catalog; '
             body += 'in Fortran, import it with <code>use module_name, only: procedure_name</code> and call the procedure name. '
+            body += '<code>module_name::type_name%binding_name</code> identifies a type-bound procedure; its usage line calls the binding on an object. '
             body += 'Entry points and helpers are distinguished only where the interface has been reviewed.</p>'
         body += '<h2>Classifications</h2><ul>'
         specific = specific_codes(tree, p['codes'])

@@ -21,7 +21,9 @@ PROCEDURE_ROLES = {
 
 def procedure_label(procedure):
     module = procedure.get('module')
-    return (module + '::' if module else '') + procedure['procedure']
+    derived_type = procedure.get('derived_type')
+    return ((module + '::' if module else '') +
+            (derived_type + '%' if derived_type else '') + procedure['procedure'])
 
 
 def read(path):
@@ -112,6 +114,8 @@ def validate_local(local, tree):
                         raise ValueError('Unknown procedure role: ' + identity)
                     if 'module' in procedure and not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*', procedure['module']):
                         raise ValueError('Invalid module name: ' + identity)
+                    if 'derived_type' in procedure and not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*', procedure['derived_type']):
+                        raise ValueError('Invalid derived type name: ' + identity)
                     if procedure.get('role') == 'public-entry-point' and not procedure.get('summary'):
                         raise ValueError('Public entry points need a usage summary: ' + identity)
                     for field in ('summary', 'signature', 'usage', 'usage_notes'):

@@ -119,12 +119,13 @@ class CatalogTests(unittest.TestCase):
 
     def test_entry_point_usage_requires_pinned_argument_declarations(self):
         original = next(p for p in self.local['projects'] if p['id'] == 'github:derivativefreelibrary/acrs')
-        for change in ('unknown-role', 'bad-module', 'no-summary', 'no-declarations', 'unhashed-file', 'reversed-range', 'sketch-without-notes'):
+        for change in ('unknown-role', 'bad-module', 'bad-type', 'no-summary', 'no-declarations', 'unhashed-file', 'reversed-range', 'sketch-without-notes'):
             record = copy.deepcopy(original)
             claim = next(c for c in record['local']['classifications'] if c['level'] == 'source-reviewed')
             procedure = claim['procedures'][0]
             if change == 'unknown-role': procedure['role'] = 'callable-maybe'
             elif change == 'bad-module': procedure['module'] = 'module::routine'
+            elif change == 'bad-type': procedure['derived_type'] = 'object%binding'
             elif change == 'no-summary': procedure.pop('summary')
             elif change == 'no-declarations': procedure.pop('declarations')
             elif change == 'unhashed-file': procedure['declarations'][0]['path'] = 'other.f90'
@@ -133,6 +134,8 @@ class CatalogTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
         self.assertEqual(procedure_label({'module': 'mod_introsort', 'procedure': 'sort'}), 'mod_introsort::sort')
+        self.assertEqual(procedure_label({'module': 'mod_splines', 'derived_type': 'spline', 'procedure': 'value'}),
+                         'mod_splines::spline%value')
 
     def test_licenses_distinguish_reviewed_imported_and_unknown_terms(self):
         acrs = next(p for p in self.projects if p['id'] == 'github:derivativefreelibrary/acrs')
@@ -224,6 +227,10 @@ class CatalogTests(unittest.TestCase):
             geometry = (destination/'projects/johngardenghi/bglcovering/index.html').read_text(encoding='utf-8')
             self.assertIn('VorCells_Polygons::interCellBall', geometry)
             self.assertIn('#L845-L858', geometry)
+            spline = (destination/'projects/ja72/fortranconsolespline/index.html').read_text(encoding='utf-8')
+            self.assertIn('mod_splines::spline%value', spline)
+            self.assertIn('y = sp%value(x)', spline)
+            self.assertIn('#L105-L109', spline)
             sorting_cards = (destination/'classes/N6a2a/index.html').read_text(encoding='utf-8')
             # Only entry points for the current problem belong on a class card.
             import re

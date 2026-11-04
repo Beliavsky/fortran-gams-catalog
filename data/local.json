@@ -3254,12 +3254,115 @@
             ],
             "notes": "The short README identifies the quadrature module and supporting polynomials. No particular order range, endpoint accuracy or asymptotic complexity is inferred without source review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "8ff674ed77eff6ed7e0c1b58755a182c4a5e1260",
+            "reviewed_on": "2026-11-04",
+            "notes": "LGL_nodes_weights constructs a requested-size Legendre-Gauss-Lobatto rule on [-1,1], using endpoint nodes and Jacobi-root iterations for the interior. LGL_quadrature combines a caller-provided vector of values at those nodes with the weights and scales by (b-a)/2. H2a1b2 describes this nonautomatic sampled-data finite-interval quadrature: the caller chooses N and supplies values; there is no integrand callback, adaptive subdivision, requested-accuracy controller or estimated-error return. The values must correspond to the mapped LGL nodes, not arbitrary or uniformly spaced samples. Jacobi-root iterations stop after at most ten steps with no convergence status, and small-N and high-order behavior were not verified. The pinned source also uses triplet-style array constructors such as [size_r:1:-1], requiring compiler support or source adaptation; no portable-build claim is made. General Jacobi/Gauss routines, polynomial exactness claims and author example results remain unverified by execution.",
+            "evidence": [
+              {
+                "path": "lgl.f90",
+                "url": "https://github.com/SpirosZafeiris/Legendre-Gauss-Lobatto-Quadrature/blob/8ff674ed77eff6ed7e0c1b58755a182c4a5e1260/lgl.f90",
+                "sha256": "585cf71f62eb2e1921f45f841b6743a42be6306f9b637d37da305a9775cbb8ac"
+              },
+              {
+                "path": "main.f90",
+                "url": "https://github.com/SpirosZafeiris/Legendre-Gauss-Lobatto-Quadrature/blob/8ff674ed77eff6ed7e0c1b58755a182c4a5e1260/main.f90",
+                "sha256": "d88622358fc10055734640d0ba4d806afee3aee618c1e3f41d4713828fb88146"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LGL_nodes_weights",
+                "module": "legendre_gauss_lobatto",
+                "role": "public-entry-point",
+                "summary": "Public module function returning a REAL(wp) N-by-2 array: normalized nodes in column one and weights in column two, with wp=real64. The implementation obtains N-2 interior nodes from jacpts; choose a supported N and check the source/portability limitations before building.",
+                "signature": "nodes_weights = LGL_nodes_weights(N)",
+                "declarations": [
+                  {
+                    "path": "lgl.f90",
+                    "line_start": 209,
+                    "line_end": 213
+                  }
+                ],
+                "path": "lgl.f90",
+                "line_start": 209,
+                "line_end": 224,
+                "examples": [
+                  {
+                    "path": "main.f90",
+                    "line_start": 16,
+                    "line_end": 24
+                  }
+                ],
+                "usage": "use legendre_gauss_lobatto, only: wp, LGL_nodes_weights\ninteger, parameter :: n = 6\nreal(wp) :: rule(n,2)\nrule = LGL_nodes_weights(n)",
+                "usage_notes": "Calling sketch only. Resolve the pinned source array-constructor syntax for your compiler first. Nodes are on [-1,1]; map them to the physical interval before sampling the integrand. The fixed iteration cap supplies no convergence flag, so this sketch is not a checked quadrature rule."
+              },
+              {
+                "procedure": "LGL_quadrature",
+                "module": "legendre_gauss_lobatto",
+                "role": "public-entry-point",
+                "summary": "Public module reduction function for N values sampled at the LGL nodes mapped onto [a,b]. f(N), a, b and the scalar result are REAL(wp). The routine regenerates its rule internally and supplies no estimated error or status output.",
+                "signature": "integral = LGL_quadrature(N, f, a, b)",
+                "declarations": [
+                  {
+                    "path": "lgl.f90",
+                    "line_start": 80,
+                    "line_end": 85
+                  }
+                ],
+                "path": "lgl.f90",
+                "line_start": 80,
+                "line_end": 90,
+                "examples": [
+                  {
+                    "path": "main.f90",
+                    "line_start": 16,
+                    "line_end": 26
+                  }
+                ],
+                "usage": "use legendre_gauss_lobatto, only: wp, LGL_nodes_weights, LGL_quadrature\ninteger, parameter :: n = 6\nreal(wp) :: rule(n,2), x(n), values(n), a, b, integral\na = -1.0_wp\nb = 2.0_wp\nrule = LGL_nodes_weights(n)\nx = a + 0.5_wp*(b-a)*(rule(:,1)+1.0_wp)\nvalues = exp(x)\nintegral = LGL_quadrature(n, values, a, b)",
+                "usage_notes": "Calling sketch adapted to the author exponential-integral example, not a checked driver. The source uses compiler-dependent triplet-style constructors; resolve that before compiling. N is an explicit rule size, not an error tolerance, and there is no accuracy/status result. The integrand must be sampled at the rule nodes in the returned order."
+              },
+              {
+                "procedure": "jacpts / jacpts_main",
+                "module": "legendre_gauss_lobatto",
+                "role": "implementation-helper",
+                "path": "lgl.f90",
+                "line_start": 151,
+                "line_end": 207
+              },
+              {
+                "procedure": "main",
+                "role": "program-entry-point",
+                "path": "main.f90",
+                "line_start": 1,
+                "line_end": 27,
+                "summary": "Author example samples an exponential at mapped six-point LGL nodes and prints an integral-error comparison. It was not compiled or run for this catalog."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected implementations and calling interfaces, not complete API audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3",
+          "spdx_expression": null,
+          "revision": "8ff674ed77eff6ed7e0c1b58755a182c4a5e1260",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3. The reviewed README and module do not add a separate project-specific version-only or or-later notice, so no precise SPDX expression is asserted. This is a recorded license document, not a build or numerical verification.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/SpirosZafeiris/Legendre-Gauss-Lobatto-Quadrature/blob/8ff674ed77eff6ed7e0c1b58755a182c4a5e1260/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4229,12 +4332,177 @@
             ],
             "notes": "The README documents value, first/second derivative and extremum interfaces, plus linear behavior outside the data range. Endpoint and extrapolation behavior have not been independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "88f138a0a8ad8e71c89237df5fc236097ab695cc",
+            "reviewed_on": "2026-11-04",
+            "notes": "The module constructs and evaluates a real64 univariate piecewise-cubic interpolant from ordered samples, with optional endpoint first derivatives and natural endpoint conditions when slopes are absent. The type-bound value, slope and slope2 methods evaluate the interpolant and its derivatives; outside the data range the implementation suppresses the cubic terms, giving linear value/slope extrapolation and zero second derivative. E1a is the supported polynomial-spline classification; this is not smoothing, multidimensional fitting or a generic global-extremum solver. Source inspection found a material construction discrepancy: the interior coefficient sig uses x(i)-(i-1), mixing an abscissa with an index, instead of the adjacent abscissa difference expected for the documented arbitrary-grid cubic-spline recurrence. Ordered, distinct abscissae and compatible lengths are not comprehensively validated. The extrema helper continues bisection even after its same-sign endpoint branch, so no root/extremum enumeration claim is added. Neither the author example nor interpolation accuracy was tested.",
+            "evidence": [
+              {
+                "path": "mod_splines.f90",
+                "url": "https://github.com/ja72/FortranConsoleSpline/blob/88f138a0a8ad8e71c89237df5fc236097ab695cc/mod_splines.f90",
+                "sha256": "45f06f0371d4b559a8a1932645dc91c8c5ae851fcba858f16b51530ddf57e200"
+              },
+              {
+                "path": "FortranConsoleSpline.f90",
+                "url": "https://github.com/ja72/FortranConsoleSpline/blob/88f138a0a8ad8e71c89237df5fc236097ab695cc/FortranConsoleSpline.f90",
+                "sha256": "9c196e1db124cdc62980ea8a7c4e63ffac0ede8b00b30bda2b5be91c52936a15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "spline",
+                "module": "mod_splines",
+                "role": "public-entry-point",
+                "summary": "Public generic constructor returning type(spline) from real(wp) sample arrays, where wp=real64. Optional y1_slope/yn_slope supply endpoint slopes; omitting them selects the implemented natural endpoint branch. The constructor stores copies of x/y and computed second derivatives.",
+                "signature": "sp = spline(x, y, y1_slope, yn_slope)",
+                "declarations": [
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 24,
+                    "line_end": 36
+                  }
+                ],
+                "path": "mod_splines.f90",
+                "line_start": 18,
+                "line_end": 20,
+                "examples": [
+                  {
+                    "path": "FortranConsoleSpline.f90",
+                    "line_start": 3,
+                    "line_end": 25
+                  }
+                ],
+                "usage": "use mod_splines, only: spline, wp\ntype(spline) :: sp\n! Initialize ordered, distinct REAL(wp) samples xi and yi first.\nsp = spline(xi, yi)\nyq = sp%value(xq)",
+                "usage_notes": "Calling sketch only. Provide compatible real64 query/data variables and at least two samples; the source does not comprehensively check the input arrays. The documented sig coefficient discrepancy remains unresolved, so this is an API reference rather than a checked interpolation driver. Source-specific helpers are also public by default, but the generic constructor is the author-facing interface."
+              },
+              {
+                "procedure": "value",
+                "module": "mod_splines",
+                "role": "public-entry-point",
+                "summary": "Public type-bound value evaluator. The passed object is class(spline), and query/result use REAL(wp). The method uses the already constructed coefficient arrays and is elemental, so compatible array queries are possible. This interface review does not establish numerical accuracy.",
+                "signature": "y = sp%value(x)",
+                "declarations": [
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 105,
+                    "line_end": 109
+                  },
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 8,
+                    "line_end": 16
+                  }
+                ],
+                "path": "mod_splines.f90",
+                "line_start": 98,
+                "line_end": 129,
+                "derived_type": "spline",
+                "examples": [
+                  {
+                    "path": "FortranConsoleSpline.f90",
+                    "line_start": 19,
+                    "line_end": 26
+                  }
+                ],
+                "usage": "use mod_splines, only: spline, wp\ntype(spline) :: sp\n! Construct sp from suitable data before evaluating.\ny = sp%value(xq)",
+                "usage_notes": "Calling sketch only. sp is an object of type spline, not the module name. Initialize xq and construct the coefficient arrays first; the construction discrepancy recorded in the review can affect these evaluations. No derivative or extrapolation result was independently checked."
+              },
+              {
+                "procedure": "slope",
+                "module": "mod_splines",
+                "role": "public-entry-point",
+                "summary": "Public type-bound first-derivative evaluator. The passed object is class(spline), and query/result use REAL(wp). The method uses the already constructed coefficient arrays and is elemental, so compatible array queries are possible. This interface review does not establish numerical accuracy.",
+                "signature": "dy = sp%slope(x)",
+                "declarations": [
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 138,
+                    "line_end": 142
+                  },
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 8,
+                    "line_end": 16
+                  }
+                ],
+                "path": "mod_splines.f90",
+                "line_start": 131,
+                "line_end": 163,
+                "derived_type": "spline",
+                "examples": [
+                  {
+                    "path": "FortranConsoleSpline.f90",
+                    "line_start": 19,
+                    "line_end": 26
+                  }
+                ],
+                "usage": "use mod_splines, only: spline, wp\ntype(spline) :: sp\n! Construct sp from suitable data before evaluating.\ndy = sp%slope(xq)",
+                "usage_notes": "Calling sketch only. sp is an object of type spline, not the module name. Initialize xq and construct the coefficient arrays first; the construction discrepancy recorded in the review can affect these evaluations. No derivative or extrapolation result was independently checked."
+              },
+              {
+                "procedure": "slope2",
+                "module": "mod_splines",
+                "role": "public-entry-point",
+                "summary": "Public type-bound second-derivative evaluator. The passed object is class(spline), and query/result use REAL(wp). The method uses the already constructed coefficient arrays and is elemental, so compatible array queries are possible. This interface review does not establish numerical accuracy.",
+                "signature": "d2y = sp%slope2(x)",
+                "declarations": [
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 172,
+                    "line_end": 176
+                  },
+                  {
+                    "path": "mod_splines.f90",
+                    "line_start": 8,
+                    "line_end": 16
+                  }
+                ],
+                "path": "mod_splines.f90",
+                "line_start": 165,
+                "line_end": 196,
+                "derived_type": "spline",
+                "examples": [
+                  {
+                    "path": "FortranConsoleSpline.f90",
+                    "line_start": 19,
+                    "line_end": 26
+                  }
+                ],
+                "usage": "use mod_splines, only: spline, wp\ntype(spline) :: sp\n! Construct sp from suitable data before evaluating.\nd2y = sp%slope2(xq)",
+                "usage_notes": "Calling sketch only. sp is an object of type spline, not the module name. Initialize xq and construct the coefficient arrays first; the construction discrepancy recorded in the review can affect these evaluations. No derivative or extrapolation result was independently checked."
+              },
+              {
+                "procedure": "sp_index_of_x",
+                "module": "mod_splines",
+                "role": "implementation-helper",
+                "path": "mod_splines.f90",
+                "line_start": 75,
+                "line_end": 96
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected implementations and calling interfaces, not complete API audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "88f138a0a8ad8e71c89237df5fc236097ab695cc",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root MIT license names John Alexiou. This records the reviewed repository license and does not imply that the implementation or any numerical result has been checked by execution.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/ja72/FortranConsoleSpline/blob/88f138a0a8ad8e71c89237df5fc236097ab695cc/LICENSE.md",
+              "sha256": "c804ea113ab114880535de97a759295bc806b7814d0aee7c987c7e45b143cb96"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5824,12 +6092,80 @@
             ],
             "notes": "The brief README describes switching from basic Newton to a hybrid method after the iteration limit. Bracketing conditions, derivative callbacks and failure handling need further review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected module solves a scalar real equation through function-value and first-derivative subroutine callbacks; the dummy vectors have length one. sub_newton takes Newton steps and attempts a sign-changing bracket after its Newton iteration limit, then calls sub_hybrid_nb, which bisects when a Newton trial leaves its current interval. F1b describes general nonpolynomial scalar root finding; this is not polynomial root enumeration, a derivative-free interface or a square-system solver. The hybrid code updates the first endpoint when f(x)<0, so its input pair must have the matching sign orientation; it does not validate a bracket on entry. Failure paths print and STOP rather than returning a status, and the Newton path divides by df before testing for a small derivative. The optional fnorm on direct Newton success stores the residual computed before the final x update. The fallback call does not forward the optional tolerance or iteration controls, so the hybrid defaults apply there. Convergence, singular-derivative behavior and all bracket assumptions were not checked by execution.",
+            "evidence": [
+              {
+                "path": "gf_solver.f90",
+                "url": "https://github.com/gfell/gf_solver/blob/0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432/gf_solver.f90",
+                "sha256": "d3934946b86f5c0e8fd25a8d22b642827a3206f978384450a64d8b87829c8a60"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sub_newton",
+                "module": "mod_gfsolver",
+                "role": "public-entry-point",
+                "summary": "Public module Newton solver with hybrid fallback. fcn and dfcn are external subroutines called as (1,x,value), not scalar Fortran functions. xguess and x are REAL(ki) arrays of length one; tolerances, lower search limit, iteration count and fnorm are optional. ki is SELECTED_REAL_KIND(15,30).",
+                "signature": "CALL sub_newton(fcn, dfcn, xguess, x, minx_in, errrel_in, &\n                errabs_in, max_iter_in, fnorm)",
+                "declarations": [
+                  {
+                    "path": "gf_solver.f90",
+                    "line_start": 37,
+                    "line_end": 44
+                  }
+                ],
+                "path": "gf_solver.f90",
+                "line_start": 13,
+                "line_end": 141,
+                "usage": "use mod_gfsolver, only: ki, sub_newton\nreal(ki) :: xguess(1), x(1)\n! Supply external callbacks fcn(n,x,f) and dfcn(n,x,df).\nxguess = 1.0_ki\ncall sub_newton(fcn, dfcn, xguess, x)",
+                "usage_notes": "Calling sketch only; implement compatible explicit-shape/assumed-size callback vectors and declare the callbacks appropriately in the caller. A zero/small derivative may trigger a division fault or STOP; failures can terminate the calling program. Lower-bound randomization is not a general bounded-root guarantee. Optional controls are not forwarded to the fallback hybrid call. No program was compiled or run."
+              },
+              {
+                "procedure": "sub_hybrid_nb",
+                "module": "mod_gfsolver",
+                "role": "public-entry-point",
+                "summary": "Public module Newton-bisection solver. Supply a two-element REAL(ki) pair whose function values have the negative/positive orientation expected by the endpoint updates, along with both function and derivative subroutines. x is a one-element output array; optional tolerances and iteration controls have defaults.",
+                "signature": "CALL sub_hybrid_nb(fcn, dfcn, xguess_in, x, errrel_in, &\n                   errabs_in, max_iter_in, fnorm)",
+                "declarations": [
+                  {
+                    "path": "gf_solver.f90",
+                    "line_start": 162,
+                    "line_end": 168
+                  }
+                ],
+                "path": "gf_solver.f90",
+                "line_start": 144,
+                "line_end": 233,
+                "usage": "use mod_gfsolver, only: ki, sub_hybrid_nb\nreal(ki) :: bracket(2), x(1)\n! Initialize a valid sign-oriented bracket and supply fcn/dfcn.\ncall sub_hybrid_nb(fcn, dfcn, bracket, x)",
+                "usage_notes": "Calling sketch only. Validate the bracket and avoid a zero derivative before relying on this interface: the implementation does not supply a bracket-validation return code or a guarded derivative division. Hitting the iteration limit prints and STOPs. This review does not establish convergence or residual accuracy."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected implementations and calling interfaces, not complete API audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT-style license with citation request",
+          "spdx_expression": null,
+          "revision": "0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432",
+          "reviewed_on": "2026-11-04",
+          "notes": "LICENSE.md is headed MIT and names Giulio Fella, but adds a numbered request to cite the package in addition to retaining the copyright/permission notice. The full pinned text is linked; no exact SPDX MIT expression is asserted for this modified notice.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/gfell/gf_solver/blob/0926b61db2c0fa3fa2e1b874ef5ac15d5d6df432/LICENSE.md",
+              "sha256": "eddd2042803c94eabce159079b88371720b3b25244a0ddf3a18bca91666e9dc4"
+            }
+          ]
         }
       },
       "imports": {}

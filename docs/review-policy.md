@@ -74,6 +74,11 @@ mapping alone does not establish that a procedure is public. Store `module` and
 `procedure` separately. Public module generics should use the generic name,
 with private implementations recorded as helpers. A module qualifier is catalog
 notation, not Fortran call syntax.
+For a type-bound entry point, store the binding in `procedure` and the containing
+type in `derived_type`, separately from `module`. The catalog displays
+`module_name::type_name%binding_name`; the usage line uses an actual object, such
+as `result = object%binding_name(x)`. Link the binding declaration and the
+implementation's argument declarations so the passed-object argument is clear.
 
 A public entry point needs a `summary`. Optional `signature` text supplies the
 Fortran usage line (including `CALL` for a subroutine). It must have `declarations`:
