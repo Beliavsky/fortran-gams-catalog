@@ -32420,6 +32420,2146 @@
         }
       },
       "imports": {}
+    },
+    {
+      "id": "github:jonathanschilling/abscab-fortran",
+      "local": {
+        "name": "ABSCAB Fortran",
+        "description": "Biot-Savart field/potential evaluation with a documented Bulirsch complete elliptic integral routine.",
+        "repository": {
+          "host": "github",
+          "owner": "jonathanschilling",
+          "name": "abscab-fortran",
+          "url": "https://github.com/jonathanschilling/abscab-fortran"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "elliptic-integrals",
+          "biot-savart",
+          "magnetic-fields"
+        ],
+        "classifications": [
+          {
+            "code": "C",
+            "level": "documentation-reviewed",
+            "revision": "bab71767cb166ef878002b806c8360fe21307765",
+            "evidence": [
+              {
+                "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/README.md",
+                "path": "README.md",
+                "sha256": "7a8897530f6494d41a79bb958ddf6b78755d90b578525af3c75b60679b444af3"
+              },
+              {
+                "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/abscab/mod_cel.f90",
+                "path": "abscab/mod_cel.f90",
+                "sha256": "3c14d5c4e63b892bd67479ca0b3fc8545bbc40c938b7d53dbfa1ac0c01ef84fb"
+              }
+            ],
+            "notes": "The README describes circular loops and straight current segments; the pinned mod_cel interface documents a complete elliptic integral and excludes zero complementary parameter. Polygon/filament approximations are not exact arbitrary finite-width conductors. Floating-point error and asymptotic-accuracy claims were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:zgimbutas/chunkmatc",
+      "local": {
+        "name": "chunkmatc",
+        "description": "Two-dimensional layer potentials, curve discretization and singular/adaptive quadratures.",
+        "repository": {
+          "host": "github",
+          "owner": "zgimbutas",
+          "name": "chunkmatc",
+          "url": "https://github.com/zgimbutas/chunkmatc"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "integral-equations",
+          "layer-potentials",
+          "quadrature",
+          "computational-geometry"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "e70b8ce97e337c8d20b1e9712bf40590eeda9994",
+            "evidence": [
+              {
+                "url": "https://github.com/zgimbutas/chunkmatc/blob/e70b8ce97e337c8d20b1e9712bf40590eeda9994/README.md",
+                "path": "README.md",
+                "sha256": "b1f1d9e6133868d8ff5cec5fe3a96484a9d7aa79719d6eb8028820a4fe2bd96d"
+              }
+            ],
+            "notes": "The README identifies Laplace/Helmholtz kernels, auxiliary smooth/log/Hilbert/hypersingular quadratures and example Dirichlet solvers. These are two-dimensional methods; all geometry/resonance cases and stated quadrature order need later review. Supplied direct-versus-solution comparisons were not rerun.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H",
+            "level": "documentation-reviewed",
+            "revision": "e70b8ce97e337c8d20b1e9712bf40590eeda9994",
+            "evidence": [
+              {
+                "url": "https://github.com/zgimbutas/chunkmatc/blob/e70b8ce97e337c8d20b1e9712bf40590eeda9994/README.md",
+                "path": "README.md",
+                "sha256": "b1f1d9e6133868d8ff5cec5fe3a96484a9d7aa79719d6eb8028820a4fe2bd96d"
+              }
+            ],
+            "notes": "The README identifies Laplace/Helmholtz kernels, auxiliary smooth/log/Hilbert/hypersingular quadratures and example Dirichlet solvers. These are two-dimensional methods; all geometry/resonance cases and stated quadrature order need later review. Supplied direct-versus-solution comparisons were not rerun.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "e70b8ce97e337c8d20b1e9712bf40590eeda9994",
+            "evidence": [
+              {
+                "url": "https://github.com/zgimbutas/chunkmatc/blob/e70b8ce97e337c8d20b1e9712bf40590eeda9994/README.md",
+                "path": "README.md",
+                "sha256": "b1f1d9e6133868d8ff5cec5fe3a96484a9d7aa79719d6eb8028820a4fe2bd96d"
+              }
+            ],
+            "notes": "The README identifies Laplace/Helmholtz kernels, auxiliary smooth/log/Hilbert/hypersingular quadratures and example Dirichlet solvers. These are two-dimensional methods; all geometry/resonance cases and stated quadrature order need later review. Supplied direct-versus-solution comparisons were not rerun.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jorgeg94/clebsch-gordan",
+      "local": {
+        "name": "Clebsch-Gordan example",
+        "description": "Fortran angular-momentum coupling coefficient examples for documented special cases.",
+        "repository": {
+          "host": "github",
+          "owner": "JorgeG94",
+          "name": "Clebsch-Gordan",
+          "url": "https://github.com/JorgeG94/Clebsch-Gordan"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "clebsch-gordan",
+          "angular-momentum",
+          "special-functions",
+          "educational-software"
+        ],
+        "classifications": [
+          {
+            "code": "C",
+            "level": "documentation-reviewed",
+            "revision": "72901c4b0bc3031be34f7f22aacfc1a379045898",
+            "evidence": [
+              {
+                "url": "https://github.com/JorgeG94/Clebsch-Gordan/blob/72901c4b0bc3031be34f7f22aacfc1a379045898/README.md",
+                "path": "README.md",
+                "sha256": "0acc8c0f60fede6b3a55127c1c761809b2217dbe951a866fa6fe73b928cb26fa"
+              },
+              {
+                "url": "https://github.com/JorgeG94/Clebsch-Gordan/blob/72901c4b0bc3031be34f7f22aacfc1a379045898/CG.f90",
+                "path": "CG.f90",
+                "sha256": "344efde0183daf2bc994824b674d54a3858b4f9a928371de279dc2b5fd28b548"
+              }
+            ],
+            "notes": "The sparse README is supplemented by CG.f90 comments describing zero-projection coefficient special cases and factorials limited to 100. This is not presented as a general, checked implementation for arbitrary angular momenta. Interfaces, allocation behavior and numeric range were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:brito-leonardo/physics_problems",
+      "local": {
+        "name": "Physics Problems examples",
+        "description": "Fortran teaching examples for condensate/heat dynamics with LU and Simpson integration.",
+        "repository": {
+          "host": "github",
+          "owner": "brito-leonardo",
+          "name": "Physics_Problems",
+          "url": "https://github.com/brito-leonardo/Physics_Problems"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "gross-pitaevskii",
+          "crank-nicolson",
+          "split-step",
+          "quadrature",
+          "educational-software"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "bc0834c86dabfc2d13fc442ba3e0e4661df95a93",
+            "evidence": [
+              {
+                "url": "https://github.com/brito-leonardo/Physics_Problems/blob/bc0834c86dabfc2d13fc442ba3e0e4661df95a93/README.md",
+                "path": "README.md",
+                "sha256": "27df004710da5901fa0f779de34b4f322e01b8854665cf64ba36b3c39e41159e"
+              }
+            ],
+            "notes": "The README table distinguishes Fortran Gross-Pitaevskii/harmonic-oscillator examples from mixed Fortran/Python heat examples and names their numerical methods. Scope is the listed teaching problems, not every classical/quantum problem. Stability, normalization and ground-state results were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "bc0834c86dabfc2d13fc442ba3e0e4661df95a93",
+            "evidence": [
+              {
+                "url": "https://github.com/brito-leonardo/Physics_Problems/blob/bc0834c86dabfc2d13fc442ba3e0e4661df95a93/README.md",
+                "path": "README.md",
+                "sha256": "27df004710da5901fa0f779de34b4f322e01b8854665cf64ba36b3c39e41159e"
+              }
+            ],
+            "notes": "The README table distinguishes Fortran Gross-Pitaevskii/harmonic-oscillator examples from mixed Fortran/Python heat examples and names their numerical methods. Scope is the listed teaching problems, not every classical/quantum problem. Stability, normalization and ground-state results were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H",
+            "level": "documentation-reviewed",
+            "revision": "bc0834c86dabfc2d13fc442ba3e0e4661df95a93",
+            "evidence": [
+              {
+                "url": "https://github.com/brito-leonardo/Physics_Problems/blob/bc0834c86dabfc2d13fc442ba3e0e4661df95a93/README.md",
+                "path": "README.md",
+                "sha256": "27df004710da5901fa0f779de34b4f322e01b8854665cf64ba36b3c39e41159e"
+              }
+            ],
+            "notes": "The README table distinguishes Fortran Gross-Pitaevskii/harmonic-oscillator examples from mixed Fortran/Python heat examples and names their numerical methods. Scope is the listed teaching problems, not every classical/quantum problem. Stability, normalization and ground-state results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/brito-leonardo/Bose-Einstein_Condensates"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:danielver02/alps",
+      "local": {
+        "name": "Arbitrary Linear Plasma Solver",
+        "description": "Numerical Vlasov-Maxwell dispersion-relation solutions for magnetized plasma distributions.",
+        "repository": {
+          "host": "github",
+          "owner": "danielver02",
+          "name": "ALPS",
+          "url": "https://github.com/danielver02/ALPS"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "nonlinear-equations",
+          "dispersion-relations",
+          "plasma-waves"
+        ],
+        "classifications": [
+          {
+            "code": "F",
+            "level": "documentation-reviewed",
+            "revision": "465a8afd7a0cd1fa6900ae6fd409cb417cf1cac4",
+            "evidence": [
+              {
+                "url": "https://github.com/danielver02/ALPS/blob/465a8afd7a0cd1fa6900ae6fd409cb417cf1cac4/README.md",
+                "path": "README.md",
+                "sha256": "48fa43d13db7c0d0982f9bb5c1fb23b90a8c7073cd40adda00dd503f446bc2f1"
+              }
+            ],
+            "notes": "The README documents gyrotropic background distributions and variable propagation direction/species. The broad equation-solving mapping describes dispersion solutions, not a general nonlinear PDE time integrator. Distribution assumptions, complex-root selection and test results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:princetonuniversity/focus",
+      "local": {
+        "name": "FOCUS coil optimization",
+        "description": "Nonlinear optimization of three-dimensional fusion-magnet coil shapes.",
+        "repository": {
+          "host": "github",
+          "owner": "PrincetonUniversity",
+          "name": "FOCUS",
+          "url": "https://github.com/PrincetonUniversity/FOCUS"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "coil-design",
+          "stellarators"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "e4bb49b0632c650e326616912e274feb7781a60d",
+            "evidence": [
+              {
+                "url": "https://github.com/PrincetonUniversity/FOCUS/blob/e4bb49b0632c650e326616912e274feb7781a60d/README.md",
+                "path": "README.md",
+                "sha256": "2bf9783ec121947ed4fa0b660b75e6e91035a99c4ae323966e69b87217e920fe"
+              }
+            ],
+            "notes": "The README distinguishes the development branch from the dipole/FAMUS permanent-magnet branch and an older NAG-dependent branch. This record covers documented coil optimization without attributing every branch feature to the pinned tree. Design constraints and optimized fields were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gvec-group/gvec",
+      "local": {
+        "name": "GVEC",
+        "description": "Variational minimization of MHD energy for three-dimensional fixed-boundary equilibria.",
+        "repository": {
+          "host": "github",
+          "owner": "gvec-group",
+          "name": "gvec",
+          "url": "https://github.com/gvec-group/gvec"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "optimization",
+          "variational-methods",
+          "magnetohydrodynamic-equilibria"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "a29d55d48776a135a1987cfb2026d001e3005957",
+            "evidence": [
+              {
+                "url": "https://github.com/gvec-group/gvec/blob/a29d55d48776a135a1987cfb2026d001e3005957/README.md",
+                "path": "README.md",
+                "sha256": "58e1564c36377c577be540d82ef0012a3ceef4860e9fd09c32ce00b31437cf71"
+              }
+            ],
+            "notes": "The README assumes nested closed flux surfaces and fixed plasma boundary with prescribed radial profiles. It documents B-spline/Fourier representations and identifies GitHub as a mirror of the official GitLab project. Physical equilibrium quality and minimizer convergence were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:itpplasma/gorilla",
+      "local": {
+        "name": "GORILLA",
+        "description": "Guiding-center orbit integration in tetrahedrally interpolated fusion-device electromagnetic fields.",
+        "repository": {
+          "host": "github",
+          "owner": "itpplasma",
+          "name": "GORILLA",
+          "url": "https://github.com/itpplasma/GORILLA"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake",
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "orbit-integration",
+          "guiding-center",
+          "local-linearization"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "8fc6353ff556e21c3f949e32bb96055a4e0e0412",
+            "evidence": [
+              {
+                "url": "https://github.com/itpplasma/GORILLA/blob/8fc6353ff556e21c3f949e32bb96055a4e0e0412/README.md",
+                "path": "README.md",
+                "sha256": "c9d112962ab2f87fc5a044d66ee5f8689445f777977f6f52e98d16dfd49ecf05"
+              }
+            ],
+            "notes": "The README documents collisionless motion, piecewise field representations and polynomial/RK4/ODE45 pushers. Exact local equations do not imply exact trajectories in the original continuous fields. Invariant preservation, adaptive criteria and device geometries were not independently verified.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:antoinehoff/gyacomo",
+      "local": {
+        "name": "Gyacomo",
+        "description": "Gyrokinetic Boltzmann simulation using Hermite-Laguerre velocity-space moments.",
+        "repository": {
+          "host": "github",
+          "owner": "Antoinehoff",
+          "name": "gyacomo",
+          "url": "https://github.com/Antoinehoff/gyacomo"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "gyrokinetics",
+          "moment-methods",
+          "plasma-turbulence"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a5d2c5ca4c7e0e02029bffcddd4ff07db2c97785",
+            "evidence": [
+              {
+                "url": "https://github.com/Antoinehoff/gyacomo/blob/a5d2c5ca4c7e0e02029bffcddd4ff07db2c97785/README.md",
+                "path": "README.md",
+                "sha256": "0aa514674076482fb97e9a80f40b370ca1b70d998fda0f3c7a9b648fa0a88dda"
+              }
+            ],
+            "notes": "The README states delta-f flux-tube assumptions with kinetic/adiabatic species and collision operators. This is a specific kinetic-plasma formulation rather than every Boltzmann problem. Moment truncation, collisions and published turbulence results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ihutch/coptic",
+      "local": {
+        "name": "COPTIC",
+        "description": "Electrostatic particle-in-cell trajectories coupled to mesh Poisson solves.",
+        "repository": {
+          "host": "github",
+          "owner": "ihutch",
+          "name": "COPTIC",
+          "url": "https://github.com/ihutch/COPTIC"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "particle-in-cell",
+          "poisson-equation",
+          "plasma-simulation"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "3f068796a4d8755cb30906d4f229e6a69958ace6",
+            "evidence": [
+              {
+                "url": "https://github.com/ihutch/COPTIC/blob/3f068796a4d8755cb30906d4f229e6a69958ace6/README",
+                "path": "README",
+                "sha256": "a4c418cb362562f70883d323aa95647d47a7dfc5e625284b38e72fad574002cf"
+              },
+              {
+                "url": "https://github.com/ihutch/COPTIC/blob/3f068796a4d8755cb30906d4f229e6a69958ace6/doc/RefManual.tex",
+                "path": "doc/RefManual.tex",
+                "sha256": "81ac3de1aafa9f6ea1f1cf216e263bf948723ecfd847ca2ba9ac75b6870c7d06"
+              }
+            ],
+            "notes": "The root README is supplemented by the reference manual documenting charged-particle motion, fixed magnetic fields and electrostatic self-consistency. Its research-use/citation terms are retained as a limitation, not interpreted as unrestricted redistribution rights. Boundary treatment, checksums and plasma results were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:amir-saadat/bdpack",
+      "local": {
+        "name": "BDpack",
+        "description": "Brownian bead-spring polymer dynamics through stochastic differential equations.",
+        "repository": {
+          "host": "github",
+          "owner": "amir-saadat",
+          "name": "BDpack",
+          "url": "https://github.com/amir-saadat/BDpack"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "stochastic-differential-equations",
+          "brownian-dynamics",
+          "polymers"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "0a97f4893f62e64ec14ec79bb7919db1003bd418",
+            "evidence": [
+              {
+                "url": "https://github.com/amir-saadat/BDpack/blob/0a97f4893f62e64ec14ec79bb7919db1003bd418/README.md",
+                "path": "README.md",
+                "sha256": "a34e0781005bfe657c430c658eba9c0e5a04b1f766558280fe1144e2c9876d8a"
+              }
+            ],
+            "notes": "The README documents Wiener increments, hydrodynamic interactions and mesoscale bead-spring assumptions. This is an approximate polymer model, not fully resolved molecular dynamics. Stochastic integrator accuracy, hydrodynamic approximations and any hardware performance claims were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "0a97f4893f62e64ec14ec79bb7919db1003bd418",
+            "evidence": [
+              {
+                "url": "https://github.com/amir-saadat/BDpack/blob/0a97f4893f62e64ec14ec79bb7919db1003bd418/README.md",
+                "path": "README.md",
+                "sha256": "a34e0781005bfe657c430c658eba9c0e5a04b1f766558280fe1144e2c9876d8a"
+              }
+            ],
+            "notes": "The README documents Wiener increments, hydrodynamic interactions and mesoscale bead-spring assumptions. This is an approximate polymer model, not fully resolved molecular dynamics. Stochastic integrator accuracy, hydrodynamic approximations and any hardware performance claims were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jvrglr/biased-versus-unbiased-codes",
+      "local": {
+        "name": "Biased versus unbiased stochastic simulations",
+        "description": "Fortran binomial/Gillespie contagion simulations and bias-comparison examples.",
+        "repository": {
+          "host": "github",
+          "owner": "jvrglr",
+          "name": "Biased-versus-unbiased-codes",
+          "url": "https://github.com/jvrglr/Biased-versus-unbiased-codes"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "stochastic-simulation",
+          "gillespie",
+          "binomial-sampling",
+          "contagion-models"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "cc9e0de7984be88bc5575e7a2f6af20216aeae20",
+            "evidence": [
+              {
+                "url": "https://github.com/jvrglr/Biased-versus-unbiased-codes/blob/cc9e0de7984be88bc5575e7a2f6af20216aeae20/README.md",
+                "path": "README.md",
+                "sha256": "87f9791941db878a1ba76b26f04c188d438425d8a971afe5fad5bec0536633e3"
+              }
+            ],
+            "notes": "The README distinguishes Fortran metapopulation examples from a separate Python SIS example and lists inherited random-number dependencies and required edge-list inputs. The paper-wide algorithm inventory is not assumed to be entirely Fortran. Bias, random sampling quality and replication plots were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:chriswoodgate/brawl",
+      "local": {
+        "name": "BraWl",
+        "description": "Lattice-alloy Monte Carlo, Wang-Landau and nested sampling with Bragg-Williams interactions.",
+        "repository": {
+          "host": "github",
+          "owner": "ChrisWoodgate",
+          "name": "BraWl",
+          "url": "https://github.com/ChrisWoodgate/BraWl"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "monte-carlo",
+          "wang-landau",
+          "nested-sampling",
+          "lattice-models"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "35c28af462bbe98686c825622aca1e6b0ea34a2c",
+            "evidence": [
+              {
+                "url": "https://github.com/ChrisWoodgate/BraWl/blob/35c28af462bbe98686c825622aca1e6b0ea34a2c/README.md",
+                "path": "README.md",
+                "sha256": "ca8071bb01dfcbfb1dc1d540b6e99f4e06fd5658e5cbba22efe43aa2a6d808f5"
+              }
+            ],
+            "notes": "The README assumes homogeneous isotropic finite-range lattice interactions and excludes off-lattice systems. Wang-Landau currently requires parallel execution, and nested-sampling analysis uses an external package. Sampling convergence, density-of-states results and all parallel configurations were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:tribo-pprime/crest",
+      "local": {
+        "name": "CREST rough surfaces",
+        "description": "Fortran generation of gridded rough surfaces with specified moments, correlation lengths and orientation.",
+        "repository": {
+          "host": "github",
+          "owner": "TRIBO-Pprime",
+          "name": "CREST",
+          "url": "https://github.com/TRIBO-Pprime/CREST"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "surface-generation",
+          "roughness",
+          "geometric-modeling",
+          "correlation-lengths"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "3606291e3151386fbc9c7f7856feed2004af30bc",
+            "evidence": [
+              {
+                "url": "https://github.com/TRIBO-Pprime/CREST/blob/3606291e3151386fbc9c7f7856feed2004af30bc/README.md",
+                "path": "README.md",
+                "sha256": "92085764b7ae7c8079c3236e22072a575efa91374da0f213383d25b4da015d6f"
+              }
+            ],
+            "notes": "The README documents surface-geometry targets and separate TOOLIB/TPGLIB dependencies, including inherited FFT/optimization tools. This is distinct from the molecular conformer program also named CREST. Requested statistical moments/correlations are targets rather than catalog-verified properties of generated surfaces.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:autosurf/autosurf-v1.3",
+      "local": {
+        "name": "AUTOSURF",
+        "description": "Local interpolating moving-least-squares construction of molecular potential-energy surfaces.",
+        "repository": {
+          "host": "github",
+          "owner": "autosurf",
+          "name": "AUTOSURF-v1.3",
+          "url": "https://github.com/autosurf/AUTOSURF-v1.3"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "approximation",
+          "moving-least-squares",
+          "potential-energy-surfaces",
+          "adaptive-fitting"
+        ],
+        "classifications": [
+          {
+            "code": "K",
+            "level": "documentation-reviewed",
+            "revision": "043b710488663408dfcff9bc75a38cf1345bf926",
+            "evidence": [
+              {
+                "url": "https://github.com/autosurf/AUTOSURF-v1.3/blob/043b710488663408dfcff9bc75a38cf1345bf926/README.md",
+                "path": "README.md",
+                "sha256": "c32eb43a47731cb138e733a8a622e17a585b6af1ed25aaeb398f31fadd3ce12d"
+              }
+            ],
+            "notes": "The README documents guided data placement, optional gradients, refinement and external electronic-structure programs. Its Linux/MPI/LAPACK and MOLPRO/Gaussian requirements are not a self-contained ab initio implementation. Fitting targets, extrapolation behavior and generated surfaces were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:allen-tildesley/examples",
+      "local": {
+        "name": "Computer Simulation of Liquids examples",
+        "description": "Fortran molecular-dynamics, Langevin and Monte Carlo textbook examples.",
+        "repository": {
+          "host": "github",
+          "owner": "Allen-Tildesley",
+          "name": "examples",
+          "url": "https://github.com/Allen-Tildesley/examples"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "scons",
+          "meson"
+        ],
+        "topics": [
+          "molecular-dynamics",
+          "monte-carlo",
+          "langevin",
+          "educational-software"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "5c4266fcdebe6271f07529d9182bfaef54fcaaed",
+            "evidence": [
+              {
+                "url": "https://github.com/Allen-Tildesley/examples/blob/5c4266fcdebe6271f07529d9182bfaef54fcaaed/README.md",
+                "path": "README.md",
+                "sha256": "a75b3d7158427d988b45f09510e97362b4a2b202958e24ec6d1b042640e906f3"
+              },
+              {
+                "url": "https://github.com/Allen-Tildesley/examples/blob/5c4266fcdebe6271f07529d9182bfaef54fcaaed/GUIDE.md",
+                "path": "GUIDE.md",
+                "sha256": "f98e2f5ee93f2f5de1a54e46641a74f5f340d671cfc2b337d0b988b9f49ba556"
+              }
+            ],
+            "notes": "The README and guide explicitly frame these as illustrations accompanying the textbook, not production recommendations. The guide distinguishes Monte Carlo, dynamics, Gibbs/Wang-Landau and path-integral examples. Published sample behavior and conservation/statistical checks were not independently reproduced.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "5c4266fcdebe6271f07529d9182bfaef54fcaaed",
+            "evidence": [
+              {
+                "url": "https://github.com/Allen-Tildesley/examples/blob/5c4266fcdebe6271f07529d9182bfaef54fcaaed/README.md",
+                "path": "README.md",
+                "sha256": "a75b3d7158427d988b45f09510e97362b4a2b202958e24ec6d1b042640e906f3"
+              },
+              {
+                "url": "https://github.com/Allen-Tildesley/examples/blob/5c4266fcdebe6271f07529d9182bfaef54fcaaed/GUIDE.md",
+                "path": "GUIDE.md",
+                "sha256": "f98e2f5ee93f2f5de1a54e46641a74f5f340d671cfc2b337d0b988b9f49ba556"
+              }
+            ],
+            "notes": "The README and guide explicitly frame these as illustrations accompanying the textbook, not production recommendations. The guide distinguishes Monte Carlo, dynamics, Gibbs/Wang-Landau and path-integral examples. Published sample behavior and conservation/statistical checks were not independently reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:atoms-ufrj/emdee",
+      "local": {
+        "name": "EmDee",
+        "description": "Fortran atomic-neighbor lists and coordinate manipulation with pair-force/energy kernels.",
+        "repository": {
+          "host": "github",
+          "owner": "atoms-ufrj",
+          "name": "EmDee",
+          "url": "https://github.com/atoms-ufrj/EmDee"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "neighbor-lists",
+          "atomic-coordinates",
+          "molecular-simulation-support"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "80af2f1199c34bb1072b60df91392d264a3b70d0",
+            "evidence": [
+              {
+                "url": "https://github.com/atoms-ufrj/EmDee/blob/80af2f1199c34bb1072b60df91392d264a3b70d0/README.md",
+                "path": "README.md",
+                "sha256": "aa2eeaa4aaf5c3ae2a7e25598222f21b4659f5dc275315cf92838f1a9678f682"
+              }
+            ],
+            "notes": "The README describes a minimalist computational kernel library intended as a platform for testing thermostats/barostats and hybrid Monte Carlo methods. This does not establish bundled implementations of every such simulation method or a complete trajectory integrator. Pair interactions, neighbor correctness and performance were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:simoneventuri/coarseair",
+      "local": {
+        "name": "CoarseAIR legacy trajectory code",
+        "description": "Fortran quasi-classical state-to-state and coarse-grained molecular trajectories.",
+        "repository": {
+          "host": "github",
+          "owner": "simoneventuri",
+          "name": "CoarseAIR",
+          "url": "https://github.com/simoneventuri/CoarseAIR"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "ode",
+          "quasi-classical-trajectories",
+          "molecular-collisions",
+          "coarse-graining"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "3758569dd1202a6356d37f0bf092a9b1c2c0fb6b",
+            "evidence": [
+              {
+                "url": "https://github.com/simoneventuri/CoarseAIR/blob/3758569dd1202a6356d37f0bf092a9b1c2c0fb6b/README.md",
+                "path": "README.md",
+                "sha256": "ce503ae3f7d590c1f244160a6fd0264641bb699e801088ce2ffecb57769156da"
+              }
+            ],
+            "notes": "The README identifies the Fortran 2008 trajectory method and says the project merged into chess-uiuc/CoarseAirQCT. The pinned tree still contains substantial Fortran source; this entry retains the listed snapshot without assuming current successor capabilities. Integrators, potential surfaces and state-to-state results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:habershonlab/cde",
+      "local": {
+        "name": "Chemistry Discovery Engine",
+        "description": "Fortran reaction-path sampling and nudged-elastic-band refinement with external energy backends.",
+        "repository": {
+          "host": "github",
+          "owner": "HabershonLab",
+          "name": "cde",
+          "url": "https://github.com/HabershonLab/cde"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "optimization",
+          "reaction-paths",
+          "nudged-elastic-band",
+          "graph-sampling"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "0ff4e8aa904f767a90720b22cab6ebf27fda8fb4",
+            "evidence": [
+              {
+                "url": "https://github.com/HabershonLab/cde/blob/0ff4e8aa904f767a90720b22cab6ebf27fda8fb4/README.md",
+                "path": "README.md",
+                "sha256": "5838634e2d18423bd01d2e7ab3c751afc75a008316b26498c731d2a59753e431"
+              }
+            ],
+            "notes": "The README distinguishes graph-driven random walks, double-ended searching and path refinement from external programs supplying energies/geometry optimization. The broad mappings do not attribute every backend algorithm to CDE. Reaction completeness, path convergence and physical energy surfaces were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "0ff4e8aa904f767a90720b22cab6ebf27fda8fb4",
+            "evidence": [
+              {
+                "url": "https://github.com/HabershonLab/cde/blob/0ff4e8aa904f767a90720b22cab6ebf27fda8fb4/README.md",
+                "path": "README.md",
+                "sha256": "5838634e2d18423bd01d2e7ab3c751afc75a008316b26498c731d2a59753e431"
+              }
+            ],
+            "notes": "The README distinguishes graph-driven random walks, double-ended searching and path refinement from external programs supplying energies/geometry optimization. The broad mappings do not attribute every backend algorithm to CDE. Reaction completeness, path convergence and physical energy surfaces were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/ScottHabershon/cde"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:grimme-lab/crest",
+      "local": {
+        "name": "CREST molecular conformers",
+        "description": "Automated low-energy conformer/rotamer exploration orchestrating molecular energy calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "grimme-lab",
+          "name": "crest",
+          "url": "https://github.com/grimme-lab/crest"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake",
+          "meson"
+        ],
+        "topics": [
+          "optimization",
+          "conformer-search",
+          "molecular-ensembles",
+          "xtb"
+        ],
+        "classifications": [
+          {
+            "code": "G",
+            "level": "documentation-reviewed",
+            "revision": "cfdc301f759686b0fd66ced63b5ddbd6c693fa4f",
+            "evidence": [
+              {
+                "url": "https://github.com/grimme-lab/crest/blob/cfdc301f759686b0fd66ced63b5ddbd6c693fa4f/README.md",
+                "path": "README.md",
+                "sha256": "104f371b4d1e59e70d1d5e92efc07c387c020158cdfc506d7c18cff7dbe179d4"
+              }
+            ],
+            "notes": "The pinned README describes a scheduler and integrated/external semiempirical backends and points current documentation to crest-lab. Some functions still require external xtb even when primary runtypes use tblite. This differs from rough-surface CREST; ensemble completeness and optimized energies were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:trovemaster/duo",
+      "local": {
+        "name": "Duo",
+        "description": "Fortran coupled rovibronic Schrodinger equations for diatomic molecules.",
+        "repository": {
+          "host": "github",
+          "owner": "Trovemaster",
+          "name": "Duo",
+          "url": "https://github.com/Trovemaster/Duo"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "differential-equations",
+          "schrodinger-equation",
+          "molecular-spectroscopy"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "054877649df4946a9a6e88625f33bdf14ef677ed",
+            "evidence": [
+              {
+                "url": "https://github.com/Trovemaster/Duo/blob/054877649df4946a9a6e88625f33bdf14ef677ed/README.md",
+                "path": "README.md",
+                "sha256": "5b9c8fb2c1779540c340a47c8efdb09d06ea692ef58e2350768a49f2d1f9dd11"
+              }
+            ],
+            "notes": "The README documents bound/continuum treatment, state selection and intensity features with a history of bug fixes. This is diatomic spectroscopy rather than a universal molecular quantum solver. Potential/coupling inputs, state assignments and spectra were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:aoterodelaroza/critic2",
+      "local": {
+        "name": "Critic2",
+        "description": "Fortran molecular/crystal geometry and scalar-field analysis, including critical points and basin integration.",
+        "repository": {
+          "host": "github",
+          "owner": "aoterodelaroza",
+          "name": "critic2",
+          "url": "https://github.com/aoterodelaroza/critic2"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "critical-points",
+          "quadrature",
+          "molecular-geometry",
+          "scalar-fields"
+        ],
+        "classifications": [
+          {
+            "code": "F",
+            "level": "documentation-reviewed",
+            "revision": "68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f",
+            "evidence": [
+              {
+                "url": "https://github.com/aoterodelaroza/critic2/blob/68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f/README.md",
+                "path": "README.md",
+                "sha256": "6eeda65204947b295f9f7afb11e91691b96f779315664e0854243ad87f92b38b"
+              }
+            ],
+            "notes": "The README documents structural formats, crystallographic calculations and Bader analysis and distinguishes optional Libxc/NLOPT/Libcint extensions. Those external capabilities are not treated as independent implementations here. Critical-point completeness, basin integrals and electronic-structure inputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H",
+            "level": "documentation-reviewed",
+            "revision": "68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f",
+            "evidence": [
+              {
+                "url": "https://github.com/aoterodelaroza/critic2/blob/68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f/README.md",
+                "path": "README.md",
+                "sha256": "6eeda65204947b295f9f7afb11e91691b96f779315664e0854243ad87f92b38b"
+              }
+            ],
+            "notes": "The README documents structural formats, crystallographic calculations and Bader analysis and distinguishes optional Libxc/NLOPT/Libcint extensions. Those external capabilities are not treated as independent implementations here. Critical-point completeness, basin integrals and electronic-structure inputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f",
+            "evidence": [
+              {
+                "url": "https://github.com/aoterodelaroza/critic2/blob/68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f/README.md",
+                "path": "README.md",
+                "sha256": "6eeda65204947b295f9f7afb11e91691b96f779315664e0854243ad87f92b38b"
+              }
+            ],
+            "notes": "The README documents structural formats, crystallographic calculations and Bader analysis and distinguishes optional Libxc/NLOPT/Libcint extensions. Those external capabilities are not treated as independent implementations here. Critical-point completeness, basin integrals and electronic-structure inputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f",
+            "evidence": [
+              {
+                "url": "https://github.com/aoterodelaroza/critic2/blob/68d95e0356d5a6e03e4827d43bd2030b5a6fbc1f/README.md",
+                "path": "README.md",
+                "sha256": "6eeda65204947b295f9f7afb11e91691b96f779315664e0854243ad87f92b38b"
+              }
+            ],
+            "notes": "The README documents structural formats, crystallographic calculations and Bader analysis and distinguishes optional Libxc/NLOPT/Libcint extensions. Those external capabilities are not treated as independent implementations here. Critical-point completeness, basin integrals and electronic-structure inputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:pierrehirel/atomsk",
+      "local": {
+        "name": "Atomsk",
+        "description": "Fortran atomic-system format conversion, crystal construction and geometry manipulation.",
+        "repository": {
+          "host": "github",
+          "owner": "pierrehirel",
+          "name": "atomsk",
+          "url": "https://github.com/pierrehirel/atomsk"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "atomic-coordinates",
+          "file-conversion",
+          "crystal-geometry",
+          "defects"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "ba5b4537a4b063a731394f37686a04c569e7f716",
+            "evidence": [
+              {
+                "url": "https://github.com/pierrehirel/atomsk/blob/ba5b4537a4b063a731394f37686a04c569e7f716/README",
+                "path": "README",
+                "sha256": "7619fbfe4b65f6d067d8f4048ae430a0d57b3e2c2a8ff604d3596406ed5679cf"
+              }
+            ],
+            "notes": "The README documents structure manipulation, defects and polycrystal construction, with Fortran95 source. It generates/manipulates configurations rather than calculating every material property or integrating molecular dynamics. Format fidelity and geometric/defect correctness were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "ba5b4537a4b063a731394f37686a04c569e7f716",
+            "evidence": [
+              {
+                "url": "https://github.com/pierrehirel/atomsk/blob/ba5b4537a4b063a731394f37686a04c569e7f716/README",
+                "path": "README",
+                "sha256": "7619fbfe4b65f6d067d8f4048ae430a0d57b3e2c2a8ff604d3596406ed5679cf"
+              }
+            ],
+            "notes": "The README documents structure manipulation, defects and polycrystal construction, with Fortran95 source. It generates/manipulates configurations rather than calculating every material property or integrating molecular dynamics. Format fidelity and geometric/defect correctness were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:chemfiles/chemfiles.f03",
+      "local": {
+        "name": "Chemfiles Fortran binding",
+        "description": "Fortran 2003 trajectory/frame input-output bindings to Chemfiles.",
+        "repository": {
+          "host": "github",
+          "owner": "chemfiles",
+          "name": "chemfiles.f03",
+          "url": "https://github.com/chemfiles/chemfiles.f03"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [],
+        "topics": [
+          "trajectory-io",
+          "molecular-data",
+          "file-formats",
+          "fortran-bindings"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "74f0514ac5f8682ed597597148243f3dd033a0c4",
+            "evidence": [
+              {
+                "url": "https://github.com/chemfiles/chemfiles.f03/blob/74f0514ac5f8682ed597597148243f3dd033a0c4/README.md",
+                "path": "README.md",
+                "sha256": "2ae9f8b40c3ec24c66552e04532d8b2fa87821227473a5218e6a9fc638fb3ad6"
+              }
+            ],
+            "notes": "The README example opens a trajectory, reads a frame and accesses atom positions. File handling is delegated to the external Chemfiles library; the binding is not a molecular integrator. Format coverage, pointer lifetimes and current compiler compatibility were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:skoerbel/cofimaker",
+      "local": {
+        "name": "cofimaker",
+        "description": "Fortran atomic-coordinate manipulation, crystal cuts and VASP postprocessing.",
+        "repository": {
+          "host": "github",
+          "owner": "skoerbel",
+          "name": "cofimaker",
+          "url": "https://github.com/skoerbel/cofimaker"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "atomic-coordinates",
+          "crystal-geometry",
+          "data-processing"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "ff2737e005d82b258032b4eb6d4297a4de33fc46",
+            "evidence": [
+              {
+                "url": "https://github.com/skoerbel/cofimaker/blob/ff2737e005d82b258032b4eb6d4297a4de33fc46/README.md",
+                "path": "README.md",
+                "sha256": "06aceb6b74b4a3da1669f73670692defc6aa43838428363466ba3e431e21baef"
+              }
+            ],
+            "notes": "The README documents geometric cuts and band-structure postprocessing and requires LAPACK. This is not an independent electronic-structure solver or proof that every supported file format round-trips losslessly. Coordinate transformations and processed outputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "ff2737e005d82b258032b4eb6d4297a4de33fc46",
+            "evidence": [
+              {
+                "url": "https://github.com/skoerbel/cofimaker/blob/ff2737e005d82b258032b4eb6d4297a4de33fc46/README.md",
+                "path": "README.md",
+                "sha256": "06aceb6b74b4a3da1669f73670692defc6aa43838428363466ba3e431e21baef"
+              }
+            ],
+            "notes": "The README documents geometric cuts and band-structure postprocessing and requires LAPACK. This is not an independent electronic-structure solver or proof that every supported file format round-trips losslessly. Coordinate transformations and processed outputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:fuxingke0601/dsas",
+      "local": {
+        "name": "DSAS",
+        "description": "Python-guided crystallographic phase retrieval with bundled Fortran charge-flipping/FFT routines.",
+        "repository": {
+          "host": "github",
+          "owner": "fuxingke0601",
+          "name": "DSAS",
+          "url": "https://github.com/fuxingke0601/DSAS"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "phase-retrieval",
+          "fourier-reconstruction",
+          "crystallography",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "J",
+            "level": "documentation-reviewed",
+            "revision": "70a8b5b58c44b8ba30bc3256ca9f9dee544b1a8b",
+            "evidence": [
+              {
+                "url": "https://github.com/fuxingke0601/DSAS/blob/70a8b5b58c44b8ba30bc3256ca9f9dee544b1a8b/README.md",
+                "path": "README.md",
+                "sha256": "6c2e4be8da72a8d4531d6968f7d71e086b22f876968c909616be2b81ab5261b6"
+              },
+              {
+                "url": "https://github.com/fuxingke0601/DSAS/blob/70a8b5b58c44b8ba30bc3256ca9f9dee544b1a8b/pdb7_38_3mei/src/chargeflip.f90",
+                "path": "pdb7_38_3mei/src/chargeflip.f90",
+                "sha256": "ba04d4615e106798e23bcee1ec7fcf44414931b38a9950919d5ae948b90e9f3e"
+              },
+              {
+                "url": "https://github.com/fuxingke0601/DSAS/blob/70a8b5b58c44b8ba30bc3256ca9f9dee544b1a8b/pdb7_38_3mei/src/functions.f90",
+                "path": "pdb7_38_3mei/src/functions.f90",
+                "sha256": "f192ca7b626dd66b834e1bcae00cf3b9b80dd2a2b7e5fc2d09f9ff939f6b98c7"
+              }
+            ],
+            "notes": "The README identifies a modified phase-retrieval workflow and a separate algorithm dependency. The pinned tree also bundles Fortran charge-flipping routines with FFTW and FGSL interfaces; both facts are retained. Parameter selection, anomalous substructure solutions and unfinished variant notes were not validated.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:tiagocampo/8bandkp-fdm",
+      "local": {
+        "name": "8bandkp-fdm",
+        "description": "Fortran finite-difference semiconductor Hamiltonians and self-consistent Schrodinger-Poisson calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "tiagocampo",
+          "name": "8bandkp-fdm",
+          "url": "https://github.com/tiagocampo/8bandkp-fdm"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake",
+          "make",
+          "fpm"
+        ],
+        "topics": [
+          "pde",
+          "eigenvalue-problems",
+          "semiconductor-models",
+          "schrodinger-poisson"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "52743b3fdefa7b4e9bcb39fd77a0712c8627106d",
+            "evidence": [
+              {
+                "url": "https://github.com/tiagocampo/8bandkp-fdm/blob/52743b3fdefa7b4e9bcb39fd77a0712c8627106d/README.md",
+                "path": "README.md",
+                "sha256": "7b195689c47c886f3c71fc45a8d67b785846cfa2f16aab389b033b81d9d07679"
+              }
+            ],
+            "notes": "The README describes 8-band models, BLAS/LAPACK/FFTW and optional MKL/stdlib. Its FPM manifest is explicitly experimental and omits some link flags; CMake is the recommended build. Material assumptions, spectra, self-consistency and optical quantities were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "52743b3fdefa7b4e9bcb39fd77a0712c8627106d",
+            "evidence": [
+              {
+                "url": "https://github.com/tiagocampo/8bandkp-fdm/blob/52743b3fdefa7b4e9bcb39fd77a0712c8627106d/README.md",
+                "path": "README.md",
+                "sha256": "7b195689c47c886f3c71fc45a8d67b785846cfa2f16aab389b033b81d9d07679"
+              }
+            ],
+            "notes": "The README describes 8-band models, BLAS/LAPACK/FFTW and optional MKL/stdlib. Its FPM manifest is explicitly experimental and omits some link flags; CMake is the recommended build. Material assumptions, spectra, self-consistency and optical quantities were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:qcmplab/cdmft-lanc-ed",
+      "local": {
+        "name": "Cluster-DMFT Lanczos diagonalization",
+        "description": "Fortran Lanczos exact-diagonalization components for cluster dynamical mean-field calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "QcmPlab",
+          "name": "CDMFT-LANC-ED",
+          "url": "https://github.com/QcmPlab/CDMFT-LANC-ED"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "linear-algebra",
+          "lanczos",
+          "many-body-models",
+          "exact-diagonalization"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "71134e19b03ac3b9946a2e0a129c9a1aae52c58b",
+            "evidence": [
+              {
+                "url": "https://github.com/QcmPlab/CDMFT-LANC-ED/blob/71134e19b03ac3b9946a2e0a129c9a1aae52c58b/README.md",
+                "path": "README.md",
+                "sha256": "ae301405f87cf04b0cfb5fdbd81577031723579ca0daf4a20dcd80b57bd40bdf"
+              }
+            ],
+            "notes": "The README limits bath types and spin/phase cases and places the problem-specific DMFT driver outside the core modules. SciFortran/DMFTtools are dependencies; unchecked roadmap items are excluded. Benchmarks, bath fitting and physical model results were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:keivans/anharmonic-lattice-dynamics",
+      "local": {
+        "name": "ALATDYN",
+        "description": "Fortran force-constant fitting, regularized SVD linear systems and phonon-property calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "KeivanS",
+          "name": "Anharmonic-lattice-dynamics",
+          "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "svd",
+          "regularized-fitting",
+          "force-constants",
+          "lattice-dynamics"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "0c324c1f66922d0b58c8486f29975701e2f186cc",
+            "evidence": [
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/README.md",
+                "path": "README.md",
+                "sha256": "f7d7df2442da8965e64e95cc0efe8c6a8dd2bb19035dc2acd8fbdbe3dd50ec7f"
+              },
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/FOCEX/README.md",
+                "path": "FOCEX/README.md",
+                "sha256": "03eea67c5f8fdd9aa4d062adf5f3edcf26a36060a2d8ad65210c34b946967ee5"
+              },
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/FOCEX/svd_ridge.f90",
+                "path": "FOCEX/svd_ridge.f90",
+                "sha256": "72a872f45610f42afa9d27f43d5a656c8ea9a597f4ce972e0378d2c796aa63e9"
+              }
+            ],
+            "notes": "The FOCEX guide and pinned svd_set documentation support force-data extraction and SVD-based solves with regularization/covariance outputs. The root README style example alone is not used as algorithm evidence. DFT/MD input physics, fit uncertainty and thermal-property results were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K",
+            "level": "documentation-reviewed",
+            "revision": "0c324c1f66922d0b58c8486f29975701e2f186cc",
+            "evidence": [
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/README.md",
+                "path": "README.md",
+                "sha256": "f7d7df2442da8965e64e95cc0efe8c6a8dd2bb19035dc2acd8fbdbe3dd50ec7f"
+              },
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/FOCEX/README.md",
+                "path": "FOCEX/README.md",
+                "sha256": "03eea67c5f8fdd9aa4d062adf5f3edcf26a36060a2d8ad65210c34b946967ee5"
+              },
+              {
+                "url": "https://github.com/KeivanS/Anharmonic-lattice-dynamics/blob/0c324c1f66922d0b58c8486f29975701e2f186cc/FOCEX/svd_ridge.f90",
+                "path": "FOCEX/svd_ridge.f90",
+                "sha256": "72a872f45610f42afa9d27f43d5a656c8ea9a597f4ce972e0378d2c796aa63e9"
+              }
+            ],
+            "notes": "The FOCEX guide and pinned svd_set documentation support force-data extraction and SVD-based solves with regularization/covariance outputs. The root README style example alone is not used as algorithm evidence. DFT/MD input physics, fit uncertainty and thermal-property results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ornl-fusion/aorsa3d",
+      "local": {
+        "name": "AORSA3D linear field systems",
+        "description": "Distributed Fortran/ScaLAPACK linear systems for three-dimensional RF plasma-field calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "ORNL-Fusion",
+          "name": "aorsa3d",
+          "url": "https://github.com/ORNL-Fusion/aorsa3d"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "linear-algebra",
+          "distributed-matrices",
+          "rf-plasma-fields",
+          "scalapack"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "cef3b9be64b6a975ee1c329ea4131a046f2f2f3e",
+            "evidence": [
+              {
+                "url": "https://github.com/ORNL-Fusion/aorsa3d/blob/cef3b9be64b6a975ee1c329ea4131a046f2f2f3e/README.md",
+                "path": "README.md",
+                "sha256": "b5a53f30b4c6b3ce8022b3b01600a049e80b7fea65edeb25c1fe2ac9151cac9e"
+              },
+              {
+                "url": "https://github.com/ORNL-Fusion/aorsa3d/blob/cef3b9be64b6a975ee1c329ea4131a046f2f2f3e/src/aorsa3dMain.F",
+                "path": "src/aorsa3dMain.F",
+                "sha256": "01b50c051b281f137c1c4303960e74e01e037e093cd6b7ddc5d8d44fead47323"
+              }
+            ],
+            "notes": "The sparse README is supplemented by main-program comments for ScaLAPACK storage/solves and electric-field transformations. The source describes fixed mode limits and excludes points outside psi=1 in that version. Only supported broad linear-algebra coverage is assigned; full plasma formulation and numerical fields need later review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:michaeltouati/amore",
+      "local": {
+        "name": "AMoRE",
+        "description": "Fortran relativistic electron-beam transport through angular-moment kinetic equations coupled to target MHD.",
+        "repository": {
+          "host": "github",
+          "owner": "michaeltouati",
+          "name": "AMoRE",
+          "url": "https://github.com/michaeltouati/AMoRE"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "kinetic-equations",
+          "moment-closure",
+          "electron-transport"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "f303971ea4b705ad7b2d3d5e928ed09689e8476a",
+            "evidence": [
+              {
+                "url": "https://github.com/michaeltouati/AMoRE/blob/f303971ea4b705ad7b2d3d5e928ed09689e8476a/readme.md",
+                "path": "readme.md",
+                "sha256": "0ba4c4f6945af5b0c60f7646a1344cd6183d685f70f4f701560abe3874f0b12b"
+              }
+            ],
+            "notes": "The README specifies the first two angular moments of Vlasov-Fokker-Planck-Beliaev-Budker with Minerbo closure and return-current assumptions. Python scripts are postprocessing tools, not the numerical core. Closure validity, energy accounting and beam/target results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jhillairet/aloha",
+      "local": {
+        "name": "ALOHA antenna coupling",
+        "description": "Fortran/Matlab scattering-matrix calculations for lower-hybrid antennas coupled to cold plasma.",
+        "repository": {
+          "host": "github",
+          "owner": "jhillairet",
+          "name": "ALOHA",
+          "url": "https://github.com/jhillairet/ALOHA"
+        },
+        "languages": [
+          "Fortran",
+          "MATLAB"
+        ],
+        "build_systems": [],
+        "topics": [
+          "scattering-matrices",
+          "antenna-coupling",
+          "plasma-waves"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "c68b26d4f98704d368a0623ef592057a5a9685bf",
+            "evidence": [
+              {
+                "url": "https://github.com/jhillairet/ALOHA/blob/c68b26d4f98704d368a0623ef592057a5a9685bf/README.md",
+                "path": "README.md",
+                "sha256": "2c9830f53798f70ed51c1e345ea90dad85d089780e457224ec6b05b1ec5d0bcd"
+              },
+              {
+                "url": "https://github.com/jhillairet/ALOHA/blob/c68b26d4f98704d368a0623ef592057a5a9685bf/aloha_matlab/code_1D/couplage_1D/fortran90_source/coupl_plasma_version6.f90",
+                "path": "aloha_matlab/code_1D/couplage_1D/fortran90_source/coupl_plasma_version6.f90",
+                "sha256": "60d1b779b60527dad4f2305306e4ab0eb3de15ebaa51ceba8771d4b935b28ab4"
+              }
+            ],
+            "notes": "The README limits plasma profiles and 1D/2D wave approximations; a pinned Fortran program documents scattering-matrix construction and complex coupling arrays. This is a specific coupling application, not every plasma wave or a general dense-algebra library. Old Matlab/platform and NAG-removal guidance was not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gkv-developers/gkvp",
+      "local": {
+        "name": "GKV",
+        "description": "Delta-f gyrokinetic Vlasov simulation of turbulence in local flux-tube geometry.",
+        "repository": {
+          "host": "github",
+          "owner": "GKV-developers",
+          "name": "gkvp",
+          "url": "https://github.com/GKV-developers/gkvp"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "gyrokinetics",
+          "vlasov-equation",
+          "plasma-turbulence"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "720c8a8d3ca684027544f4a768f9737dc7b6acf4",
+            "evidence": [
+              {
+                "url": "https://github.com/GKV-developers/gkvp/blob/720c8a8d3ca684027544f4a768f9737dc7b6acf4/README.md",
+                "path": "README.md",
+                "sha256": "7633eb3cd02ec1dce16e026215821a3da216221a576a0cf74f39cd525d567505"
+              }
+            ],
+            "notes": "The README identifies species, electromagnetic fluctuations, equilibrium interfaces and collision operators. Local flux-tube assumptions do not establish a general global plasma solver. Strong-scaling figures, collision accuracy and turbulence results were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:epochpic/epoch",
+      "local": {
+        "name": "EPOCH",
+        "description": "Fortran particle-in-cell plasma simulation with separate one-, two- and three-dimensional programs.",
+        "repository": {
+          "host": "github",
+          "owner": "epochpic",
+          "name": "epoch",
+          "url": "https://github.com/epochpic/epoch"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "pde",
+          "particle-in-cell",
+          "plasma-simulation"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "f294c484f76dff0777d5cc0d50b38506a2b049ff",
+            "evidence": [
+              {
+                "url": "https://github.com/epochpic/epoch/blob/f294c484f76dff0777d5cc0d50b38506a2b049ff/README.md",
+                "path": "README.md",
+                "sha256": "735575f15e87086f81620769875488af205bf2f96d7d97b70674fe078067f2c0"
+              },
+              {
+                "url": "https://github.com/epochpic/epoch/blob/f294c484f76dff0777d5cc0d50b38506a2b049ff/epoch1d/src/epoch1d.F90",
+                "path": "epoch1d/src/epoch1d.F90",
+                "sha256": "93adcbe02f0011a03ee4811afca21ab9b314d53b958808ea2fe09a809cfe3b1c"
+              }
+            ],
+            "notes": "The README documents dimension-specific programs, MPI compiler wrappers and an SDF submodule required for output. Its build guide alone does not verify every model or dimension; missing submodule data can prevent builds. Particle/field updates, physical modules and outputs were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/Warwick-Plasma/epoch"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:aladyn/aladyn",
+      "local": {
+        "name": "ALaDyn",
+        "description": "Fortran particle-in-cell Maxwell-Vlasov simulations of laser/beam-driven plasma acceleration.",
+        "repository": {
+          "host": "github",
+          "owner": "ALaDyn",
+          "name": "ALaDyn",
+          "url": "https://github.com/ALaDyn/ALaDyn"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "pde",
+          "particle-in-cell",
+          "maxwell-vlasov",
+          "plasma-acceleration"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "9955d9dc1593dda9ed03b3e7c844acd1d7b4ac27",
+            "evidence": [
+              {
+                "url": "https://github.com/ALaDyn/ALaDyn/blob/9955d9dc1593dda9ed03b3e7c844acd1d7b4ac27/README.md",
+                "path": "README.md",
+                "sha256": "6b974cc8dd5d7a2f6bf4497f09e2921e1bf4cac83fe68db5d3e4cb210bec08ad"
+              }
+            ],
+            "notes": "The README documents LWFA/PWFA/TNSA applications and says the newer code was partly rewritten. Results from older publications are not automatic verification of the current snapshot. Charge conservation, acceleration predictions and platform/build combinations were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:princetonuniversity/edipic-2d",
+      "local": {
+        "name": "EDIPIC-2D",
+        "description": "Two-dimensional particle-in-cell simulation for low-temperature plasmas.",
+        "repository": {
+          "host": "github",
+          "owner": "PrincetonUniversity",
+          "name": "EDIPIC-2D",
+          "url": "https://github.com/PrincetonUniversity/EDIPIC-2D"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "particle-in-cell",
+          "low-temperature-plasma"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a32863ad046eabe170037e9ef3b849b763d25053",
+            "evidence": [
+              {
+                "url": "https://github.com/PrincetonUniversity/EDIPIC-2D/blob/a32863ad046eabe170037e9ef3b849b763d25053/README.md",
+                "path": "README.md",
+                "sha256": "1a16e4909656d8d56a74aec52f6f826e50f0100d3140690046dea2584b50c023"
+              }
+            ],
+            "notes": "The README explicitly distinguishes this two-dimensional code from the separate one-dimensional EDIPIC repository. Detailed input/model options need later manual review. No equivalence between versions, convergence or physical validation is inferred from their shared name.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:drmywu/hypic",
+      "local": {
+        "name": "HYPIC",
+        "description": "Fortran electromagnetic hybrid PIC with Monte Carlo collisions and ion trajectory integration.",
+        "repository": {
+          "host": "github",
+          "owner": "DrMYWu",
+          "name": "HYPIC",
+          "url": "https://github.com/DrMYWu/HYPIC"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "particle-in-cell",
+          "monte-carlo-collisions",
+          "ion-trajectories"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "b98dfa82a16cc83101f02d33184633839d0254a0",
+            "evidence": [
+              {
+                "url": "https://github.com/DrMYWu/HYPIC/blob/b98dfa82a16cc83101f02d33184633839d0254a0/README.md",
+                "path": "README.md",
+                "sha256": "12b8fa7a5e12acaec45d8143af121e2e9b79274e33300bc0a4685c4ee6091383"
+              }
+            ],
+            "notes": "The README documents axisymmetry, frequency-domain Maxwell equations, ion motion and collision sampling, with version-specific electron-temperature and antenna changes. Stated timestep/energy criteria are upstream design claims, not independently checked guarantees. MKL/compiler configurations and plasma results were not tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "b98dfa82a16cc83101f02d33184633839d0254a0",
+            "evidence": [
+              {
+                "url": "https://github.com/DrMYWu/HYPIC/blob/b98dfa82a16cc83101f02d33184633839d0254a0/README.md",
+                "path": "README.md",
+                "sha256": "12b8fa7a5e12acaec45d8143af121e2e9b79274e33300bc0a4685c4ee6091383"
+              }
+            ],
+            "notes": "The README documents axisymmetry, frequency-domain Maxwell equations, ion motion and collision sampling, with version-specific electron-temperature and antenna changes. Stated timestep/energy criteria are upstream design claims, not independently checked guarantees. MKL/compiler configurations and plasma results were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:trebonius91/caracal",
+      "local": {
+        "name": "Caracal",
+        "description": "Classical and ring-polymer molecular dynamics with analytical, external and learned potentials.",
+        "repository": {
+          "host": "github",
+          "owner": "Trebonius91",
+          "name": "Caracal",
+          "url": "https://github.com/Trebonius91/Caracal"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "molecular-dynamics",
+          "ring-polymer",
+          "potential-energy-surfaces"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "7f95ce9818b7f6d81d7cb3b634f360373c090820",
+            "evidence": [
+              {
+                "url": "https://github.com/Trebonius91/Caracal/blob/7f95ce9818b7f6d81d7cb3b634f360373c090820/README.md",
+                "path": "README.md",
+                "sha256": "19454def7f533b8a32e429fd9ba823a475ec00170bb01aa5478355cbc6a0c6b4"
+              }
+            ],
+            "notes": "The README distinguishes integrated and external force/energy models and warns against parallel Make because of module-order issues. Flexible potential interfaces do not validate arbitrary chemical systems or transferability of learned potentials. Trajectories, rate constants and ensemble properties were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:photox/abin",
+      "local": {
+        "name": "ABIN",
+        "description": "Fortran ab initio molecular propagation with path-integral/Langevin and surface-hopping options.",
+        "repository": {
+          "host": "github",
+          "owner": "PHOTOX",
+          "name": "ABIN",
+          "url": "https://github.com/PHOTOX/ABIN"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "ode",
+          "molecular-dynamics",
+          "langevin",
+          "surface-hopping"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "a3b078467497507c39327afa150f2f71fda878a6",
+            "evidence": [
+              {
+                "url": "https://github.com/PHOTOX/ABIN/blob/a3b078467497507c39327afa150f2f71fda878a6/README.md",
+                "path": "README.md",
+                "sha256": "28a01706292bab898dd5f4e5e5014fd4da5509304e0e6c72d03bfc8cb60f4f43"
+              }
+            ],
+            "notes": "The README explicitly delegates forces/energies to external electronic-structure programs and documents quantum thermostat/surface-hopping options. It also notes optimization-level caveats on ARM. Those methods do not imply universal nuclear-quantum accuracy; trajectories, state transitions and build tests were not checked.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "a3b078467497507c39327afa150f2f71fda878a6",
+            "evidence": [
+              {
+                "url": "https://github.com/PHOTOX/ABIN/blob/a3b078467497507c39327afa150f2f71fda878a6/README.md",
+                "path": "README.md",
+                "sha256": "28a01706292bab898dd5f4e5e5014fd4da5509304e0e6c72d03bfc8cb60f4f43"
+              }
+            ],
+            "notes": "The README explicitly delegates forces/energies to external electronic-structure programs and documents quantum thermostat/surface-hopping options. It also notes optimization-level caveats on ARM. Those methods do not imply universal nuclear-quantum accuracy; trajectories, state transitions and build tests were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gafusion/gacode",
+      "local": {
+        "name": "GACODE",
+        "description": "Fortran gyrokinetic, neoclassical and transport/profile-evolution plasma codes.",
+        "repository": {
+          "host": "github",
+          "owner": "gafusion",
+          "name": "gacode",
+          "url": "https://github.com/gafusion/gacode"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pde",
+          "gyrokinetics",
+          "transport-models",
+          "plasma-simulation"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "1df9cdce6bd1b1065ffba1d57a4f28b0b9017d73",
+            "evidence": [
+              {
+                "url": "https://github.com/gafusion/gacode/blob/1df9cdce6bd1b1065ffba1d57a4f28b0b9017d73/README.rst",
+                "path": "README.rst",
+                "sha256": "d44301ff1b0281e97da97a0f05ad7ce283fcbd79ab04835acc041e29e99029e1"
+              }
+            ],
+            "notes": "The README identifies distinct CGYRO/GYRO/NEO/TGLF/TGYRO components and links their technical references. Only broad kinetic/transport-equation scope is assigned; their different assumptions and granular mathematical methods need individual review. Published component results were not reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
     }
   ]
 }
