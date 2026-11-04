@@ -17,7 +17,7 @@ this filter is not proof that every remaining repository lacks FPM support.
 
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
-Detailed optimization and nonlinear-equation reviews include source-linked
+Detailed numerical-method reviews include source-linked
 classifications and explicit limits where no leaf fits; see
 [the review progress](docs/granular-reviews.md).
 

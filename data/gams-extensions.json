@@ -1,6 +1,12 @@
 {
   "schema_version": 1,
   "classes": {
+    "N6a2a": {
+      "label": "Integer",
+      "parent": "N6a2",
+      "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/N6a2a",
+      "reviewed_on": "2026-11-04"
+    },
     "G2h3b2": {
       "label": "General function and constraints (no smoothness assumed)",
       "parent": "G2h3b",

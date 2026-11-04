@@ -35977,9 +35977,65 @@
             ],
             "notes": "The README specifies equally spaced real/complex samples and returns the integral divided by the interval length, so callers must supply interval scaling themselves. Extrapolation requires 2^M+1 samples; other lengths use trapezoidal reduction, and a singleton is returned unchanged. Stated error orders and edge cases were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "5472eb6f2b85c5ff2337f3e52acd2d689335c078",
+            "evidence": [
+              {
+                "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.F90",
+                "path": "src/Extrapolation_Integration.F90",
+                "sha256": "cb0b6122b63617be03037eb2dde8c971c03aa6b9bd0bd815c358b4b63ee9890b"
+              },
+              {
+                "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/src/Extrapolation_Integration.fpp",
+                "path": "src/Extrapolation_Integration.fpp",
+                "sha256": "d56e2869a2f00a94c2cb0c7b658d05a16875c359afca14d9c9a9434acb291196"
+              },
+              {
+                "url": "https://github.com/irukoa/Extrapolation_Integration/blob/5472eb6f2b85c5ff2337f3e52acd2d689335c078/example/Integral_of_SINC.F90",
+                "path": "example/Integral_of_SINC.F90",
+                "sha256": "62774233d7dfdc6d233cdd6bff2fb7c7bd0e2ebe76b6fc517270e69b6d99e7a2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Extrapolation_Integration::extrapol_rdp",
+                "path": "src/Extrapolation_Integration.F90",
+                "line_start": 287,
+                "line_end": 330
+              },
+              {
+                "procedure": "Extrapolation_Integration::extrapol_rdp::trap_rdp",
+                "path": "src/Extrapolation_Integration.F90",
+                "line_start": 334,
+                "line_end": 354
+              },
+              {
+                "procedure": "Extrapolation_Integration::extrapol_rdp::org_dt_rdp",
+                "path": "src/Extrapolation_Integration.F90",
+                "line_start": 356,
+                "line_end": 384
+              },
+              {
+                "procedure": "Extrapolation_Integration::extrapol_rdp::extrapol_driver_rdp",
+                "path": "src/Extrapolation_Integration.F90",
+                "line_start": 386,
+                "line_end": 417
+              },
+              {
+                "procedure": "Integral_of_SINC",
+                "path": "example/Integral_of_SINC.F90",
+                "line_start": 15,
+                "line_end": 51
+              }
+            ],
+            "notes": "The reviewed real(dp) extrapol_rdp path accepts equally spaced samples rather than an integrand callback, error tolerance or adaptive sampling request. It reorders 2^m+1 samples with endpoints first, constructs nested trapezoidal approximations and applies Richardson extrapolation. H2a1b2 is the nonautomatic finite-interval grid-quadrature leaf. The reduction is normalized to [0,1]; multiply by (b-a) for samples on [a,b], as the author sinc example does. A material fallback discrepancy was found by source inspection: non-dyadic sample counts are sent directly to trap_rdp, which half-weights array(1) and array(2), not the first and last samples in natural order. For [0,1/3,2/3,1] the displayed formula predicts 11/18 instead of the trapezoidal result 1/2; this is an arithmetic consequence of the source, not a compiled result. Singleton/two-point cases have separate branches; empty input and all accuracy claims remain unverified. No checked driver is supplied.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -36023,9 +36079,176 @@
             ],
             "notes": "The README documents intro_sort_mod and its sort interface with optional reverse order, CMake presets and example builds. Supported element kinds, worst-case behavior, stability and edge cases require source-level review. No timings or sorted-output checks were run.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N6a2a",
+            "level": "source-reviewed",
+            "revision": "0907093a66f05f1c59bee70fb82ed9e40924416d",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90",
+                "path": "src/intro-sort.F90",
+                "sha256": "8eef406d1fb34e9d68c42dc71c845580ba973d158318f8a3e339598f73d495e2"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.fypp",
+                "path": "src/intro-sort.fypp",
+                "sha256": "a24d20d79c70d4a6916e897e1161638ef9ab2e0e2f9b8da126f0a4d4cf385e3a"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/hsort.fypp",
+                "path": "src/hsort.fypp",
+                "sha256": "3a864916313b00b6ed15d38b145c16d8f1b16466c65802e62440952325c315e5"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp",
+                "path": "src/partition.fypp",
+                "sha256": "9f604f4b6e5b6f60b0ca656d3e0f17219af1c2c8c1441b72910fa0fdc15145b1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mod_introsort::sort (generic integer bindings)",
+                "path": "src/intro-sort.F90",
+                "line_start": 15,
+                "line_end": 39
+              },
+              {
+                "procedure": "mod_introsort::introsort_int32 / introsort_recurs_int32",
+                "path": "src/intro-sort.F90",
+                "line_start": 176,
+                "line_end": 225
+              },
+              {
+                "procedure": "mod_introsort::introsort / introsort_recurs (template)",
+                "path": "src/intro-sort.fypp",
+                "line_start": 74,
+                "line_end": 123
+              },
+              {
+                "procedure": "mod_introsort::hsort_recurs / sift_down (template)",
+                "path": "src/hsort.fypp",
+                "line_start": 32,
+                "line_end": 86
+              },
+              {
+                "procedure": "mod_introsort::partition (template)",
+                "path": "src/partition.fypp",
+                "line_start": 14,
+                "line_end": 39
+              }
+            ],
+            "notes": "The sort generic dispatches to integer int8/int16/int32/int64 routines that overwrite arr, so this is active internal integer sorting (N6a2a), not passive ranking. The inspected int32 implementation and shared templates partition around a pivot, switch to binary insertion sorting for short ranges and to heapsort at the depth limit. History-enabled variants carry caller-provided labels along with moved values; they still sort arr actively. The actual module name at this pin is mod_introsort, differing from the README usage snippet. The wrapper computes log(size(arr)) before handling empty input; zero-length behavior, stability, concurrency of module max_depth and performance were not checked. No external/file sorting or character/complex-key interface is claimed.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "0907093a66f05f1c59bee70fb82ed9e40924416d",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90",
+                "path": "src/intro-sort.F90",
+                "sha256": "8eef406d1fb34e9d68c42dc71c845580ba973d158318f8a3e339598f73d495e2"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/common.fypp",
+                "path": "src/common.fypp",
+                "sha256": "076d3255c8c2ea18713a35e9aec1de14049640579a83caa03b1ecea4265ee47a"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/partition.fypp",
+                "path": "src/partition.fypp",
+                "sha256": "9f604f4b6e5b6f60b0ca656d3e0f17219af1c2c8c1441b72910fa0fdc15145b1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mod_introsort::sort (generic real bindings)",
+                "path": "src/intro-sort.F90",
+                "line_start": 24,
+                "line_end": 39
+              },
+              {
+                "procedure": "mod_introsort::introsort_real64 / introsort_recurs_real64",
+                "path": "src/intro-sort.F90",
+                "line_start": 329,
+                "line_end": 378
+              },
+              {
+                "procedure": "mod_introsort::partition (template)",
+                "path": "src/partition.fypp",
+                "line_start": 14,
+                "line_end": 39
+              }
+            ],
+            "notes": "The generated real32/real64/real128 sort bindings and inspected real64 body use the same in-memory partition/insertion/heap strategy, overwriting the data. This supports the active internal real-sorting leaf N6a2b. The presence of a history array does not turn these routines into a passive rank-only operation. Real128 availability depends on the compiler; comparisons do not establish a defined NaN ordering or numerical total order. Stability, empty arrays and all kinds were not independently tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N8",
+            "level": "source-reviewed",
+            "revision": "0907093a66f05f1c59bee70fb82ed9e40924416d",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/intro-sort.F90",
+                "path": "src/intro-sort.F90",
+                "sha256": "8eef406d1fb34e9d68c42dc71c845580ba973d158318f8a3e339598f73d495e2"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/src/apply-permutation.fypp",
+                "path": "src/apply-permutation.fypp",
+                "sha256": "a432bb266dfbe1952a7dfd809db8526141d2552252d66784b998bee030356d08"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-introsort/blob/0907093a66f05f1c59bee70fb82ed9e40924416d/tests/main.F90",
+                "path": "tests/main.F90",
+                "sha256": "48ca8013559e2e69005ee903f2e67c2d3122d6bc67798ef47b043c708e8c636d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mod_introsort::apply_permutation (generic)",
+                "path": "src/intro-sort.F90",
+                "line_start": 59,
+                "line_end": 68
+              },
+              {
+                "procedure": "mod_introsort::apply_permutation_int32",
+                "path": "src/intro-sort.F90",
+                "line_start": 3668,
+                "line_end": 3682
+              },
+              {
+                "procedure": "mod_introsort::apply_permutation_real64",
+                "path": "src/intro-sort.F90",
+                "line_start": 3713,
+                "line_end": 3727
+              },
+              {
+                "procedure": "mod_introsort::apply_permutation (template)",
+                "path": "src/apply-permutation.fypp",
+                "line_start": 1,
+                "line_end": 17
+              },
+              {
+                "procedure": "main",
+                "path": "tests/main.F90",
+                "line_start": 10,
+                "line_end": 41
+              },
+              {
+                "procedure": "main",
+                "path": "tests/main.F90",
+                "line_start": 66,
+                "line_end": 99
+              }
+            ],
+            "notes": "The public apply_permutation generic rearranges integer/real companion data by gathering temp(permutation(:)) into the output array. The inspected int32 and real64 bodies and common template support the N8 permuting leaf independently of the sorting operation. The permutation must already have the desired output-to-input convention; history arrays supplied to sort must be initialized by the caller, as the author test initializes identity labels. SAFE_MODE checks matching lengths but does not establish that entries form a valid bijection. This is not a passive ranking API or a permutation validator. No permutation or history round trip was executed.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -36070,9 +36293,198 @@
             ],
             "notes": "The README demonstrates sorting, reverse order, history-based rearrangement and selection of a reference line for 2D arrays. The documented Make defaults use ifx and llvm-ar but are configurable. Stability, supported kinds and permutation correctness were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N6a2a",
+            "level": "source-reviewed",
+            "revision": "fb8d241576af567597f357cd1b2491f7b3b16dba",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90",
+                "path": "src/merge_sort.F90",
+                "sha256": "12d9d0cb319ca58f4b4bd816eb8de382ab5ccfc50670298da580c598c4e1f18d"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc",
+                "path": "src/merge-1.inc",
+                "sha256": "629bb3af559c4bd191fbd2352d0801dfeff1b260b161c7eab0d027f84fe199c5"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc",
+                "path": "src/merge-1h.inc",
+                "sha256": "4e2d79c037c701753aea096cf9de4715d28c2bfa9f3ecbf03cb7f323bb9bdc3e"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-1.inc",
+                "path": "src/optional-args-1.inc",
+                "sha256": "c7a8f4032e708188aeecbff14848fc1e39f08174e4b6541663bc1dc515d1f6a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "merge_sort_mod::msort_1i_init",
+                "path": "src/merge_sort.F90",
+                "line_start": 32,
+                "line_end": 58
+              },
+              {
+                "procedure": "merge_sort_mod::msort_2i_init",
+                "path": "src/merge_sort.F90",
+                "line_start": 142,
+                "line_end": 169
+              },
+              {
+                "procedure": "merge_sort_mod::merge_1i / merge_1ih",
+                "path": "src/merge_sort.F90",
+                "line_start": 483,
+                "line_end": 506
+              },
+              {
+                "procedure": "merge_1i (included body)",
+                "path": "src/merge-1.inc",
+                "line_start": 1,
+                "line_end": 33
+              },
+              {
+                "procedure": "merge_1ih (included body)",
+                "path": "src/merge-1h.inc",
+                "line_start": 1,
+                "line_end": 41
+              }
+            ],
+            "notes": "merge_sort_mod::sort overwrites default-integer vectors or reorders integer matrix columns according to a selected reference row, with optional caller-supplied history. Recursive halves are combined by merge_1i/merge_1ih using a temporary copy and a left-first <= comparison. This is active internal integer sorting (N6a2a); the history option is not a rank-only interface. The descending wrapper reverses arr without reversing history, so the ascending-history correspondence must not be assumed to survive reverse=.true. The implementation moves whole columns for 2-D input; it is not independent sorting of every row. No stability guarantee, descending-history check or author example was executed.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "fb8d241576af567597f357cd1b2491f7b3b16dba",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90",
+                "path": "src/merge_sort.F90",
+                "sha256": "12d9d0cb319ca58f4b4bd816eb8de382ab5ccfc50670298da580c598c4e1f18d"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc",
+                "path": "src/merge-1.inc",
+                "sha256": "629bb3af559c4bd191fbd2352d0801dfeff1b260b161c7eab0d027f84fe199c5"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc",
+                "path": "src/merge-1h.inc",
+                "sha256": "4e2d79c037c701753aea096cf9de4715d28c2bfa9f3ecbf03cb7f323bb9bdc3e"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-2.inc",
+                "path": "src/merge-2.inc",
+                "sha256": "7323b8a559768611da2f890a8be18d134dcf8140a5826fc58d43b5631e8e1f54"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-2.inc",
+                "path": "src/optional-args-2.inc",
+                "sha256": "bd89a1f374b508485da60ab36be43b4bf8bb180724c3faf9f5255803cd5433f1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "merge_sort_mod::sort (generic)",
+                "path": "src/merge_sort.F90",
+                "line_start": 1,
+                "line_end": 26
+              },
+              {
+                "procedure": "merge_sort_mod::msort_1d_init",
+                "path": "src/merge_sort.F90",
+                "line_start": 87,
+                "line_end": 112
+              },
+              {
+                "procedure": "merge_sort_mod::msort_2d_init",
+                "path": "src/merge_sort.F90",
+                "line_start": 199,
+                "line_end": 225
+              },
+              {
+                "procedure": "merge_1d (included body)",
+                "path": "src/merge-1.inc",
+                "line_start": 1,
+                "line_end": 33
+              },
+              {
+                "procedure": "merge_1dh (included body)",
+                "path": "src/merge-1h.inc",
+                "line_start": 1,
+                "line_end": 41
+              },
+              {
+                "procedure": "merge_2d (included body)",
+                "path": "src/merge-2.inc",
+                "line_start": 1,
+                "line_end": 32
+              }
+            ],
+            "notes": "The real(sp), real(dp) and real(qp) generic bindings overwrite a vector or permute complete matrix columns using one selected real reference row. The inspected double-precision wrappers and shared merge bodies support active internal real sorting (N6a2b). The optional history is moved during ascending merges; reverse=.true. reverses only the data in the inspected wrappers, so descending history correspondence is not verified and appears inconsistent. Real128 support, NaNs, signed-zero ordering, stability after reversal and extreme sizes were not checked. No passive-rank, character or complex-key mapping is inferred.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N8",
+            "level": "source-reviewed",
+            "revision": "fb8d241576af567597f357cd1b2491f7b3b16dba",
+            "evidence": [
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90",
+                "path": "src/merge_sort.F90",
+                "sha256": "12d9d0cb319ca58f4b4bd816eb8de382ab5ccfc50670298da580c598c4e1f18d"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-1.inc",
+                "path": "src/rearrange-1.inc",
+                "sha256": "42c3837151313ad80e531db3fe620b663acaffd1db01de0877ac61e6c3b1324a"
+              },
+              {
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-2.inc",
+                "path": "src/rearrange-2.inc",
+                "sha256": "55103c9d7acfdb7337f2e9a4549edbee2d0cd153924a0d91903c0c4d567bbfb2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "merge_sort_mod::rearrange (generic)",
+                "path": "src/merge_sort.F90",
+                "line_start": 22,
+                "line_end": 26
+              },
+              {
+                "procedure": "merge_sort_mod::rearrange_1i / rearrange_1d",
+                "path": "src/merge_sort.F90",
+                "line_start": 773,
+                "line_end": 802
+              },
+              {
+                "procedure": "merge_sort_mod::rearrange_2i / rearrange_2d",
+                "path": "src/merge_sort.F90",
+                "line_start": 813,
+                "line_end": 842
+              },
+              {
+                "procedure": "rearrange_1i / rearrange_1d (included body)",
+                "path": "src/rearrange-1.inc",
+                "line_start": 1,
+                "line_end": 9
+              },
+              {
+                "procedure": "rearrange_2i / rearrange_2d (included body)",
+                "path": "src/rearrange-2.inc",
+                "line_start": 1,
+                "line_end": 10
+              }
+            ],
+            "notes": "The public rearrange generic applies reference_history as a gather permutation. The included 1-D body copies arr(reference_history(i)); the 2-D body copies complete arr(:,reference_history(i)) columns. Default integer and real sp/dp/qp variants are exposed. This supports the N8 permuting leaf, independently of how the permutation was obtained. The caller must supply valid indices with the correct direction; the inspected bodies do not validate a bijection or compute its inverse. The separate descending-sort history discrepancy is retained in the sorting mappings. No bounds, permutation-cycle or round-trip checks were executed.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -36117,9 +36529,76 @@
             ],
             "notes": "The README distinguishes cyclic, dynamic and blocked methods, requires libpvn and documents little-endian gfortran/ifx configurations, REAL128 requirements and accuracy/reliability modes. Some routines are only wrappers around libpvn; complex routines are explicitly less tested. No decomposition, rounding or parallel-performance claims were verified.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "c852e6d85355b5e7f3efb58b86cbe0c043cecd7d",
+            "evidence": [
+              {
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/dksvd0.F90",
+                "path": "src/blksvd/dksvd0.F90",
+                "sha256": "3a60551c97315645bdf0294e787a4d5939be683989a8bd004e9141c8c32a1667"
+              },
+              {
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/blksvd/gksvd0.F90",
+                "path": "src/blksvd/gksvd0.F90",
+                "sha256": "1954d83909c3d764a40f1b0aa9ffe2d7b804c1eaab3e8d8a35f9cff836cd1248"
+              },
+              {
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/dksvd2.F90",
+                "path": "src/ksvd2/dksvd2.F90",
+                "sha256": "6304b9aa426d8ae8a1dc48357efc6ee1e060eb3ba7a73c7cab61d592edb4b2ac"
+              },
+              {
+                "url": "https://github.com/venovako/KogAcc/blob/c852e6d85355b5e7f3efb58b86cbe0c043cecd7d/src/ksvd2/gksvd2.F90",
+                "path": "src/ksvd2/gksvd2.F90",
+                "sha256": "120479979d51d22d422e21c644e51fc150057fdc55f0b099bafd66dc9ffaf3f5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DKSVD0",
+                "path": "src/blksvd/dksvd0.F90",
+                "line_start": 1,
+                "line_end": 113
+              },
+              {
+                "procedure": "DKSVD0 (shared included body)",
+                "path": "src/blksvd/gksvd0.F90",
+                "line_start": 1,
+                "line_end": 54
+              },
+              {
+                "procedure": "DKSVD0 (shared included body)",
+                "path": "src/blksvd/gksvd0.F90",
+                "line_start": 212,
+                "line_end": 335
+              },
+              {
+                "procedure": "DKSVD0 (shared included body)",
+                "path": "src/blksvd/gksvd0.F90",
+                "line_start": 429,
+                "line_end": 469
+              },
+              {
+                "procedure": "DKSVD2",
+                "path": "src/ksvd2/dksvd2.F90",
+                "line_start": 1,
+                "line_end": 23
+              },
+              {
+                "procedure": "DKSVD2 (shared included body)",
+                "path": "src/ksvd2/gksvd2.F90",
+                "line_start": 1,
+                "line_end": 11
+              }
+            ],
+            "notes": "The real64 DKSVD0 interface and its included gksvd0 body implement a two-sided Kogbetliantz SVD of a square N-by-N matrix. The body generates index pairs, extracts 2-by-2 pivots, applies left/right rotations, optionally accumulates U and V, and extracts singular values from the transformed diagonal. D6 is already a GAMS leaf, with no separate cyclic or precision subclass. This review follows the cyclic/quasi-cyclic real64 path, not every blocked, dynamic, complex or higher-precision variant. Some strategies require even N. DKSVD2 is a Fortran wrapper around the external libpvn PVN_DLJSV2 kernel; it is not an independent local implementation of that 2-by-2 algorithm. INFO carries an input step budget/accuracy mode and an output sweep count or limit, rather than a universal zero-success convention. Scaling, rounding assumptions, reconstruction, orthogonality and parallel performance were not tested; no rectangular-matrix claim is inferred from the repository title.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
