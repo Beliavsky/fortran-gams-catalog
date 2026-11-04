@@ -2556,12 +2556,172 @@
             ],
             "notes": "The README documents both interpolation interfaces and the Make workflow. Polynomial degree, extrapolation options and error behavior are not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "7b0f9014f49236dd6aff0afacc75cf5aeb441f9d",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected 1D method selects a neighboring interval and evaluates a two-point affine formula, so the supported mapping is univariate piecewise-polynomial interpolation (E1a), not arbitrary-degree global Lagrange interpolation inferred from the repository name. The public method creates/destroys private stored data per call and supports none/constant/linear extrapolation selectors. Important source findings remain: constant extrapolation returns endpoint x values rather than y values; early exits do not assign the optional success output; an unsorted-input create failure is not checked before using internal arrays; and normal cleanup resets the public object success property even after a successful optional status has been assigned. The naive method also uses adjacent-point linear interpolation. Author tests query supplied nodes rather than establishing between-node accuracy. No interpolation result or failure was reproduced by execution.",
+            "evidence": [
+              {
+                "path": "src/type_LagrangeInterpolator.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/type_LagrangeInterpolator.f90",
+                "sha256": "9d3e2a4939bb65262671ddf26bc3f7f4c4423e521241b812fa8bf6ee17182788"
+              },
+              {
+                "path": "src/lagrange_interpolator_library.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/lagrange_interpolator_library.f90",
+                "sha256": "9fcfca8c408d17e115c57941a7003dfc878281d72c4a4bc77a10f81e602a991e"
+              },
+              {
+                "path": "test/test.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/test/test.f90",
+                "sha256": "58d1e942ebde67a4561ccc86e9a12702e6ce31c0f0772df010f12daaae8b2d71"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "perform_1d_interpolation",
+                "role": "public-entry-point",
+                "summary": "Public type-bound subroutine for piecewise-linear 1D interpolation. x_data/fx_data, query and estimate use REAL64; extrapolation_type uses INT32, with values 0/1/2 for none/constant/linear. The optional logical success output is assigned only on the normal completion path. Import the public type through lagrange_interpolator_library.",
+                "signature": "CALL interp%perform_1d_interpolation(extrapolation_type, &\n     x_data, fx_data, desired_point, estimate, success)",
+                "declarations": [
+                  {
+                    "path": "src/type_LagrangeInterpolator.f90",
+                    "line_start": 139,
+                    "line_end": 150
+                  },
+                  {
+                    "path": "src/type_LagrangeInterpolator.f90",
+                    "line_start": 24,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/type_LagrangeInterpolator.f90",
+                "line_start": 139,
+                "line_end": 217,
+                "module": "type_LagrangeInterpolator",
+                "derived_type": "LagrangeInterpolator",
+                "examples": [
+                  {
+                    "path": "test/test.f90",
+                    "line_start": 19,
+                    "line_end": 53
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64, int32\nuse lagrange_interpolator_library, only: LagrangeInterpolator\ntype(LagrangeInterpolator) :: interp\nreal(real64) :: x(3), y(3), estimate\nlogical :: success\nx = [0.0_real64, 1.0_real64, 2.0_real64]\ny = [0.0_real64, 2.0_real64, 4.0_real64]\ncall interp%perform_1d_interpolation(0_int32, x, y, &\n     0.5_real64, estimate, success)",
+                "usage_notes": "Calling sketch only. Use ascending, distinct abscissae, compatible array lengths and an in-range query; the optional success dummy is not assigned on early-return paths, so do not assume it is always defined. The object success property is reset during normal cleanup. Constant extrapolation has the endpoint-value discrepancy recorded in the review. No result was compiled or run."
+              },
+              {
+                "procedure": "create_lagrange_interpolator",
+                "module": "type_LagrangeInterpolator",
+                "role": "implementation-helper",
+                "path": "src/type_LagrangeInterpolator.f90",
+                "line_start": 51,
+                "line_end": 112
+              },
+              {
+                "procedure": "destroy_lagrange_interpolator",
+                "module": "type_LagrangeInterpolator",
+                "role": "implementation-helper",
+                "path": "src/type_LagrangeInterpolator.f90",
+                "line_start": 115,
+                "line_end": 136
+              },
+              {
+                "procedure": "perform_naive_interpolation",
+                "module": "type_LagrangeInterpolator",
+                "derived_type": "LagrangeInterpolator",
+                "role": "implementation-evidence",
+                "path": "src/type_LagrangeInterpolator.f90",
+                "line_start": 279,
+                "line_end": 309
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "7b0f9014f49236dd6aff0afacc75cf5aeb441f9d",
+            "reviewed_on": "2026-11-04",
+            "notes": "The 2D method applies the 1D adjacent-point interpolation along grid rows and then along the other axis. E2a records gridded bivariate interpolation, not scattered-data fitting, an arbitrary-degree polynomial or a mesh generator. The data layout read by source is fxy_data(size(x_data),size(y_data)). The final along-x interpolation is inside the row-filling loop, so early iterations read not-yet-filled x_estimate elements; although the final iteration has all entries filled, invalid-value traps or intermediate results were not investigated. There is no 2D status output and the 1D failure/extrapolation limitations propagate. Tests use an equal-sized grid and node queries; nonsquare grids and between-node behavior were not verified by execution.",
+            "evidence": [
+              {
+                "path": "src/type_LagrangeInterpolator.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/type_LagrangeInterpolator.f90",
+                "sha256": "9d3e2a4939bb65262671ddf26bc3f7f4c4423e521241b812fa8bf6ee17182788"
+              },
+              {
+                "path": "src/lagrange_interpolator_library.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/lagrange_interpolator_library.f90",
+                "sha256": "9fcfca8c408d17e115c57941a7003dfc878281d72c4a4bc77a10f81e602a991e"
+              },
+              {
+                "path": "test/test.f90",
+                "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/test/test.f90",
+                "sha256": "58d1e942ebde67a4561ccc86e9a12702e6ce31c0f0772df010f12daaae8b2d71"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "perform_2d_interpolation",
+                "role": "public-entry-point",
+                "summary": "Public type-bound gridded interpolation subroutine. Supply REAL64 coordinate arrays, fxy_data(nx,ny), a two-component query and a scalar output. The method performs repeated 1D operations and offers no success dummy. Source-level initialization and extrapolation findings must be resolved before relying on results.",
+                "signature": "CALL interp%perform_2d_interpolation(extrapolation_type, &\n     x_data, y_data, fxy_data, desired_point, estimate)",
+                "declarations": [
+                  {
+                    "path": "src/type_LagrangeInterpolator.f90",
+                    "line_start": 236,
+                    "line_end": 242
+                  },
+                  {
+                    "path": "src/type_LagrangeInterpolator.f90",
+                    "line_start": 24,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/type_LagrangeInterpolator.f90",
+                "line_start": 221,
+                "line_end": 275,
+                "module": "type_LagrangeInterpolator",
+                "derived_type": "LagrangeInterpolator",
+                "examples": [
+                  {
+                    "path": "test/test.f90",
+                    "line_start": 19,
+                    "line_end": 65
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64, int32\nuse lagrange_interpolator_library, only: LagrangeInterpolator\ntype(LagrangeInterpolator) :: interp\n! Initialize sorted REAL64 x/y arrays, fxy(nx,ny), query(2), estimate.\ncall interp%perform_2d_interpolation(0_int32, x, y, fxy, query, estimate)",
+                "usage_notes": "Calling sketch only, not a recommended checked driver. The source repeats its final interpolation before all temporary entries have been filled; inspect/fix and validate this path before use with floating-point traps or uninitialized-value checking. No output status is returned. The source mapping records implemented structure and interface, not correctness."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "7b0f9014f49236dd6aff0afacc75cf5aeb441f9d",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license grant was identified in the reviewed README or defining module, and the pinned tree has no separately named LICENSE/COPYING file. This is a scoped absence finding; public access and author examples do not themselves establish redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/README.md",
+              "sha256": "ced213e6b517fa7df475e40ccd53b772e204bae4ffec3c049b72f844046fbead"
+            },
+            {
+              "path": "src/type_LagrangeInterpolator.f90",
+              "url": "https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/type_LagrangeInterpolator.f90",
+              "sha256": "9d3e2a4939bb65262671ddf26bc3f7f4c4423e521241b812fa8bf6ee17182788"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8203,12 +8363,128 @@
             ],
             "notes": "The README identifies the broad reference library and Make/CMake builds. This upstream repository is distinct from the selected perazz/fortran-lapack wrapper; individual routine mappings and build configurations remain to be reviewed here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "472b3a0fcbc5e90bf30a41b13ead24e40fff54ce",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected DGESV driver solves a general real dense square system with one or more right-hand sides. It checks dimensions, dispatches LU factorization with partial pivoting to DGETRF and solves through DGETRS only if factorization reports success. A is overwritten by LU factors and B by the solution; positive INFO reports an exactly zero pivot. D2a1 is the general-system class. This source review covers the driver interface and dispatch, not an audit of every BLAS/LAPACK kernel or vendor implementation. It does not establish conditioning, error bounds, inverse formation, sparse support or numerical accuracy by execution.",
+            "evidence": [
+              {
+                "path": "SRC/dgesv.f",
+                "url": "https://github.com/Reference-LAPACK/lapack/blob/472b3a0fcbc5e90bf30a41b13ead24e40fff54ce/SRC/dgesv.f",
+                "sha256": "2ec966567d9a75f69fbccc59a3efa01dfbae3876661ba5676b349587eea36aaf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DGESV",
+                "role": "public-entry-point",
+                "summary": "External double-precision dense linear-system driver. A(LDA,N) is overwritten by factors, B(LDB,NRHS) by solutions, and IPIV(N) records row pivots. Check INFO before using the solution. Link a compatible LAPACK/BLAS library; this source file alone is insufficient.",
+                "signature": "CALL DGESV(N, NRHS, A, LDA, IPIV, B, LDB, INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/dgesv.f",
+                    "line_start": 121,
+                    "line_end": 133
+                  }
+                ],
+                "path": "SRC/dgesv.f",
+                "line_start": 121,
+                "line_end": 173,
+                "usage": "external :: dgesv\ninteger :: ipiv(2), info\ndouble precision :: a(2,2), b(2,1)\na = reshape([3.0d0, 1.0d0, 1.0d0, 2.0d0], [2,2])\nb(:,1) = [9.0d0, 8.0d0]\ncall dgesv(2, 1, a, 2, ipiv, b, 2, info)\nif (info /= 0) error stop \"DGESV failed\"\n! The solution is now in b(:,1).",
+                "usage_notes": "Calling sketch only, not a checked driver. Use a double-precision/integer ABI compatible with the linked LAPACK build; a vendor ILP64 build needs matching integer arguments. Preserve input copies if residuals or the original matrix are needed. INFO=0 is not a condition-number or accuracy estimate. No compilation, residual calculation or solver comparison was performed."
+              }
+            ]
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "472b3a0fcbc5e90bf30a41b13ead24e40fff54ce",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected real DGELS driver chooses QR or LQ factorization by matrix shape and applies orthogonal transformations and triangular solves for unconstrained least squares or minimum-norm underdetermined solves. For TRANS=N and M>=N, the reviewed path forms Q-transpose B and solves with R. The interface assumes full rank; positive INFO detects exactly zero triangular diagonals, not reliable numerical rank or near-singularity. D9a1 records the unconstrained L2 solution scope. Workspace queries and scaling are visible in the driver. This review does not certify all dependency kernels, rank-deficient methods, constrained least squares or runtime accuracy.",
+            "evidence": [
+              {
+                "path": "SRC/dgels.f",
+                "url": "https://github.com/Reference-LAPACK/lapack/blob/472b3a0fcbc5e90bf30a41b13ead24e40fff54ce/SRC/dgels.f",
+                "sha256": "1c0c4aa4314403dbe3641bda2f29013bfac55c72df2ca2651fe86d8160594901"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DGELS",
+                "role": "public-entry-point",
+                "summary": "External full-rank real least-squares/minimum-norm driver. TRANS selects A or its transpose. A and B are overwritten; B needs at least MAX(1,M,N) rows even when the input right-hand side is shorter. Query WORK with LWORK=-1 before allocating the working buffer, then check INFO after the solve.",
+                "signature": "CALL DGELS(TRANS, M, N, NRHS, A, LDA, B, LDB, WORK, LWORK, INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/dgels.f",
+                    "line_start": 189,
+                    "line_end": 203
+                  }
+                ],
+                "path": "SRC/dgels.f",
+                "line_start": 189,
+                "line_end": 525,
+                "usage": "external :: dgels\ninteger :: info, lwork\ndouble precision :: a(3,2), b(3,1), query(1)\ndouble precision, allocatable :: work(:)\na(:,1) = 1.0d0\na(:,2) = [0.0d0, 1.0d0, 2.0d0]\nb(:,1) = [1.0d0, 2.0d0, 2.0d0]\ncall dgels(\"N\", 3, 2, 1, a, 3, b, 3, query, -1, info)\nif (info /= 0) error stop \"DGELS query failed\"\nlwork = max(1, ceiling(query(1)))\nallocate(work(lwork))\ncall dgels(\"N\", 3, 2, 1, a, 3, b, 3, work, lwork, info)\nif (info /= 0) error stop \"DGELS failed\"\n! For this M>=N case, b(1:2,1) holds the fitted coefficients.",
+                "usage_notes": "Calling sketch only. Link compatible LAPACK and BLAS and match the integer/real ABI. The example uses the full-rank overdetermined TRANS=N branch; it is not a rank-revealing solver demonstration. Preserve original A/B for an independent residual check. Neither the fit nor any underdetermined branch was run for this catalog."
+              }
+            ]
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "472b3a0fcbc5e90bf30a41b13ead24e40fff54ce",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected DSYEV driver computes ordinary eigenvalues of a real symmetric dense matrix, optionally eigenvectors. It reads the selected triangle, reduces through DSYTRD and dispatches eigenvalues-only work to DSTERF or the vector path through DORGTR and DSTEQR; optional scaling is undone on the eigenvalues. D4a1 is the real-symmetric ordinary-eigenproblem scope. This is not a generalized, complex, nonsymmetric or subset-eigensolver mapping. The driver exposes workspace-query and convergence status, but no eigenpair residual, orthogonality check or audit of all lower-level kernels was performed.",
+            "evidence": [
+              {
+                "path": "SRC/dsyev.f",
+                "url": "https://github.com/Reference-LAPACK/lapack/blob/472b3a0fcbc5e90bf30a41b13ead24e40fff54ce/SRC/dsyev.f",
+                "sha256": "9c9dcb34fed866f91ddd785897c653a94671fd75bc2856171b18547cb6fafe62"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DSYEV",
+                "role": "public-entry-point",
+                "summary": "External double-precision symmetric eigensolver. JOBZ selects values alone or values plus vectors; UPLO selects the stored triangle. Eigenvalues are returned in ascending order. A is overwritten, holding eigenvectors on a successful JOBZ=V call. Query WORK with LWORK=-1 and check INFO.",
+                "signature": "CALL DSYEV(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK, INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/dsyev.f",
+                    "line_start": 129,
+                    "line_end": 141
+                  }
+                ],
+                "path": "SRC/dsyev.f",
+                "line_start": 129,
+                "line_end": 281,
+                "usage": "external :: dsyev\ninteger :: info, lwork\ndouble precision :: a(2,2), w(2), query(1)\ndouble precision, allocatable :: work(:)\na = reshape([2.0d0, 1.0d0, 1.0d0, 2.0d0], [2,2])\ncall dsyev(\"V\", \"U\", 2, a, 2, w, query, -1, info)\nif (info /= 0) error stop \"DSYEV query failed\"\nlwork = max(1, ceiling(query(1)))\nallocate(work(lwork))\ncall dsyev(\"V\", \"U\", 2, a, 2, w, work, lwork, info)\nif (info /= 0) error stop \"DSYEV failed\"\n! w contains eigenvalues; columns of a contain eigenvectors.",
+                "usage_notes": "Calling sketch only. Match the linked LAPACK/BLAS ABI and use only the selected triangle as input. Keep the original matrix for independent eigenpair-residual and orthogonality checks; INFO=0 alone is not such a check. Neither the sample eigenproblem nor the author test suite was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause-Open-MPI",
+          "spdx_expression": "BSD-3-Clause-Open-MPI",
+          "revision": "472b3a0fcbc5e90bf30a41b13ead24e40fff54ce",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned license has the three redistribution/endorsement clauses and the additional third-party intellectual-property disclaimer of SPDX BSD-3-Clause-Open-MPI. SPDX lists the Netlib LAPACK license among this variant references (https://spdx.org/licenses/BSD-3-Clause-Open-MPI.html). The root notice allows additional component copyrights; this review records that file, not every bundled component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Reference-LAPACK/lapack/blob/472b3a0fcbc5e90bf30a41b13ead24e40fff54ce/LICENSE",
+              "sha256": "a1e742e31b6793e83cd36a98ed2db993ec291d0e4be79e9c0520c4d8aef7aa3a"
+            }
+          ]
         }
       },
       "imports": {}

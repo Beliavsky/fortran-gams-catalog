@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Nineteen repositories now have twenty-seven source-reviewed
+Reviewed on 2026-11-04. Twenty-one repositories now have thirty-two source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Eighteen repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A nineteenth, DDFSA, identifies the supplied
+Twenty repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A twenty-first, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All nineteen independently source-reviewed repositories now have an
+separately. All twenty-one independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -42,6 +42,8 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | gfsolver | `mod_gfsolver::sub_newton`, `mod_gfsolver::sub_hybrid_nb` | MIT-style notice with a citation request |
 | FortranConsoleSpline | `mod_splines::spline` constructor; `spline%value`, `spline%slope`, `spline%slope2` bindings | MIT |
 | Legendre-Gauss-Lobatto Quadrature | `legendre_gauss_lobatto::LGL_nodes_weights`, `legendre_gauss_lobatto::LGL_quadrature` | GNU GPL version 3; version scope unresolved |
+| LAPACK | `DGESV`, `DGELS`, `DSYEV` (external double-precision drivers) | BSD-3-Clause-Open-MPI |
+| lagrange_interpolator | `type_LagrangeInterpolator::LagrangeInterpolator%perform_1d_interpolation`, `%perform_2d_interpolation` | No license identified in reviewed material |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -80,6 +82,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [gfsolver](https://github.com/gfell/gf_solver) | F1b | Scalar Newton search and sign-oriented Newton/bisection fallback using value/derivative subroutines | No bracket validation or failure status; failure paths STOP. Division precedes the small-derivative check. Fallback does not forward optional controls. |
 | [FortranConsoleSpline](https://github.com/ja72/FortranConsoleSpline) | E1a | Cubic-spline construction and type-bound value/derivative evaluation | An interior coefficient mixes an abscissa with an index; arbitrary-grid correctness requires a compiled check. Extrema enumeration is not mapped. |
 | [Legendre-Gauss-Lobatto Quadrature](https://github.com/SpirosZafeiris/Legendre-Gauss-Lobatto-Quadrature) | H2a1b2 | LGL node/weight construction and weighted integration of caller-sampled data | Sample at mapped rule nodes, not arbitrary grid points. Fixed iteration limits have no status; triplet-style constructors require compiler support or adaptation. No accuracy check was run. |
+| [LAPACK](https://github.com/Reference-LAPACK/lapack) | D2a1; D9a1; D4a1 | DGESV LU-solve dispatch, DGELS QR/LQ least-squares paths and DSYEV symmetric eigensolver dispatch | Driver/source review, not a complete kernel audit. Inputs are overwritten; DGELS assumes full rank. Query workspaces and match the library ABI. No numerical tests were run here. |
+| [lagrange_interpolator](https://github.com/jlokimlin/lagrange_interpolator) | E1a; E2a | Adjacent-point 1D linear interpolation and repeated 1D interpolation on a 2D grid | The name does not establish higher-order Lagrange interpolation. Source findings affect constant extrapolation, status handling and the 2D temporary-vector initialization. Node-only author checks are not between-node verification. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -138,6 +142,22 @@ They do not change the classification of the mathematical problem implemented.
   use triplet-style array constructors such as `[size_r:1:-1]`. Build support
   for that syntax and the intended node generation must be checked; no compiler
   failure is claimed from source inspection alone.
+
+* **lagrange_interpolator extrapolation/status:** the
+  [constant-extrapolation branch](https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/type_LagrangeInterpolator.f90#L172-L187)
+  assigns an endpoint abscissa (`x`) instead of its ordinate (`y`). Early
+  returns precede assignment of the optional success output, while normal
+  cleanup resets the object's success property. Unsorted-input creation can
+  return without allocated data, and the interpolation method does not check
+  that failure before referencing its arrays. These are inspection findings.
+* **lagrange_interpolator 2D temporary vector:** the
+  [row loop](https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/src/type_LagrangeInterpolator.f90#L251-L268)
+  performs the final along-x interpolation after filling each individual
+  temporary entry, so early iterations read entries not yet initialized. The
+  last iteration has a complete vector, but intermediate behavior with traps
+  or uninitialized-value checking remains untested. The
+  [author checks](https://github.com/jlokimlin/lagrange_interpolator/blob/7b0f9014f49236dd6aff0afacc75cf5aeb441f9d/test/test.f90#L46-L65)
+  query the supplied nodes; they do not establish off-node interpolation accuracy.
 
 Next numerical reviews move to other independently reviewed linear-algebra,
 quadrature and differential-equation libraries. Benchmark collections remain
