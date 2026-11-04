@@ -17,8 +17,9 @@ this filter is not proof that every remaining repository lacks FPM support.
 
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
-The first five detailed optimization reviews now include source-linked leaf
-classifications; see [the review progress](docs/granular-reviews.md).
+Detailed optimization and nonlinear-equation reviews include source-linked
+classifications and explicit limits where no leaf fits; see
+[the review progress](docs/granular-reviews.md).
 
 The existing [playground package catalog](https://beliavsky.github.io/fortran-playground/gams/)
 continues to focus on selected packages and runnable examples. This broader

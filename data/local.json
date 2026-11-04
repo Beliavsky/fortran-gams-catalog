@@ -35148,9 +35148,71 @@
             ],
             "notes": "The usage guide is supplemented by pinned source-header documentation naming nonlinear finite minimax optimization and its linearly constrained algorithm reference. This does not establish a general nonlinear-constraint interface. Component functions, stopping tests and numerical results need later individual review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "27a938c530b5a8b4bddc3f6c3dc56ab655e90870",
+            "evidence": [
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/main.f90",
+                "path": "CODE/main.f90",
+                "sha256": "86914eada2927bd77cb6e080bb6756d97aee0daaf7b6ee37f18a2ef610bf9a78"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/SDMINMAX.f",
+                "path": "CODE/SDMINMAX.f",
+                "sha256": "9729d55f653ded96cb3f3a90f181aa50f04454c0133e4c37afe615dd8b84146f"
+              },
+              {
+                "url": "https://github.com/DerivativeFreeLibrary/SDMINMAX/blob/27a938c530b5a8b4bddc3f6c3dc56ab655e90870/CODE/problem.f",
+                "path": "CODE/problem.f",
+                "sha256": "ba3a2f1f553d91b4fc6a8bf18aa1700ad7148d2906f155553767da7f63d43cac"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "minmax",
+                "path": "CODE/main.f90",
+                "line_start": 1,
+                "line_end": 57
+              },
+              {
+                "procedure": "functmu",
+                "path": "CODE/main.f90",
+                "line_start": 62,
+                "line_end": 96
+              },
+              {
+                "procedure": "MAINBOX",
+                "path": "CODE/SDMINMAX.f",
+                "line_start": 22,
+                "line_end": 90
+              },
+              {
+                "procedure": "MAINBOX",
+                "path": "CODE/SDMINMAX.f",
+                "line_start": 112,
+                "line_end": 156
+              },
+              {
+                "procedure": "MAINBOX",
+                "path": "CODE/SDMINMAX.f",
+                "line_start": 298,
+                "line_end": 325
+              },
+              {
+                "procedure": "functs",
+                "path": "CODE/problem.f",
+                "line_start": 35,
+                "line_end": 52
+              }
+            ],
+            "notes": "The inspected executable minimizes a finite maximum of component functions, a generally nonsmooth multivariate objective. functmu builds a log-sum-exp smoothing from value-only functs callbacks, and MAINBOX performs derivative-free line searches while adapting the smoothing parameter. This supports the G1b2 leaf. Despite the linearly constrained minimax paper cited in the header, the inspected interface exposes neither bounds nor a general linear-constraint callback or matrix; no G2h2 claim is inferred from the citation. Exponent clipping and a small-sum floor are implementation safeguards, not a checked stable log-sum-exp algorithm for every magnitude. The supplied Hald-Madsen rational-approximation problem can encounter denominator issues; its reported optimum was not reproduced. No convergence, minimax accuracy or example execution was checked.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -35284,9 +35346,92 @@
             ],
             "notes": "The README identifies a modified TRDF for trust-region models and ALGENCAN for subproblems, with configurable advanced phases. Those dependencies are not replaced by a standalone implementation here. Feasibility, convergence and supplied Hock-Schittkowski examples were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3b1",
+            "level": "source-reviewed",
+            "revision": "16ef79b194358c20e5ffb3554c6362742de1018c",
+            "evidence": [
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/doc/doc.tex",
+                "path": "doc/doc.tex",
+                "sha256": "2d5772ea069ee0b6cd885070ee5cafbf55172711c59ab19b10eec25b5c2565fa"
+              },
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/fird.f90",
+                "path": "src/fird.f90",
+                "sha256": "2feca473f65a0ccffdf17d50fff641c8c5fb0481089ce4db3bd29f7b113805ff"
+              },
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/userinterface.f90",
+                "path": "src/userinterface.f90",
+                "sha256": "44dca766abb6426601d0b63e27ff5c6034a116ccb8684e97d5c6ed121692e630"
+              },
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90",
+                "path": "src/dfoirfilter.f90",
+                "sha256": "40d7a601c747b4b58f6733374832440ca6044fdda12eb299f7acf5171e539e6c"
+              },
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/solvers/restoration.f90",
+                "path": "solvers/restoration.f90",
+                "sha256": "7139b1e323ad6afcc13dbc9ac253e6f83414d85be77e69fc5dcf36891679ccda"
+              },
+              {
+                "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/tests/examples/hs14.f90",
+                "path": "tests/examples/hs14.f90",
+                "sha256": "b297cfbda68afd44c9db70019fa188c19dd54520e6d373468a887011a08e9960"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fird",
+                "path": "src/fird.f90",
+                "line_start": 1,
+                "line_end": 78
+              },
+              {
+                "procedure": "userinterface::evalf / evalc / evaljac",
+                "path": "src/userinterface.f90",
+                "line_start": 1,
+                "line_end": 40
+              },
+              {
+                "procedure": "dfoirfilter::dfoirfalg",
+                "path": "src/dfoirfilter.f90",
+                "line_start": 178,
+                "line_end": 245
+              },
+              {
+                "procedure": "dfoirfilter::dfoirfalg",
+                "path": "src/dfoirfilter.f90",
+                "line_start": 266,
+                "line_end": 326
+              },
+              {
+                "procedure": "dfoirfilter::aevaljac",
+                "path": "src/dfoirfilter.f90",
+                "line_start": 594,
+                "line_end": 610
+              },
+              {
+                "procedure": "restore",
+                "path": "solvers/restoration.f90",
+                "line_start": 20,
+                "line_end": 47
+              },
+              {
+                "procedure": "FIRDMAIN / evalf / evalc / evaljac",
+                "path": "tests/examples/hs14.f90",
+                "line_start": 1,
+                "line_end": 134
+              }
+            ],
+            "notes": "FIRD solves smooth nonlinear programs with equality/inequality constraints and variable bounds. The fird wrapper requires objective-value, constraint-value and constraint-Jacobian callbacks. dfoirfalg actually calls the user Jacobian to form linearized constraints and passes it to restoration, while the objective interface requests no derivatives. The author guide (doc/doc.tex, lines 99-123 at this revision) explicitly assumes continuously differentiable objective and constraint functions. G2h3b1 is retained deliberately: G2h3b1a would falsely imply no user derivatives, while G2h3b1b requires objective derivatives as well as constraint derivatives. No GAMS leaf exactly represents this mixed interface. Default restoration delegates to external ALGENCAN; source inspection does not establish a standalone solver or successful convergence. The HS14 author example is a future driver candidate, not a checked solve.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -35329,9 +35474,94 @@
             ],
             "notes": "The README requires the objective outside the feasible region because the method enlarges and shrinks that region. It identifies ALGENCAN 2.4 compatibility, while 3.1 support is described as development work. Equality-constraint handling and published results were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3b",
+            "level": "source-reviewed",
+            "revision": "7d3f57d39de38bfb687a551fef26a86700a8ab7f",
+            "evidence": [
+              {
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/skinny.f90",
+                "path": "skinny.f90",
+                "sha256": "0a85e2ee717ea7dc7e0aef782f9847f2ac2d3524d59e7fe6aec08feb91240747"
+              },
+              {
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/restoration.f90",
+                "path": "restoration.f90",
+                "sha256": "b2483bd9643862e1a32eb02109167677d4ab9c456e8d4efe25c9775d2648ba1c"
+              },
+              {
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/extremebarrier.f90",
+                "path": "extremebarrier.f90",
+                "sha256": "4b8c0a12bf29fd776502c8f9786cd9cb99082548c332028dc7a968190e6ecda4"
+              },
+              {
+                "url": "https://github.com/fsobral/skinny/blob/7d3f57d39de38bfb687a551fef26a86700a8ab7f/toyprob.f90",
+                "path": "toyprob.f90",
+                "sha256": "63e675a1521df6167680a2392c66cdd90e9f10f327d8b377e674bd9a341ad0a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "skinny::SK_RESTTYPE / sksolve",
+                "path": "skinny.f90",
+                "line_start": 22,
+                "line_end": 25
+              },
+              {
+                "procedure": "skinny::sksolve",
+                "path": "skinny.f90",
+                "line_start": 94,
+                "line_end": 181
+              },
+              {
+                "procedure": "skinny::sksolve",
+                "path": "skinny.f90",
+                "line_start": 447,
+                "line_end": 461
+              },
+              {
+                "procedure": "skinny::sksolve",
+                "path": "skinny.f90",
+                "line_start": 499,
+                "line_end": 622
+              },
+              {
+                "procedure": "restoration",
+                "path": "restoration.f90",
+                "line_start": 101,
+                "line_end": 149
+              },
+              {
+                "procedure": "callfrest",
+                "path": "restoration.f90",
+                "line_start": 164,
+                "line_end": 212
+              },
+              {
+                "procedure": "exbarr",
+                "path": "extremebarrier.f90",
+                "line_start": 8,
+                "line_end": 100
+              },
+              {
+                "procedure": "initializes / evalconstr",
+                "path": "toyprob.f90",
+                "line_start": 1,
+                "line_end": 32
+              },
+              {
+                "procedure": "evalconstr",
+                "path": "toyprob.f90",
+                "line_start": 125,
+                "line_end": 147
+              }
+            ],
+            "notes": "sksolve relaxes nonlinear inequalities g(x)<=gamma, restores feasibility and reduces gamma while searching within variable bounds. Equalities require an appropriate inequality encoding; the inspected public interface has no separate equality count or equality flag. The pinned source selects SK_RESTTYPE=2, a function-value compass restoration; the ALGENCAN branch returns with instructions to uncomment code, so it is not active merely by changing that selector. Compass and SDS improvement paths are active; Nelder-Mead, BOBYQA and DFO branches return before commented implementations. G2h3b is the supported nonlinear-constraint scope. A smooth or fully general nonsmooth leaf is withheld because the reviewed material does not establish a matching regularity contract for all active paths; derivative-free alone does not imply nonsmooth convergence. The toy file describes HS6 as an equality but exposes one signed constraint value, so its encoding must be checked before reuse as an equality driver. No program was run.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -35376,9 +35606,82 @@
             ],
             "notes": "The README documents MGH and packing drivers and bundled ALGENCAN 3.1.1. Reproducing the paper requires additional HSL MA57 and BLAS routines, which are not mandatory for every ALGENCAN build. Derivative requirements, regularization parameters and convergence results need later review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b1c",
+            "level": "source-reviewed",
+            "revision": "0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08",
+                "path": "src/arp.f08",
+                "sha256": "6e66d6c8bbd64cd78c23b59524e6731246f1851990024637570b7dc3236d1f44"
+              },
+              {
+                "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08",
+                "path": "src/arp_types.f08",
+                "sha256": "0b8f203dd5503a6948ae097908017438791dc9c15a44996093e603e02128941a"
+              },
+              {
+                "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_model.f08",
+                "path": "src/arp_model.f08",
+                "sha256": "3e6bec45213292b8052f9bcaae3efe02b384484dc51afeb1ca26acdc327c7c11"
+              },
+              {
+                "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08",
+                "path": "drv/mgh.f08",
+                "sha256": "47b7907212d9a9f2ebacbff2d8af2bc3acc7cd19a9f133cb826d9c9fec836076"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "arp::arp_load",
+                "path": "src/arp.f08",
+                "line_start": 17,
+                "line_end": 40
+              },
+              {
+                "procedure": "arp::arp_solve",
+                "path": "src/arp.f08",
+                "line_start": 136,
+                "line_end": 213
+              },
+              {
+                "procedure": "arp::arp_solve",
+                "path": "src/arp.f08",
+                "line_start": 286,
+                "line_end": 328
+              },
+              {
+                "procedure": "arp_types::evalg / evalh / evalhs / evalt / evalts",
+                "path": "src/arp_types.f08",
+                "line_start": 36,
+                "line_end": 93
+              },
+              {
+                "procedure": "arp_types::arp_param",
+                "path": "src/arp_types.f08",
+                "line_start": 97,
+                "line_end": 129
+              },
+              {
+                "procedure": "arp_model::model_evalf",
+                "path": "src/arp_model.f08",
+                "line_start": 54,
+                "line_end": 148
+              },
+              {
+                "procedure": "mgh",
+                "path": "drv/mgh.f08",
+                "line_start": 99,
+                "line_end": 110
+              }
+            ],
+            "notes": "The arp::arp_solve path is unconstrained (zero general constraints, unbounded variable arrays) and evaluates user gradient and Hessian callbacks for p=2 or p=3, adding user third-derivative tensors for p=3. arp_model::model_evalf constructs a quadratic/cubic Taylor model with cubic/fourth-order regularization; model minimization delegates to bundled ALGENCAN. G1b1c is the most specific available GAMS class for the reviewed second-/third-order modes: there is no third-derivative child. This is not automatic differentiation, and the p=3 default needs more than the first and second derivatives named by the class. The sparse and dense fourth-order regularizers have different formulas in source; numerical equivalence is not asserted. The advertised p=1 mode, generic constrained problems, and all bundled ALGENCAN algorithms are outside this mapping. No optimizer or author MGH driver was executed.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -35482,9 +35785,66 @@
             ],
             "notes": "The README explicitly separates a Fortran implementation from the R package and CUTEst experiment infrastructure. R parameter defaults are not assumed to be the Fortran interface. Only nonlinear-system solving is mapped; residual accuracy and published comparisons were not reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "2e879f8b0baf7de75de8382e65d619b02bc5c7b6",
+            "evidence": [
+              {
+                "url": "https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "sha256": "aaaee384300eb5c0b832dc42066f9e77d1c770cfa53953644f72f9e4454936f3"
+              },
+              {
+                "url": "https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
+                "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
+                "sha256": "06b9266ba363772e3a3c2236af7e47043af563494836494282e9b7f996d68a1e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bmdfsaneacc::rsub / dfsaneacc",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "line_start": 1,
+                "line_end": 111
+              },
+              {
+                "procedure": "bmdfsaneacc::dfsaneacc",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "line_start": 128,
+                "line_end": 163
+              },
+              {
+                "procedure": "bmdfsaneacc::dfsaneacc",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "line_start": 242,
+                "line_end": 257
+              },
+              {
+                "procedure": "bmdfsaneacc::dfsaneacc",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "line_start": 326,
+                "line_end": 370
+              },
+              {
+                "procedure": "dfsaneaccma",
+                "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
+                "line_start": 24,
+                "line_end": 52
+              },
+              {
+                "procedure": "dfsaneaccma::evalr",
+                "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
+                "line_start": 113,
+                "line_end": 131
+              }
+            ],
+            "notes": "bmdfsaneacc::dfsaneacc solves a square system: the residual callback maps x(n) to res(n), with no Jacobian callback. It combines residual-direction nonmonotone steps with QR-based sequential-secant acceleration built from iterate/residual history. Success requires dot_product(res,res)<=epsf**2, so epsf bounds the residual Euclidean norm; iteration exhaustion is a distinct return. F2 is already a GAMS leaf: there is no official derivative-free or acceleration child to add. Internal least-squares acceleration is not evidence for a general rectangular least-squares solver, and this does not enumerate all roots or certify uniqueness. The Fortran example supplies a three-variable exponential system; the reviewed Fortran path does not require running R or CUTEst. Memory/rank limits, singular cases and the author example were not tested.",
+            "reviewed_on": "2026-11-04"
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
