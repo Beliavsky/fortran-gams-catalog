@@ -11,6 +11,31 @@ and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
 The original broad documentation reviews remain available.
 
+## Reviewed calling interfaces
+
+Eight repository cards now identify public entry points, link their usage lines
+to pinned argument declarations, and distinguish implementation helpers on the
+detail pages. Module names and procedure names are stored separately. These are
+source-inspected calling interfaces, not new compilation or numerical checks.
+
+| Repository | Entry points | Recorded license |
+| --- | --- | --- |
+| ACRS | `ACRS` (external subroutine) | GPL-3.0-or-later |
+| DIRDFN | `dirdfn` (external subroutine; linked problem routines and shared state) | GPL-3.0-or-later |
+| FIRD | `fird` (external wrapper; objective, constraint and constraint-Jacobian callbacks) | MIT |
+| AR4 | `arp::arp_load`, `arp::arp_solve` | Multiple licenses; root GPL v3 and separate ALGENCAN notice |
+| Accelerated DF-SANE | `bmdfsaneacc::dfsaneacc` | No license identified in reviewed Fortran material |
+| Fortran introsort | `mod_introsort::sort`, `mod_introsort::apply_permutation` | MIT |
+| Fortran mergesort | `merge_sort_mod::sort`, `merge_sort_mod::rearrange` | No license identified in reviewed material |
+| Minimum-radius ball covering | `VorCells_Polygons::VorCellInterConvPol`, `VorCells_Polygons::interCellBall` | Not yet reviewed |
+
+Pinned license evidence, declaration ranges, author examples and calling sketches
+are retained in [the review ledger](local-reviews.md). A generic's private
+implementation names are not promoted as public APIs. The mergesort descending
+history issue below remains unresolved; the calling sketches use ascending sorts.
+
+## Source mappings
+
 | Repository | Detailed classes | Implementation reviewed | Material limits |
 | --- | --- | --- | --- |
 | [ACRS](https://github.com/DerivativeFreeLibrary/ACRS) | G2i | Objective-only working-set search, weighted Price reflection and box projection | Implementation restricts bound magnitudes. Objective spread and resource limits do not prove global optimality. |

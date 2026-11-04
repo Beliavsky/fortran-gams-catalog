@@ -885,6 +885,18 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## Accelerated DF-SANE
 
+**License: No license identified**
+
+No license grant was identified in the reviewed Fortran README or solver module, and the pinned tree has no separately named LICENSE/COPYING file. This finding is limited to the Fortran implementation reviewed here; it does not assign the terms of the separate R distribution to the Fortran sources.
+
+Reviewed 2026-11-04 at `2e879f8b0baf7de75de8382e65d619b02bc5c7b6`.
+
+[dfsaneacc-in-Fortran/README.md](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/README.md)
+SHA-256 (normalized UTF-8/LF): `342547ba2f038f42c565438c1ada522eb35df6e3d479ac30c57e592f2d757f9d`.
+
+[dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90)
+SHA-256 (normalized UTF-8/LF): `aaaee384300eb5c0b832dc42066f9e77d1c770cfa53953644f72f9e4454936f3`.
+
 **F — documentation-reviewed**
 
 The README explicitly separates a Fortran implementation from the R package and CUTEst experiment infrastructure. R parameter defaults are not assumed to be the Fortran interface. Only nonlinear-system solving is mapped; residual accuracy and published comparisons were not reproduced.
@@ -906,17 +918,48 @@ SHA-256 (normalized UTF-8/LF): `aaaee384300eb5c0b832dc42066f9e77d1c770cfa5395364
 [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90)
 SHA-256 (normalized UTF-8/LF): `06b9266ba363772e3a3c2236af7e47043af563494836494282e9b7f996d68a1e`.
 
-Procedure `bmdfsaneacc::rsub / dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:1–111](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L1-L111).
+Callback `bmdfsaneacc::rsub`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:8–16](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L8-L16).
 
-Procedure `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:128–163](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L128-L163).
+Required residual-subroutine interface: evalr(n,x,res,pdataptr), with an optional C_PTR data handle. The residual vector has the same length as x.
 
-Procedure `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:242–257](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L242-L257).
+Public entry point `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:25–39](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L25-L39).
 
-Procedure `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:326–370](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L326-L370).
+Public module subroutine for square nonlinear systems. Supply n residuals for n REAL(KIND=8) unknowns through evalr; x is updated and res, iter, fcnt and istop are returned. epsf controls the residual 2-norm, ndiis the acceleration interval and nhlim the history capacity. pdataptr is optional.
 
-Procedure `dfsaneaccma`: [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90:24–52](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90#L24-L52).
+Usage:
 
-Procedure `dfsaneaccma::evalr`: [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90:113–131](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90#L113-L131).
+```fortran
+CALL dfsaneacc(evalr, n, x, res, epsf, maxit, ndiis, nhlim, &
+               iter, fcnt, istop, pdataptr)
+```
+
+Argument declarations: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:25–39](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L25-L39).
+
+Argument declarations: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:8–16](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L8-L16).
+
+Author example (not run): [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90:24–52](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90#L24-L52).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use bmdfsaneacc, only: dfsaneacc
+! Define evalr with the rsub interface and initialize x and controls.
+! Use a positive ndiis and suitable history capacity, e.g. nhlim=6.
+call dfsaneacc(evalr, n, x, res, epsf, maxit, ndiis, nhlim, &
+               iter, fcnt, istop)
+```
+
+Calling sketch only; the optional data pointer is omitted here. If the residual callback needs data, pass a valid C_PTR as in the author example. Build bmqr and the numerical-library dependencies described in the Fortran README. Check istop and the residual norm. No new numerical execution was performed.
+
+Implementation evidence `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:128–163](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L128-L163).
+
+Implementation evidence `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:242–257](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L242-L257).
+
+Implementation evidence `bmdfsaneacc::dfsaneacc`: [dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90:326–370](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90#L326-L370).
+
+Program entry point `dfsaneaccma`: [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90:24–52](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90#L24-L52).
+
+Callback `dfsaneaccma::evalr`: [dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90:113–131](https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90#L113-L131).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -1505,6 +1548,18 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## AR4
 
+**License: Multiple licenses**
+
+The root LICENSE is GNU GPL version 3. Bundled ALGENCAN has a separate notice permitting GPL version 2 or later. This descriptive label retains the distinct notices without guessing a single SPDX expression or whether the main project permits later GPL versions. Optional HSL and other separately obtained dependencies require their own terms.
+
+Reviewed 2026-11-04 at `0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026`.
+
+[LICENSE](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[algencan/license.txt](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/algencan/license.txt)
+SHA-256 (normalized UTF-8/LF): `7d4f39c16d3340e539d7b424159758a181a4894dae94532c3170bc0abb583ab0`.
+
 **G — documentation-reviewed**
 
 The README documents MGH and packing drivers and bundled ALGENCAN 3.1.1. Reproducing the paper requires additional HSL MA57 and BLAS routines, which are not mandatory for every ALGENCAN build. Derivative requirements, regularization parameters and convergence results need later review.
@@ -1532,19 +1587,63 @@ SHA-256 (normalized UTF-8/LF): `3e6bec45213292b8052f9bcaae3efe02b384484dc51afeb1
 [drv/mgh.f08](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08)
 SHA-256 (normalized UTF-8/LF): `47b7907212d9a9f2ebacbff2d8af2bc3acc7cd19a9f133cb826d9c9fec836076`.
 
-Procedure `arp::arp_load`: [src/arp.f08:17–40](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L17-L40).
+Public entry point `arp::arp_load`: [src/arp.f08:17–40](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L17-L40).
 
-Procedure `arp::arp_solve`: [src/arp.f08:136–213](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L136-L213).
+Initialize algorithmic defaults in an arp_param structure. The default derivative order is p=3. This routine does not connect the user objective and derivative procedure pointers; attach them before calling arp_solve.
 
-Procedure `arp::arp_solve`: [src/arp.f08:286–328](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L286-L328).
+Usage:
 
-Procedure `arp_types::evalg / evalh / evalhs / evalt / evalts`: [src/arp_types.f08:36–93](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08#L36-L93).
+```fortran
+CALL arp_load(param)
+```
 
-Procedure `arp_types::arp_param`: [src/arp_types.f08:97–129](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08#L97-L129).
+Argument declarations: [src/arp.f08:17–19](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L17-L19).
 
-Procedure `arp_model::model_evalf`: [src/arp_model.f08:54–148](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_model.f08#L54-L148).
+Author example (not run): [drv/mgh.f08:144–170](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08#L144-L170).
 
-Procedure `mgh`: [drv/mgh.f08:99–110](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08#L99-L110).
+Public entry point `arp::arp_solve`: [src/arp.f08:44–53](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L44-L53).
+
+Public module solver for unconstrained minimization. x is an assumed-shape REAL(KIND=dp) initial point overwritten by the result; param is an arp_param and output an arp_output. The mapped p=2/3 paths require gradient and Hessian callbacks; p=3 additionally requires third derivatives. Model minimization delegates to ALGENCAN.
+
+Usage:
+
+```fortran
+CALL arp_solve(x, param, output)
+```
+
+Argument declarations: [src/arp.f08:44–53](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L44-L53).
+
+Argument declarations: [src/arp_types.f08:97–147](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08#L97-L147).
+
+Author example (not run): [drv/mgh.f08:144–170](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08#L144-L170).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use arp, only: arp_load, arp_solve, arp_param, arp_output
+! Declare param/output with these types and initialize x.
+call arp_load(param)
+param%p = 2
+param%dense = .true.
+param%uevalf => my_evalf
+param%uevalg => my_evalg
+param%uevalh => my_evalh
+call arp_solve(x, param, output)
+```
+
+Calling sketch for the reviewed dense p=2 path, not a complete driver. Implement compatible objective, gradient and Hessian procedures with explicit interfaces as declared in arp_types; attach procedure pointers before solving. arp_load leaves these pointers for the caller to set. Sparse or p=3 modes require their corresponding callbacks. Follow upstream build instructions for ALGENCAN and optional numerical dependencies. Not compiled or run for this catalog.
+
+Implementation evidence `arp::arp_solve`: [src/arp.f08:136–213](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L136-L213).
+
+Implementation evidence `arp::arp_solve`: [src/arp.f08:286–328](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp.f08#L286-L328).
+
+Callback `arp_types::evalg / evalh / evalhs / evalt / evalts`: [src/arp_types.f08:36–93](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08#L36-L93).
+
+Implementation evidence `arp_types::arp_param`: [src/arp_types.f08:97–129](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_types.f08#L97-L129).
+
+Implementation evidence `arp_model::model_evalf`: [src/arp_model.f08:54–148](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/src/arp_model.f08#L54-L148).
+
+Program entry point `mgh`: [drv/mgh.f08:99–110](https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/drv/mgh.f08#L99-L110).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -3668,6 +3767,21 @@ Not built or run for this catalog. Broad GAMS divisions are assigned first; gran
 
 ## DIRDFN
 
+**License: GPL-3.0-or-later**
+
+The root LICENSE contains GPL version 3; the DIRDFN and CS-DFN source headers explicitly permit version 3 or any later version. This records the reviewed solver-source terms, not a license audit of all dependencies.
+
+Reviewed 2026-11-04 at `3776d1d4e71abf371f2f143493ab48cb1affaadc`.
+
+[LICENSE](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/LICENSE)
+SHA-256 (normalized UTF-8/LF): `3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986`.
+
+[DIRDFN.f90](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90)
+SHA-256 (normalized UTF-8/LF): `2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4ef0ccbeddb83caaaa`.
+
+[DFNcon.f90](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90)
+SHA-256 (normalized UTF-8/LF): `e5540edcd4b760c148920627c5d5b10521a55aa65b47573b693dfd24579df3c3`.
+
 **G — documentation-reviewed**
 
 The usage guide specifies objective, equality and inequality callbacks, initial point and variable bounds. This supports constrained optimization without assuming arbitrary constraint regularity or guaranteed global solutions. Feasibility and termination behavior were not checked.
@@ -3689,13 +3803,37 @@ SHA-256 (normalized UTF-8/LF): `2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4e
 [main_test.f90](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90)
 SHA-256 (normalized UTF-8/LF): `5a4215036f0918f10d87ec800d2b25c5af7a37f47784da7e7d0921978c93e374`.
 
-Procedure `dirdfn`: [DIRDFN.f90:22–176](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L22-L176).
+Public entry point `dirdfn`: [DIRDFN.f90:22–176](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L22-L176).
 
-Procedure `nuovoglobale`: [DIRDFN.f90:694–804](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L694-L804).
+External subroutine for bounded, generally constrained global search. It returns xbest and uses separately linked objective/constraint routines and shared modules rather than callback arguments. The initial xbest is replaced by the box midpoint. Bounds must be finite; maxnf is INTEGER*8, nomefun has length 40 and numerical vectors use REAL*8.
 
-Procedure `funct_pen / funct_vinc`: [DIRDFN.f90:204–264](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L204-L264).
+Usage:
 
-Procedure `main_test`: [main_test.f90:1–42](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90#L1-L42).
+```fortran
+CALL dirdfn(n, me, mi, xbest, lb0, ub0, nomefun, iprint, &
+            maxint, maxnf, fglob, tolglob)
+```
+
+Argument declarations: [DIRDFN.f90:22–41](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L22-L41).
+
+Author example (not run): [main_test.f90:1–42](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90#L1-L42).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Compile upstream modules and your problem.f90 definitions first.
+! Set dimensions, finite bounds, budgets and target-value controls.
+call dirdfn(n, me, mi, xbest, lb, ub, nomefun, iprint, &
+            maxint, maxnf, fglob, tolglob)
+```
+
+Calling sketch only. Follow the author main_test for variable kinds and supply the upstream problem routine interfaces (funob, fconstreq and fconstrin). This is not a stateless callback API: shared modules and output units are used. A desired objective target and tolerance do not certify a global minimum. Not compiled or run for this catalog.
+
+Implementation helper `nuovoglobale`: [DIRDFN.f90:694–804](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L694-L804).
+
+Callback `funct_pen / funct_vinc`: [DIRDFN.f90:204–264](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L204-L264).
+
+Program entry point `main_test`: [main_test.f90:1–42](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90#L1-L42).
 
 **G2h3b2 — source-reviewed**
 
@@ -3712,13 +3850,42 @@ SHA-256 (normalized UTF-8/LF): `2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4e
 [problem.f90](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/problem.f90)
 SHA-256 (normalized UTF-8/LF): `e68209a1f5da7332d7e43e7e34a1547a9b44aa147df2874ff81e97e36815bd4e`.
 
-Procedure `sd_box`: [DFNcon.f90:1–155](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90#L1-L155).
+[main_test.f90](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90)
+SHA-256 (normalized UTF-8/LF): `5a4215036f0918f10d87ec800d2b25c5af7a37f47784da7e7d0921978c93e374`.
 
-Procedure `sd_box`: [DFNcon.f90:183–245](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90#L183-L245).
+Public entry point `dirdfn`: [DIRDFN.f90:22–176](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L22-L176).
 
-Procedure `funct_pen / funct_vinc`: [DIRDFN.f90:204–264](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L204-L264).
+External subroutine for bounded, generally constrained global search. It returns xbest and uses separately linked objective/constraint routines and shared modules rather than callback arguments. The initial xbest is replaced by the box midpoint. Bounds must be finite; maxnf is INTEGER*8, nomefun has length 40 and numerical vectors use REAL*8.
 
-Procedure `fconstreq / fconstrin`: [problem.f90:43–78](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/problem.f90#L43-L78).
+Usage:
+
+```fortran
+CALL dirdfn(n, me, mi, xbest, lb0, ub0, nomefun, iprint, &
+            maxint, maxnf, fglob, tolglob)
+```
+
+Argument declarations: [DIRDFN.f90:22–41](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L22-L41).
+
+Author example (not run): [main_test.f90:1–42](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90#L1-L42).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Compile upstream modules and your problem.f90 definitions first.
+! Set dimensions, finite bounds, budgets and target-value controls.
+call dirdfn(n, me, mi, xbest, lb, ub, nomefun, iprint, &
+            maxint, maxnf, fglob, tolglob)
+```
+
+Calling sketch only. Follow the author main_test for variable kinds and supply the upstream problem routine interfaces (funob, fconstreq and fconstrin). This is not a stateless callback API: shared modules and output units are used. A desired objective target and tolerance do not certify a global minimum. Not compiled or run for this catalog.
+
+Implementation helper `sd_box`: [DFNcon.f90:1–155](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90#L1-L155).
+
+Implementation helper `sd_box`: [DFNcon.f90:183–245](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90#L183-L245).
+
+Callback `funct_pen / funct_vinc`: [DIRDFN.f90:204–264](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90#L204-L264).
+
+Callback `fconstreq / fconstrin`: [problem.f90:43–78](https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/problem.f90#L43-L78).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -5172,6 +5339,15 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## FIRD
 
+**License: MIT**
+
+The root MIT license names Ferreira, Karas, Sachine and Sobral. This label covers the reviewed project license; external solver dependencies have their own terms.
+
+Reviewed 2026-11-04 at `16ef79b194358c20e5ffb3554c6362742de1018c`.
+
+[LICENSE](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/LICENSE)
+SHA-256 (normalized UTF-8/LF): `9e610101c04cd743413a9ee076b8ae97ec82d496933da55f6bb7b09ced9e951b`.
+
 **G — documentation-reviewed**
 
 The README identifies a modified TRDF for trust-region models and ALGENCAN for subproblems, with configurable advanced phases. Those dependencies are not replaced by a standalone implementation here. Feasibility, convergence and supplied Hock-Schittkowski examples were not checked.
@@ -5205,19 +5381,47 @@ SHA-256 (normalized UTF-8/LF): `7139b1e323ad6afcc13dbc9ac253e6f83414d85be77e69fc
 [tests/examples/hs14.f90](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/tests/examples/hs14.f90)
 SHA-256 (normalized UTF-8/LF): `b297cfbda68afd44c9db70019fa188c19dd54520e6d373468a887011a08e9960`.
 
-Procedure `fird`: [src/fird.f90:1–78](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/fird.f90#L1-L78).
+Public entry point `fird`: [src/fird.f90:1–78](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/fird.f90#L1-L78).
 
-Procedure `userinterface::evalf / evalc / evaljac`: [src/userinterface.f90:1–40](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/userinterface.f90#L1-L40).
+External wrapper for constrained minimization. Supply objective values, individual constraint values and sparse constraint Jacobians through the userinterface callback signatures. Objective derivatives are not required; constraint derivatives are required. x is updated in place; equality constraints precede inequalities.
 
-Procedure `dfoirfilter::dfoirfalg`: [src/dfoirfilter.f90:178–245](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L178-L245).
+Usage:
 
-Procedure `dfoirfilter::dfoirfalg`: [src/dfoirfilter.f90:266–326](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L266-L326).
+```fortran
+CALL fird(n, x, l, u, me, mi, uevalf, uevalc, uevaljac, &
+          verbose, ftype, epsfeas, epsopt, f, feas, fcnt, flag)
+```
 
-Procedure `dfoirfilter::aevaljac`: [src/dfoirfilter.f90:594–610](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L594-L610).
+Argument declarations: [src/fird.f90:57–73](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/fird.f90#L57-L73).
 
-Procedure `restore`: [solvers/restoration.f90:20–47](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/solvers/restoration.f90#L20-L47).
+Argument declarations: [src/userinterface.f90:1–35](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/userinterface.f90#L1-L35).
 
-Procedure `FIRDMAIN / evalf / evalc / evaljac`: [tests/examples/hs14.f90:1–134](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/tests/examples/hs14.f90#L1-L134).
+Author example (not run): [tests/examples/hs14.f90:1–37](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/tests/examples/hs14.f90#L1-L37).
+
+Calling sketch (not a checked driver):
+
+```fortran
+! Supply callbacks matching the userinterface abstract interfaces.
+! Initialize x, bounds, constraint counts, filter choice and tolerances.
+call fird(n, x, l, u, me, mi, evalf, evalc, evaljac, &
+          verbose, ftype, epsfeas, epsopt, f, feas, fcnt, flag)
+```
+
+Calling sketch only. fird is an external wrapper even though it uses modules internally; do not write use fird. Follow the author HS14 example and callback declarations. The restoration/optimization solver dependencies, including ALGENCAN, must be built as documented. Not compiled or run for this catalog.
+
+Callback `userinterface::evalf / evalc / evaljac`: [src/userinterface.f90:1–40](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/userinterface.f90#L1-L40).
+
+Implementation helper `dfoirfilter::dfoirfalg`: [src/dfoirfilter.f90:178–245](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L178-L245).
+
+Implementation helper `dfoirfilter::dfoirfalg`: [src/dfoirfilter.f90:266–326](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L266-L326).
+
+Implementation helper `dfoirfilter::aevaljac`: [src/dfoirfilter.f90:594–610](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/src/dfoirfilter.f90#L594-L610).
+
+Implementation helper `restore`: [solvers/restoration.f90:20–47](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/solvers/restoration.f90#L20-L47).
+
+Program entry point `FIRDMAIN`: [tests/examples/hs14.f90:1–37](https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/tests/examples/hs14.f90#L1-L37).
+
+Author HS14 driver; callback implementations follow its CONTAINS statement in the same file.
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 
@@ -6030,6 +6234,18 @@ Not built or run for this catalog. Build systems are recorded only where reviewe
 
 ## Fortran mergesort
 
+**License: No license identified**
+
+No license grant was identified in the reviewed README or main module, and the pinned tree has no separately named LICENSE/COPYING file. This is a recorded absence in the inspected material, not a claim that public source access grants reuse rights.
+
+Reviewed 2026-11-04 at `fb8d241576af567597f357cd1b2491f7b3b16dba`.
+
+[README.md](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/README.md)
+SHA-256 (normalized UTF-8/LF): `59e4f1a08b66af7b4bb1ef9b74a5fa6eace8c1746b66c4f0141cbecf2df61908`.
+
+[src/merge_sort.F90](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90)
+SHA-256 (normalized UTF-8/LF): `12d9d0cb319ca58f4b4bd816eb8de382ab5ccfc50670298da580c598c4e1f18d`.
+
 **N — documentation-reviewed**
 
 The README demonstrates sorting, reverse order, history-based rearrangement and selection of a reference line for 2D arrays. The documented Make defaults use ifx and llvm-ar but are configurable. Stability, supported kinds and permutation correctness were not checked.
@@ -6057,15 +6273,47 @@ SHA-256 (normalized UTF-8/LF): `4e2d79c037c701753aea096cf9de4715d28c2bfa9f3ecbf0
 [src/optional-args-1.inc](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-1.inc)
 SHA-256 (normalized UTF-8/LF): `c7a8f4032e708188aeecbff14848fc1e39f08174e4b6541663bc1dc515d1f6a8`.
 
-Procedure `merge_sort_mod::msort_1i_init`: [src/merge_sort.F90:32–58](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L32-L58).
+[example/main.F90](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90)
+SHA-256 (normalized UTF-8/LF): `e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a`.
 
-Procedure `merge_sort_mod::msort_2i_init`: [src/merge_sort.F90:142–169](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L142-L169).
+Public entry point `merge_sort_mod::sort`: [src/merge_sort.F90:1–26](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L1-L26).
 
-Procedure `merge_sort_mod::merge_1i / merge_1ih`: [src/merge_sort.F90:483–506](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L483-L506).
+Public generic for in-place integer vector sorting or sorting matrix columns by a reference row. history and reverse are optional; matrix aref selects the reference row. Specific msort implementation routines are private. Ascending examples are shown because the inspected descending wrappers reverse data without reversing history.
 
-Procedure `merge_1i (included body)`: [src/merge-1.inc:1–33](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc#L1-L33).
+Usage:
 
-Procedure `merge_1ih (included body)`: [src/merge-1h.inc:1–41](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc#L1-L41).
+```fortran
+CALL sort(arr, history, reverse)
+CALL sort(matrix, history, aref, reverse)
+```
+
+Argument declarations: [src/merge_sort.F90:32–38](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L32-L38).
+
+Argument declarations: [src/merge_sort.F90:142–149](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L142-L149).
+
+Author example (not run): [example/main.F90:1–35](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90#L1-L35).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use merge_sort_mod, only: sort
+! arr is an initialized array of a supported element kind.
+call sort(arr)
+! For labels: initialize history to [1,2,...,size(arr)] first.
+! Then call sort(arr, history) for ascending order.
+```
+
+Calling sketch only. history and reverse may be omitted. For a matrix, use a valid reference-row index and one history label per column. Do not rely on descending history: the documented source-review finding remains unresolved. No sort result or edge case was checked by execution.
+
+Implementation helper `merge_sort_mod::msort_1i_init`: [src/merge_sort.F90:32–58](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L32-L58).
+
+Implementation helper `merge_sort_mod::msort_2i_init`: [src/merge_sort.F90:142–169](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L142-L169).
+
+Implementation helper `merge_sort_mod::merge_1i / merge_1ih`: [src/merge_sort.F90:483–506](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L483-L506).
+
+Implementation helper `merge_1i (included body)`: [src/merge-1.inc:1–33](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc#L1-L33).
+
+Implementation helper `merge_1ih (included body)`: [src/merge-1h.inc:1–41](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc#L1-L41).
 
 **N6a2b — source-reviewed**
 
@@ -6088,17 +6336,47 @@ SHA-256 (normalized UTF-8/LF): `7323b8a559768611da2f890a8be18d134dcf8140a5826fc5
 [src/optional-args-2.inc](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-2.inc)
 SHA-256 (normalized UTF-8/LF): `bd89a1f374b508485da60ab36be43b4bf8bb180724c3faf9f5255803cd5433f1`.
 
-Procedure `merge_sort_mod::sort (generic)`: [src/merge_sort.F90:1–26](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L1-L26).
+[example/main.F90](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90)
+SHA-256 (normalized UTF-8/LF): `e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a`.
 
-Procedure `merge_sort_mod::msort_1d_init`: [src/merge_sort.F90:87–112](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L87-L112).
+Public entry point `merge_sort_mod::sort`: [src/merge_sort.F90:1–26](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L1-L26).
 
-Procedure `merge_sort_mod::msort_2d_init`: [src/merge_sort.F90:199–225](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L199-L225).
+Public generic for in-place real vector sorting or sorting matrix columns by a reference row. history and reverse are optional; matrix aref selects the reference row. Specific msort implementation routines are private. Ascending examples are shown because the inspected descending wrappers reverse data without reversing history.
 
-Procedure `merge_1d (included body)`: [src/merge-1.inc:1–33](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc#L1-L33).
+Usage:
 
-Procedure `merge_1dh (included body)`: [src/merge-1h.inc:1–41](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc#L1-L41).
+```fortran
+CALL sort(arr, history, reverse)
+CALL sort(matrix, history, aref, reverse)
+```
 
-Procedure `merge_2d (included body)`: [src/merge-2.inc:1–32](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-2.inc#L1-L32).
+Argument declarations: [src/merge_sort.F90:87–93](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L87-L93).
+
+Argument declarations: [src/merge_sort.F90:199–206](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L199-L206).
+
+Author example (not run): [example/main.F90:1–35](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90#L1-L35).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use merge_sort_mod, only: sort
+! arr is an initialized array of a supported element kind.
+call sort(arr)
+! For labels: initialize history to [1,2,...,size(arr)] first.
+! Then call sort(arr, history) for ascending order.
+```
+
+Calling sketch only. history and reverse may be omitted. For a matrix, use a valid reference-row index and one history label per column. Do not rely on descending history: the documented source-review finding remains unresolved. No sort result or edge case was checked by execution.
+
+Implementation helper `merge_sort_mod::msort_1d_init`: [src/merge_sort.F90:87–112](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L87-L112).
+
+Implementation helper `merge_sort_mod::msort_2d_init`: [src/merge_sort.F90:199–225](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L199-L225).
+
+Implementation helper `merge_1d (included body)`: [src/merge-1.inc:1–33](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1.inc#L1-L33).
+
+Implementation helper `merge_1dh (included body)`: [src/merge-1h.inc:1–41](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-1h.inc#L1-L41).
+
+Implementation helper `merge_2d (included body)`: [src/merge-2.inc:1–32](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge-2.inc#L1-L32).
 
 **N8 — source-reviewed**
 
@@ -6115,15 +6393,46 @@ SHA-256 (normalized UTF-8/LF): `42c3837151313ad80e531db3fe620b663acaffd1db01de08
 [src/rearrange-2.inc](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-2.inc)
 SHA-256 (normalized UTF-8/LF): `55103c9d7acfdb7337f2e9a4549edbee2d0cd153924a0d91903c0c4d567bbfb2`.
 
-Procedure `merge_sort_mod::rearrange (generic)`: [src/merge_sort.F90:22–26](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L22-L26).
+[example/main.F90](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90)
+SHA-256 (normalized UTF-8/LF): `e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a`.
 
-Procedure `merge_sort_mod::rearrange_1i / rearrange_1d`: [src/merge_sort.F90:773–802](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L773-L802).
+Public entry point `merge_sort_mod::rearrange`: [src/merge_sort.F90:22–26](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L22-L26).
 
-Procedure `merge_sort_mod::rearrange_2i / rearrange_2d`: [src/merge_sort.F90:813–842](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L813-L842).
+Public generic for gathering companion values or matrix columns using reference_history. The data are overwritten; reference_history is an input integer index vector. The specific rearrange_* implementations are private. Caller-supplied indices must be valid for the input array.
 
-Procedure `rearrange_1i / rearrange_1d (included body)`: [src/rearrange-1.inc:1–9](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-1.inc#L1-L9).
+Usage:
 
-Procedure `rearrange_2i / rearrange_2d (included body)`: [src/rearrange-2.inc:1–10](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-2.inc#L1-L10).
+```fortran
+CALL rearrange(arr, reference_history)
+```
+
+Argument declarations: [src/merge_sort.F90:773–778](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L773-L778).
+
+Argument declarations: [src/merge_sort.F90:793–798](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L793-L798).
+
+Argument declarations: [src/merge_sort.F90:813–818](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L813-L818).
+
+Argument declarations: [src/merge_sort.F90:833–838](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L833-L838).
+
+Author example (not run): [example/main.F90:38–58](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90#L38-L58).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use merge_sort_mod, only: rearrange
+! Initialize companion data and a valid output-to-input index vector.
+call rearrange(arr, reference_history)
+```
+
+Calling sketch only. Matrix overloads move complete columns. Obtain history from a compatible ascending sort or construct a valid permutation yourself; the catalog does not claim this routine validates indices. The descending-history source finding also affects history-based companion rearrangement. Not compiled or run here.
+
+Implementation helper `merge_sort_mod::rearrange_1i / rearrange_1d`: [src/merge_sort.F90:773–802](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L773-L802).
+
+Implementation helper `merge_sort_mod::rearrange_2i / rearrange_2d`: [src/merge_sort.F90:813–842](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90#L813-L842).
+
+Implementation helper `rearrange_1i / rearrange_1d (included body)`: [src/rearrange-1.inc:1–9](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-1.inc#L1-L9).
+
+Implementation helper `rearrange_2i / rearrange_2d (included body)`: [src/rearrange-2.inc:1–10](https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-2.inc#L1-L10).
 
 Not built or run for this catalog. Source-reviewed mappings identify the inspected procedures and source ranges; they are not a complete code audit or numerical verification. The original documentation review is retained separately. Build systems are recorded only where reviewed documentation identifies them.
 

@@ -34869,25 +34869,47 @@
                 "procedure": "dirdfn",
                 "path": "DIRDFN.f90",
                 "line_start": 22,
-                "line_end": 176
+                "line_end": 176,
+                "role": "public-entry-point",
+                "summary": "External subroutine for bounded, generally constrained global search. It returns xbest and uses separately linked objective/constraint routines and shared modules rather than callback arguments. The initial xbest is replaced by the box midpoint. Bounds must be finite; maxnf is INTEGER*8, nomefun has length 40 and numerical vectors use REAL*8.",
+                "signature": "CALL dirdfn(n, me, mi, xbest, lb0, ub0, nomefun, iprint, &\n            maxint, maxnf, fglob, tolglob)",
+                "declarations": [
+                  {
+                    "path": "DIRDFN.f90",
+                    "line_start": 22,
+                    "line_end": 41
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "main_test.f90",
+                    "line_start": 1,
+                    "line_end": 42
+                  }
+                ],
+                "usage": "! Compile upstream modules and your problem.f90 definitions first.\n! Set dimensions, finite bounds, budgets and target-value controls.\ncall dirdfn(n, me, mi, xbest, lb, ub, nomefun, iprint, &\n            maxint, maxnf, fglob, tolglob)",
+                "usage_notes": "Calling sketch only. Follow the author main_test for variable kinds and supply the upstream problem routine interfaces (funob, fconstreq and fconstrin). This is not a stateless callback API: shared modules and output units are used. A desired objective target and tolerance do not certify a global minimum. Not compiled or run for this catalog."
               },
               {
                 "procedure": "nuovoglobale",
                 "path": "DIRDFN.f90",
                 "line_start": 694,
-                "line_end": 804
+                "line_end": 804,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "funct_pen / funct_vinc",
                 "path": "DIRDFN.f90",
                 "line_start": 204,
-                "line_end": 264
+                "line_end": 264,
+                "role": "callback"
               },
               {
                 "procedure": "main_test",
                 "path": "main_test.f90",
                 "line_start": 1,
-                "line_end": 42
+                "line_end": 42,
+                "role": "program-entry-point"
               }
             ],
             "notes": "dirdfn combines a DIRECT-type global partition search with CS-DFN local minimizations. The inspected nuovoglobale block invokes sd_box and subdivides potentially optimal rectangles; objective and feasibility are tracked separately through value-only callbacks. Finite lower and upper bounds are required, as the author driver explicitly warns. This global constrained search maps to the G2i leaf; finite evaluation/interval budgets and a supplied target fglob do not certify a global optimum or feasibility. The author main_test/problem example is available as a future driver candidate, not a checked example.",
@@ -34912,32 +34934,66 @@
                 "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/problem.f90",
                 "path": "problem.f90",
                 "sha256": "e68209a1f5da7332d7e43e7e34a1547a9b44aa147df2874ff81e97e36815bd4e"
+              },
+              {
+                "path": "main_test.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/main_test.f90",
+                "sha256": "5a4215036f0918f10d87ec800d2b25c5af7a37f47784da7e7d0921978c93e374"
               }
             ],
             "procedures": [
               {
+                "procedure": "dirdfn",
+                "path": "DIRDFN.f90",
+                "line_start": 22,
+                "line_end": 176,
+                "role": "public-entry-point",
+                "summary": "External subroutine for bounded, generally constrained global search. It returns xbest and uses separately linked objective/constraint routines and shared modules rather than callback arguments. The initial xbest is replaced by the box midpoint. Bounds must be finite; maxnf is INTEGER*8, nomefun has length 40 and numerical vectors use REAL*8.",
+                "signature": "CALL dirdfn(n, me, mi, xbest, lb0, ub0, nomefun, iprint, &\n            maxint, maxnf, fglob, tolglob)",
+                "declarations": [
+                  {
+                    "path": "DIRDFN.f90",
+                    "line_start": 22,
+                    "line_end": 41
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "main_test.f90",
+                    "line_start": 1,
+                    "line_end": 42
+                  }
+                ],
+                "usage": "! Compile upstream modules and your problem.f90 definitions first.\n! Set dimensions, finite bounds, budgets and target-value controls.\ncall dirdfn(n, me, mi, xbest, lb, ub, nomefun, iprint, &\n            maxint, maxnf, fglob, tolglob)",
+                "usage_notes": "Calling sketch only. Follow the author main_test for variable kinds and supply the upstream problem routine interfaces (funob, fconstreq and fconstrin). This is not a stateless callback API: shared modules and output units are used. A desired objective target and tolerance do not certify a global minimum. Not compiled or run for this catalog."
+              },
+              {
                 "procedure": "sd_box",
                 "path": "DFNcon.f90",
                 "line_start": 1,
-                "line_end": 155
+                "line_end": 155,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "sd_box",
                 "path": "DFNcon.f90",
                 "line_start": 183,
-                "line_end": 245
+                "line_end": 245,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "funct_pen / funct_vinc",
                 "path": "DIRDFN.f90",
                 "line_start": 204,
-                "line_end": 264
+                "line_end": 264,
+                "role": "callback"
               },
               {
                 "procedure": "fconstreq / fconstrin",
                 "path": "problem.f90",
                 "line_start": 43,
-                "line_end": 78
+                "line_end": 78,
+                "role": "callback"
               }
             ],
             "notes": "The local sd_box implementation is explicitly CS-DFN for nonsmooth nonlinear programming. It uses coordinate/dense search directions and value-only objective/constraint evaluation, while funct_pen adds positive inequality violations and absolute equality violations. funct_vinc calls both fconstrin and fconstreq. This supports G2h3b2, the leaf for general nonlinear functions with equality and inequality constraints without a smoothness assumption. Nonsmooth does not establish convergence for arbitrary discontinuities: regularity assumptions, penalty updates and numerical convergence remain unverified. The supplied problem contains nonlinear polynomial equalities; its existence is not a successful solve.",
@@ -34948,6 +35004,30 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "3776d1d4e71abf371f2f143493ab48cb1affaadc",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GPL version 3; the DIRDFN and CS-DFN source headers explicitly permit version 3 or any later version. This records the reviewed solver-source terms, not a license audit of all dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "DIRDFN.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DIRDFN.f90",
+              "sha256": "2ebec28ec5a14840883c67db9a5929ab72fe275354cd7b4ef0ccbeddb83caaaa"
+            },
+            {
+              "path": "DFNcon.f90",
+              "url": "https://github.com/DerivativeFreeLibrary/DIRDFN/blob/3776d1d4e71abf371f2f143493ab48cb1affaadc/DFNcon.f90",
+              "sha256": "e5540edcd4b760c148920627c5d5b10521a55aa65b47573b693dfd24579df3c3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35441,43 +35521,74 @@
                 "procedure": "fird",
                 "path": "src/fird.f90",
                 "line_start": 1,
-                "line_end": 78
+                "line_end": 78,
+                "role": "public-entry-point",
+                "summary": "External wrapper for constrained minimization. Supply objective values, individual constraint values and sparse constraint Jacobians through the userinterface callback signatures. Objective derivatives are not required; constraint derivatives are required. x is updated in place; equality constraints precede inequalities.",
+                "signature": "CALL fird(n, x, l, u, me, mi, uevalf, uevalc, uevaljac, &\n          verbose, ftype, epsfeas, epsopt, f, feas, fcnt, flag)",
+                "declarations": [
+                  {
+                    "path": "src/fird.f90",
+                    "line_start": 57,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "src/userinterface.f90",
+                    "line_start": 1,
+                    "line_end": 35
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "tests/examples/hs14.f90",
+                    "line_start": 1,
+                    "line_end": 37
+                  }
+                ],
+                "usage": "! Supply callbacks matching the userinterface abstract interfaces.\n! Initialize x, bounds, constraint counts, filter choice and tolerances.\ncall fird(n, x, l, u, me, mi, evalf, evalc, evaljac, &\n          verbose, ftype, epsfeas, epsopt, f, feas, fcnt, flag)",
+                "usage_notes": "Calling sketch only. fird is an external wrapper even though it uses modules internally; do not write use fird. Follow the author HS14 example and callback declarations. The restoration/optimization solver dependencies, including ALGENCAN, must be built as documented. Not compiled or run for this catalog."
               },
               {
                 "procedure": "userinterface::evalf / evalc / evaljac",
                 "path": "src/userinterface.f90",
                 "line_start": 1,
-                "line_end": 40
+                "line_end": 40,
+                "role": "callback"
               },
               {
                 "procedure": "dfoirfilter::dfoirfalg",
                 "path": "src/dfoirfilter.f90",
                 "line_start": 178,
-                "line_end": 245
+                "line_end": 245,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "dfoirfilter::dfoirfalg",
                 "path": "src/dfoirfilter.f90",
                 "line_start": 266,
-                "line_end": 326
+                "line_end": 326,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "dfoirfilter::aevaljac",
                 "path": "src/dfoirfilter.f90",
                 "line_start": 594,
-                "line_end": 610
+                "line_end": 610,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "restore",
                 "path": "solvers/restoration.f90",
                 "line_start": 20,
-                "line_end": 47
+                "line_end": 47,
+                "role": "implementation-helper"
               },
               {
-                "procedure": "FIRDMAIN / evalf / evalc / evaljac",
+                "procedure": "FIRDMAIN",
                 "path": "tests/examples/hs14.f90",
                 "line_start": 1,
-                "line_end": 134
+                "line_end": 37,
+                "role": "program-entry-point",
+                "summary": "Author HS14 driver; callback implementations follow its CONTAINS statement in the same file."
               }
             ],
             "notes": "FIRD solves smooth nonlinear programs with equality/inequality constraints and variable bounds. The fird wrapper requires objective-value, constraint-value and constraint-Jacobian callbacks. dfoirfalg actually calls the user Jacobian to form linearized constraints and passes it to restoration, while the objective interface requests no derivatives. The author guide (doc/doc.tex, lines 99-123 at this revision) explicitly assumes continuously differentiable objective and constraint functions. G2h3b1 is retained deliberately: G2h3b1a would falsely imply no user derivatives, while G2h3b1b requires objective derivatives as well as constraint derivatives. No GAMS leaf exactly represents this mixed interface. Default restoration delegates to external ALGENCAN; source inspection does not establish a standalone solver or successful convergence. The HS14 author example is a future driver candidate, not a checked solve.",
@@ -35488,6 +35599,20 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "16ef79b194358c20e5ffb3554c6362742de1018c",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root MIT license names Ferreira, Karas, Sachine and Sobral. This label covers the reviewed project license; external solver dependencies have their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/fsobral/fird/blob/16ef79b194358c20e5ffb3554c6362742de1018c/LICENSE",
+              "sha256": "9e610101c04cd743413a9ee076b8ae97ec82d496933da55f6bb7b09ced9e951b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35688,46 +35813,106 @@
             ],
             "procedures": [
               {
-                "procedure": "arp::arp_load",
+                "procedure": "arp_load",
                 "path": "src/arp.f08",
                 "line_start": 17,
-                "line_end": 40
+                "line_end": 40,
+                "role": "public-entry-point",
+                "module": "arp",
+                "summary": "Initialize algorithmic defaults in an arp_param structure. The default derivative order is p=3. This routine does not connect the user objective and derivative procedure pointers; attach them before calling arp_solve.",
+                "signature": "CALL arp_load(param)",
+                "declarations": [
+                  {
+                    "path": "src/arp.f08",
+                    "line_start": 17,
+                    "line_end": 19
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "drv/mgh.f08",
+                    "line_start": 144,
+                    "line_end": 170
+                  }
+                ]
               },
               {
-                "procedure": "arp::arp_solve",
+                "procedure": "arp_solve",
+                "module": "arp",
+                "path": "src/arp.f08",
+                "line_start": 44,
+                "line_end": 53,
+                "role": "public-entry-point",
+                "summary": "Public module solver for unconstrained minimization. x is an assumed-shape REAL(KIND=dp) initial point overwritten by the result; param is an arp_param and output an arp_output. The mapped p=2/3 paths require gradient and Hessian callbacks; p=3 additionally requires third derivatives. Model minimization delegates to ALGENCAN.",
+                "signature": "CALL arp_solve(x, param, output)",
+                "declarations": [
+                  {
+                    "path": "src/arp.f08",
+                    "line_start": 44,
+                    "line_end": 53
+                  },
+                  {
+                    "path": "src/arp_types.f08",
+                    "line_start": 97,
+                    "line_end": 147
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "drv/mgh.f08",
+                    "line_start": 144,
+                    "line_end": 170
+                  }
+                ],
+                "usage": "use arp, only: arp_load, arp_solve, arp_param, arp_output\n! Declare param/output with these types and initialize x.\ncall arp_load(param)\nparam%p = 2\nparam%dense = .true.\nparam%uevalf => my_evalf\nparam%uevalg => my_evalg\nparam%uevalh => my_evalh\ncall arp_solve(x, param, output)",
+                "usage_notes": "Calling sketch for the reviewed dense p=2 path, not a complete driver. Implement compatible objective, gradient and Hessian procedures with explicit interfaces as declared in arp_types; attach procedure pointers before solving. arp_load leaves these pointers for the caller to set. Sparse or p=3 modes require their corresponding callbacks. Follow upstream build instructions for ALGENCAN and optional numerical dependencies. Not compiled or run for this catalog."
+              },
+              {
+                "procedure": "arp_solve",
                 "path": "src/arp.f08",
                 "line_start": 136,
-                "line_end": 213
+                "line_end": 213,
+                "role": "implementation-evidence",
+                "module": "arp"
               },
               {
-                "procedure": "arp::arp_solve",
+                "procedure": "arp_solve",
                 "path": "src/arp.f08",
                 "line_start": 286,
-                "line_end": 328
+                "line_end": 328,
+                "role": "implementation-evidence",
+                "module": "arp"
               },
               {
-                "procedure": "arp_types::evalg / evalh / evalhs / evalt / evalts",
+                "procedure": "evalg / evalh / evalhs / evalt / evalts",
                 "path": "src/arp_types.f08",
                 "line_start": 36,
-                "line_end": 93
+                "line_end": 93,
+                "role": "callback",
+                "module": "arp_types"
               },
               {
-                "procedure": "arp_types::arp_param",
+                "procedure": "arp_param",
                 "path": "src/arp_types.f08",
                 "line_start": 97,
-                "line_end": 129
+                "line_end": 129,
+                "role": "implementation-evidence",
+                "module": "arp_types"
               },
               {
-                "procedure": "arp_model::model_evalf",
+                "procedure": "model_evalf",
                 "path": "src/arp_model.f08",
                 "line_start": 54,
-                "line_end": 148
+                "line_end": 148,
+                "role": "implementation-evidence",
+                "module": "arp_model"
               },
               {
                 "procedure": "mgh",
                 "path": "drv/mgh.f08",
                 "line_start": 99,
-                "line_end": 110
+                "line_end": 110,
+                "role": "program-entry-point"
               }
             ],
             "notes": "The arp::arp_solve path is unconstrained (zero general constraints, unbounded variable arrays) and evaluates user gradient and Hessian callbacks for p=2 or p=3, adding user third-derivative tensors for p=3. arp_model::model_evalf constructs a quadratic/cubic Taylor model with cubic/fourth-order regularization; model minimization delegates to bundled ALGENCAN. G1b1c is the most specific available GAMS class for the reviewed second-/third-order modes: there is no third-derivative child. This is not automatic differentiation, and the p=3 default needs more than the first and second derivatives named by the class. The sparse and dense fourth-order regularizers have different formulas in source; numerical equivalence is not asserted. The advertised p=1 mode, generic constrained problems, and all bundled ALGENCAN algorithms are outside this mapping. No optimizer or author MGH driver was executed.",
@@ -35738,6 +35923,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Multiple licenses",
+          "spdx_expression": null,
+          "revision": "0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE is GNU GPL version 3. Bundled ALGENCAN has a separate notice permitting GPL version 2 or later. This descriptive label retains the distinct notices without guessing a single SPDX expression or whether the main project permits later GPL versions. Optional HSL and other separately obtained dependencies require their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "algencan/license.txt",
+              "url": "https://github.com/johngardenghi/ar4/blob/0f8ffc1b2701a4f5c5fd00facb8cd28c5b518026/algencan/license.txt",
+              "sha256": "7d4f39c16d3340e539d7b424159758a181a4894dae94532c3170bc0abb583ab0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36011,40 +36215,82 @@
             ],
             "procedures": [
               {
-                "procedure": "bmdfsaneacc::rsub / dfsaneacc",
+                "procedure": "rsub",
                 "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
-                "line_start": 1,
-                "line_end": 111
+                "line_start": 8,
+                "line_end": 16,
+                "role": "callback",
+                "module": "bmdfsaneacc",
+                "summary": "Required residual-subroutine interface: evalr(n,x,res,pdataptr), with an optional C_PTR data handle. The residual vector has the same length as x."
               },
               {
-                "procedure": "bmdfsaneacc::dfsaneacc",
+                "procedure": "dfsaneacc",
+                "module": "bmdfsaneacc",
+                "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                "line_start": 25,
+                "line_end": 39,
+                "role": "public-entry-point",
+                "summary": "Public module subroutine for square nonlinear systems. Supply n residuals for n REAL(KIND=8) unknowns through evalr; x is updated and res, iter, fcnt and istop are returned. epsf controls the residual 2-norm, ndiis the acceleration interval and nhlim the history capacity. pdataptr is optional.",
+                "signature": "CALL dfsaneacc(evalr, n, x, res, epsf, maxit, ndiis, nhlim, &\n               iter, fcnt, istop, pdataptr)",
+                "declarations": [
+                  {
+                    "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                    "line_start": 25,
+                    "line_end": 39
+                  },
+                  {
+                    "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+                    "line_start": 8,
+                    "line_end": 16
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
+                    "line_start": 24,
+                    "line_end": 52
+                  }
+                ],
+                "usage": "use bmdfsaneacc, only: dfsaneacc\n! Define evalr with the rsub interface and initialize x and controls.\n! Use a positive ndiis and suitable history capacity, e.g. nhlim=6.\ncall dfsaneacc(evalr, n, x, res, epsf, maxit, ndiis, nhlim, &\n               iter, fcnt, istop)",
+                "usage_notes": "Calling sketch only; the optional data pointer is omitted here. If the residual callback needs data, pass a valid C_PTR as in the author example. Build bmqr and the numerical-library dependencies described in the Fortran README. Check istop and the residual norm. No new numerical execution was performed."
+              },
+              {
+                "procedure": "dfsaneacc",
                 "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
                 "line_start": 128,
-                "line_end": 163
+                "line_end": 163,
+                "role": "implementation-evidence",
+                "module": "bmdfsaneacc"
               },
               {
-                "procedure": "bmdfsaneacc::dfsaneacc",
+                "procedure": "dfsaneacc",
                 "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
                 "line_start": 242,
-                "line_end": 257
+                "line_end": 257,
+                "role": "implementation-evidence",
+                "module": "bmdfsaneacc"
               },
               {
-                "procedure": "bmdfsaneacc::dfsaneacc",
+                "procedure": "dfsaneacc",
                 "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
                 "line_start": 326,
-                "line_end": 370
+                "line_end": 370,
+                "role": "implementation-evidence",
+                "module": "bmdfsaneacc"
               },
               {
                 "procedure": "dfsaneaccma",
                 "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
                 "line_start": 24,
-                "line_end": 52
+                "line_end": 52,
+                "role": "program-entry-point"
               },
               {
                 "procedure": "dfsaneaccma::evalr",
                 "path": "dfsaneacc-in-Fortran/src/examples/dfsaneaccma.f90",
                 "line_start": 113,
-                "line_end": 131
+                "line_end": 131,
+                "role": "callback"
               }
             ],
             "notes": "bmdfsaneacc::dfsaneacc solves a square system: the residual callback maps x(n) to res(n), with no Jacobian callback. It combines residual-direction nonmonotone steps with QR-based sequential-secant acceleration built from iterate/residual history. Success requires dot_product(res,res)<=epsf**2, so epsf bounds the residual Euclidean norm; iteration exhaustion is a distinct return. F2 is already a GAMS leaf: there is no official derivative-free or acceleration child to add. Internal least-squares acceleration is not evidence for a general rectangular least-squares solver, and this does not enumerate all roots or certify uniqueness. The Fortran example supplies a three-variable exponential system; the reviewed Fortran path does not require running R or CUTEst. Memory/rank limits, singular cases and the author example were not tested.",
@@ -36055,6 +36301,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "2e879f8b0baf7de75de8382e65d619b02bc5c7b6",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license grant was identified in the reviewed Fortran README or solver module, and the pinned tree has no separately named LICENSE/COPYING file. This finding is limited to the Fortran implementation reviewed here; it does not assign the terms of the separate R distribution to the Fortran sources.",
+          "evidence": [
+            {
+              "path": "dfsaneacc-in-Fortran/README.md",
+              "url": "https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/README.md",
+              "sha256": "342547ba2f038f42c565438c1ada522eb35df6e3d479ac30c57e592f2d757f9d"
+            },
+            {
+              "path": "dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+              "url": "https://github.com/johngardenghi/dfsaneacc/blob/2e879f8b0baf7de75de8382e65d619b02bc5c7b6/dfsaneacc-in-Fortran/src/dfsaneacc/dfsaneacc.f90",
+              "sha256": "aaaee384300eb5c0b832dc42066f9e77d1c770cfa53953644f72f9e4454936f3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36620,38 +36885,82 @@
                 "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-1.inc",
                 "path": "src/optional-args-1.inc",
                 "sha256": "c7a8f4032e708188aeecbff14848fc1e39f08174e4b6541663bc1dc515d1f6a8"
+              },
+              {
+                "path": "example/main.F90",
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90",
+                "sha256": "e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a"
               }
             ],
             "procedures": [
               {
-                "procedure": "merge_sort_mod::msort_1i_init",
+                "procedure": "sort",
+                "module": "merge_sort_mod",
+                "path": "src/merge_sort.F90",
+                "line_start": 1,
+                "line_end": 26,
+                "role": "public-entry-point",
+                "summary": "Public generic for in-place integer vector sorting or sorting matrix columns by a reference row. history and reverse are optional; matrix aref selects the reference row. Specific msort implementation routines are private. Ascending examples are shown because the inspected descending wrappers reverse data without reversing history.",
+                "signature": "CALL sort(arr, history, reverse)\nCALL sort(matrix, history, aref, reverse)",
+                "declarations": [
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 32,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 142,
+                    "line_end": 149
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "example/main.F90",
+                    "line_start": 1,
+                    "line_end": 35
+                  }
+                ],
+                "usage": "use merge_sort_mod, only: sort\n! arr is an initialized array of a supported element kind.\ncall sort(arr)\n! For labels: initialize history to [1,2,...,size(arr)] first.\n! Then call sort(arr, history) for ascending order.",
+                "usage_notes": "Calling sketch only. history and reverse may be omitted. For a matrix, use a valid reference-row index and one history label per column. Do not rely on descending history: the documented source-review finding remains unresolved. No sort result or edge case was checked by execution."
+              },
+              {
+                "procedure": "msort_1i_init",
                 "path": "src/merge_sort.F90",
                 "line_start": 32,
-                "line_end": 58
+                "line_end": 58,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
-                "procedure": "merge_sort_mod::msort_2i_init",
+                "procedure": "msort_2i_init",
                 "path": "src/merge_sort.F90",
                 "line_start": 142,
-                "line_end": 169
+                "line_end": 169,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
-                "procedure": "merge_sort_mod::merge_1i / merge_1ih",
+                "procedure": "merge_1i / merge_1ih",
                 "path": "src/merge_sort.F90",
                 "line_start": 483,
-                "line_end": 506
+                "line_end": 506,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
                 "procedure": "merge_1i (included body)",
                 "path": "src/merge-1.inc",
                 "line_start": 1,
-                "line_end": 33
+                "line_end": 33,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "merge_1ih (included body)",
                 "path": "src/merge-1h.inc",
                 "line_start": 1,
-                "line_end": 41
+                "line_end": 41,
+                "role": "implementation-helper"
               }
             ],
             "notes": "merge_sort_mod::sort overwrites default-integer vectors or reorders integer matrix columns according to a selected reference row, with optional caller-supplied history. Recursive halves are combined by merge_1i/merge_1ih using a temporary copy and a left-first <= comparison. This is active internal integer sorting (N6a2a); the history option is not a rank-only interface. The descending wrapper reverses arr without reversing history, so the ascending-history correspondence must not be assumed to survive reverse=.true. The implementation moves whole columns for 2-D input; it is not independent sorting of every row. No stability guarantee, descending-history check or author example was executed.",
@@ -36686,44 +36995,81 @@
                 "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/optional-args-2.inc",
                 "path": "src/optional-args-2.inc",
                 "sha256": "bd89a1f374b508485da60ab36be43b4bf8bb180724c3faf9f5255803cd5433f1"
+              },
+              {
+                "path": "example/main.F90",
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90",
+                "sha256": "e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a"
               }
             ],
             "procedures": [
               {
-                "procedure": "merge_sort_mod::sort (generic)",
+                "procedure": "sort",
+                "module": "merge_sort_mod",
                 "path": "src/merge_sort.F90",
                 "line_start": 1,
-                "line_end": 26
+                "line_end": 26,
+                "role": "public-entry-point",
+                "summary": "Public generic for in-place real vector sorting or sorting matrix columns by a reference row. history and reverse are optional; matrix aref selects the reference row. Specific msort implementation routines are private. Ascending examples are shown because the inspected descending wrappers reverse data without reversing history.",
+                "signature": "CALL sort(arr, history, reverse)\nCALL sort(matrix, history, aref, reverse)",
+                "declarations": [
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 87,
+                    "line_end": 93
+                  },
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 199,
+                    "line_end": 206
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "example/main.F90",
+                    "line_start": 1,
+                    "line_end": 35
+                  }
+                ],
+                "usage": "use merge_sort_mod, only: sort\n! arr is an initialized array of a supported element kind.\ncall sort(arr)\n! For labels: initialize history to [1,2,...,size(arr)] first.\n! Then call sort(arr, history) for ascending order.",
+                "usage_notes": "Calling sketch only. history and reverse may be omitted. For a matrix, use a valid reference-row index and one history label per column. Do not rely on descending history: the documented source-review finding remains unresolved. No sort result or edge case was checked by execution."
               },
               {
-                "procedure": "merge_sort_mod::msort_1d_init",
+                "procedure": "msort_1d_init",
                 "path": "src/merge_sort.F90",
                 "line_start": 87,
-                "line_end": 112
+                "line_end": 112,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
-                "procedure": "merge_sort_mod::msort_2d_init",
+                "procedure": "msort_2d_init",
                 "path": "src/merge_sort.F90",
                 "line_start": 199,
-                "line_end": 225
+                "line_end": 225,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
                 "procedure": "merge_1d (included body)",
                 "path": "src/merge-1.inc",
                 "line_start": 1,
-                "line_end": 33
+                "line_end": 33,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "merge_1dh (included body)",
                 "path": "src/merge-1h.inc",
                 "line_start": 1,
-                "line_end": 41
+                "line_end": 41,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "merge_2d (included body)",
                 "path": "src/merge-2.inc",
                 "line_start": 1,
-                "line_end": 32
+                "line_end": 32,
+                "role": "implementation-helper"
               }
             ],
             "notes": "The real(sp), real(dp) and real(qp) generic bindings overwrite a vector or permute complete matrix columns using one selected real reference row. The inspected double-precision wrappers and shared merge bodies support active internal real sorting (N6a2b). The optional history is moved during ascending merges; reverse=.true. reverses only the data in the inspected wrappers, so descending history correspondence is not verified and appears inconsistent. Real128 support, NaNs, signed-zero ordering, stability after reversal and extreme sizes were not checked. No passive-rank, character or complex-key mapping is inferred.",
@@ -36748,38 +37094,84 @@
                 "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/rearrange-2.inc",
                 "path": "src/rearrange-2.inc",
                 "sha256": "55103c9d7acfdb7337f2e9a4549edbee2d0cd153924a0d91903c0c4d567bbfb2"
+              },
+              {
+                "path": "example/main.F90",
+                "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/example/main.F90",
+                "sha256": "e250f30c55bfac7990a52aaeeb145328056d606d4f414b51c19aabdca52efa9a"
               }
             ],
             "procedures": [
               {
-                "procedure": "merge_sort_mod::rearrange (generic)",
+                "procedure": "rearrange",
                 "path": "src/merge_sort.F90",
                 "line_start": 22,
-                "line_end": 26
+                "line_end": 26,
+                "role": "public-entry-point",
+                "module": "merge_sort_mod",
+                "summary": "Public generic for gathering companion values or matrix columns using reference_history. The data are overwritten; reference_history is an input integer index vector. The specific rearrange_* implementations are private. Caller-supplied indices must be valid for the input array.",
+                "signature": "CALL rearrange(arr, reference_history)",
+                "declarations": [
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 773,
+                    "line_end": 778
+                  },
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 793,
+                    "line_end": 798
+                  },
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 813,
+                    "line_end": 818
+                  },
+                  {
+                    "path": "src/merge_sort.F90",
+                    "line_start": 833,
+                    "line_end": 838
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "example/main.F90",
+                    "line_start": 38,
+                    "line_end": 58
+                  }
+                ],
+                "usage": "use merge_sort_mod, only: rearrange\n! Initialize companion data and a valid output-to-input index vector.\ncall rearrange(arr, reference_history)",
+                "usage_notes": "Calling sketch only. Matrix overloads move complete columns. Obtain history from a compatible ascending sort or construct a valid permutation yourself; the catalog does not claim this routine validates indices. The descending-history source finding also affects history-based companion rearrangement. Not compiled or run here."
               },
               {
-                "procedure": "merge_sort_mod::rearrange_1i / rearrange_1d",
+                "procedure": "rearrange_1i / rearrange_1d",
                 "path": "src/merge_sort.F90",
                 "line_start": 773,
-                "line_end": 802
+                "line_end": 802,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
-                "procedure": "merge_sort_mod::rearrange_2i / rearrange_2d",
+                "procedure": "rearrange_2i / rearrange_2d",
                 "path": "src/merge_sort.F90",
                 "line_start": 813,
-                "line_end": 842
+                "line_end": 842,
+                "role": "implementation-helper",
+                "module": "merge_sort_mod"
               },
               {
                 "procedure": "rearrange_1i / rearrange_1d (included body)",
                 "path": "src/rearrange-1.inc",
                 "line_start": 1,
-                "line_end": 9
+                "line_end": 9,
+                "role": "implementation-helper"
               },
               {
                 "procedure": "rearrange_2i / rearrange_2d (included body)",
                 "path": "src/rearrange-2.inc",
                 "line_start": 1,
-                "line_end": 10
+                "line_end": 10,
+                "role": "implementation-helper"
               }
             ],
             "notes": "The public rearrange generic applies reference_history as a gather permutation. The included 1-D body copies arr(reference_history(i)); the 2-D body copies complete arr(:,reference_history(i)) columns. Default integer and real sp/dp/qp variants are exposed. This supports the N8 permuting leaf, independently of how the permutation was obtained. The caller must supply valid indices with the correct direction; the inspected bodies do not validate a bijection or compute its inverse. The separate descending-sort history discrepancy is retained in the sorting mappings. No bounds, permutation-cycle or round-trip checks were executed.",
@@ -36790,6 +37182,25 @@
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "fb8d241576af567597f357cd1b2491f7b3b16dba",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license grant was identified in the reviewed README or main module, and the pinned tree has no separately named LICENSE/COPYING file. This is a recorded absence in the inspected material, not a claim that public source access grants reuse rights.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/README.md",
+              "sha256": "59e4f1a08b66af7b4bb1ef9b74a5fa6eace8c1746b66c4f0141cbecf2df61908"
+            },
+            {
+              "path": "src/merge_sort.F90",
+              "url": "https://github.com/suzuyuyuyu/Fortran-mergesort/blob/fb8d241576af567597f357cd1b2491f7b3b16dba/src/merge_sort.F90",
+              "sha256": "12d9d0cb319ca58f4b4bd816eb8de382ab5ccfc50670298da580c598c4e1f18d"
+            }
+          ]
         }
       },
       "imports": {}
