@@ -10,7 +10,7 @@ from urllib.parse import unquote, urlsplit
 
 from catalog import ROOT, assemble, belongs, extend_taxonomy, matching_drivers, read, validate_local
 from vendor.catalog_export import merge_catalog, snapshot_id
-from xbuild import build, supports_fpm
+from xbuild import build, supports_fpm, source_codes
 from xrefresh import refresh
 from xreviews import render
 
@@ -138,9 +138,12 @@ class CatalogTests(unittest.TestCase):
             index = (destination/'index.html').read_text(encoding='utf-8')
             self.assertIn('<h1>Fortran software by GAMS classification</h1>', index)
             self.assertIn('id="exclude-fpm"', index)
+            self.assertIn('id="source-reviewed"', index)
+            self.assertIn('data-source-count=', index)
             self.assertIn('data-without-fpm=', index)
             listing = (destination/'projects/index.html').read_text(encoding='utf-8')
             self.assertEqual(listing.count('data-fpm="true"'), sum(supports_fpm(p) for p in self.projects))
+            self.assertEqual(listing.count('data-source-match="true"'), sum(bool(source_codes(p)) for p in self.projects))
             self.assertTrue((destination/'catalog.json').is_file())
             for page in destination.rglob('index.html'):
                 for url in Links(page.read_text(encoding='utf-8')).urls:
@@ -165,6 +168,14 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('source reviewed', acrs)
             self.assertNotIn('<h2>Checked hosted drivers</h2>', acrs)
             self.assertIn('price_base_iteration', listing)
+            # A reviewed BLAS mapping must not qualify an unreviewed
+            # linear-system classification in the same repository.
+            linear_systems = (destination/'classes/D2/index.html').read_text(encoding='utf-8')
+            from html import unescape
+            import re
+            card = next(c for c in re.findall(r'<article .*?</article>', linear_systems, re.S)
+                        if 'awvwgk/blas-interface' in unescape(c))
+            self.assertIn('data-source-match="false"', card)
             self.assertTrue((destination/'classes/G2h3b2/index.html').is_file())
 
     def test_seed_review_document_matches_catalog_owned_records(self):
@@ -180,6 +191,14 @@ class CatalogTests(unittest.TestCase):
         self.assertFalse(supports_fpm({}))
         independent_fpm = [p for p in self.projects if not p.get('playground') and supports_fpm(p)]
         self.assertTrue(independent_fpm)
+
+    def test_source_filter_requires_explicit_review_level(self):
+        project = {'local': {'classifications': [
+            {'code': 'H', 'level': 'documentation-reviewed'},
+            {'code': 'H1', 'level': 'source-reviewed'}]}, 'procedures': [
+                {'gams_codes': ['D'], 'review_level': 'documentation-reviewed'},
+                {'gams_codes': ['D2a2'], 'review_level': 'source-reviewed'}]}
+        self.assertEqual(source_codes(project), ['D2a2', 'H1'])
 
     def test_classification_scope_does_not_turn_support_tools_into_solvers(self):
         records = {p['id']: p['local'] for p in self.local['projects']}

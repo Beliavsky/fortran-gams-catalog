@@ -1,6 +1,7 @@
 'use strict';
 const form = document.querySelector('.search');
 const excludeFpm = document.getElementById('exclude-fpm');
+const sourceReviewed = document.getElementById('source-reviewed');
 if (excludeFpm) {
   const query = document.getElementById('query');
   const collection = document.getElementById('collection');
@@ -17,29 +18,40 @@ if (excludeFpm) {
   if (query) query.value = params.get('q') || '';
   if (collection && ['independent', 'imported'].includes(params.get('collection'))) collection.value = params.get('collection');
   excludeFpm.checked = params.get('exclude_fpm') === '1';
+  if (sourceReviewed) sourceReviewed.checked = params.get('source_reviewed') === '1';
   function update() {
+    const sourceOnly = Boolean(sourceReviewed?.checked);
     const terms = (query?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
     let count = 0;
     for (const card of cards) {
-      card.hidden = !(terms.every(term => card.dataset.search.includes(term)) &&
+      const search = sourceOnly ? card.dataset.sourceSearch : card.dataset.search;
+      card.hidden = !((!sourceOnly || card.dataset.sourceMatch === 'true') &&
+        terms.every(term => search.includes(term)) &&
         (!collection?.value || card.dataset.collection === collection.value) &&
         (!excludeFpm.checked || card.dataset.fpm !== 'true'));
       if (!card.hidden) count++;
+      for (const section of card.querySelectorAll('[data-all-mappings]')) section.hidden = sourceOnly;
+      for (const section of card.querySelectorAll('[data-source-mappings]')) section.hidden = !sourceOnly;
     }
     const matches = document.getElementById('matches');
     if (matches) matches.textContent = `${count} of ${cards.length} repositories shown`;
     for (const label of classCounts) {
-      label.textContent = `(${excludeFpm.checked ? label.dataset.withoutFpm : label.dataset.classCount})`;
+      const key = sourceOnly ? (excludeFpm.checked ? 'sourceWithoutFpm' : 'sourceCount') :
+        (excludeFpm.checked ? 'withoutFpm' : 'classCount');
+      label.textContent = `(${label.dataset[key]})`;
     }
     for (const {link, url: original} of navigation) {
       const target = new URL(original);
       if (excludeFpm.checked) target.searchParams.set('exclude_fpm', '1');
       else target.searchParams.delete('exclude_fpm');
+      if (sourceOnly) target.searchParams.set('source_reviewed', '1');
+      else target.searchParams.delete('source_reviewed');
       link.href = target.href;
     }
     const url = new URL(location.href);
     for (const [name, value] of [['q', query?.value.trim() || ''], ['collection', collection?.value || ''],
-                                 ['exclude_fpm', excludeFpm.checked ? '1' : '']]) {
+                                 ['exclude_fpm', excludeFpm.checked ? '1' : ''],
+                                 ['source_reviewed', sourceOnly ? '1' : '']]) {
       if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
     }
     history.replaceState(null, '', url);
@@ -48,5 +60,6 @@ if (excludeFpm) {
   query?.addEventListener('input', update);
   collection?.addEventListener('change', update);
   excludeFpm.addEventListener('change', update);
+  sourceReviewed?.addEventListener('change', update);
   update();
 }

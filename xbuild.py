@@ -31,9 +31,18 @@ def supports_fpm(project):
     return any(system.casefold() == 'fpm' for system in project.get('build_systems', []))
 
 
+def source_codes(project):
+    """Only explicitly source-reviewed claims, including imported procedure reviews."""
+    return sorted({c['code'] for c in project['local'].get('classifications', [])
+                   if c['level'] == 'source-reviewed'} |
+                  {c for p in project['procedures'] if p.get('review_level') == 'source-reviewed'
+                   for c in p['gams_codes']})
+
+
 def build(destination, root=ROOT):
     destination, root = Path(destination), Path(root)
     tree, projects, merged = assemble(root)
+    reviewed_codes = {p['id']: source_codes(p) for p in projects}
     destination.mkdir(parents=True, exist_ok=True)
     for asset in ('catalog.css', 'search.js'):
         shutil.copy2(root/'assets'/asset, destination/asset)
@@ -57,7 +66,9 @@ def build(destination, root=ROOT):
 {link('https://beliavsky.github.io/fortran-playground/gams/', 'Playground package catalog')} ·
 {link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
-<span class="muted" id="fpm-filter-help">Repositories with unreviewed build support remain included.</span></div></header>
+<span class="muted" id="fpm-filter-help">Repositories with unreviewed build support remain included.</span></div>
+<div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="source-reviewed" aria-describedby="source-filter-help"> Only source-reviewed mappings</label>
+<span class="muted" id="source-filter-help">Evidence in the source supports the classification; compilation and numerical testing are separate.</span></div></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
 {link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
@@ -97,9 +108,21 @@ def build(destination, root=ROOT):
             drivers = ''.join('<li>'+link(d['url'], d['gams_code']+' — '+d['name'])+'</li>'
                               for d in matching_drivers(tree, p, code))
             driver_links = '<details><summary>Checked drivers for this scope</summary><ul>'+drivers+'</ul></details>' if drivers else ''
-            cards.append(f'''<article data-search="{e(search.lower())}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
+            reviewed = reviewed_codes[p['id']]
+            source_match = any(belongs(tree, c, code) for c in reviewed)
+            source_search = ' '.join([p['name'], p['description'], repo['owner'], p['owner_label'],
+                                      *p['topics'], *reviewed, *(tree[c]['label'] for c in reviewed),
+                                      *(proc['procedure'] for proc in p['procedures']
+                                        if proc.get('origin') == 'local' or proc.get('review_level') == 'source-reviewed')])
+            reviewed_leaves = specific_codes(tree, reviewed)
+            source_labels = ' · '.join(link(prefix+'classes/'+c+'/', c)
+                                        for c in reviewed_leaves[:8])
+            if len(reviewed_leaves) > 8:
+                source_labels += ' · '+link(prefix+project_path(p), f'{len(reviewed_leaves)-8} more reviewed classes')
+            cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
-<p>{e(p['description'])}</p><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</article>''')
+<p>{e(p['description'])}</p><div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
+<div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div></article>''')
         return controls+''.join(cards)
 
     def class_links(parent, prefix):
@@ -108,8 +131,9 @@ def build(destination, root=ROOT):
         for c in codes:
             members = [p for p in projects if any(belongs(tree, k, c) for k in p['codes'])]
             without_fpm = sum(not supports_fpm(p) for p in members)
+            reviewed = [p for p in members if any(belongs(tree, k, c) for k in reviewed_codes[p['id']])]
             rows.append('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
-                        f' <span class="muted" data-class-count="{len(members)}" data-without-fpm="{without_fpm}">({len(members)})</span></li>')
+                        f' <span class="muted" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
         return '<ul class="classes">'+''.join(rows)+'</ul>'
 
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'

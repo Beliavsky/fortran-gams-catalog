@@ -15,6 +15,14 @@ update and the selection follows catalog links; it can be shared with
 `?exclude_fpm=1`. Repositories with unreviewed build support remain included, so
 this filter is not proof that every remaining repository lacks FPM support.
 
+Select **Only source-reviewed mappings** to restrict results, displayed class
+labels and GAMS counts to classifications supported by reviewed source code.
+This includes independent reviews and source-reviewed procedures imported from
+the playground. On a GAMS page, a reviewed mapping must match that class or a
+descendant. Combine it with the other filters or share `?source_reviewed=1`;
+the selection follows catalog links. Repository detail pages retain the full
+evidence record. Source review does not imply compilation or numerical testing.
+
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
 Detailed numerical-method reviews include source-linked
