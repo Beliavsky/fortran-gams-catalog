@@ -310,12 +310,143 @@
             ],
             "notes": "The README documents AD types and Jacobian extraction. Its optional AD-aware FFT is not separately classified here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "0b75bb2e52de1ace8edb7a9ef114791ea04e43f2",
+            "reviewed_on": "2026-11-04",
+            "notes": "The reviewed real adjac_double path records local first-derivative dependencies in module-wide tape arrays. Multiplication records the product rule through sum_taylor_a; get_dense_jacobian_a seeds dependent variables in blocks and traverses those dependencies backward to assemble Jacobian rows. adjac_set_independent seeds variable indices. This establishes operator-overloaded first differentiation, not higher derivatives or a numerical finite-difference method. The scoped review covers real variables and dense extraction; complex, sparse-COO, tapeless and FFT variants remain outside this source mapping. The shared storage and mode flag require coordinated lifecycle management and are not independently thread-local. Reset without product_mode preserves the previous mode. Fatal errors STOP rather than return status. No numerical derivative test was run.",
+            "evidence": [
+              {
+                "path": "adjac.f95",
+                "url": "https://github.com/pv/adjac/blob/0b75bb2e52de1ace8edb7a9ef114791ea04e43f2/adjac.f95",
+                "sha256": "9c4c202fa5ad2c563e665d3550ed11a04fee49ea19252849720349a27d674189"
+              },
+              {
+                "path": "examples/simple.f95",
+                "url": "https://github.com/pv/adjac/blob/0b75bb2e52de1ace8edb7a9ef114791ea04e43f2/examples/simple.f95",
+                "sha256": "5e45bc11d6c16a04e482dcbda3e3f18dd5178f019c3f5a0fc7dc3be8a35a28a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "adjac_reset",
+                "role": "public-entry-point",
+                "summary": "Reset shared tape indices before registering independent variables. Explicitly pass product_mode=.false. for the dense-Jacobian path; omitting it preserves the last mode. Existing AD values tied to an earlier tape must not be reused after resetting.",
+                "signature": "CALL adjac_reset(product_mode)",
+                "declarations": [
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 284,
+                    "line_end": 286
+                  }
+                ],
+                "path": "adjac.f95",
+                "line_start": 284,
+                "line_end": 293,
+                "module": "adjac"
+              },
+              {
+                "procedure": "adjac_set_independent",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected real vector overload takes type(adjac_double) x(:), double-precision xval(size(x)), and optional directional seeds dx. Dense mode numbers variables in x order. Scalar registration instead requires the variable index j.",
+                "signature": "CALL adjac_set_independent(x, xval, dx)",
+                "declarations": [
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 465,
+                    "line_end": 469
+                  },
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 250,
+                    "line_end": 253
+                  }
+                ],
+                "path": "adjac.f95",
+                "line_start": 250,
+                "line_end": 253,
+                "module": "adjac"
+              },
+              {
+                "procedure": "adjac_get_dense_jacobian",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected real overload takes dependent type(adjac_double) y(:) as INOUT and a caller-sized double-precision matrix. Allocate one row per dependent and one column per registered independent; extraction requires tape mode. Specific get_dense_jacobian_a is private.",
+                "signature": "CALL adjac_get_dense_jacobian(y, jac_dense)",
+                "declarations": [
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 517,
+                    "line_end": 520
+                  },
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 264,
+                    "line_end": 266
+                  }
+                ],
+                "path": "adjac.f95",
+                "line_start": 264,
+                "line_end": 266,
+                "module": "adjac",
+                "usage": "use adjac\ntype(adjac_double) :: x(2), y(1)\ndouble precision :: jac(1,2)\ncall adjac_reset(product_mode=.false.)\ncall adjac_set_independent(x, [2.0d0, 3.0d0])\ny(1) = x(1)*x(2)\ncall adjac_get_dense_jacobian(y, jac)\ncall adjac_free()",
+                "usage_notes": "Calling sketch for the inspected real dense path, not a checked driver. The analytic expected Jacobian is [3,2], but this was not compiled or compared. Complete all extraction before freeing or resetting shared tape storage. The supplied author example demonstrates a separate complex-analytic specialization, which is not certified by this real-path source review."
+              },
+              {
+                "procedure": "adjac_free",
+                "role": "public-entry-point",
+                "summary": "Release the shared tape arrays after all values and derivatives have been extracted. Existing tape-dependent AD variables become unusable; this does not reset the product-mode flag.",
+                "signature": "CALL adjac_free()",
+                "declarations": [
+                  {
+                    "path": "adjac.f95",
+                    "line_start": 295,
+                    "line_end": 307
+                  }
+                ],
+                "path": "adjac.f95",
+                "line_start": 295,
+                "line_end": 307,
+                "module": "adjac"
+              },
+              {
+                "procedure": "get_dense_jacobian_a",
+                "role": "implementation-helper",
+                "module": "adjac",
+                "path": "adjac.f95",
+                "line_start": 517,
+                "line_end": 628
+              },
+              {
+                "procedure": "sum_taylor_a",
+                "role": "implementation-helper",
+                "module": "adjac",
+                "path": "adjac.f95",
+                "line_start": 820,
+                "line_end": 849
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause (adjac core)",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "0b75bb2e52de1ace8edb7a9ef114791ea04e43f2",
+          "reviewed_on": "2026-11-04",
+          "notes": "The adjac core has the three-clause BSD notice in LICENSE.txt. That file separately describes fftpack/* as public domain; the optional FFT material is outside this core source review. The SPDX expression here identifies the core notice, not a uniform license for all bundled files.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/pv/adjac/blob/0b75bb2e52de1ace8edb7a9ef114791ea04e43f2/LICENSE.txt",
+              "sha256": "53ab9feedd10e5abe70e5c9cb058c1888acb120171349168350fffe6794d236f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -491,12 +622,188 @@
             ],
             "notes": "The README describes smoothing the absolute-value operation for data sensitivities. It explicitly cautions against substantial extrapolation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "b72e0f6272b8b9721141b7130b8628d6554b6958",
+            "reviewed_on": "2026-11-04",
+            "notes": "setup forms segment slopes, extrapolated endpoint slopes and Akima weighted nodal slopes, then local cubic coefficients; interp selects an interval and evaluates its cubic. This establishes univariate piecewise-polynomial interpolation. abs_smooth rounds the absolute-value weights when delta_x is positive, so that variant differs from unsmoothed Akima. The source assumes ordered distinct nodes and at least three points without checking them. Queries outside the data range continue the nearest end polynomial; this is not a reliable general extrapolation method. No shape-preservation, monotonicity or accuracy guarantee is inferred from the README, and no spline was run.",
+            "evidence": [
+              {
+                "path": "src/akima.f90",
+                "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/src/akima.f90",
+                "sha256": "e1013b1dea0715722b4ec01db76f878c53c91c419a2bc60b3072ebbd77413c10"
+              },
+              {
+                "path": "src/akima.py",
+                "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/src/akima.py",
+                "sha256": "a67083f9a3eb7b473f7b0fbf177d133cba7eacb54b931cdf0715f5cd97394af5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup",
+                "role": "public-entry-point",
+                "summary": "External double-precision spline constructor. Supply n >= 3 strictly increasing abscissae and matching ordinates; allocate four coefficient vectors of length n-1. delta_x controls smoothing of slope-difference weights. No status argument or input validation is provided.",
+                "signature": "CALL setup(n, xpt, ypt, p0, p1, p2, p3, delta_x)",
+                "declarations": [
+                  {
+                    "path": "src/akima.f90",
+                    "line_start": 33,
+                    "line_end": 43
+                  }
+                ],
+                "path": "src/akima.f90",
+                "line_start": 28,
+                "line_end": 92
+              },
+              {
+                "procedure": "interp",
+                "role": "public-entry-point",
+                "summary": "External evaluator returning values, argument derivatives and data sensitivities. All coefficient-sensitivity matrices are required, shaped (npt-1,npt); transpose the appropriate SETUP_DV direction blocks as the Python wrapper does. Output data sensitivities have shape (n,npt). Out-of-range queries use the nearest end polynomial.",
+                "signature": "CALL interp(npt, n, x, xpt, p0, p1, p2, p3, dp0dxpt, dp1dxpt, dp2dxpt, dp3dxpt, dp0dypt, dp1dypt, dp2dypt, dp3dypt, y, dydx, dydxpt, dydypt)",
+                "declarations": [
+                  {
+                    "path": "src/akima.f90",
+                    "line_start": 105,
+                    "line_end": 116
+                  }
+                ],
+                "path": "src/akima.f90",
+                "line_start": 95,
+                "line_end": 154,
+                "examples": [
+                  {
+                    "path": "src/akima.py",
+                    "line_start": 121,
+                    "line_end": 124
+                  }
+                ]
+              },
+              {
+                "procedure": "SETUP_DV",
+                "role": "public-entry-point",
+                "summary": "External tangent-mode constructor specialized to the spline setup. Supply xptd and yptd as (nbdirs,n) seed arrays; each coefficient derivative is (nbdirs,n-1). Use positive delta_x for smooth data sensitivities. It is not a general differentiation engine for arbitrary user functions.",
+                "signature": "CALL SETUP_DV(n, xpt, xptd, ypt, yptd, p0, p0d, p1, p1d, p2, p2d, p3, p3d, delta_x, nbdirs)",
+                "declarations": [
+                  {
+                    "path": "src/akima.f90",
+                    "line_start": 173,
+                    "line_end": 186
+                  }
+                ],
+                "path": "src/akima.f90",
+                "line_start": 168,
+                "line_end": 289,
+                "examples": [
+                  {
+                    "path": "src/akima.py",
+                    "line_start": 60,
+                    "line_end": 79
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "b72e0f6272b8b9721141b7130b8628d6554b6958",
+            "reviewed_on": "2026-11-04",
+            "notes": "The Tapenade-generated SETUP_DV propagates caller-supplied tangent directions through slope differences, smoothed Akima weights and cubic coefficients. interp then forms analytic derivatives with respect to the query argument and original abscissae/ordinates, including the derivative of the local coordinate. The Python wrapper seeds 2*n directions with identity/zero blocks and transposes their coefficient sensitivities. This mapping is differentiation of this particular interpolant, not a general-purpose AD package, finite-difference estimator or derivative of an unknown sampled function. delta_x is held fixed; its derivative is not computed. Positive smoothing is needed for the intended smooth data sensitivities. No derivative comparison was executed.",
+            "evidence": [
+              {
+                "path": "src/akima.f90",
+                "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/src/akima.f90",
+                "sha256": "e1013b1dea0715722b4ec01db76f878c53c91c419a2bc60b3072ebbd77413c10"
+              },
+              {
+                "path": "src/akima.py",
+                "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/src/akima.py",
+                "sha256": "a67083f9a3eb7b473f7b0fbf177d133cba7eacb54b931cdf0715f5cd97394af5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SETUP_DV",
+                "role": "public-entry-point",
+                "summary": "External tangent-mode constructor specialized to the spline setup. Supply xptd and yptd as (nbdirs,n) seed arrays; each coefficient derivative is (nbdirs,n-1). Use positive delta_x for smooth data sensitivities. It is not a general differentiation engine for arbitrary user functions.",
+                "signature": "CALL SETUP_DV(n, xpt, xptd, ypt, yptd, p0, p0d, p1, p1d, p2, p2d, p3, p3d, delta_x, nbdirs)",
+                "declarations": [
+                  {
+                    "path": "src/akima.f90",
+                    "line_start": 173,
+                    "line_end": 186
+                  }
+                ],
+                "path": "src/akima.f90",
+                "line_start": 168,
+                "line_end": 289,
+                "examples": [
+                  {
+                    "path": "src/akima.py",
+                    "line_start": 60,
+                    "line_end": 79
+                  }
+                ]
+              },
+              {
+                "procedure": "interp",
+                "role": "public-entry-point",
+                "summary": "External evaluator returning values, argument derivatives and data sensitivities. All coefficient-sensitivity matrices are required, shaped (npt-1,npt); transpose the appropriate SETUP_DV direction blocks as the Python wrapper does. Output data sensitivities have shape (n,npt). Out-of-range queries use the nearest end polynomial.",
+                "signature": "CALL interp(npt, n, x, xpt, p0, p1, p2, p3, dp0dxpt, dp1dxpt, dp2dxpt, dp3dxpt, dp0dypt, dp1dypt, dp2dypt, dp3dypt, y, dydx, dydxpt, dydypt)",
+                "declarations": [
+                  {
+                    "path": "src/akima.f90",
+                    "line_start": 105,
+                    "line_end": 116
+                  }
+                ],
+                "path": "src/akima.f90",
+                "line_start": 95,
+                "line_end": 154,
+                "examples": [
+                  {
+                    "path": "src/akima.py",
+                    "line_start": 121,
+                    "line_end": 124
+                  }
+                ]
+              },
+              {
+                "procedure": "ABS_SMOOTH_DV",
+                "role": "implementation-helper",
+                "path": "src/akima.f90",
+                "line_start": 295,
+                "line_end": 325
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "b72e0f6272b8b9721141b7130b8628d6554b6958",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE provides Apache License 2.0. The Fortran source identifies Tapenade-generated tangent code; this records the repository license and generation attribution, not an independent audit of generator licensing or every distribution component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/LICENSE",
+              "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+            },
+            {
+              "path": "src/akima.f90",
+              "url": "https://github.com/andrewning/akima/blob/b72e0f6272b8b9721141b7130b8628d6554b6958/src/akima.f90",
+              "sha256": "e1013b1dea0715722b4ec01db76f878c53c91c419a2bc60b3072ebbd77413c10"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5423,12 +5730,110 @@
             ],
             "notes": "The brief README describes modular ODE solvers and a Brusselator initial-value example. Method inventory, stiffness handling and error-control guarantees need source review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "eebf44cc47e9f62adf19c093d59479afda1b88ce",
+            "reviewed_on": "2026-11-04",
+            "notes": "The active rk_wrapper path selects the explicit seven-stage Dormand-Prince embedded tableau, then uses two weighted stage estimates for adaptive one-step integration of a callback-defined initial-value system. Tolerances are hard-coded to sqrt(machine epsilon), the estimator uses an L2 difference and a global maximum component scale, and accepted states use the bstar estimate. This records intended one-step nonstiff scope, not verified order or accuracy. A material source finding is that calc_k initializes dummy_y only once before the stage loop and accumulates all successive stage sums into it, instead of rebuilding each stage from y; the implemented stages therefore need correction/checking before relying on the named method. The first adaptive trial is not clipped to the interval endpoint; clipping occurs after a step. Rejection exhaustion STOPs; there is no status output. The routine writes to unit 22. Implicit/nonlinear-solver branches and their stiff suitability are not reviewed or mapped.",
+            "evidence": [
+              {
+                "path": "src/runge_kutta.f90",
+                "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/src/runge_kutta.f90",
+                "sha256": "2e900ee51236ef8f3374baf1916c12c8526280eda60fa203f839e048cf92ab90"
+              },
+              {
+                "path": "src/rk_constants.f90",
+                "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/src/rk_constants.f90",
+                "sha256": "22db18c9e38941c36209de7f5e744b638c410cf941f8a4ecfa5b77021f69e575"
+              },
+              {
+                "path": "src/test/src/main.f90",
+                "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/src/test/src/main.f90",
+                "sha256": "3a88bb778ece5cd3864ac4ffde03e056cc95caf16ea5566f43bef1669d7fd3b9"
+              },
+              {
+                "path": "src/test/src/misc.f90",
+                "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/src/test/src/misc.f90",
+                "sha256": "a52fce287e3593923e9d601a6d951e513890f06935cb7a95de22c91f5dbdea83"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rk_wrapper",
+                "role": "public-entry-point",
+                "summary": "Module entry for real64 state integration. Provide num_t >= 2 increasing output times t(num_t), initialize y(1,:) in y(num_t,n), and supply dysub(n,t,y,dy) with real64 inputs/output. The selected method and tolerances are fixed in the source. Open unit 22 for internal-step output. Linking still requires nonlinalg and its dependencies even for this selected explicit path.",
+                "signature": "CALL rk_wrapper(n, num_t, t, y, dysub)",
+                "declarations": [
+                  {
+                    "path": "src/runge_kutta.f90",
+                    "line_start": 39,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "src/runge_kutta.f90",
+                    "line_start": 25,
+                    "line_end": 33
+                  }
+                ],
+                "path": "src/runge_kutta.f90",
+                "line_start": 37,
+                "line_end": 100,
+                "module": "runge_kutta",
+                "examples": [
+                  {
+                    "path": "src/test/src/main.f90",
+                    "line_start": 16,
+                    "line_end": 40
+                  }
+                ]
+              },
+              {
+                "procedure": "rk_adaptive",
+                "module": "runge_kutta",
+                "role": "implementation-evidence",
+                "path": "src/runge_kutta.f90",
+                "line_start": 102,
+                "line_end": 227
+              },
+              {
+                "procedure": "calc_k",
+                "module": "runge_kutta",
+                "role": "implementation-evidence",
+                "path": "src/runge_kutta.f90",
+                "line_start": 263,
+                "line_end": 294
+              },
+              {
+                "procedure": "dormand_prince_rk45",
+                "module": "rk_constants",
+                "role": "implementation-evidence",
+                "path": "src/rk_constants.f90",
+                "line_start": 244,
+                "line_end": 273
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause",
+          "spdx_expression": "BSD-2-Clause",
+          "revision": "eebf44cc47e9f62adf19c093d59479afda1b88ce",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned root LICENSE supplies the two-clause BSD notice. This records the repository notice, not license compatibility or a full review of the separately referenced fortranlib submodule and other dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/cbcoutinho/generic_rk/blob/eebf44cc47e9f62adf19c093d59479afda1b88ce/LICENSE",
+              "sha256": "ebd0682ff08ce79c60f86e8e8a2286b8fcbf07e80c01370a9d8c27e314853d5b"
+            }
+          ]
         }
       },
       "imports": {}

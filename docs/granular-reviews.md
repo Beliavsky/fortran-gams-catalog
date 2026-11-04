@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Twenty-four repositories now have thirty-six source-reviewed
+Reviewed on 2026-11-04. Twenty-seven repositories now have forty source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Twenty-three repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A twenty-fourth, DDFSA, identifies the supplied
+Twenty-six repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A twenty-seventh, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All twenty-four independently source-reviewed repositories now have an
+separately. All twenty-seven independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -47,6 +47,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FORTRAN-Roots | `MOD_Roots::fun_zero`, `MOD_Roots::poly_roots` | No license identified in reviewed material |
 | GetRootsF | `roots::hybridD`, `roots::hybridSA` | No license identified in reviewed material |
 | FORTRAN-ODE-Toolbox | `MOD_ODE_Toolbox::ODE_Numerical_Solve_RK4`, `::ODE_Numerical_Solve_RK4_Adaptive` | GNU GPL version 3; version scope unresolved |
+| Akima with Derivatives | External `setup`, `SETUP_DV`, `interp` | Apache-2.0 |
+| adjac | `adjac::adjac_reset`, `::adjac_set_independent`, `::adjac_get_dense_jacobian`, `::adjac_free` | BSD-3-Clause core; separate FFTPACK notice |
+| generic_rk | `runge_kutta::rk_wrapper` | BSD-2-Clause |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -90,6 +93,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FORTRAN-Roots](https://github.com/bryand4140/FORTRAN-Roots) | F1b; F1a | Secant/bisection scalar search and balanced-companion double-QR polynomial roots | Strict endpoint sign test rejects endpoint roots. Interior NaN checking depends on printing. Polynomial accuracy hint is heuristic. |
 | [GetRootsF](https://github.com/physicsfan/GetRootsF) | F1b | Newton/bisection and derivative-free accelerated-secant/bisection branches | Bracket-update operands need correction/checking; candidate-relative stopping can divide by zero. No returned convergence flag. Range scanning is not all-root enumeration. |
 | [FORTRAN-ODE-Toolbox](https://github.com/bryand4140/FORTRAN-ODE-Toolbox) | I1a1a | Classical fixed RK4 and adaptive RK4 step doubling | Fixed and adaptive arrays have opposite orientations. Fixed output needs at least two time points. Adaptive discrepancy is absolute and not a global error bound. No stiff mapping added. |
+| [Akima with Derivatives](https://github.com/andrewning/akima) | E1a; H1 | Smoothed Akima cubic construction, tangent coefficient propagation and analytic query/data derivatives | Ordered distinct nodes and n >= 3 required. End-polynomial extrapolation is not generally reliable. Sensitivities differentiate the interpolant, not an unknown sampled function. |
+| [adjac](https://github.com/pv/adjac) | H1 | Real overloaded product rule, derivative tape and dense Jacobian extraction | Shared tape/mode lifecycle needs coordination. Only the real dense path is source reviewed; complex, COO, FFT and tapeless variants are not certified. |
+| [generic_rk](https://github.com/cbcoutinho/generic_rk) | I1a1a | Active Dormand-Prince tableau selection and adaptive explicit stage path | Stage state accumulates across stages instead of resetting. Initial endpoint clipping needs attention. Hard-coded tolerances, unit-22 output and STOP on exhaustion; no stiff mapping. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -169,3 +175,14 @@ Next numerical reviews move to other independently reviewed linear-algebra,
 quadrature and differential-equation libraries. Benchmark collections remain
 separate from implemented solvers. The ball-covering derivative callbacks and
 DNAD examples remain candidates for later compiled checks, not checked drivers.
+
+## Further interface reviews: interpolation, differentiation and ODEs
+
+Akima's sensitivity arrays are directional during construction and transposed
+into coefficient-by-data arrays for evaluation; the author Python wrapper is
+linked as a setup reference. These derivatives describe the interpolant.
+Adjac's public generic names are retained rather than advertising their private
+real overloads. Its real dense calling sketch explicitly resets tape mode.
+The generic_rk mapping records the active explicit path and its stage-state
+finding; its method name alone does not establish numerical order or stiff
+capability. No upstream source was compiled or run for these reviews.
