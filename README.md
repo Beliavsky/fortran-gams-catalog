@@ -4,10 +4,13 @@ A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
 The saved catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, alongside **206 independent
+procedure evidence and checked driver links, alongside **406 independent
 repository reviews**. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
+
+New discovery reviews start with broad GAMS divisions. More granular classes
+and procedure mappings are added through later reviews of individual repositories.
 
 The existing [playground package catalog](https://beliavsky.github.io/fortran-playground/gams/)
 continues to focus on selected packages and runnable examples. This broader
