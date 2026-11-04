@@ -24322,6 +24322,1960 @@
         }
       },
       "imports": {}
+    },
+    {
+      "id": "github:hfp/libxsmm",
+      "local": {
+        "name": "LIBXSMM",
+        "description": "Specialized small matrix operations with generated Fortran interfaces to optimized kernels.",
+        "repository": {
+          "host": "github",
+          "owner": "hfp",
+          "name": "libxsmm",
+          "url": "https://github.com/hfp/libxsmm"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "linear-algebra",
+          "matrix-multiplication",
+          "jit",
+          "simd"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "3469aa806f4acef8f30c1241d5c2705713811b4c",
+            "evidence": [
+              {
+                "url": "https://github.com/hfp/libxsmm/blob/3469aa806f4acef8f30c1241d5c2705713811b4c/README.md",
+                "path": "README.md",
+                "sha256": "31e2c1baaabcce4d8eb54fd18a83b80d5c2e33b241257e250e705748ad84c7b7"
+              }
+            ],
+            "notes": "The README describes dense/sparse small-matrix kernels, Fortran interfaces and their generation. This entry records the listed hfp snapshot; upstream links point to libxsmm/libxsmm. The implementation includes C and generated machine code; not every C interface is available to Fortran, and performance claims were not reproduced.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:openmathlib/openblas",
+      "local": {
+        "name": "OpenBLAS",
+        "description": "Optimized BLAS implementation with LAPACK routines and Fortran-callable interfaces.",
+        "repository": {
+          "host": "github",
+          "owner": "OpenMathLib",
+          "name": "OpenBLAS",
+          "url": "https://github.com/OpenMathLib/OpenBLAS"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "linear-algebra",
+          "blas",
+          "lapack",
+          "optimized-kernels"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "02f585444a0fba2505cfda77cc6684de008ea477",
+            "evidence": [
+              {
+                "url": "https://github.com/OpenMathLib/OpenBLAS/blob/02f585444a0fba2505cfda77cc6684de008ea477/README.md",
+                "path": "README.md",
+                "sha256": "917cae542832497268b269b5070ce3fed90cebc43d438e529a0c430af8442885"
+              }
+            ],
+            "notes": "The README identifies the GotoBLAS2 lineage, architecture-dependent BLAS kernels and included LAPACK. GitHub redirects the listed address to OpenMathLib/OpenBLAS. This mixed-language backend is not a pure Fortran implementation; architecture support and benchmark claims were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/xianyi/OpenBLAS"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:duumbo/pfapack-sys-rs",
+      "local": {
+        "name": "PFAPACK Rust bindings",
+        "description": "Rust bindings bundling Fortran PFAPACK routines for skew-symmetric matrices and Pfaffians.",
+        "repository": {
+          "host": "github",
+          "owner": "Duumbo",
+          "name": "pfapack-sys-rs",
+          "url": "https://github.com/Duumbo/pfapack-sys-rs"
+        },
+        "languages": [
+          "Fortran",
+          "Rust"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "linear-algebra",
+          "pfaffian",
+          "skew-symmetric-matrices",
+          "rust-bindings"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "a237bd39c4daf4f4b4765260e99530274c8d660e",
+            "evidence": [
+              {
+                "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/README.md",
+                "path": "README.md",
+                "sha256": "5618961ebde4d1f59bdb1b9c275d3efd6adff15997aaa9043ee8d685bed9f286"
+              },
+              {
+                "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/fortran/EXAMPLES/README.txt",
+                "path": "fortran/EXAMPLES/README.txt",
+                "sha256": "a2ea09dcf044e56c5fbc27ead0f6f6fe8ee24298da37457c57203ad98f5d9ca5"
+              }
+            ],
+            "notes": "The short Rust-binding README is supplemented by the bundled Fortran example guide, which documents dense/banded Pfaffians and skew-symmetric decompositions. The build tag records the documented Make-based Fortran examples, not a verified Rust packaging workflow; this is a binding/distribution of PFAPACK rather than a separate algorithm.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:urbanjost/spag_lapack",
+      "local": {
+        "name": "SPAG LAPACK experiment",
+        "description": "Experimental refactoring and module packaging of LAPACK with plusFORT SPAG.",
+        "repository": {
+          "host": "github",
+          "owner": "urbanjost",
+          "name": "spag_lapack",
+          "url": "https://github.com/urbanjost/spag_lapack"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "linear-algebra",
+          "lapack",
+          "refactoring",
+          "experimental-software"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "30099d725bfb7b130229e7c7b56309e51a6183c3",
+            "evidence": [
+              {
+                "url": "https://github.com/urbanjost/spag_lapack/blob/30099d725bfb7b130229e7c7b56309e51a6183c3/README.md",
+                "path": "README.md",
+                "sha256": "9e4a4c57253503b974818361a2568c8a805c2e2072a4e723da65877370a144dd"
+              }
+            ],
+            "notes": "The README explicitly labels the project an experiment that is not production tested. It discusses FPM and generated-interface/large-build limitations. Broad algebra coverage records intended LAPACK-derived functionality without asserting that refactored routines or generated interfaces are correct.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:oamarques/stcollection",
+      "local": {
+        "name": "Symmetric Tridiagonal Collection",
+        "description": "Matrix collections and Fortran test support for tridiagonal eigenvalue and bidiagonal SVD software.",
+        "repository": {
+          "host": "github",
+          "owner": "oamarques",
+          "name": "STCollection",
+          "url": "https://github.com/oamarques/STCollection"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "benchmark-problems",
+          "eigenvalues",
+          "singular-values",
+          "tridiagonal-matrices"
+        ],
+        "classifications": [
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "0dd2b42636578266a00c1ca6fb4f21adc72ac159",
+            "evidence": [
+              {
+                "url": "https://github.com/oamarques/STCollection/blob/0dd2b42636578266a00c1ca6fb4f21adc72ac159/README.md",
+                "path": "README.md",
+                "sha256": "a525438ef3a764261d18600499a6299932b2b0281f9f4e4031abbe19e82b1564"
+              }
+            ],
+            "notes": "The README describes matrix data, reference solutions and testing routines. This is a benchmark/test resource, not itself a newly reviewed general eigensolver or SVD implementation; supplied reference values were not checked here.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:real-space/tfqmrgpu",
+      "local": {
+        "name": "tfQMRgpu",
+        "description": "GPU transpose-free quasi-minimal-residual sparse linear solves with Fortran interfaces.",
+        "repository": {
+          "host": "github",
+          "owner": "real-space",
+          "name": "tfQMRgpu",
+          "url": "https://github.com/real-space/tfQMRgpu"
+        },
+        "languages": [
+          "Fortran",
+          "C++",
+          "CUDA"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "linear-algebra",
+          "iterative-solvers",
+          "sparse-matrices",
+          "cuda"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "a87bfcdcd75a127628f38053c16aa041f47464c6",
+            "evidence": [
+              {
+                "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/README.md",
+                "path": "README.md",
+                "sha256": "2be914674842b058aac9eaf8a4b285fd831707056977159e6dc1901de553fa05"
+              }
+            ],
+            "notes": "The README documents complex block-sparse tfQMR solves, multiple right-hand sides and Fortran 90/77 entry points. CUDA implements the computational backend. Convergence, GPU availability and performance require individual testing and are not implied by this broad classification.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:yymmt742/tri_indices",
+      "local": {
+        "name": "tri_indices",
+        "description": "Mapping between triangular matrix coordinates and packed one-dimensional indices.",
+        "repository": {
+          "host": "github",
+          "owner": "yymmt742",
+          "name": "tri_indices",
+          "url": "https://github.com/yymmt742/tri_indices"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "packed-storage",
+          "triangular-matrices",
+          "indexing"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "8f9037b16bcda22201dc491c3f6b47f8fd98a013",
+            "evidence": [
+              {
+                "url": "https://github.com/yymmt742/tri_indices/blob/8f9037b16bcda22201dc491c3f6b47f8fd98a013/README.md",
+                "path": "README.md",
+                "sha256": "d44c3118fb48af120814e4af81623f11e58a456ae0cc6afb92021c5f2c9cee28"
+              }
+            ],
+            "notes": "The README examples cover upper-triangular indexing with and without the diagonal. This is storage/indexing support, not a triangular linear-system solver or matrix factorization implementation.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:niceno/visual-fortran-solvers",
+      "local": {
+        "name": "Visual Fortran Solvers",
+        "description": "Small Fortran linear-solver experiments including incomplete-Cholesky conjugate gradients and OpenACC work.",
+        "repository": {
+          "host": "github",
+          "owner": "Niceno",
+          "name": "Visual-Fortran-Solvers",
+          "url": "https://github.com/Niceno/Visual-Fortran-Solvers"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "linear-algebra",
+          "iterative-solvers",
+          "conjugate-gradient",
+          "openacc"
+        ],
+        "classifications": [
+          {
+            "code": "D",
+            "level": "documentation-reviewed",
+            "revision": "de1d9858da1ee4cb2e977ce7050f7926cdd3f17a",
+            "evidence": [
+              {
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/readme.md",
+                "path": "readme.md",
+                "sha256": "e172732613a62ed31cb17e093fb065d6b63dbf33daf65a0dc1404a9061026b5a"
+              }
+            ],
+            "notes": "The README describes textbook-derived solvers, ICCG fill-in investigations and dated GPU tooling. This does not establish coverage of every algorithm in the cited textbook or verify current GPU compatibility.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:benmql/2decomp_emptyfourierfourier",
+      "local": {
+        "name": "2DECOMP Fourier fork",
+        "description": "Fortran pencil decomposition and distributed three-dimensional FFT infrastructure.",
+        "repository": {
+          "host": "github",
+          "owner": "BenMql",
+          "name": "2decomp_emptyFourierFourier",
+          "url": "https://github.com/BenMql/2decomp_emptyFourierFourier"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "fourier-transforms",
+          "fft",
+          "pencil-decomposition",
+          "mpi"
+        ],
+        "classifications": [
+          {
+            "code": "J",
+            "level": "documentation-reviewed",
+            "revision": "a7655268d78937f7b65043871af3d23736c55845",
+            "evidence": [
+              {
+                "url": "https://github.com/BenMql/2decomp_emptyFourierFourier/blob/a7655268d78937f7b65043871af3d23736c55845/README",
+                "path": "README",
+                "sha256": "35fd10bb370405a121c0bc2b8c7a5e63b0192233960c24290e3d9f9e6fcfa194"
+              }
+            ],
+            "notes": "The pinned README describes inherited 2DECOMP parallel FFT functionality. The older discovery-list wording about further transform extensions is not used to assert unreviewed algorithms; this snapshot is distinguished from the separately maintained upstream library.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:majosm/overkit-fortran",
+      "local": {
+        "name": "Overkit Fortran",
+        "description": "Parallel structured overset-grid assembly with donor/receiver search and interpolation weights.",
+        "repository": {
+          "host": "github",
+          "owner": "majosm",
+          "name": "overkit-fortran",
+          "url": "https://github.com/majosm/overkit-fortran"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "overset-grids",
+          "computational-geometry",
+          "interpolation",
+          "mesh"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "04891d3a6bbad192e42f1df58d329feb157d4aec",
+            "evidence": [
+              {
+                "url": "https://github.com/majosm/overkit-fortran/blob/04891d3a6bbad192e42f1df58d329feb157d4aec/README.md",
+                "path": "README.md",
+                "sha256": "860f8a17e5e6d90883360a62ea41c75e45b850203bfc9166d2b10f86b6b773cb"
+              }
+            ],
+            "notes": "The README documents node-centered structured grids, hole cutting, donor/receiver selection and remapping. Unstructured and cell-centered support are described as future work. This Fortran snapshot is distinct from the newer C++ project linked by the author and is not a complete flow solver.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "04891d3a6bbad192e42f1df58d329feb157d4aec",
+            "evidence": [
+              {
+                "url": "https://github.com/majosm/overkit-fortran/blob/04891d3a6bbad192e42f1df58d329feb157d4aec/README.md",
+                "path": "README.md",
+                "sha256": "860f8a17e5e6d90883360a62ea41c75e45b850203bfc9166d2b10f86b6b773cb"
+              }
+            ],
+            "notes": "The README documents node-centered structured grids, hole cutting, donor/receiver selection and remapping. Unstructured and cell-centered support are described as future work. This Fortran snapshot is distinct from the newer C++ project linked by the author and is not a complete flow solver.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:mdolab/pyhyp",
+      "local": {
+        "name": "pyHyp",
+        "description": "Hyperbolic surface-to-volume structured mesh generation with a Python interface.",
+        "repository": {
+          "host": "github",
+          "owner": "mdolab",
+          "name": "pyhyp",
+          "url": "https://github.com/mdolab/pyhyp"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "mesh-generation",
+          "structured-grids",
+          "hyperbolic-marching",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "42a811371b1f4e2173e84f8c88b239d6fb569fb2",
+            "evidence": [
+              {
+                "url": "https://github.com/mdolab/pyhyp/blob/42a811371b1f4e2173e84f8c88b239d6fb569fb2/README.md",
+                "path": "README.md",
+                "sha256": "03ae59f695790c2c8d092424790604459069f67f063aaf0f29b92f86440a6d65"
+              }
+            ],
+            "notes": "The README describes mesh marching for CFD preprocessing and a Fortran-backed Python tool. Its use in optimization workflows does not make this package an optimizer or a flow-equation solver by itself.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:omhafez/shabaka",
+      "local": {
+        "name": "Shabaka",
+        "description": "Image-to-surface reconstruction and meshing pipeline with Fortran geometry-format conversion utilities.",
+        "repository": {
+          "host": "github",
+          "owner": "omhafez",
+          "name": "shabaka",
+          "url": "https://github.com/omhafez/shabaka"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "mesh-generation",
+          "surface-reconstruction",
+          "image-segmentation",
+          "geometry-formats"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "b504f411e10f0869b2db1ee83c0ea0059831b9b9",
+            "evidence": [
+              {
+                "url": "https://github.com/omhafez/shabaka/blob/b504f411e10f0869b2db1ee83c0ea0059831b9b9/README.md",
+                "path": "README.md",
+                "sha256": "d6152e82676ec5a75f767890e2d79e8430b69baa529142c834769f4e07657518"
+              },
+              {
+                "url": "https://github.com/omhafez/shabaka/blob/b504f411e10f0869b2db1ee83c0ea0059831b9b9/src/pmeshgen/ply2smfe/ply2smfe.f",
+                "path": "src/pmeshgen/ply2smfe/ply2smfe.f",
+                "sha256": "416a0a094b7d2d20e2b74a68bc53c4bbf79aa5f222ef4d9b7143b796863f2e3e"
+              }
+            ],
+            "notes": "The README describes a mixed-language segmented-image pipeline. The reviewed PLY2SMFE Fortran source is a geometry interface/converter; core reconstruction must not be attributed entirely to Fortran. Its header includes restrictive research/proprietary wording, so public availability does not establish unrestricted reuse; dependencies and dated installation instructions were not tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "b504f411e10f0869b2db1ee83c0ea0059831b9b9",
+            "evidence": [
+              {
+                "url": "https://github.com/omhafez/shabaka/blob/b504f411e10f0869b2db1ee83c0ea0059831b9b9/README.md",
+                "path": "README.md",
+                "sha256": "d6152e82676ec5a75f767890e2d79e8430b69baa529142c834769f4e07657518"
+              },
+              {
+                "url": "https://github.com/omhafez/shabaka/blob/b504f411e10f0869b2db1ee83c0ea0059831b9b9/src/pmeshgen/ply2smfe/ply2smfe.f",
+                "path": "src/pmeshgen/ply2smfe/ply2smfe.f",
+                "sha256": "416a0a094b7d2d20e2b74a68bc53c4bbf79aa5f222ef4d9b7143b796863f2e3e"
+              }
+            ],
+            "notes": "The README describes a mixed-language segmented-image pipeline. The reviewed PLY2SMFE Fortran source is a geometry interface/converter; core reconstruction must not be attributed entirely to Fortran. Its header includes restrictive research/proprietary wording, so public availability does not establish unrestricted reuse; dependencies and dated installation instructions were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:trixi-framework/smesh",
+      "local": {
+        "name": "smesh",
+        "description": "Fortran tools for generating and handling unstructured triangular and polygonal meshes.",
+        "repository": {
+          "host": "github",
+          "owner": "trixi-framework",
+          "name": "smesh",
+          "url": "https://github.com/trixi-framework/smesh"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "mesh-generation",
+          "unstructured-grids",
+          "computational-geometry",
+          "delaunay"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "bbe7f9b1c1b39513193d05b4b8cf2d85d5fd689e",
+            "evidence": [
+              {
+                "url": "https://github.com/trixi-framework/smesh/blob/bbe7f9b1c1b39513193d05b4b8cf2d85d5fd689e/README.md",
+                "path": "README.md",
+                "sha256": "bcc5f5ede13a2260511af6f17715538ea7bcbcc33c0c5d7e706b0d81d4cf9132"
+              }
+            ],
+            "notes": "The README documents mesh generation/handling and an example Delaunay workflow. Example mesh statistics and compiler behavior were not reproduced; the broad geometry mapping does not imply a complete finite-element PDE solver.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nmgbechi/tetmeshf90",
+      "local": {
+        "name": "TetMeshF90",
+        "description": "Experimental tetrahedral mesh representation and adaptive refinement using half-facet data structures.",
+        "repository": {
+          "host": "github",
+          "owner": "nmgbechi",
+          "name": "TetMeshF90",
+          "url": "https://github.com/nmgbechi/TetMeshF90"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "tetrahedral-meshes",
+          "mesh-refinement",
+          "adjacency",
+          "computational-geometry"
+        ],
+        "classifications": [
+          {
+            "code": "P",
+            "level": "documentation-reviewed",
+            "revision": "8258c54d097c216f48de890a744f8fdfe962d335",
+            "evidence": [
+              {
+                "url": "https://github.com/nmgbechi/TetMeshF90/blob/8258c54d097c216f48de890a744f8fdfe962d335/README.md",
+                "path": "README.md",
+                "sha256": "2691d903d8a5a6a3ce429e781092488e801c94706038af0b7ec84e2774fffa17"
+              }
+            ],
+            "notes": "The README documents AHF mesh representation, adjacency, boundary detection and red refinement of tetrahedra. Input and refinement restrictions apply, including conformal manifold meshes and one-irregularity constraints. GitHub redirects the listed address to nmgbechi/TetMeshF90; experimental status is retained.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
+          "listed_repository": "https://github.com/Kingdageek/TetMeshF90"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:victorsndvg/xh5for",
+      "local": {
+        "name": "XH5For",
+        "description": "Parallel partitioned finite-element mesh input/output using XDMF and HDF5.",
+        "repository": {
+          "host": "github",
+          "owner": "victorsndvg",
+          "name": "XH5For",
+          "url": "https://github.com/victorsndvg/XH5For"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "mesh-io",
+          "xdmf",
+          "hdf5",
+          "parallel-io"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "da3d86bc407b0ba053a21989053097c92c2bd04a",
+            "evidence": [
+              {
+                "url": "https://github.com/victorsndvg/XH5For/blob/da3d86bc407b0ba053a21989053097c92c2bd04a/README.md",
+                "path": "README.md",
+                "sha256": "ccd02b4115296304989ebf958a0d8759427dbd8a0cc303796b82f414c2b131fb"
+              }
+            ],
+            "notes": "The README explicitly says this is not a general-purpose XDMF reader and only reads XDMF files written by itself. The broad mapping is data handling, not mesh generation or numerical solution of a finite-element problem; MPI/HDF5 configurations were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:cdslaborg/paramonte",
+      "local": {
+        "name": "ParaMonte",
+        "description": "Serial and parallel Monte Carlo routines for sampling multidimensional density functions.",
+        "repository": {
+          "host": "github",
+          "owner": "cdslaborg",
+          "name": "paramonte",
+          "url": "https://github.com/cdslaborg/paramonte"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "monte-carlo",
+          "sampling",
+          "parallel-computing",
+          "probability-densities"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "93a9f4f472894115b9f15ac0c68490af719f44fb",
+            "evidence": [
+              {
+                "url": "https://github.com/cdslaborg/paramonte/blob/93a9f4f472894115b9f15ac0c68490af719f44fb/README.md",
+                "path": "README.md",
+                "sha256": "5f8f7526395dd6ff6f8ba797913234e2f57655cd3c713f12c912f1300e27214f"
+              }
+            ],
+            "notes": "The README documents Monte Carlo sampling, multilingual interfaces and selected Fortran coarray routines. This broad sampling classification does not assume all advertised machine-learning goals or every parallel interface is implemented uniformly. Reproducibility, convergence and speed claims were not independently checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:hpcseries/hpcseriescore",
+      "local": {
+        "name": "HPCSeriesCore",
+        "description": "Fortran-backed statistical reductions, quantiles, rolling summaries and anomaly-analysis kernels.",
+        "repository": {
+          "host": "github",
+          "owner": "hpcseries",
+          "name": "HPCSeriesCore",
+          "url": "https://github.com/hpcseries/HPCSeriesCore"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "cmake",
+          "python-packaging"
+        ],
+        "topics": [
+          "statistics",
+          "descriptive-statistics",
+          "quantiles",
+          "rolling-windows",
+          "python-fortran"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "73eff3bf5f9b764307bc2be2345e176f970ef58c",
+            "evidence": [
+              {
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/README.md",
+                "path": "README.md",
+                "sha256": "f01874e4d120bf3d0c5256707f21f87dc0234043d67f68aacfe298655a9f0144"
+              }
+            ],
+            "notes": "The README documents Fortran/C/C++ kernels exposed through Python tooling, including reductions, robust summaries and rolling analysis. Reported speedups and cross-backend consistency were not reproduced; this is statistical computing rather than a general-purpose physical simulator.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:qianyesu/skyborn",
+      "local": {
+        "name": "Skyborn",
+        "description": "Python climate-data analysis with Fortran-backed trend calculations and missing-data interpolation.",
+        "repository": {
+          "host": "github",
+          "owner": "QianyeSu",
+          "name": "Skyborn",
+          "url": "https://github.com/QianyeSu/Skyborn"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "climate-data",
+          "statistics",
+          "trend-analysis",
+          "regression",
+          "interpolation"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "evidence": [
+              {
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/README.md",
+                "path": "README.md",
+                "sha256": "fcbcfd49f7676ad328c9215b4505f276ef957a5eae9a9930c5d34b2323ff7afb"
+              }
+            ],
+            "notes": "The README describes trend/regression analysis, grid filling and modernized Fortran components. The package is mixed-language and not every operation is asserted to be implemented in Fortran. Platform support, Poisson gap-filling accuracy and advertised speed improvements were not independently tested.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E",
+            "level": "documentation-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "evidence": [
+              {
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/README.md",
+                "path": "README.md",
+                "sha256": "fcbcfd49f7676ad328c9215b4505f276ef957a5eae9a9930c5d34b2323ff7afb"
+              }
+            ],
+            "notes": "The README describes trend/regression analysis, grid filling and modernized Fortran components. The package is mixed-language and not every operation is asserted to be implemented in Fortran. Platform support, Poisson gap-filling accuracy and advertised speed improvements were not independently tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:mommy003/xa_grm",
+      "local": {
+        "name": "XA_GRM",
+        "description": "Ancestry-specific genetic relationship analysis workflows with bundled MTG2 Fortran source.",
+        "repository": {
+          "host": "github",
+          "owner": "mommy003",
+          "name": "XA_GRM",
+          "url": "https://github.com/mommy003/XA_GRM"
+        },
+        "languages": [
+          "Fortran",
+          "R"
+        ],
+        "build_systems": [],
+        "topics": [
+          "statistical-genetics",
+          "mixed-models",
+          "relationship-matrices",
+          "r-interface"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "18810b27a0f757270b8e37d8c99aab53dae3d126",
+            "evidence": [
+              {
+                "url": "https://github.com/mommy003/XA_GRM/blob/18810b27a0f757270b8e37d8c99aab53dae3d126/README.md",
+                "path": "README.md",
+                "sha256": "8ebc8c80b802fa396d30a84e6f71540a02a7436158de2f8f08ca17a393123993"
+              },
+              {
+                "url": "https://github.com/mommy003/XA_GRM/blob/18810b27a0f757270b8e37d8c99aab53dae3d126/mtg2_src/mtg2_main.f90",
+                "path": "mtg2_src/mtg2_main.f90",
+                "sha256": "c50d45890dd8fab777b7919849062fafcdf51f2015a0bf850349703df19d7f81"
+              }
+            ],
+            "notes": "The README primarily documents R simulation and calls to MTG2/PLINK. The pinned tree also contains mtg2_src, and its reviewed main program identifies MTG2 GREML/GBLUP/random-regression functionality. Bundled inherited Fortran code is distinguished from new workflow code; neither genetic estimates nor external-program compatibility were checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:beliavsky/time-series",
+      "local": {
+        "name": "Fortran time-series translations",
+        "description": "Fortran translations and adapters for time-series modeling routines originating in R packages.",
+        "repository": {
+          "host": "github",
+          "owner": "Beliavsky",
+          "name": "time-series",
+          "url": "https://github.com/Beliavsky/time-series"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make",
+          "cmake"
+        ],
+        "topics": [
+          "time-series",
+          "statistics",
+          "forecasting",
+          "r-translations"
+        ],
+        "classifications": [
+          {
+            "code": "L",
+            "level": "documentation-reviewed",
+            "revision": "6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f",
+            "evidence": [
+              {
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/README.md",
+                "path": "README.md",
+                "sha256": "e2055ccecf11bda381c17f7fd264be7ba71e41c2d170dbcbb39f859d63fdce95"
+              }
+            ],
+            "notes": "The README documents modeling examples and shared numerical infrastructure. Translation/adaptation status does not establish numerical equivalence with each R package; reusable inherited routines are distinguished from independent implementations. Broad time-series statistics is recorded before method-by-method review.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:ghfbsd/sacbook",
+      "local": {
+        "name": "SAC book software",
+        "description": "Seismological signal-processing examples with multitaper frequency-domain receiver-function estimation.",
+        "repository": {
+          "host": "github",
+          "owner": "ghfbsd",
+          "name": "sacbook",
+          "url": "https://github.com/ghfbsd/sacbook"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "seismology",
+          "signal-processing",
+          "multitaper",
+          "deconvolution"
+        ],
+        "classifications": [
+          {
+            "code": "J",
+            "level": "documentation-reviewed",
+            "revision": "01d999edc70820b1780c69ca1238a713f6abcf79",
+            "evidence": [
+              {
+                "url": "https://github.com/ghfbsd/sacbook/blob/01d999edc70820b1780c69ca1238a713f6abcf79/README.md",
+                "path": "README.md",
+                "sha256": "48571f30af967029a35409fc97f5c0ec36b9e9e6a095fd774a3f35ee1c75a0a0"
+              },
+              {
+                "url": "https://github.com/ghfbsd/sacbook/blob/01d999edc70820b1780c69ca1238a713f6abcf79/methods/rf/README",
+                "path": "methods/rf/README",
+                "sha256": "12bd9fc876b62eeb5dfc8de7c05ca4f635c4ee222614c51b93be986027a551f5"
+              }
+            ],
+            "notes": "The root README is supplemented by receiver-function documentation describing multitaper frequency-domain estimation and Fortran programs. SAC, TauP and FFT-related dependencies need user configuration; this class covers the reviewed signal-transform component and does not validate all geophysical inversion methods in the collection.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:kineticpreprocessor/kpp",
+      "local": {
+        "name": "Kinetic PreProcessor",
+        "description": "Chemical-kinetics code generator with Fortran ODE models and stiff time integrators.",
+        "repository": {
+          "host": "github",
+          "owner": "KineticPreProcessor",
+          "name": "KPP",
+          "url": "https://github.com/KineticPreProcessor/KPP"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "chemical-kinetics",
+          "ode",
+          "stiff-solvers",
+          "code-generation",
+          "rosenbrock"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "fd1c2cd87fa0c07abea82d568155719c2569405f",
+            "evidence": [
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/README.md",
+                "path": "README.md",
+                "sha256": "82a6af67aa4afc3cccf02e3cd675be55e2f10f14bbd8017b0d9375473ee06c0d"
+              },
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/docs/source/output/code_f90.rst",
+                "path": "docs/source/output/code_f90.rst",
+                "sha256": "caeea9ce2d7e54531a9a41b5accbac40c80f0e307aae8e234501630028fbeb3f"
+              },
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/docs/source/num_methods/rosenbrock-methods.rst",
+                "path": "docs/source/num_methods/rosenbrock-methods.rst",
+                "sha256": "d74ce95ad99878680c332afaa85f82394a44f070a2fd14f66afc324e74607892"
+              }
+            ],
+            "notes": "Pinned Fortran-output documentation describes generated model/integrator modules; the numerical-method guide identifies implemented Rosenbrock schemes. KPP includes both code-generation tooling and time integration. This does not establish chemical mechanism validity, error tolerances or performance for arbitrary models.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "S",
+            "level": "documentation-reviewed",
+            "revision": "fd1c2cd87fa0c07abea82d568155719c2569405f",
+            "evidence": [
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/README.md",
+                "path": "README.md",
+                "sha256": "82a6af67aa4afc3cccf02e3cd675be55e2f10f14bbd8017b0d9375473ee06c0d"
+              },
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/docs/source/output/code_f90.rst",
+                "path": "docs/source/output/code_f90.rst",
+                "sha256": "caeea9ce2d7e54531a9a41b5accbac40c80f0e307aae8e234501630028fbeb3f"
+              },
+              {
+                "url": "https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/docs/source/num_methods/rosenbrock-methods.rst",
+                "path": "docs/source/num_methods/rosenbrock-methods.rst",
+                "sha256": "d74ce95ad99878680c332afaa85f82394a44f070a2fd14f66afc324e74607892"
+              }
+            ],
+            "notes": "Pinned Fortran-output documentation describes generated model/integrator modules; the numerical-method guide identifies implemented Rosenbrock schemes. KPP includes both code-generation tooling and time integration. This does not establish chemical mechanism validity, error tolerances or performance for arbitrary models.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:rug-l/cminor",
+      "local": {
+        "name": "Cminor",
+        "description": "Fortran chemical-mechanism ODE integration using Rosenbrock methods and analytical sparse Jacobians.",
+        "repository": {
+          "host": "github",
+          "owner": "rug-l",
+          "name": "Cminor",
+          "url": "https://github.com/rug-l/Cminor"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "chemical-kinetics",
+          "ode",
+          "stiff-solvers",
+          "rosenbrock"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "48ea5e88a3ffbbeae2cdecb923522d32241dd383",
+            "evidence": [
+              {
+                "url": "https://github.com/rug-l/Cminor/blob/48ea5e88a3ffbbeae2cdecb923522d32241dd383/README.md",
+                "path": "README.md",
+                "sha256": "2b6605f4e165f51a78359c7b5e229f7fdf1427ed83732b4da29a52526d4863eb"
+              }
+            ],
+            "notes": "The README describes box, parcel and constant-volume configurations and a canonical Make build. FPM is mentioned as optional rather than the canonical workflow. Broad differential-equation coverage does not validate reaction data, physical model assumptions or regression results.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nicholaswogan/equilibrate",
+      "local": {
+        "name": "Equilibrate",
+        "description": "Chemical-equilibrium calculations based on EasyChem and NASA CEA, with Fortran source.",
+        "repository": {
+          "host": "github",
+          "owner": "Nicholaswogan",
+          "name": "Equilibrate",
+          "url": "https://github.com/Nicholaswogan/Equilibrate"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "chemical-equilibrium",
+          "thermochemistry",
+          "cea"
+        ],
+        "classifications": [
+          {
+            "code": "Z",
+            "level": "documentation-reviewed",
+            "revision": "840324bc223ca0ba64b48bca64da2e9f997d246e",
+            "evidence": [
+              {
+                "url": "https://github.com/Nicholaswogan/Equilibrate/blob/840324bc223ca0ba64b48bca64da2e9f997d246e/README.md",
+                "path": "README.md",
+                "sha256": "8b3013104b5537647b5695c604e2e1e71bf03f51c2fab2b5cc0467047d5356b0"
+              },
+              {
+                "url": "https://github.com/Nicholaswogan/Equilibrate/blob/840324bc223ca0ba64b48bca64da2e9f997d246e/src/equilibrate_cea.f90",
+                "path": "src/equilibrate_cea.f90",
+                "sha256": "85e76d130c95f1ef7af035be7028e8626de7e14cdef6a837dab29f538c0c29f5"
+              }
+            ],
+            "notes": "The standalone README says development has moved into Photochem and this repository is no longer maintained. Reviewed Fortran source exposes CEA data and an iterative equilibrium solve. A broad application-level mapping is used until the specific mathematical formulation is reviewed; this is not classified as a general nonlinear-equation solver solely from its name.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:maginngroup/cassandra",
+      "local": {
+        "name": "Cassandra",
+        "description": "Atomistic Monte Carlo simulations of molecular fluids and phase equilibria.",
+        "repository": {
+          "host": "github",
+          "owner": "MaginnGroup",
+          "name": "Cassandra",
+          "url": "https://github.com/MaginnGroup/Cassandra"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "monte-carlo",
+          "molecular-simulation",
+          "fluids",
+          "phase-equilibria"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "e217e33f20fc8db8619838490b8164740f9cb5ca",
+            "evidence": [
+              {
+                "url": "https://github.com/MaginnGroup/Cassandra/blob/e217e33f20fc8db8619838490b8164740f9cb5ca/README.md",
+                "path": "README.md",
+                "sha256": "41559baecc519c4e0a895d44a2be6f8d9a8849a77d9bc3d28d4ed916ef4f2847"
+              }
+            ],
+            "notes": "The README documents ensembles, molecular moves, potentials and Fortran builds. This is molecular Monte Carlo rather than a universal stochastic solver; force-field suitability, sampling convergence and OpenMP scaling were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:mrnucleation/classymc",
+      "local": {
+        "name": "ClassyMC",
+        "description": "Object-oriented Fortran Metropolis Monte Carlo framework for molecular simulations.",
+        "repository": {
+          "host": "github",
+          "owner": "mrnucleation",
+          "name": "ClassyMC",
+          "url": "https://github.com/mrnucleation/ClassyMC"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "monte-carlo",
+          "metropolis",
+          "molecular-simulation"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "faa45c4e36f611da56afb5166e54827426af1b9e",
+            "evidence": [
+              {
+                "url": "https://github.com/mrnucleation/ClassyMC/blob/faa45c4e36f611da56afb5166e54827426af1b9e/README.md",
+                "path": "README.md",
+                "sha256": "922bdefe11338418563211c8df3dcd2248cf7bfd9e0db4ec501b35b352112d3b"
+              }
+            ],
+            "notes": "The README documents modular moves, optional Python/LAMMPS/AENet integration and MPI configurations. Optional backends have separate dependencies; these capabilities do not establish sampling convergence, force-field accuracy or that every optional combination builds.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:kmcos/kmcos",
+      "local": {
+        "name": "kmcos",
+        "description": "Lattice-based kinetic Monte Carlo modeling with Python tooling and generated Fortran kernels.",
+        "repository": {
+          "host": "github",
+          "owner": "kmcos",
+          "name": "kmcos",
+          "url": "https://github.com/kmcos/kmcos"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "python-packaging"
+        ],
+        "topics": [
+          "kinetic-monte-carlo",
+          "lattice-models",
+          "chemical-kinetics",
+          "code-generation"
+        ],
+        "classifications": [
+          {
+            "code": "M",
+            "level": "documentation-reviewed",
+            "revision": "4442009d73032cbe39f8201370ad6d8927c7be4c",
+            "evidence": [
+              {
+                "url": "https://github.com/kmcos/kmcos/blob/4442009d73032cbe39f8201370ad6d8927c7be4c/README.rst",
+                "path": "README.rst",
+                "sha256": "c0f5bbfabad0d2dedc9195545f153d565f7b1fcdba0337558c39bc4afc40ca12"
+              }
+            ],
+            "notes": "The README identifies lattice kinetic Monte Carlo and lists static Fortran solver sources and generated models. This is stochastic kinetics, not a general deterministic ODE integrator; agreement with chemical experiments and performance claims were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jonas-finkler/ewald-summation",
+      "local": {
+        "name": "Ewald summation",
+        "description": "Fortran Ewald electrostatic energies and forces for periodic point or Gaussian charge systems.",
+        "repository": {
+          "host": "github",
+          "owner": "Jonas-Finkler",
+          "name": "ewald-summation",
+          "url": "https://github.com/Jonas-Finkler/ewald-summation"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "ewald-summation",
+          "electrostatics",
+          "periodic-systems",
+          "computational-physics"
+        ],
+        "classifications": [
+          {
+            "code": "Z",
+            "level": "documentation-reviewed",
+            "revision": "6c399ba021184c1ca66540642ab0b0d8f236cce3",
+            "evidence": [
+              {
+                "url": "https://github.com/Jonas-Finkler/ewald-summation/blob/6c399ba021184c1ca66540642ab0b0d8f236cce3/README.md",
+                "path": "README.md",
+                "sha256": "d7c00a1d4d9aead82b7ee115d292adfc5793ef1e06524c55608ca6e58770b4dd"
+              }
+            ],
+            "notes": "The README documents charge neutrality, energies, forces, optional stress and user-specified precision. The broad application mapping avoids claiming a general quadrature or integral-transform library from the use of reciprocal-space sums. Finite-difference checks supplied upstream were not run here.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:hibridon/hibridon",
+      "local": {
+        "name": "Hibridon",
+        "description": "Fortran close-coupled equation solver for quantum molecular scattering and bound-state calculations.",
+        "repository": {
+          "host": "github",
+          "owner": "hibridon",
+          "name": "hibridon",
+          "url": "https://github.com/hibridon/hibridon"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "cmake"
+        ],
+        "topics": [
+          "quantum-scattering",
+          "coupled-equations",
+          "molecular-collisions"
+        ],
+        "classifications": [
+          {
+            "code": "I",
+            "level": "documentation-reviewed",
+            "revision": "27b79222d0e09d1ea39de6651d465c932125654b",
+            "evidence": [
+              {
+                "url": "https://github.com/hibridon/hibridon/blob/27b79222d0e09d1ea39de6651d465c932125654b/README.md",
+                "path": "README.md",
+                "sha256": "9e961e849c0851651402a23237727f90513e18ea250b073cebb93dc11d3b0823"
+              }
+            ],
+            "notes": "The README describes close-coupled equations, scattering/photodissociation applications and user-supplied potential energy surfaces with BLAS/LAPACK. Broad differential-equation coverage is assigned; physical potentials, scattering observables and convergence were not independently validated.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:shahid718/7-fortran-plots",
+      "local": {
+        "name": "Seven Fortran quick plots",
+        "description": "Examples of seven DISLIN quick-plot routines and plot customization from Fortran.",
+        "repository": {
+          "host": "github",
+          "owner": "Shahid718",
+          "name": "7-Fortran-plots",
+          "url": "https://github.com/Shahid718/7-Fortran-plots"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "plotting",
+          "dislin",
+          "visualization",
+          "examples"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "c050308e57ad078d15674a6d54e21ac6743f5b04",
+            "evidence": [
+              {
+                "url": "https://github.com/Shahid718/7-Fortran-plots/blob/c050308e57ad078d15674a6d54e21ac6743f5b04/README.md",
+                "path": "README.md",
+                "sha256": "92ed6ef999b2c3a7d695f109bef775bbb11fad582f98dd0206ccb5bebe65ca50"
+              }
+            ],
+            "notes": "The README lists line, scatter, color, contour, surface, bar and pie plotting calls and external DISLIN linkage. This is an example collection using DISLIN, not an independent plotting engine or a verified Cahn-Hilliard numerical solver.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:nicocardiel/button",
+      "local": {
+        "name": "Button for PGPLOT",
+        "description": "Fortran graphical-button support for interactive PGPLOT applications.",
+        "repository": {
+          "host": "github",
+          "owner": "nicocardiel",
+          "name": "button",
+          "url": "https://github.com/nicocardiel/button"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "pgplot",
+          "graphical-interface",
+          "interactive-graphics"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "02ea3f5111635777647514cd4abaf09491a1f63a",
+            "evidence": [
+              {
+                "url": "https://github.com/nicocardiel/button/blob/02ea3f5111635777647514cd4abaf09491a1f63a/README",
+                "path": "README",
+                "sha256": "84f4122b8b873787082267b54cb719d42437c9199eeec4b25a59843ac164aebb"
+              }
+            ],
+            "notes": "The README identifies a Fortran 77 library with later Fortran 90 compilation adjustments. Its scope is button-driven graphical interaction on top of PGPLOT; it is not a replacement plotting backend and current platform support was not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:meom-group/chart_coupe",
+      "local": {
+        "name": "CHART_COUPE",
+        "description": "Fortran plotting of horizontal views and vertical slices from geophysical model output.",
+        "repository": {
+          "host": "github",
+          "owner": "meom-group",
+          "name": "CHART_COUPE",
+          "url": "https://github.com/meom-group/CHART_COUPE"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "plotting",
+          "geophysical-data",
+          "ncar-graphics",
+          "visualization"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "5bd95312aea7230bc47ad6b70186788e489ea1c3",
+            "evidence": [
+              {
+                "url": "https://github.com/meom-group/CHART_COUPE/blob/5bd95312aea7230bc47ad6b70186788e489ea1c3/README.md",
+                "path": "README.md",
+                "sha256": "ca5580c4a39ebbd76c1989b45c6702bf927de9727677f6a96038a177d04753c8"
+              }
+            ],
+            "notes": "The README documents chart/coupe executables and dependencies on NCAR/NCL graphics and NetCDF. This visualizes model output rather than solving the underlying physical equations; external library availability and documented rendering examples were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:andizuend/dislin_x_y_plot",
+      "local": {
+        "name": "DISLIN x-y plot module",
+        "description": "Convenience Fortran interface for customizable two-dimensional multi-curve DISLIN plots.",
+        "repository": {
+          "host": "github",
+          "owner": "andizuend",
+          "name": "Dislin_x_y_plot",
+          "url": "https://github.com/andizuend/Dislin_x_y_plot"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "visual-studio"
+        ],
+        "topics": [
+          "plotting",
+          "dislin",
+          "two-dimensional-graphics"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "a41f7a8d5b72fbc85a74d2a4df1d7b8a0d41c83d",
+            "evidence": [
+              {
+                "url": "https://github.com/andizuend/Dislin_x_y_plot/blob/a41f7a8d5b72fbc85a74d2a4df1d7b8a0d41c83d/README.md",
+                "path": "README.md",
+                "sha256": "4cd8257e230099038621ed7cb8b7385f89ed177ef8a1f45b341171163020f3f4"
+              }
+            ],
+            "notes": "The README explicitly limits the wrapper to a selection of common two-dimensional plotting controls, rather than all of DISLIN. Visual Studio projects and direct compiler commands are documented; DISLIN installation/link settings remain external requirements.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:dcesari/f03gl",
+      "local": {
+        "name": "F03gl",
+        "description": "Fortran 2003 ISO_C_BINDING interfaces to OpenGL, GLU and GLUT.",
+        "repository": {
+          "host": "github",
+          "owner": "dcesari",
+          "name": "f03gl",
+          "url": "https://github.com/dcesari/f03gl"
+        },
+        "languages": [
+          "Fortran",
+          "C"
+        ],
+        "build_systems": [
+          "autotools",
+          "make"
+        ],
+        "topics": [
+          "opengl",
+          "graphics",
+          "iso-c-binding",
+          "glut"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "7ff9e3b718b66e3282d437876f8f7a7a616405ca",
+            "evidence": [
+              {
+                "url": "https://github.com/dcesari/f03gl/blob/7ff9e3b718b66e3282d437876f8f7a7a616405ca/README.md",
+                "path": "README.md",
+                "sha256": "da1e5a4b0736e63e15cf0183bb957ec49443f3f2ce7d9e68ea9f858ce3c25208"
+              }
+            ],
+            "notes": "The README describes an interface derived from Stone/Donev work and adds GNU Autotools/shared-library packaging. Graphics operations are provided by external OpenGL libraries; example execution, display support and driver compatibility were not checked.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:gasinan/fdata2pyplot",
+      "local": {
+        "name": "fdata2pyplot",
+        "description": "Fortran array export and generated Python scripts for Matplotlib plots.",
+        "repository": {
+          "host": "github",
+          "owner": "GasinAn",
+          "name": "fdata2pyplot",
+          "url": "https://github.com/GasinAn/fdata2pyplot"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [],
+        "topics": [
+          "plotting",
+          "matplotlib",
+          "python-fortran",
+          "data-export"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "0fa84c77a29ad8fe21b8fa56f4a20af6b24dece6",
+            "evidence": [
+              {
+                "url": "https://github.com/GasinAn/fdata2pyplot/blob/0fa84c77a29ad8fe21b8fa56f4a20af6b24dece6/README.md",
+                "path": "README.md",
+                "sha256": "755351d9100d86643c70c418a82e0dfca98233e3fbe2f607dccc7f7e4edde67b"
+              }
+            ],
+            "notes": "The README example writes arrays to text, generates a Python script and optionally runs it. Rendering is delegated to NumPy/Matplotlib; the Fortran module is a bridge rather than a native plotting engine. Generated-script execution and cross-platform quoting were not tested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jeyemhex/fortran-graphics",
+      "local": {
+        "name": "Fortran OpenGL graphics",
+        "description": "Fortran OpenGL/GLFW scene helpers for grid fields and line objects.",
+        "repository": {
+          "host": "github",
+          "owner": "jeyemhex",
+          "name": "fortran-graphics",
+          "url": "https://github.com/jeyemhex/fortran-graphics"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "opengl",
+          "glfw",
+          "grid-visualization",
+          "graphics"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "6496e181595c81aaa325f8eaf9b652dc2afeb94c",
+            "evidence": [
+              {
+                "url": "https://github.com/jeyemhex/fortran-graphics/blob/6496e181595c81aaa325f8eaf9b652dc2afeb94c/README.md",
+                "path": "README.md",
+                "sha256": "e4ca7704d54ca008da1841ddc6fbce5abd89d1010de6a77eecdfc0bd5de9d0dd"
+              },
+              {
+                "url": "https://github.com/jeyemhex/fortran-graphics/blob/6496e181595c81aaa325f8eaf9b652dc2afeb94c/src/graphics.f90",
+                "path": "src/graphics.f90",
+                "sha256": "e351fbc08fb6a7a44e778866608492ffba71269125664c447ce63a0d99660292"
+              }
+            ],
+            "notes": "The short README is supplemented by the graphics module exposing scenes, real/complex grids and lines through gl/glfw interfaces. This establishes graphical scope without assuming a comprehensive modern OpenGL binding or a verified PDE solver from the included examples.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:lewisfish/fortgl",
+      "local": {
+        "name": "FortGL",
+        "description": "Software rendering in Fortran with triangle rasterization, shaders and texture mapping.",
+        "repository": {
+          "host": "github",
+          "owner": "lewisfish",
+          "name": "FortGL",
+          "url": "https://github.com/lewisfish/FortGL"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "software-rendering",
+          "rasterization",
+          "texture-mapping",
+          "three-dimensional-graphics"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "90cfb7c3f3c6d9d34993631a871300e1c2a4e938",
+            "evidence": [
+              {
+                "url": "https://github.com/lewisfish/FortGL/blob/90cfb7c3f3c6d9d34993631a871300e1c2a4e938/README.md",
+                "path": "README.md",
+                "sha256": "6360cf42e87fe9c6fc34eb6d2ed35bdd7f4a8182eb0343f9f8a79b3016e3524c"
+              }
+            ],
+            "notes": "The README documents a CPU renderer with camera controls, limited OBJ/PLY input and PPM output. Despite its name, this is not an OpenGL binding. Planned normal mapping and additional formats are excluded; dated compiler/platform claims were not retested.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:jtappin/graffer",
+      "local": {
+        "name": "Graffer",
+        "description": "Interactive Fortran data/function plotting using gtk-fortran and PLplot.",
+        "repository": {
+          "host": "github",
+          "owner": "jtappin",
+          "name": "graffer",
+          "url": "https://github.com/jtappin/graffer"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "plotting",
+          "interactive-graphics",
+          "gtk-fortran",
+          "plplot"
+        ],
+        "classifications": [
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "7c9c9b8d9a34a9a861d6ecd63fba4b9cd173d206",
+            "evidence": [
+              {
+                "url": "https://github.com/jtappin/graffer/blob/7c9c9b8d9a34a9a861d6ecd63fba4b9cd173d206/README",
+                "path": "README",
+                "sha256": "1921e9cf6b5571900357c569b7eeef14864bf91cc0be6d51f474d37fdce9c577"
+              }
+            ],
+            "notes": "The README distinguishes this Fortran version from the original IDL tool and requires GDL or IDL for function display. GUI and plotting are delegated to gtk-fortran/PLplot; no numerical-function engine is inferred from the plotting interface.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
+    },
+    {
+      "id": "github:noaa-pmel/pyferret",
+      "local": {
+        "name": "PyFerret",
+        "description": "Interactive analysis and visualization of gridded scientific data with a Fortran core and Python integration.",
+        "repository": {
+          "host": "github",
+          "owner": "NOAA-PMEL",
+          "name": "PyFerret",
+          "url": "https://github.com/NOAA-PMEL/PyFerret"
+        },
+        "languages": [
+          "Fortran",
+          "Python"
+        ],
+        "build_systems": [
+          "make"
+        ],
+        "topics": [
+          "scientific-visualization",
+          "gridded-data",
+          "netcdf",
+          "oceanography"
+        ],
+        "classifications": [
+          {
+            "code": "N",
+            "level": "documentation-reviewed",
+            "revision": "8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa",
+            "evidence": [
+              {
+                "url": "https://github.com/NOAA-PMEL/PyFerret/blob/8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa/README.md",
+                "path": "README.md",
+                "sha256": "9259cc078c67748211356c01138de2300bbe4915a3f863bfdd57d62e44addbb7"
+              },
+              {
+                "url": "https://github.com/NOAA-PMEL/PyFerret/blob/8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa/docs/ferret.pmel.noaa.gov/Ferret/documentation/users-guide/introduction/OVERVIEW.html",
+                "path": "docs/ferret.pmel.noaa.gov/Ferret/documentation/users-guide/introduction/OVERVIEW.html",
+                "sha256": "ecdb2b05ea87c054ff7dece5a52ccd79a2c5046e40541b8bf9b438d95d34641f"
+              }
+            ],
+            "notes": "The repository README and pinned bundled Ferret overview describe gridded-data expressions, extraction and plots. The overview documents Ferret foundations and includes historical platform details, not a guarantee of current PyFerret support. External-function extensibility is not proof that every mathematical method is bundled or reviewed.",
+            "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "Q",
+            "level": "documentation-reviewed",
+            "revision": "8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa",
+            "evidence": [
+              {
+                "url": "https://github.com/NOAA-PMEL/PyFerret/blob/8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa/README.md",
+                "path": "README.md",
+                "sha256": "9259cc078c67748211356c01138de2300bbe4915a3f863bfdd57d62e44addbb7"
+              },
+              {
+                "url": "https://github.com/NOAA-PMEL/PyFerret/blob/8e77eb6f650d3bf0b306cc192f4f432db3b5a8aa/docs/ferret.pmel.noaa.gov/Ferret/documentation/users-guide/introduction/OVERVIEW.html",
+                "path": "docs/ferret.pmel.noaa.gov/Ferret/documentation/users-guide/introduction/OVERVIEW.html",
+                "sha256": "ecdb2b05ea87c054ff7dece5a52ccd79a2c5046e40541b8bf9b438d95d34641f"
+              }
+            ],
+            "notes": "The repository README and pinned bundled Ferret overview describe gridded-data expressions, extraction and plots. The overview documents Ferret foundations and includes historical platform details, not a guarantee of current PyFerret support. External-function extensibility is not proof that every mathematical method is bundled or reviewed.",
+            "reviewed_on": "2026-11-04"
+          }
+        ],
+        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "discovery": {
+          "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
+          "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        }
+      },
+      "imports": {}
     }
   ]
 }
