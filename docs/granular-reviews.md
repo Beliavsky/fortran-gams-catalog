@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Thirty repositories now have forty-three source-reviewed
+Reviewed on 2026-11-04. Thirty-three repositories now have forty-seven source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Twenty-nine repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A thirtieth, DDFSA, identifies the supplied
+Thirty-two repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A thirty-third, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All thirty independently source-reviewed repositories now have an
+separately. All thirty-three independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -53,6 +53,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Interpolation in 2D and 3D | `quadratic_shepard_2d::qshep_2d%create_mesh`, `%interpolate_point`, `%gradient_point` | MIT wrappers; ACM numerical-core notice |
 | chol-rev | External `DPO2FT`, `DPOFRT` (lower-factor reverse differentiation) | MIT and BSD-3-Clause-Open-MPI component notices |
 | findiff | `findiffmod::findiff`, `::findiff_multiscale`, `::findiffhes` | No license identified in reviewed material |
+| libdierckx FITPACK | External `splder`, `splint` | No license identified in reviewed material |
+| ORTHPOL | External `dgauss` (rule generation from recurrence coefficients) | No license identified in reviewed material |
+| triasymq | External `triasymq` (triangle nodes and weights) | BSD-3-Clause core; modified BSD notice for some helpers |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -102,6 +105,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Interpolation in 2D and 3D](https://github.com/arjenmarkus/interpolation2d3d) | E2b | Planar modified quadratic Shepard fit, weighted local evaluation and interpolant gradients | Only the 2D path reviewed. Default REAL, at least six samples, construction/status checks required; unsupported queries are not general extrapolation. |
 | [chol-rev](https://github.com/imurray/chol-rev) | H1 | Lower-factor reverse sensitivity propagation, unblocked and blocked BLAS updates | Upper path unimplemented, LDC not checked, blocked routine overwrites upper entries. Preserve triangular adjoint convention and match BLAS integer ABI. |
 | [findiff](https://github.com/PunchesMalone/findiff) | H1 | Symmetric finite-difference square Jacobians and derivatives of a supplied Jacobian | Requires real128 and user-selected nonzero steps. order counts stencil points. Bundled real64 tests need consistent kinds; no automatic error estimate. |
+| [libdierckx FITPACK](https://github.com/DaanVanVugt/libdierckx) | E3a2; E3a3 | B-spline derivative coefficients/evaluation and basis-integral contraction | Caller supplies valid representation; default REAL and degree at most five. Spline calculus is not arbitrary-function differentiation/integration. |
+| [ORTHPOL](https://github.com/ivan-pi/orthpol) | H2c | Jacobi-matrix Gaussian nodes and weights from supplied recurrence coefficients | Caller supplies a valid measure and forms the weighted sum. deps controls node iteration, not integration accuracy. Other rule families not reviewed. |
+| [triasymq](https://github.com/zgimbutas/triasymq) | H2c | Tabulated D3 triangle-rule expansion and affine area scaling | Prevalidate degree 1..50 and nondegenerate vertices. Initialize node-count capacity; no public status. Tables not numerically reverified. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -205,3 +211,14 @@ The chol-rev entries describe differentiation through an existing lower factor,
 not ordinary Cholesky factorization or another review of the LAPACK repository.
 The findiff tensor entry requires a Jacobian callback; it is not advertised as
 a scalar-Hessian-from-values routine. No upstream program was compiled or run.
+
+## Spline calculus and quadrature-rule services
+
+H2c is the NIST service-routine class for quadrature weights/nodes (printed
+page 20 / PDF page 22). ORTHPOL and triasymq return rules; their calling
+sketches explicitly form weighted sums and identify analytic reference values,
+without claiming executed comparisons or automatic error control.
+FITPACK's reviewed derivative and integral routines act on an existing spline,
+so E3a2 and E3a3 describe them more precisely than general differentiation or
+integration classes. Its fitting/smoothing paths remain documentation reviewed.
+None of the upstream routines or sketches in this batch was compiled or run.

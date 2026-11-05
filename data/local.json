@@ -1627,12 +1627,85 @@
             ],
             "notes": "The brief README explicitly identifies orthogonal-polynomial and Gauss-type rule generation. No particular rule family, accuracy bound or integration API is inferred from the repository name.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "07aee9bd398887c0f47ae5406b3be865aa692d40",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected DGAUSS routine constructs an n-point Gaussian rule from the monic orthogonal-polynomial recurrence coefficients. It builds the symmetric tridiagonal Jacobi matrix implicitly, iterates eigenvalues and first eigenvector components, sorts nodes and scales squared components by dbeta(1), the measure mass. It returns nodes and weights rather than invoking an integrand or returning an integral. H2c is therefore the precise quadrature-service mapping; an internal eigensolver does not make this a general eigensystem API. The caller must supply a valid positive integration measure and consistent recurrence coefficients. Negative beta entries and iteration exhaustion have error returns; eps is an eigensolver convergence parameter, not a requested integration-error bound. Other ORTHPOL recurrence-generation and Gauss-Radau/Lobatto routines are outside this source review. No moment or quadrature test was run.",
+            "evidence": [
+              {
+                "path": "legacy/dgauss.f",
+                "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/legacy/dgauss.f",
+                "sha256": "6bcbc1c327f62a40a066e6ff64809eb2a315ade548ab47dcf383b1712f067bb2"
+              },
+              {
+                "path": "legacy/gauss.f",
+                "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/legacy/gauss.f",
+                "sha256": "ae61d23b4b0017576afc80d2592f79003885fd42f1a7a2a9be1e44375498e246"
+              },
+              {
+                "path": "legacy/README",
+                "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/legacy/README",
+                "sha256": "cef2d1cc1bcbd910050c5ec5283b3a20c5073eee372aad8372be5c2b20fe0502"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dgauss",
+                "role": "public-entry-point",
+                "summary": "External double-precision Gaussian-rule constructor. dalpha(n), dbeta(n), dzero(n), dweigh(n), and workspace de(n) are required. dbeta(1) is the total mass; later entries are recurrence coefficients. Supply n >= 1 and positive deps. ierr=0 indicates normal return; -1/-2 flag size/negative beta and a positive value flags iteration exhaustion. Form the weighted sum yourself.",
+                "signature": "CALL dgauss(n, dalpha, dbeta, deps, dzero, dweigh, ierr, de)",
+                "declarations": [
+                  {
+                    "path": "legacy/dgauss.f",
+                    "line_start": 3,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "legacy/gauss.f",
+                    "line_start": 24,
+                    "line_end": 44
+                  }
+                ],
+                "path": "legacy/dgauss.f",
+                "line_start": 3,
+                "line_end": 103,
+                "usage": "external :: dgauss\ninteger, parameter :: n=4\ninteger :: i, ierr\ndouble precision :: alpha(n), beta(n), nodes(n), weights(n), work(n), q\nalpha = 0.0d0\nbeta(1) = 2.0d0\ndo i=2,n\n  beta(i) = dble(i-1)**2/(4.0d0*dble(i-1)**2-1.0d0)\nend do\ncall dgauss(n,alpha,beta,epsilon(1.0d0),nodes,weights,ierr,work)\nif (ierr /= 0) error stop \"Gaussian rule failed\"\nq = sum(weights*nodes**6)",
+                "usage_notes": "Uncompiled calling sketch using the monic Legendre recurrence on [-1,1]. The analytic integral of x**6 is 2/7, but no moment comparison was run. The measure weight is already represented by the recurrence and quadrature weights: do not multiply it into the sampled integrand again. Rule-generation convergence does not bound integration error for a general function."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "07aee9bd398887c0f47ae5406b3be865aa692d40",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned tree contains no identified license/copying file. Reviewed READMEs attribute the original ORTHPOL package to Walter Gautschi and describe the ACM paper and local build changes, but no explicit license grant was identified there or in DGAUSS. ACM publication is not inferred to be a specific license. Other distributions and histories are outside this finding.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/README.md",
+              "sha256": "6642b70bae54f789ceb7a73ae2e836c78d3c564834908b4cdbf4f7d8bca1c711"
+            },
+            {
+              "path": "legacy/README",
+              "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/legacy/README",
+              "sha256": "cef2d1cc1bcbd910050c5ec5283b3a20c5073eee372aad8372be5c2b20fe0502"
+            },
+            {
+              "path": "legacy/dgauss.f",
+              "url": "https://github.com/ivan-pi/orthpol/blob/07aee9bd398887c0f47ae5406b3be865aa692d40/legacy/dgauss.f",
+              "sha256": "6bcbc1c327f62a40a066e6ff64809eb2a315ade548ab47dcf383b1712f067bb2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -1674,12 +1747,91 @@
             ],
             "notes": "The README lists supported geometric domains, symmetry variants, rule files and driver programs. Mapping is multidimensional quadrature; author drivers have not been executed here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "332f5f4b2846bd7345400f5d25ad0650b884fa6f",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected triasymq entry retrieves tabulated reference-triangle nodes and weights, expands the D3 symmetry and maps them affinely to caller-supplied vertices. trianmap rescales weights to the absolute triangle area. This is a fixed-rule service returning nodes/weights, not an adaptive integrand-callback interface. The supported requested polynomial degree is 1..50, distinct from the returned node count (up to 453 according to the table). The wrapper ignores its internal ier, so validate degree before calling and supply a nondegenerate triangle and adequately sized arrays. The internal explicit-shape quaequad dummy uses the incoming nptsout value before overwriting it: initialize numnodes to the supplied capacity rather than relying on the author driver uninitialized variable. Tables and expansion/mapping paths were inspected, but all rule moments, degrees and claimed extended-precision construction accuracy were not independently verified. Other domains in the repository are outside this source review.",
+            "evidence": [
+              {
+                "path": "triasymq.f",
+                "url": "https://github.com/zgimbutas/triasymq/blob/332f5f4b2846bd7345400f5d25ad0650b884fa6f/triasymq.f",
+                "sha256": "d4cc45f53207d656e76aacdc68c3b02a7b003c274a569dc284e8b529d0644e4c"
+              },
+              {
+                "path": "triasymq_dr.f",
+                "url": "https://github.com/zgimbutas/triasymq/blob/332f5f4b2846bd7345400f5d25ad0650b884fa6f/triasymq_dr.f",
+                "sha256": "0fac0a080e3e9f17b6801d54bf439e9087bb60ca71ea87cf68b95f96a8807a49"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "triasymq",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 triangle quadrature-rule retrieval. vert1,vert2,vert3 each have length two, rnodes has two rows and weights is a vector. Prevalidate degree n in 1..50 and nonzero area, allocate capacity at least 453 for the full range, and initialize numnodes to that capacity. On return use only entries 1:numnodes. No public error flag is returned.",
+                "signature": "CALL triasymq(n, vert1, vert2, vert3, rnodes, weights, numnodes)",
+                "declarations": [
+                  {
+                    "path": "triasymq.f",
+                    "line_start": 17,
+                    "line_end": 22
+                  }
+                ],
+                "path": "triasymq.f",
+                "line_start": 17,
+                "line_end": 83,
+                "examples": [
+                  {
+                    "path": "triasymq_dr.f",
+                    "line_start": 76,
+                    "line_end": 90
+                  }
+                ],
+                "usage": "external :: triasymq\ninteger :: numnodes\ndouble precision :: v1(2), v2(2), v3(2), nodes(2,453), weights(453), q\nv1 = [0.0d0,0.0d0]\nv2 = [1.0d0,0.0d0]\nv3 = [0.0d0,1.0d0]\nnumnodes = 453\ncall triasymq(2,v1,v2,v3,nodes,weights,numnodes)\nq = sum(weights(1:numnodes)*nodes(1,1:numnodes)**2)",
+                "usage_notes": "Uncompiled calling sketch for the unit right triangle. The analytic integral of x**2 is 1/12, but no numerical moment was checked. The weights already include triangle-area scaling. Degree two is the requested polynomial degree, not an allocation size. Prevalidate input because the public wrapper does not expose internal errors; this is not adaptive error-controlled integration."
+              },
+              {
+                "procedure": "trianmap",
+                "role": "implementation-helper",
+                "path": "triasymq.f",
+                "line_start": 89,
+                "line_end": 126
+              },
+              {
+                "procedure": "quaequad",
+                "role": "implementation-helper",
+                "path": "triasymq.f",
+                "line_start": 158,
+                "line_end": 256
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause core; modified BSD notice for some helpers",
+          "spdx_expression": null,
+          "revision": "332f5f4b2846bd7345400f5d25ad0650b884fa6f",
+          "reviewed_on": "2026-11-04",
+          "notes": "COPYING gives the standard three-clause BSD notice for the Gimbutas/Xiao core. Its separate notice for legeexps.f and prini.f adds a requirement to mark and date modifications. A single BSD-3-Clause expression would omit that extra helper condition; no uniform SPDX expression is asserted for the repository. The inspected triasymq source refers to this COPYING file.",
+          "evidence": [
+            {
+              "path": "COPYING",
+              "url": "https://github.com/zgimbutas/triasymq/blob/332f5f4b2846bd7345400f5d25ad0650b884fa6f/COPYING",
+              "sha256": "2654a0f9c65851cab6652cf4088dd2677fb84853621e10477edf78c4bb9ad243"
+            },
+            {
+              "path": "triasymq.f",
+              "url": "https://github.com/zgimbutas/triasymq/blob/332f5f4b2846bd7345400f5d25ad0650b884fa6f/triasymq.f",
+              "sha256": "d4cc45f53207d656e76aacdc68c3b02a7b003c274a569dc284e8b529d0644e4c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22763,12 +22915,152 @@
             ],
             "notes": "The distribution README documents smoothing factors, knot selection and spline differentiation/integration, with specialized domains. It explicitly distinguishes this FITPACK from Alan Cline FITPACK; routine-specific input assumptions and results are deferred to individual review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E3a2",
+            "level": "source-reviewed",
+            "revision": "5dd7bd76738153e4cda2a0269e2bdfd6b386976d",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected SPLDER routine differences B-spline coefficients recursively to obtain derivative coefficients, then evaluates the lower-degree basis with FPBSPL; the highest derivative has a piecewise-constant branch. This is derivative evaluation of a supplied spline, not numerical differentiation of an arbitrary callback or recovery of derivatives of an unknown sampled function. The caller supplies knots, coefficients and spline degree. The fixed work arrays support the FITPACK degree range through five. The input checks cover derivative order and sorted queries, not complete knot validity or coefficient construction. The nonconstant branch clamps out-of-range queries to endpoints, while the highest-derivative branch differs; keep queries in the documented spline interval. No spline value, derivative or author example was executed.",
+            "evidence": [
+              {
+                "path": "splder.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/splder.f",
+                "sha256": "6a0f8464ab262b80f270648cb03383e63b9e8a8fe3fb42e01f824dea489be574"
+              },
+              {
+                "path": "fpbspl.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/fpbspl.f",
+                "sha256": "ff0dd4d69f8d61077d4da23499b626c4445720ca2400a49a0c44f645fe10e427"
+              },
+              {
+                "path": "ex/mnspde.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/ex/mnspde.f",
+                "sha256": "c8d61c551dccb962b0cee3162dcf321ce708286160dc8ab7af4e8ad49b3456df"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "splder",
+                "role": "public-entry-point",
+                "summary": "External default REAL routine for an existing normalized B-spline representation. Provide t(n), c(n), sorted x(m), y(m), wrk(n), 1 <= k <= 5 and 0 <= nu <= k, with valid knots. Keep query points in [t(k+1),t(n-k)]. Check ier before using y: zero is normal return, ten reports some invalid inputs.",
+                "signature": "CALL splder(t, n, c, k, nu, x, y, m, wrk, ier)",
+                "declarations": [
+                  {
+                    "path": "splder.f",
+                    "line_start": 51,
+                    "line_end": 59
+                  }
+                ],
+                "path": "splder.f",
+                "line_start": 1,
+                "line_end": 137,
+                "examples": [
+                  {
+                    "path": "ex/mnspde.f",
+                    "line_start": 19,
+                    "line_end": 49
+                  }
+                ],
+                "usage": "external :: splder\ninteger :: ier\nreal :: t(4), c(4), x(3), y(3), work(4)\nt = [0.,0.,1.,1.]\nc = [0.,1.,0.,0.]\nx = [0.,0.5,1.]\ncall splder(t,4,c,1,1,x,y,3,work,ier)\nif (ier /= 0) error stop \"spline derivative failed\"",
+                "usage_notes": "Uncompiled calling sketch of the linear spline s(x)=x on [0,1]. The analytic derivative is one, but no comparison was run. Link fpbspl with splder and use matching default REAL kinds. This sketch supplies coefficients directly and does not demonstrate a fitting routine."
+              },
+              {
+                "procedure": "fpbspl",
+                "role": "implementation-helper",
+                "path": "fpbspl.f",
+                "line_start": 1,
+                "line_end": 32
+              }
+            ]
+          },
+          {
+            "code": "E3a3",
+            "level": "source-reviewed",
+            "revision": "5dd7bd76738153e4cda2a0269e2bdfd6b386976d",
+            "reviewed_on": "2026-11-04",
+            "notes": "SPLINT obtains integrals of the normalized B-spline basis from FPINTB and contracts them with the supplied spline coefficients. The helper uses the Gaffney recurrence, reverses sign for reversed integration limits and clips limits to the spline support. E3a3 records quadrature of an already-fitted function, rather than an adaptive integrator for arbitrary functions. The spline is treated as zero outside its base interval according to the public header. The routine has no status or error estimate and assumes valid knots, degree and storage. The helper contains six-element local arrays, consistent with degree at most five; it is not a general arbitrary-degree API. No integral or author example was checked by execution.",
+            "evidence": [
+              {
+                "path": "splint.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/splint.f",
+                "sha256": "2cf6bf39e9c4184940372a66ef2bfe60816a5ac100dbb6a975854d85933f5658"
+              },
+              {
+                "path": "fpintb.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/fpintb.f",
+                "sha256": "c29563f5c4fcc0ff5855e16a6417595241d7d0e5fb68b35815f8ef07bae45160"
+              },
+              {
+                "path": "ex/mnspin.f",
+                "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/ex/mnspin.f",
+                "sha256": "de809eea6fb93f590251cba918b8a09cdfc3f2d82ab7951f5ca58483cad238a5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "splint",
+                "role": "public-entry-point",
+                "summary": "External default REAL function taking t(n), c(n), degree k, scalar limits a,b and wrk(n). Supply a valid normalized B-spline of degree 1..5. wrk returns basis integrals. No ier argument exists. The represented spline is zero outside [t(k+1),t(n-k)] and reversed limits reverse the sign.",
+                "signature": "integral = splint(t, n, c, k, a, b, wrk)",
+                "declarations": [
+                  {
+                    "path": "splint.f",
+                    "line_start": 40,
+                    "line_end": 46
+                  }
+                ],
+                "path": "splint.f",
+                "line_start": 1,
+                "line_end": 58,
+                "examples": [
+                  {
+                    "path": "ex/mnspin.f",
+                    "line_start": 15,
+                    "line_end": 49
+                  }
+                ],
+                "usage": "real, external :: splint\nreal :: t(4), c(4), work(4), integral\nt = [0.,0.,1.,1.]\nc = [0.,1.,0.,0.]\nintegral = splint(t,4,c,1,0.,1.,work)",
+                "usage_notes": "Uncompiled calling sketch integrating the linear spline s(x)=x on [0,1]; its analytic integral is 0.5. Link fpintb with splint, using matching default REAL kinds. No quadrature check or fitting-error estimate was computed. Prefer valid limits within the spline interval when using the documented representation."
+              },
+              {
+                "procedure": "fpintb",
+                "role": "implementation-helper",
+                "path": "fpintb.f",
+                "line_start": 1,
+                "line_end": 127
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "5dd7bd76738153e4cda2a0269e2bdfd6b386976d",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license/copying file was found in the pinned tree, and no license grant was identified in the inspected distribution README and calculus routine headers. Attribution and the software distribution description do not themselves establish redistribution rights. This is limited to reviewed material, not other FITPACK distributions.",
+          "evidence": [
+            {
+              "path": "readme.txt",
+              "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/readme.txt",
+              "sha256": "1725f2ef32dc1daf99fa7f63b5cb9b7acd74a2f895d5ccb97917ec17601c7c20"
+            },
+            {
+              "path": "splder.f",
+              "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/splder.f",
+              "sha256": "6a0f8464ab262b80f270648cb03383e63b9e8a8fe3fb42e01f824dea489be574"
+            },
+            {
+              "path": "splint.f",
+              "url": "https://github.com/DaanVanVugt/libdierckx/blob/5dd7bd76738153e4cda2a0269e2bdfd6b386976d/splint.f",
+              "sha256": "2cf6bf39e9c4184940372a66ef2bfe60816a5ac100dbb6a975854d85933f5658"
+            }
+          ]
         }
       },
       "imports": {}
