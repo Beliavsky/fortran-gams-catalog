@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Forty-five repositories now have sixty-one source-reviewed
+Reviewed on 2026-11-04. Forty-eight repositories now have sixty-five source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Forty-four repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A forty-fifth, DDFSA, identifies the supplied
+Forty-seven repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A forty-eighth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All forty-five independently source-reviewed repositories now have an
+separately. All forty-eight independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -68,6 +68,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | autodiff (sgeard) | `AVD::init`, `::exp` (reviewed `avd_d4` overload) | MIT |
 | dnad (joddlehod) | `dnadmod::exp` (public generic; seeded first-derivative vectors) | Custom DNAD copying/modification notices |
 | FORbID | `newton_cotes_integrator%init`, `%integrate_1D`; `romberg_integrator%init`, `%integrate_1D` in their defining modules | README conditional GPL/BSD/MIT licensing notice |
+| Cyclic banded matrix solvers | External `DCTSV` (cyclic) and `thomas` (ordinary tridiagonal) | Custom BSD-style terms with machine-learning restrictions |
+| chebpak | `chebyshev_m::cheb_node`, `::bary_weights`, `::lag_intrp` (reviewed CGL interpolation path) | MIT; external MKL terms separate |
+| Numerical Differentiation | `LIBRARY_REAL8::DIFF`, external `FDM` (finite-difference path) | Root GNU GPL version 3; component/version scope unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -132,6 +135,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [autodiff](https://github.com/sgeard/autodiff) | H1 | Fourth-order scalar forward product and exponential composition rules in `src/avd.f90` | Call init before elementary functions. One scalar differentiation parameter; consistent eight-byte default REAL build requested. Other overloads and older root implementation unreviewed. |
 | [dnad](https://github.com/joddlehod/dnad) | H1 | First-order dual-number product/exponential rules and derivative seeding | Compile-time ndv, default REAL kinds and explicit seed initialization required. Public generic retained; private specifics are helpers. |
 | [FORbID](https://github.com/giacrossi/FORbID) | H2a1a2; H2a1a1 | Fixed closed Newton-Cotes weights and globally refined Romberg extrapolation | Higher-degree Newton-Cotes scaling appears incorrect; sketch uses n=1. Romberg exhausts its table on nonconvergence. Separate adaptive accumulator is undefined on entry; 2D/3D methods are stubs. No checked driver. |
+| [Cyclic banded matrix solvers](https://github.com/mostlyharmlessone/cyclic-banded-matrix) | D2a1; D2a2a | Paired endpoint cyclic elimination with even/odd terminal solves; separate ordinary Thomas elimination | No pivoting. Cyclic intermediate determinant breakdown is not proof of full-matrix singularity. Thomas overwrites diagonal/RHS and has no status. Wider-band/OpenMP variants unreviewed. |
+| [chebpak](https://github.com/saridut/chebpak) | E1b | CGL node generation, endpoint-halved barycentric weights and global polynomial evaluation | n is degree, arrays need n+1 elements. Pass ordering flag explicitly because its default is saved. Weight generator supports CGL only. MKL interfaces required; other paths unreviewed. |
+| [Numerical Differentiation](https://github.com/theysy/Numerical_differentiation) | H1 | Central finite differences for gradient, Hessian diagonal and mixed entries | Fixed absolute steps and built-in objective selectors; not a callback library. Unsupported selectors lack safe failure reporting. Complex/hyper-dual correctness not audited. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
