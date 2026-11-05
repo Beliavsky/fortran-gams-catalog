@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Fifty-seven repositories now have seventy-four source-reviewed
+Reviewed on 2026-11-05. Sixty repositories now have seventy-seven source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Fifty-six repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A fifty-seventh, DDFSA, identifies the supplied
+Fifty-nine repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A sixtieth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All fifty-seven independently source-reviewed repositories now have an
+separately. All sixty independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -80,6 +80,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FFTE | External `ZFFT1D` (complex 1D driver) | Custom use/modification grant; original-package redistribution |
 | modern_fftpack | `type_FFTpack::FFTpack%fft`, `%ifft` (complex 1D bindings; facade `fftpack_library`) | MIT root notice; inherited FFTPACK terms not fully audited |
 | FFTW3 wrapper | `fftw3_wrapper::fft`, `::ifft` (complex REAL64 1D bindings) | GNU GPL version 3; version scope unresolved; FFTW terms separate |
+| gamma_f77 | `GAMMA_MOD::TGAMMA` (real Gamma in a selected 32-digit kind) | BSL-1.0 |
+| elliptic_k_using_agm_fortran | `elliptic_k_using_agm_fortran::elliptic_k` (REAL64 overload) | MIT; external dependency terms separate |
+| spherical_bessel_fortran | External `sbessj` (real spherical first-kind function) | LGPL-3.0-or-later routine; separate comparison-code notice |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -156,6 +159,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FFTE](https://github.com/certik/ffte) | J1a2 | Complex driver setup, 2/3/5 factorization, radix dispatch and conjugate/scaled inverse | Initialize for current N; only 2/3/5-smooth lengths with compiled dimension limits. Large tables are saved state. No status or kernel/numerical audit. |
 | [modern_fftpack](https://github.com/jlokimlin/modern_fftpack) | J1a2 | Complex 1D wrapper, setup/dispatch and inspected forward-normalization path | Forward scaled, inverse unscaled. Workspace/setup rebuilt per call. Positive N required; errors may terminate. Parent/submodule workspace INTENT differences need build checking. |
 | [FFTW3 wrapper](https://github.com/kuanchihwang/fftw3_wrapper) | J1a2 | FFTW aligned-buffer planning/execution/cleanup for complex REAL64 1D | Forward unscaled, inverse divided by N. Optional length truncates/pads. New plan per call, allocatable distinct output required, failures STOP. External FFTW kernels not audited. |
+| [gamma_f77](https://github.com/ckormanyos/gamma_f77) | C7a | Reciprocal-Gamma Horner expansion, recurrence, reflection and integer factorial branch | Poles return finite sentinel; large-argument INTEGER conversion/overflow unguarded. Last coefficient lacks kind suffix. File also contains a main program; separate module before reuse. No precision certification. |
+| [elliptic_k_using_agm_fortran](https://github.com/dscf-1224/elliptic_k_using_agm_fortran) | C14 | Direct/complementary AGM and elliptic-nome dispatch for complete first-kind K(k) | k is modulus, not parameter. Large negative k passes signed input to AGM; sketch uses positive k. Unpinned dependencies, unconditional REAL128 declarations and external algorithms need checking. |
+| [spherical_bessel_fortran](https://github.com/jlm785/spherical_bessel_fortran) | C10a3 | Real spherical j_n power series and upward recurrence | Half-integer cylindrical-order subset only. STOP on some errors/accuracy guards; no returned estimate. Guard is asymmetric in x. Complex/quad variants unreviewed. |
+
+The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
+in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
+index does not make it an arbitrary integer-order cylindrical `J_n` evaluator.
+The card limits C10a3 coverage to that spherical subset.
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.

@@ -60,6 +60,18 @@
       "parent": "G2e",
       "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=20",
       "reviewed_on": "2026-11-04"
+    },
+    "C10a": {
+      "label": "J, Y, H1, H2",
+      "parent": "C10",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=16",
+      "reviewed_on": "2026-11-05"
+    },
+    "C10a3": {
+      "label": "Real argument, real order",
+      "parent": "C10a",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=16",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -3207,12 +3207,78 @@
             ],
             "notes": "The README explicitly implements real Gamma using reciprocal-series expansion, recurrence and reflection. The mathematical discussion of complex Gamma is not taken as evidence of a complex-argument implementation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C7a",
+            "level": "source-reviewed",
+            "revision": "56568aa9257f587c4c09f033954c3cadd5ef4666",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected GAMMA_MOD::TGAMMA evaluates real Gamma by a 48-coefficient reciprocal-Gamma expansion in Horner form, recurrence products after reducing |X|, and reflection for negative noninteger arguments of magnitude above one. Positive integer arguments take a factorial-product branch. C7a records Gamma evaluation; no log-Gamma, reciprocal-Gamma output API, incomplete Gamma or complex extension is inferred. QP=selected_real_kind(32) requires compiler support for at least 32 decimal digits and sufficient range for the source literal 1e4000. At zero/negative integer poles the routine returns that finite sentinel rather than an IEEE infinity or status. Default-INTEGER conversions of X are not range-guarded; NaN, infinities, overflow and large recurrence products are not handled robustly. The last DATA coefficient lacks the _QP suffix used by the others, so coefficient rounding deserves checking before asserting a full precision guarantee. gamma.f also contains a main test program after the module; extract/build the module separately when linking a different main. No accuracy or pole/overflow case was executed.",
+            "evidence": [
+              {
+                "path": "gamma.f",
+                "url": "https://github.com/ckormanyos/gamma_f77/blob/56568aa9257f587c4c09f033954c3cadd5ef4666/gamma.f",
+                "sha256": "3ef1160389fa7a78f329024b26f1d0a862653f823ff9a585c31b5e829b3102e3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ckormanyos/gamma_f77/blob/56568aa9257f587c4c09f033954c3cadd5ef4666/README.md",
+                "sha256": "8674f592fa4e48a0ccf0fbbde99e84e14408dffb4111be53ca21884b4b475439"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TGAMMA",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine for real Gamma. X and GA use the module QP kind, selected_real_kind(32). X is read and GA assigned in the inspected body, although neither has an INTENT declaration. Pass variables of that exact kind. Exclude zero and negative integers; there is no status or error-bound result.",
+                "signature": "CALL TGAMMA(X, GA)",
+                "declarations": [
+                  {
+                    "path": "gamma.f",
+                    "line_start": 27,
+                    "line_end": 33
+                  }
+                ],
+                "path": "gamma.f",
+                "line_start": 31,
+                "line_end": 130,
+                "module": "GAMMA_MOD",
+                "examples": [
+                  {
+                    "path": "gamma.f",
+                    "line_start": 137,
+                    "line_end": 161
+                  }
+                ],
+                "usage": "use GAMMA_MOD, only: QP, TGAMMA\nreal(QP) :: x, value\nx=0.5_QP\ncall TGAMMA(x,value)\n! Gamma(1/2) should equal sqrt(pi).",
+                "usage_notes": "Uncompiled fragment; sqrt(pi) was not compared with the result. Build only the GAMMA_MOD portion (lines 27..131, retaining its license notice) when supplying your own main: the original file also defines PROGRAM GAMMA. The compiler must support QP and the large exponent literal. Avoid poles and unchecked default-INTEGER conversion/overflow ranges. A 32-digit arithmetic kind does not establish 32 correct result digits; series coefficients and error behavior were not numerically audited."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Boost Software License 1.0",
+          "spdx_expression": "BSL-1.0",
+          "revision": "56568aa9257f587c4c09f033954c3cadd5ef4666",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE contains Boost Software License 1.0 and gamma.f explicitly names that license. This records the reviewed distribution notice and source attribution, not an audit of cited algorithm history.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ckormanyos/gamma_f77/blob/56568aa9257f587c4c09f033954c3cadd5ef4666/LICENSE",
+              "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+            },
+            {
+              "path": "gamma.f",
+              "url": "https://github.com/ckormanyos/gamma_f77/blob/56568aa9257f587c4c09f033954c3cadd5ef4666/gamma.f",
+              "sha256": "3ef1160389fa7a78f329024b26f1d0a862653f823ff9a585c31b5e829b3102e3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -6521,12 +6587,92 @@
             ],
             "notes": "The README documents sbessj and zsbessj and discusses reliability limits near zeros and parameter extremes. Its reported digits of accuracy and author comparisons have not been reproduced here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C10a3",
+            "level": "source-reviewed",
+            "revision": "90759662246614ffb3bbcfaa770b0bc98b9fb4a2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected real SBESSJ evaluates spherical j_n(x), choosing a power series for |x|<=0.78*n and upward recurrence from sin(x)/x and (sin(x)/x-cos(x))/x otherwise. At x=0 the series returns j_0=1 and j_n=0 for n>0. C10a3 (real argument, real order) is used for the half-integer cylindrical-Bessel subset: j_n(x)=sqrt(pi/(2*x))*J_(n+1/2)(x) for positive x (NIST DLMF 10.47.3, https://dlmf.nist.gov/10.47.E3). The procedure exposes only nonnegative integer spherical n, not arbitrary real cylindrical orders, Y/Hankel or modified I/K functions. Negative order, a flagged low-accuracy positive-x region for n>50, and series nonconvergence print diagnostics and STOP. The low-accuracy guard uses x rather than abs(x), so negative-x reliability is not established by that guard. Series stopping uses an absolute term threshold and a finite 20+2*n budget; it supplies neither a returned error estimate nor a status code. Precision/accuracy claims in comments/README were not reproduced. Complex and quad variants and the comparison implementation remain outside this source review. No Bessel value or recurrence residual was executed.",
+            "evidence": [
+              {
+                "path": "sbessj.f90",
+                "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/sbessj.f90",
+                "sha256": "d61eb717007d985c5fefa63798e0ffc9ed56ded235612a81a4d5806bea762703"
+              },
+              {
+                "path": "test_bessel.f90",
+                "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/test_bessel.f90",
+                "sha256": "cb4c840422f5403c87c3aa0f4c372f5d03d6733d8db6df5b35158004ebdb27d2"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/README.md",
+                "sha256": "65d3ea6e152bef079fe4ad37a2de2abdde0743c9fd2a3d182279c23080c9c43e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sbessj",
+                "role": "public-entry-point",
+                "summary": "External real spherical-Bessel function. n is default INTEGER and must be nonnegative; x and function result use selected_real_kind(12), called REAL64 locally (not an ISO_FORTRAN_ENV constant). Declare that exact return kind in an explicit interface or typed EXTERNAL declaration. Returns one j_n(x) value, with no derivative/status. Some invalid or low-accuracy cases STOP.",
+                "signature": "value = sbessj(n, x)",
+                "declarations": [
+                  {
+                    "path": "sbessj.f90",
+                    "line_start": 31,
+                    "line_end": 42
+                  }
+                ],
+                "path": "sbessj.f90",
+                "line_start": 19,
+                "line_end": 155,
+                "examples": [
+                  {
+                    "path": "test_bessel.f90",
+                    "line_start": 5,
+                    "line_end": 31
+                  }
+                ],
+                "usage": "integer, parameter :: rk=selected_real_kind(12)\nreal(rk), external :: sbessj\nreal(rk) :: at_origin, value\nat_origin=sbessj(0,0.0_rk)\nvalue=sbessj(2,1.0_rk)",
+                "usage_notes": "Uncompiled fragment; at_origin should be one, but no result was checked. Build/link sbessj.f90 with compatible default INTEGER and selected_real_kind(12). This is the spherical j_n function: an integer argument n corresponds to cylindrical order n+1/2, not J_n. A matching kind alone does not certify the author accuracy claim. The supplied interactive comparison program embeds a separately licensed reference routine and was not run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0-or-later routine; separate comparison-code notice",
+          "spdx_expression": null,
+          "revision": "90759662246614ffb3bbcfaa770b0bc98b9fb4a2",
+          "reviewed_on": "2026-11-05",
+          "notes": "sbessj.f90 explicitly grants GNU LGPL version 3 or later; the repository supplies GPL v3 and LGPL v3 license texts. The comparison program embeds SPHJ with a Shanjie Zhang/Jianming Jin acknowledgment-based permission notice. Record these component terms rather than applying a single SPDX expression to the whole distribution; complex/quad and all other test material were not fully audited.",
+          "evidence": [
+            {
+              "path": "sbessj.f90",
+              "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/sbessj.f90",
+              "sha256": "d61eb717007d985c5fefa63798e0ffc9ed56ded235612a81a4d5806bea762703"
+            },
+            {
+              "path": "COPYING",
+              "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/COPYING",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "COPYING.LESSER",
+              "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/COPYING.LESSER",
+              "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+            },
+            {
+              "path": "test_bessel.f90",
+              "url": "https://github.com/jlm785/spherical_bessel_fortran/blob/90759662246614ffb3bbcfaa770b0bc98b9fb4a2/test_bessel.f90",
+              "sha256": "cb4c840422f5403c87c3aa0f4c372f5d03d6733d8db6df5b35158004ebdb27d2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -6567,12 +6713,102 @@
             ],
             "notes": "The README defines K(k) with modulus k, lists supporting-module dependencies and describes precision variants. Optional real128 support depends on the compiler; parameter/modulus conventions must be respected in future drivers.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C14",
+            "level": "source-reviewed",
+            "revision": "3adb5648e31a72c019e81f05545b36a8642304ec",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected REAL64 elliptic_k overload evaluates the complete Legendre elliptic integral of the first kind with modulus k. It forms the complementary modulus as sqrt((1-k)*(1+k)); for k*k<0.5 it returns (pi/2)/AGM(1,k-prime), and otherwise uses an AGM/elliptic-nome logarithmic transformation. C14 is the elliptic-integrals leaf in this taxonomy; complete first-kind scope is recorded in the procedure rather than inventing a narrower code. IEEE branches return quiet NaN for NaN input or |k|>1 and positive infinity for |k|=1. Material limitation: although the interface advertises |k|<=1, the second branch calls arithmetic_geometric_mean_kernel(1,k), not AGM(1,abs(k)); negative k with k*k>=0.5 therefore reaches a signed-input dependency path and must not be assumed valid. The sketch uses nonnegative modulus and the simple direct branch. Dependencies are unpinned Git references in fpm.toml, and their full AGM/nome algorithms are outside this review. The committed module unconditionally imports/declares REAL128 as well as REAL32/64, so its build needs that kind despite README calling it optional. No integral or reference test was executed.",
+            "evidence": [
+              {
+                "path": "src/elliptic_k_using_agm_fortran.f90",
+                "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/src/elliptic_k_using_agm_fortran.f90",
+                "sha256": "35d2efecfd7c6012f83904eb47dbd5348846a1287afed3e17ea42636bd60b197"
+              },
+              {
+                "path": "fpm.toml",
+                "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/fpm.toml",
+                "sha256": "e21cf8226c4ed744a549561abb30dedc91a47da1679a7e37986109dfe246c5e4"
+              },
+              {
+                "path": "test/check_reference0.f90",
+                "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/test/check_reference0.f90",
+                "sha256": "c7a38a7f175cf2d4eb542e4203caf7e2b3237ec77dffc4a71d4008d11cda5e42"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/README.md",
+                "sha256": "0d3e3a29ed03fabf935dedcc52d7ae6aed613ce4866a7ef1816352f0fb8795e3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "elliptic_k",
+                "role": "public-entry-point",
+                "summary": "Public elemental generic, scoped here to the private REAL64 overload. Input k is the elliptic MODULUS, not parameter m=k**2; returns REAL64 K(k), not an incomplete integral or a second-kind value. Use nonnegative k<1 for the illustrated path and check IEEE outcomes as needed. It has no separate status/iteration-count result.",
+                "signature": "value = elliptic_k(k)",
+                "declarations": [
+                  {
+                    "path": "src/elliptic_k_using_agm_fortran.f90",
+                    "line_start": 152,
+                    "line_end": 179
+                  },
+                  {
+                    "path": "src/elliptic_k_using_agm_fortran.f90",
+                    "line_start": 56,
+                    "line_end": 67
+                  }
+                ],
+                "path": "src/elliptic_k_using_agm_fortran.f90",
+                "line_start": 56,
+                "line_end": 67,
+                "module": "elliptic_k_using_agm_fortran",
+                "examples": [
+                  {
+                    "path": "test/check_reference0.f90",
+                    "line_start": 274,
+                    "line_end": 290
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse elliptic_k_using_agm_fortran, only: elliptic_k\nreal(real64) :: value\nvalue=elliptic_k(0.5_real64)\n! k=0.5 is the modulus; this is K(k), not K(parameter=0.5).",
+                "usage_notes": "Uncompiled fragment. The known value is approximately 1.685750354812596, but no numerical check was performed. Build the required arithmetic_geometric_mean_fortran and elliptic_nome_fortran dependencies with compatible kinds; the manifest does not pin their commits. The generated source also requires REAL128 availability. Negative large-modulus behavior and complementary/nome conditioning remain unverified; use the nonnegative modulus sketch without treating it as a general correctness guarantee."
+              },
+              {
+                "procedure": "elliptic_k_real64",
+                "module": "elliptic_k_using_agm_fortran",
+                "role": "implementation-helper",
+                "summary": "Private REAL64 binding with direct AGM and complementary/nome branches.",
+                "path": "src/elliptic_k_using_agm_fortran.f90",
+                "line_start": 152,
+                "line_end": 225
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "3adb5648e31a72c019e81f05545b36a8642304ec",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT license contains the grant, copyright-retention condition and disclaimer; fpm.toml also names MIT. The external AGM/nome dependencies have separate terms and their complete license provenance was not audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/LICENSE",
+              "sha256": "e2c2777ed1cf8e5d0c04c6bf33f09478d861dfefd874a39c7ccdbc55955b2188"
+            },
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/DSCF-1224/elliptic_k_using_agm_fortran/blob/3adb5648e31a72c019e81f05545b36a8642304ec/fpm.toml",
+              "sha256": "e21cf8226c4ed744a549561abb30dedc91a47da1679a7e37986109dfe246c5e4"
+            }
+          ]
         }
       },
       "imports": {}
