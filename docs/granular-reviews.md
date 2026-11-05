@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Fifty-one repositories now have sixty-eight source-reviewed
+Reviewed on 2026-11-04. Fifty-four repositories now have seventy-one source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Fifty repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A fifty-first, DDFSA, identifies the supplied
+Fifty-three repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A fifty-fourth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All fifty-one independently source-reviewed repositories now have an
+separately. All fifty-four independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -74,6 +74,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | L-BFGS (jmbr) | External `LBFGS` (reverse communication; `LB2` block-data defaults) | README BSD declaration; variant unspecified |
 | NNLS Fortran 2018 | `nnls::solve` (Fortran and C binding) | GNU GPL version 3; version scope unresolved |
 | QuadProg modern Fortran | `QuadProg::qp_problem`, `::solve` (standard dense constrained path) | Root GPL v3; driver GPL-2.0-or-later notice |
+| Akima86 | External `uvipia` (reviewed general ND>=5 path) | Custom NRLMMD/GeoIPS redistribution and acknowledgment terms |
+| FoLLiA | `follia::lagrange_interpolator%initialize_interpolator`, `%compute_coefficients`, `%compute_interpolations` | README conditional GPL/BSD/MIT licensing notice |
+| SPRINT | `bilinear_interpolator_mod::bilinear_interpolator_type%init`, `%prepare`, `%apply` (restricted REAL(4) illustration) | No project license identified in reviewed material |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -144,6 +147,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [L-BFGS](https://github.com/jmbr/lbfgs) | G1b1b | Limited-memory inverse-Hessian action, reverse communication and line-search dispatch | Caller supplies gradient and preserves state/workspace. Saved/shared state is not reentrant. Initial zero-gradient step is unguarded; include LB2 defaults. No global/minimum certificate. |
 | [NNLS Fortran 2018](https://github.com/cuamll/nnls) | D9b1 | Passive-set nonnegative least squares using normal equations | Actual normal MODE=1 differs from documented 0. DSYSV INFO is ignored and MAXITER counts only inner steps. Rank-deficient behavior and KKT accuracy unchecked. |
 | [QuadProg modern Fortran](https://github.com/loiseaujc/Quadprog) | G2e1 | Positive-definite factorization and standard dense active-set QP driver | Objective uses minus q; constraints are rows with C*x>=d. No indefinite/semidefinite claim. Unconstrained obj is unset; constructor factorization status is not propagated. Author inequality test transposes C despite row-layout interface. |
+| [Akima86](https://github.com/NRLMMD-GEOIPS/akima86) | E1a | Weighted endpoint-slope estimates and interval polynomial evaluation | General query loop prints thread/index diagnostics. Four-node cubic formula repeats one ordinate term; sketch uses seven nodes. Invalid input returns sentinel values without status. No shape-preservation claim. |
+| [FoLLiA](https://github.com/giacrossi/FoLLiA) | E1b | Lagrange coefficient products and separate overlapping-stencil estimates | S>=2, 2*S-1 distinct ordered nodes and restricted target required. No automatic stencil combination. PENF/preprocessing required; initializer clears data. |
+| [SPRINT](https://github.com/dongli/sprint) | E2a | Cached tensor-product bilinear weights and four-value application | Index/boundary defects, unassigned first apply return, unusual upper-corner order and no outside guard. REAL(4) sketch is strictly interior and explicitly prepared; general use needs fixes. Dependencies/curvilinear path unverified. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
