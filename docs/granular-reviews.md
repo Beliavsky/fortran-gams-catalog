@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. One hundred repositories now have 119 source-reviewed
+Reviewed on 2026-11-05. 108 repositories now have 127 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Ninety-eight repository cards now identify public routines and link their usage lines
+106 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. DDFSA and CWT identify supplied program entry
 points and keep their internal/benchmark routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All one hundred independently source-reviewed repositories now have an
+separately. All 108 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -123,6 +123,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fortsparse | `fortsparse_csr::csr_matvec` (real64 service) | MIT core; backend licenses separate |
 | Fortran_CSR | `csrmodule::CSRcomplex%matmul` (native fallback) | MIT |
 | Linear System Solvers | `mod_lis_linear_solver::lis_linear_solver_t%Keep_lsys_ops_and_solve` | No adapter license identified |
+| DualSimplex | `DUALSIMP_MOD::DUALSIMPLEX` | MIT |
+| LightConvex | `lightconvex_lp::linear_program`, `lightconvex_lp::solve` (primal-simplex LP path) | MIT root; component terms separate |
+| vc-sqnm | `sqnm::sqnm_optimizer%sqnm_step` (fixed-coordinate Fortran optimizer) | GPL-3.0-or-later |
+| Differential-Evolution_f95 | `DE_mod::Diff_Evol` (built-in objective) | MIT |
+| pso | `psomod::optimizer` (star topology) | GPL-2.0-or-later |
+| TRDF | External `TRDF` (linked objective/constraints and ALGENCAN path) | No license identified in reviewed material |
+| DFO mirror | External `dfo` (legacy linked-problem driver) | CPL-1.0 |
+| LMBM | External `LMBMU` (linked objective/subgradient) | No redistribution grant identified in reviewed files |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -242,6 +250,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fortsparse](https://github.com/lazy-fortran/fortsparse) | D1b4 | Canonical real CSR validator and sparse matrix-vector sum | One-based storage, sorted distinct columns, externally checked X/Y shapes. Solver/AMG/backend claims remain documentation reviewed. |
 | [Fortran_CSR](https://github.com/cometscome/Fortran_CSR) | D1b4 | Public complex type-bound product and native CSR row loop | Preprocessing selects MKL or fallback; native fallback reviewed. Y capacity unchecked; dimension failure STOPs. NONZERO returns terminal pointer, not NNZ. |
 | [Linear System Solvers](https://github.com/M-Badri/linear_system_solvers) | D2a4 | CSR/LIS object setup and solve/result-copy dispatch | Adapter review, not a numerical-kernel audit. LIS index/ABI conventions and lifecycle required; IERR mostly ignored, RHS length not asserted. |
+| [DualSimplex](https://github.com/thchang/DualSimplex) | G2a | Asymmetric dual revised simplex, LU basis solves and Dantzig/Bland pivoting | Supply initial basis despite OPTIONAL declaration; M>=N. EPS code defaults to epsilon rather than square-root prose. Check IERR and independent primal/dual conditions. |
+| [LightConvex](https://github.com/loiseaujc/LightConvex) | G2a | Dense LP tableau assembly, feasibility dispatch and primal-simplex iteration | Maximization/nonnegative variables; RHS restrictions. Check status on problem, not solution. Y/T dual fields not populated; MAXITER is not a total phase-one budget. |
+| [vc-sqnm](https://github.com/moritzgubler/vc-sqnm) | G1b1b | History-subspace stabilized quasi-Newton displacement | Caller supplies values/gradients and updates coordinates. Own stopping/budgets required; LAPACK failure STOPs. No variable-cell-wrapper or rigorous-bound claim. |
+| [Differential-Evolution_f95](https://github.com/ian-mmm/differential-evolution_f95) | G2i | Stochastic differential mutation/crossover and selection | Fixed built-in objective. Bounds only initialize population; donor/crossover bugs and possibly undefined best-point output require repair. No global guarantee. |
+| [pso](https://github.com/konrad1991/pso) | G2i | Callback swarm initialization, velocity update, bound clamp and best-state dispatch | Star topology only reviewed. Social index and current-versus-personal-best output findings; reevaluate returned vector. No status or returned objective. |
+| [TRDF](https://github.com/fsobral/TRDF) | G2h3b | Feasibility/model/subproblem dispatch and trust-region outer iteration | Linked evaluators and constrained solver; fixed limits/COMMON state. Inconsistent CALFUN arity and early-output risks require checked repair. No termination flag. |
+| [DFO mirror](https://github.com/jacobwilliams/dfo) | G2h3b | Input/scaling/interpolation setup and constrained trust-region solver dispatch | Legacy flat arrays, CHARACTER*256 and linked FUN; saved COMMON and default 50-dimensional model limits. Backend configuration/rights and INFO checks required. |
+| [LMBM](https://github.com/WilmerHenao/lmbm) | G1b2 | Workspace initialization, bundle/update dispatch and termination tests | Linked objective/subgradient; no callback argument. Default-REAL time buffers mixed with double work. Distinguish stationarity from progress/budget exits in IOUT(3). |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical

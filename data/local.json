@@ -6873,12 +6873,71 @@
             ],
             "notes": "The README states the primal/dual LP forms and BLAS/LAPACK requirements. A complete LU factorization is used per iteration; the Delaunay driver does not establish a general-purpose interpolation library.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2a",
+            "level": "source-reviewed",
+            "revision": "1d1be4c1afec13224fc64b3125194cd7d6ce4e4b",
+            "reviewed_on": "2026-11-05",
+            "notes": "DUALSIMPLEX maximizes C-transpose*X subject to A*X<=B by applying revised simplex to the asymmetric dual. It accepts AT (the transpose), factors each basis with LAPACK, checks primal slacks/dual feasibility and switches from Dantzig to Bland pivoting when progress stalls. Require M>=N and a dual-feasible initial basis. The declared OPTIONAL IBASIS is read unconditionally during shape/basis checks, so callers must supply it in this revision; it is not automatic phase-one discovery. FEASIBLEBASIS is a separate routine and not independently reviewed here. EPS defaults to machine epsilon in executable code, contrary to the square-root prose. IERR reports completion, infeasibility, bad inputs/bases, pivot budget and LAPACK failures. This is dense linear programming, not integer/global-nonlinear optimization or a numerical reliability certificate.",
+            "evidence": [
+              {
+                "path": "dualsimplex.f90",
+                "url": "https://github.com/thchang/DualSimplex/blob/1d1be4c1afec13224fc64b3125194cd7d6ce4e4b/dualsimplex.f90",
+                "sha256": "d6fa623c507f5881002af134f2d06e639f7962fd924db9e75805ed044b89a1e7"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/thchang/DualSimplex/blob/1d1be4c1afec13224fc64b3125194cd7d6ce4e4b/README.md",
+                "sha256": "ebbc4171d145f4046ba7aeb4155a537e910c18f99e55e3f6c7a3eb083e6c926f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DUALSIMPLEX",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine using DUALSIMP_MOD::R8=SELECTED_REAL_KIND(13). AT(N,M), B(M), C(N), X(N), Y(M), basis indices of length N and IERR are needed. IBASIS is declared OPTIONAL/INOUT but must be present. EPS/IBUDGET/OBASIS are optional; OBASIS returns final basis indices.",
+                "signature": "CALL DUALSIMPLEX(N, M, AT, B, C, IBASIS, X, Y, IERR, EPS, IBUDGET, OBASIS)",
+                "declarations": [
+                  {
+                    "path": "dualsimplex.f90",
+                    "line_start": 29,
+                    "line_end": 35
+                  },
+                  {
+                    "path": "dualsimplex.f90",
+                    "line_start": 168,
+                    "line_end": 181
+                  }
+                ],
+                "path": "dualsimplex.f90",
+                "line_start": 34,
+                "line_end": 448,
+                "module": "DUALSIMP_MOD",
+                "usage": "use DUALSIMP_MOD, only: r8,DUALSIMPLEX\nreal(r8) :: at(1,2),b(2),c(1),x(1),y(2)\ninteger :: basis(1),status\nat(1,:)=[1.0_r8,-1.0_r8]; b=[1.0_r8,0.0_r8]; c=[1.0_r8]\nbasis=[1]\ncall DUALSIMPLEX(1,2,at,b,c,basis,x,y,status,ibudget=1000)\nif (status /= 0) error stop \"LP failed\"\n! This maximizes x on 0<=x<=1; reference x=1.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply a dual-feasible basis explicitly, even though the dummy is OPTIONAL. Link compatible BLAS/LAPACK. Independently check primal feasibility, nonnegative dual variables and objective agreement; IERR=0 is not an executed catalog certificate. The example starts with a known feasible basis rather than demonstrating phase one."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "1d1be4c1afec13224fc64b3125194cd7d6ce4e4b",
+          "reviewed_on": "2026-11-05",
+          "notes": "Pinned root MIT notice inspected; linked numerical libraries retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/thchang/DualSimplex/blob/1d1be4c1afec13224fc64b3125194cd7d6ce4e4b/LICENSE",
+              "sha256": "4b8e54f90cec5bba3dd84e561ad9d63fc90aaa7556a8d503ece5ee076b8302e6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -9938,12 +9997,100 @@
             ],
             "notes": "The README targets fewer than roughly 100 variables and functions without efficiently available derivatives. This is the stated intended scale, not a tested hard limit or a claim of large-scale/global optimization capability.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h3b",
+            "level": "source-reviewed",
+            "revision": "b44e41bfdcb4d71838e2cd194f6201543b9dfbe9",
+            "reviewed_on": "2026-11-05",
+            "notes": "The legacy external DFO driver minimizes an objective with simple, linear and nonlinear constraints using quadratic interpolation/trust-region modeling. The inspected driver validates/setup dimensions, scales inputs, evaluates linked FUN, initializes interpolation points and dispatches DFOSLV; the outer solver file shows model/subproblem dispatch rather than an independent full kernel audit here. The mapping records nonlinear equality/inequality constrained optimization without claiming the fine derivative-supply classes or every backend path. This is not a modern callback object: FUN is a linked external, model/control state is in saved COMMON blocks and arrays are flattened column-major buffers. dfo_model_inc.inc limits the default model dimensions to 50 variables/constraints and 10000 functions. Trust-region subproblems require a compatible IPOPT/NPSOL path and build configuration. INFO, final objective/constraint values and independent feasibility checks are essential; no optimizer was compiled or run.",
+            "evidence": [
+              {
+                "path": "src/dfo.f90",
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/src/dfo.f90",
+                "sha256": "2df4498bdb9e62f27d42b3a3e72b8b5903c24b0ea1b050d29a48cf22607fa71c"
+              },
+              {
+                "path": "src/dfosolv.f90",
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/src/dfosolv.f90",
+                "sha256": "f3d5bbc846521ca02d659a663e69838e4b5c05a72cbbb7b902796bfd609560d3"
+              },
+              {
+                "path": "src/dfo_model_inc.inc",
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/src/dfo_model_inc.inc",
+                "sha256": "736ab1051452f616b3d126e1213447f657ed1427422520e4254e503e6b3e5c2d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/README.md",
+                "sha256": "ef22eb3456230c059b1828efaf70a7f98d5fcc802d288158f8eba48bd11efbf0"
+              },
+              {
+                "path": "test/dfotest.f90",
+                "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/test/dfotest.f90",
+                "sha256": "adcd83e42205bd69ea202ad26504113a70a65a617a0e05f91825811ac62afe3d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dfo",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION legacy driver with many explicit controls. X is declared X(LDX*NX), FX(NX), A(LDA*N); C/CONX/LB/UB are assumed-size buffers. XNAMES(N), PNAME, CNAMES use CHARACTER*256, and IFINIV is LOGICAL. Linked FUN(N,M,X,VALUE,C,IFERR) supplies objective and derivative-free constraint values; other constraint/backend setup remains required.",
+                "signature": "CALL dfo(N, NX, X, LDX, FX, CONX, IFINIV, M, C, &\n     NCLIN, NCNLN, LB, UB, A, LDA, XNAMES, PNAME, CNAMES, IT, NF, INFO, &\n     MAXIT, MAXNF, STPCRTR, DELMIN, STPTHR, CNSTOLP, DELTA, PP, SCALE, IOUTP, IPRINTP)",
+                "declarations": [
+                  {
+                    "path": "src/dfo.f90",
+                    "line_start": 1,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "src/dfo.f90",
+                    "line_start": 138,
+                    "line_end": 158
+                  },
+                  {
+                    "path": "src/dfo_model_inc.inc",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "test/dfotest.f90",
+                    "line_start": 983,
+                    "line_end": 991
+                  }
+                ],
+                "path": "src/dfo.f90",
+                "line_start": 1,
+                "line_end": 771,
+                "usage": "! Initialize all documented dimensions/buffers, names, bounds and controls.\n! Link problem-specific FUN and the configured subproblem-solver dependencies.\ncall dfo(n,nx,x,ldx,fx,conx,ifiniv,m,c,nclin,ncnln,lb,ub,a,lda, &\n     xnames,pname,cnames,it,nf,info,maxit,maxnf,stpcrtr,delmin,stpthr, &\n     cnstolp,delta,pp,scale,ioutp,iprintp)\n! Decode INFO, inspect IT/NF, and independently check returned constraints.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment only, not a ready initialized problem. Respect fixed compile-time limits and flat-array/storage lengths. The test FUN has benchmark-specific COMMON state and should not be linked unchanged for a different objective. Saved COMMON blocks require isolation; linked backend licensing/configuration and all lower-level numerical routines were not audited."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CPL-1.0",
+          "spdx_expression": "CPL-1.0",
+          "revision": "b44e41bfdcb4d71838e2cd194f6201543b9dfbe9",
+          "reviewed_on": "2026-11-05",
+          "notes": "Pinned root Common Public License Version 1.0 inspected. This is the DFO distribution notice; IPOPT/NPSOL and other linked components have separate license/build requirements.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/LICENSE",
+              "sha256": "157907612a4f59f67a323a5137ff9001b7c96e5f5c36523ab3375e2a9c34161b"
+            },
+            {
+              "path": "src/dfo.f90",
+              "url": "https://github.com/jacobwilliams/dfo/blob/b44e41bfdcb4d71838e2cd194f6201543b9dfbe9/src/dfo.f90",
+              "sha256": "2df4498bdb9e62f27d42b3a3e72b8b5903c24b0ea1b050d29a48cf22607fa71c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14668,12 +14815,122 @@
             ],
             "notes": "The README explicitly restricts the current prototype to linear programs and marks a dense primal simplex implementation. Quadratic programming, sparse solvers and other unchecked roadmap items are not presented as implemented capabilities.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2a",
+            "level": "source-reviewed",
+            "revision": "1e6ac10032690cfe5ca64ae103d1a2bfd61bf714",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public LINEAR_PROGRAM constructor assembles a dense tableau for maximizing C-transpose*X with nonnegative variables and supplied <=, >= or equality blocks; RHS vectors must be nonnegative within epsilon. SOLVE with PRIMALSIMPLEX dispatches auxiliary-function feasibility initialization and tableau pivots with Dantzig selection. It updates status on the PROBLEM object, then allocates primal X/slacks/objective only on an optimal status. The declared solution Y/T fields are not populated by this path. MAXITER bounds the phase-two loop, not a reviewed total phase-one evaluation budget. The inspected scope is the LP constructor/high-level dispatch and tableau iteration, not the advertised QP/KKT features or all phase-one edge cases. No feasibility/duality or numerical accuracy was verified by execution.",
+            "evidence": [
+              {
+                "path": "src/LP/lightconvex_linear_programs.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/LP/lightconvex_linear_programs.f90",
+                "sha256": "2dfa57759cf83304c935436182eaf54f96c58a2f2c20e098f1cb3a1f57c4d7c5"
+              },
+              {
+                "path": "src/LP/lightconvex_simplex.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/LP/lightconvex_simplex.f90",
+                "sha256": "4e27247e96d12d2c339c02a5f09f61a07cc4cef5c4fa6b0ee987eae9a490aebd"
+              },
+              {
+                "path": "src/core/lightconvex_constants.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/core/lightconvex_constants.f90",
+                "sha256": "31723179ce0b1b5d8aca36c6911ea098152013a7b3535d1e70df6742b713aa59"
+              },
+              {
+                "path": "src/core/lightconvex_abstract.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/core/lightconvex_abstract.f90",
+                "sha256": "3eb0d1b97568563e17a471a684bc659cf648588743224678e8165154f2deddd0"
+              },
+              {
+                "path": "src/LightConvex.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/LightConvex.f90",
+                "sha256": "128a51838bfe522e520dccf444f62d7cbf79b228520e044b9e0f594cb2527c45"
+              },
+              {
+                "path": "test/linear_programs.f90",
+                "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/test/linear_programs.f90",
+                "sha256": "83428b8efceff0a2e8519124fcdcba096cf33b9be1617e0cd77cbda5a1ced3fe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "linear_program",
+                "role": "public-entry-point",
+                "summary": "Public generic returning DENSE_LP_TYPE. C(:) and matched optional matrix/RHS constraint pairs use project DP. Variables are nonnegative. Normalize negative RHS constraints before calling; construction assertions can terminate on invalid shapes or RHS values.",
+                "signature": "PROBLEM = linear_program(C, ALEQ, BLEQ, AGEQ, BGEQ, AEQ, BEQ)",
+                "declarations": [
+                  {
+                    "path": "src/LP/lightconvex_linear_programs.f90",
+                    "line_start": 23,
+                    "line_end": 39
+                  }
+                ],
+                "path": "src/LP/lightconvex_linear_programs.f90",
+                "line_start": 30,
+                "line_end": 39,
+                "module": "lightconvex_lp",
+                "usage": "use lightconvex_constants, only: dp,ilp\nuse LightConvex, only: dense_lp_type,lp_solution,PrimalSimplex, &\n     linear_program,solve,is_optimal\ntype(dense_lp_type) :: problem\ntype(lp_solution) :: solution\ntype(PrimalSimplex) :: alg\nreal(dp) :: a(2,2)\na=reshape([1.0_dp,0.0_dp,0.0_dp,1.0_dp],[2,2])\nproblem=linear_program([1.0_dp,1.0_dp],Aleq=a,bleq=[1.0_dp,2.0_dp])\nalg=PrimalSimplex(maxiter=1000_ilp)\nsolution=solve(problem,alg)\nif (.not. is_optimal(problem)) error stop \"LP not optimal\"\n! Only now inspect solution%x/solution%s/objective_value; reference cost is 3.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. SOLVE mutates the tableau and the status belongs to PROBLEM. Do not use solution fields after nonoptimal return, or assume Y/T dual fields were populated. Requires stdlib, LightKrylov and the project dependencies; the source uses modern IMPLICIT NONE(EXTERNAL) declarations. The author tests are linked as context, not executed here.",
+                "examples": [
+                  {
+                    "path": "test/linear_programs.f90",
+                    "line_start": 25,
+                    "line_end": 38
+                  }
+                ]
+              },
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public generic selecting the dense primal-simplex solve. PROBLEM is INOUT, ALG is a PrimalSimplex configuration, and the result is LP_SOLUTION. Call IS_OPTIMAL(PROBLEM) before reading primal fields.",
+                "signature": "SOLUTION = solve(PROBLEM, ALG)",
+                "declarations": [
+                  {
+                    "path": "src/LP/lightconvex_linear_programs.f90",
+                    "line_start": 93,
+                    "line_end": 100
+                  },
+                  {
+                    "path": "src/LP/lightconvex_simplex.f90",
+                    "line_start": 25,
+                    "line_end": 54
+                  }
+                ],
+                "path": "src/LP/lightconvex_linear_programs.f90",
+                "line_start": 93,
+                "line_end": 100,
+                "module": "lightconvex_lp",
+                "usage": "! After constructing PROBLEM and ALG:\nsolution=solve(problem,alg)\nif (.not. is_optimal(problem)) error stop \"Inspect problem status\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is the LP overload only. It does not certify QP, KKT, dual-output or complete feasibility-phase behavior."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; dependency/component terms separate",
+          "spdx_expression": "MIT",
+          "revision": "1e6ac10032690cfe5ca64ae103d1a2bfd61bf714",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root MIT notice inspected. stdlib, LightKrylov and source-attributed algorithm components retain separate provenance; this is not a file-by-file dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/LICENSE",
+              "sha256": "278db9171364ae1b2ca5581bcaff9f2c1ac3a32c5b7aff8965e7995119280369"
+            },
+            {
+              "path": "src/LP/lightconvex_linear_programs.f90",
+              "url": "https://github.com/loiseaujc/LightConvex/blob/1e6ac10032690cfe5ca64ae103d1a2bfd61bf714/src/LP/lightconvex_linear_programs.f90",
+              "sha256": "2dfa57759cf83304c935436182eaf54f96c58a2f2c20e098f1cb3a1f57c4d7c5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -16839,12 +17096,92 @@
             ],
             "notes": "The lmbm.f interface documentation specifies unconstrained nonsmooth problems and initialization/workspace controls. It is not classified as a smooth-gradient solver or a constrained optimizer.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "18d2ea10466957618b957b421352eceac88273f7",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public LMBMU entry validates dimension/memory controls, partitions caller workspace and dispatches the limited-memory bundle core. The inspected core calls linked FUNDER for objective/subgradient, maintains bundle data, chooses BFGS/SR1/skip update paths, distinguishes serious/null iteration work and checks stationarity/function-progress/evaluation/iteration/time limits. This is unconstrained multivariate nonsmooth minimization requiring a subgradient, not derivative-free search or a global optimality guarantee. FUNDER is linked rather than passed as an argument. IOUT(3) distinguishes successful stationarity, small-progress/budget exits and failures; not every positive code means a solved problem. Review covers entry/interface and core dispatch/stopping structure, not every bundle/line-search/matrix helper or numerical accuracy.",
+            "evidence": [
+              {
+                "path": "lmbm.f",
+                "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/lmbm.f",
+                "sha256": "3b1b61e961ac7559838af9dbadce29d308b760e84e9916951150da58491180d5"
+              },
+              {
+                "path": "tlmbm.f",
+                "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/tlmbm.f",
+                "sha256": "666acac4819bce070a1217a4066582d9c7aa5f0ab36027a06f8a8093613107e7"
+              },
+              {
+                "path": "tnsunc.f",
+                "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/tnsunc.f",
+                "sha256": "ec2f1e985482060ca98c26f0c8fcd227f868b02f3a5d6633d5d65028d1cfd50a",
+                "source_encoding": "cp1252"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LMBMU",
+                "role": "public-entry-point",
+                "summary": "External initializer/driver. N>0, NA>=2, MCU>=3, correction count MC, workspace length NW; X/F/RPAR/W are DOUBLE PRECISION, IPAR/IOUT integers, but TIME and RTIM(2) are default REAL. RPAR has eight controls, IPAR seven, IOUT three. Required NW is given in the linked source prologue. FUNDER(N,X,F,G,ITERM) must return both objective and subgradient.",
+                "signature": "CALL LMBMU(N, NA, MCU, MC, NW, X, F, RPAR, IPAR, IOUT, TIME, RTIM, W)",
+                "declarations": [
+                  {
+                    "path": "lmbm.f",
+                    "line_start": 87,
+                    "line_end": 117
+                  },
+                  {
+                    "path": "lmbm.f",
+                    "line_start": 133,
+                    "line_end": 153
+                  },
+                  {
+                    "path": "lmbm.f",
+                    "line_start": 477,
+                    "line_end": 485
+                  }
+                ],
+                "path": "lmbm.f",
+                "line_start": 133,
+                "line_end": 270,
+                "usage": "! Initialize X, RPAR(8), IPAR(7), MC and the documented workspace.\n! Declare default-REAL TIME, RTIM(2), not DOUBLE PRECISION.\n! Link FUNDER and LMBM support routines; FUNDER sets ITERM on evaluation failure.\ncall lmbmu(n,na,mcu,mc,nw,x,f,rpar,ipar,iout,time,rtim,w)\n! Inspect IOUT(3) and independently assess the returned point.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The calling fragment does not provide a problem or initialize all tuning controls. Respect NW >= 1+9*N+2*N*NA+3*NA+2*N*(MCU+1)+3*(MCU+2)*(MCU+1)/2+9*(MCU+1). IOUT(3)=1 denotes the method stationarity test; codes 2/3 and 4/5/6 are progress or budget/time exits, not an interchangeable success status. No test problem or convergence comparison was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No redistribution grant identified in reviewed LMBM files",
+          "spdx_expression": null,
+          "revision": "18d2ea10466957618b957b421352eceac88273f7",
+          "reviewed_on": "2026-11-05",
+          "notes": "Reviewed files identify the numerical authors and test collection but no license grant. The pinned six-file tree has no separately named license or README. No license from a newer/different LMBM distribution is inferred.",
+          "evidence": [
+            {
+              "path": "lmbm.f",
+              "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/lmbm.f",
+              "sha256": "3b1b61e961ac7559838af9dbadce29d308b760e84e9916951150da58491180d5"
+            },
+            {
+              "path": "tlmbm.f",
+              "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/tlmbm.f",
+              "sha256": "666acac4819bce070a1217a4066582d9c7aa5f0ab36027a06f8a8093613107e7"
+            },
+            {
+              "path": "tnsunc.f",
+              "url": "https://github.com/wilmerhenao/LMBM/blob/18d2ea10466957618b957b421352eceac88273f7/tnsunc.f",
+              "sha256": "ec2f1e985482060ca98c26f0c8fcd227f868b02f3a5d6633d5d65028d1cfd50a",
+              "source_encoding": "cp1252"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21811,12 +22148,81 @@
             ],
             "notes": "The README identifies DE/rand/1/bin with dithering and reports early grid locking for the example. Suggested larger populations or ad hoc perturbations are upstream workarounds, not independently established reliability or global convergence.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "efeb31150b35010c5bdb465d81fc0e56000f37b2",
+            "reviewed_on": "2026-11-05",
+            "notes": "DIFF_EVOL implements a stochastic differential-evolution search using mutation, binomial-style crossover, greedy selection and optional population perturbation. It calls the module-specific Griewank OBJ_FTN directly rather than accepting an objective callback. Lower/upper bounds initialize/reinitialize the population but do not constrain later mutation trials. Source findings: donor rejection uses AND rather than OR, so indices need not be distinct/exclude the target; the forced crossover coordinate can be NOP+1; BH_BEST is assigned only after improvement over the initial minimum and can remain undefined. G2i records the intended global-search method, not a guarantee of a global solution, correct bounded DE, or fitness for production use. The fixed generation/progress logic prints each generation and exposes no status or evaluation count.",
+            "evidence": [
+              {
+                "path": "DE_mod.f95",
+                "url": "https://github.com/ian-mmm/differential-evolution_f95/blob/efeb31150b35010c5bdb465d81fc0e56000f37b2/DE_mod.f95",
+                "sha256": "0833a068aff6f81613e1b0e3717eda000237659aa3665cf78f24be27a18e027c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ian-mmm/differential-evolution_f95/blob/efeb31150b35010c5bdb465d81fc0e56000f37b2/README.md",
+                "sha256": "fbc48ee94d8a01144af07000bea034d86765c59e1a37ad3b0362839990f82876"
+              },
+              {
+                "path": "DE_main.f95",
+                "url": "https://github.com/ian-mmm/differential-evolution_f95/blob/efeb31150b35010c5bdb465d81fc0e56000f37b2/DE_main.f95",
+                "sha256": "ca40db3fd9bfc6fc973af6ce6ef7246518df662602da59ace87fbb6a756d6315"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Diff_Evol",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine using DE_MOD::DP=SELECTED_REAL_KIND(12,100). NOP/NP/T/PD are integer, LB/UB/BH_BEST vectors, F_LO/F_HI/CR real controls and F_BEST scalar output. The objective must be changed in the module to use a different problem; no callback argument exists.",
+                "signature": "CALL Diff_Evol(NOP, NP, LB, UB, T, F_LO, F_HI, CR, PD, BH_BEST, F_BEST)",
+                "declarations": [
+                  {
+                    "path": "DE_mod.f95",
+                    "line_start": 7,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "DE_mod.f95",
+                    "line_start": 56,
+                    "line_end": 79
+                  }
+                ],
+                "path": "DE_mod.f95",
+                "line_start": 56,
+                "line_end": 213,
+                "module": "DE_mod",
+                "usage": "use DE_mod, only: dp,Diff_Evol\nreal(dp) :: lower(2),upper(2),best(2),cost\nlower=-5.0_dp; upper=5.0_dp\ncall Diff_Evol(2,20,lower,upper,100,0.5_dp,0.9_dp,0.8_dp,0,best,cost)\n! This calls the built-in Griewank objective.\n! BEST may be undefined if no improvement occurred; repair before relying on it.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface illustration only, not a recommended checked optimizer. Use valid positive dimensions/population and probability controls, but those do not fix the donor/crossover/output/bounds findings. Seed RANDOM_NUMBER externally for reproducibility. No trial population, returned optimum or global-search performance was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "efeb31150b35010c5bdb465d81fc0e56000f37b2",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root MIT notice and source link to it were inspected. This grant does not establish numerical correctness.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ian-mmm/differential-evolution_f95/blob/efeb31150b35010c5bdb465d81fc0e56000f37b2/LICENSE",
+              "sha256": "e91761875b63a4fda35ce47cd3b17e6f7f84bbae3c779033542399e45918a9d9"
+            },
+            {
+              "path": "DE_mod.f95",
+              "url": "https://github.com/ian-mmm/differential-evolution_f95/blob/efeb31150b35010c5bdb465d81fc0e56000f37b2/DE_mod.f95",
+              "sha256": "0833a068aff6f81613e1b0e3717eda000237659aa3665cf78f24be27a18e027c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25180,12 +25586,98 @@
             ],
             "notes": "The README documents a scalar loss callback, parameter bounds and topology controls; additional optimizers are future plans. It refers to opti in installation examples, while this reviewed repository identity remains Konrad1991/pso.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "6fb22db21bd2338e00690ff3706be61a1f101101",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public OPTIMIZER initializes random particles, evaluates a scalar callback, updates velocity from inertial/personal/social terms and clamps coordinates to bounds. It retains personal/global best costs and returns a parameter vector after a generation budget or desired-cost threshold. The inspected scope is the star topology (TOPO=1); adaptive-neighborhood logic is not independently reviewed. Source findings: the star social index is selected initially and not refreshed in the general generation loop, and the returned global-best parameters are copied from the particle current position rather than its saved personal-best position. They can therefore disagree with the stored best error. There is no returned objective/status; desired_error is an objective threshold rather than parameter accuracy. This is heuristic global search, not a global-optimum guarantee or a validated convergence result.",
+            "evidence": [
+              {
+                "path": "src/particle_swarm.f90",
+                "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/particle_swarm.f90",
+                "sha256": "99dbf107e8cdd418b72892545e7064b28fd67570174d072646a16e80ef1ed2a9"
+              },
+              {
+                "path": "src/swarm.f90",
+                "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/swarm.f90",
+                "sha256": "1a0609d5466f6d7ae6179dab067b3d6327ffc2033d7dd96901922b45b1f64d3b"
+              },
+              {
+                "path": "src/parameters.f90",
+                "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/parameters.f90",
+                "sha256": "a7bf4350498690215a0a7a00e81f5c14b475c87128fb92099879ecc76e98f0b5"
+              },
+              {
+                "path": "src/init.f90",
+                "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/init.f90",
+                "sha256": "5ef5539ccf959c0f222b49c9baf06807abca191892def0450e846677de83127c"
+              },
+              {
+                "path": "test/testrun.f90",
+                "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/test/testrun.f90",
+                "sha256": "63733bdafe30f160db3e597b6d1eb5ce5848ca363baa5838273daa5de8f18b0c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "optimizer",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine in PSOMOD. REAL(8) LB/UB/RESULT have N_PARAMS entries; FCT(INP,PROBLEM_SIZE) returns REAL(8) for a vector input with INTENT(IN). RESULT is INOUT, TOPO and N_NEIGHBOURS optional integers. Other dimensions/generation controls are default integer. Project coefficient constants are imported from PARAMETERS.",
+                "signature": "CALL optimizer(N_SWARM, N_GENERATIONS, N_PARAMS, LB, UB, &\n     DESIRED_ERROR, FCT, RESULT, TOPO, N_NEIGHBOURS)",
+                "declarations": [
+                  {
+                    "path": "src/particle_swarm.f90",
+                    "line_start": 57,
+                    "line_end": 105
+                  }
+                ],
+                "path": "src/particle_swarm.f90",
+                "line_start": 57,
+                "line_end": 279,
+                "module": "psomod",
+                "usage": "use psomod, only: optimizer\nreal(8) :: lower(2),upper(2),result(2)\n! Provide scalar FCT(INP,PROBLEM_SIZE) with the linked REAL(8) interface.\nlower=-5d0; upper=5d0; result=0d0\ncall optimizer(40,100,2,lower,upper,1d-8,fct,result,topo=1)\n! Reevaluate FCT at RESULT and check bounds independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment does not repair the social-index/global-best-vector findings. Match REAL(8) with the compiled modules, use valid finite bounds/population controls and seed the RNG for reproducible investigations. A returned vector does not prove the desired threshold was reached; no accuracy or search comparison was run.",
+                "examples": [
+                  {
+                    "path": "test/testrun.f90",
+                    "line_start": 10,
+                    "line_end": 28
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "6fb22db21bd2338e00690ff3706be61a1f101101",
+          "reviewed_on": "2026-11-05",
+          "notes": "Inspected defining sources explicitly grant GNU GPL version 2 or later, with root GPL text. No dependency-wide license audit is implied.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/LICENSE",
+              "sha256": "b90ed8150a6d371c84b7dbaa680cd0e9893ef7c2558765e1e00930513efcfe3b"
+            },
+            {
+              "path": "src/particle_swarm.f90",
+              "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/particle_swarm.f90",
+              "sha256": "99dbf107e8cdd418b72892545e7064b28fd67570174d072646a16e80ef1ed2a9"
+            },
+            {
+              "path": "src/swarm.f90",
+              "url": "https://github.com/Konrad1991/pso/blob/6fb22db21bd2338e00690ff3706be61a1f101101/src/swarm.f90",
+              "sha256": "1a0609d5466f6d7ae6179dab067b3d6327ffc2033d7dd96901922b45b1f64d3b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25668,12 +26160,105 @@
             ],
             "notes": "The brief README identifies the algorithm and links publications on constrained minimization and convergence. A broad optimization mapping does not establish that all publication assumptions or variants apply to each routine in this snapshot.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3b",
+            "level": "source-reviewed",
+            "revision": "ef204368370f257c50260b0a04a063ed8fff4598",
+            "reviewed_on": "2026-11-05",
+            "notes": "TRDF performs a constrained derivative-free objective trust-region iteration: it dispatches a feasibility solve, builds a quadratic interpolation model, solves a constrained model subproblem, evaluates the true objective and updates radius/model geometry. Constraints can mix equalities/inequalities and bound constraints; CCODED selects whether linked constraint Jacobian/Hessian routines are supplied. This review covers outer iteration/linked-problem dispatch, not all model algebra or ALGENCAN kernels. The interface requires linked CALOBJF/CALCON and optional derivative routines via functions.f, not procedure arguments. COMMON state and compile-time dimensions in tr_params.par limit reentrancy/size. An alternate model-build path calls CALFUN with three arguments although its wrapper takes four; this mismatch needs repair/checked validation. The routine returns F/FEAS/FCNT but no termination flag, and early failure can reach output code before a valid final model point exists. No feasibility or optimizer result was run.",
+            "evidence": [
+              {
+                "path": "src/TRDF.f",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/TRDF.f",
+                "sha256": "a2917e9cadaa67343cc17d486457de780a90c88037fa4b17823dbef57286b3aa"
+              },
+              {
+                "path": "src/functions.f",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/functions.f",
+                "sha256": "dd412b84b964961f5572e11f3076c72b54cd014933b5e1c991028d15bb2e1350"
+              },
+              {
+                "path": "src/tr_params.par",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/tr_params.par",
+                "sha256": "5b7dc747b596c8408f8c1613b6d66573ff4012f70ae06765ae4c2f8fccfd693f"
+              },
+              {
+                "path": "src/solvers/algencan_solver.f",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/solvers/algencan_solver.f",
+                "sha256": "df1e27176d2e07e5ff31dc0d8dbb403116f4bb132f3484f2f273bd33de0faa90"
+              },
+              {
+                "path": "tests/examples/trdf_main.f",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/tests/examples/trdf_main.f",
+                "sha256": "774b3c73f43515c3544070654503e91fc633efd3794d25ef82261be4e286859e"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/README.md",
+                "sha256": "7ce6e81e4e80505e4c669a3d457776a6e0429e9a655c7be33c76faa20191570e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TRDF",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION constrained objective-minimization routine. X/XL/XU length N, EQUATN/LINEAR length M, CCODED(2), explicit model/evaluation/radius controls and scalar F/FEAS/FCNT outputs. Supply compatible linked objective/constraint evaluators and subproblem solver. EQUATN marks equality; inequalities use CALCON<=0.",
+                "signature": "CALL TRDF(N, NPT, X, XL, XU, M, EQUATN, LINEAR, CCODED, &\n     MAXFCNT, RBEG, REND, XEPS, F, FEAS, FCNT)",
+                "declarations": [
+                  {
+                    "path": "src/TRDF.f",
+                    "line_start": 47,
+                    "line_end": 48
+                  },
+                  {
+                    "path": "src/TRDF.f",
+                    "line_start": 105,
+                    "line_end": 115
+                  },
+                  {
+                    "path": "src/functions.f",
+                    "line_start": 21,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/TRDF.f",
+                "line_start": 47,
+                "line_end": 359,
+                "usage": "! Initialize X, bounds, constraint flags and model/budget controls.\n! Link CALOBJF/CALCON (and coded constraint derivatives), functions.f and SOLVER.\ncall trdf(n,npt,x,xl,xu,m,equatn,linear,ccoded,maxfcnt, &\n     rbeg,rend,xeps,f,feas,fcnt)\n! Independently reevaluate objective and constraint violations at returned X.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is not a self-contained callback driver. The source mismatch/early-failure behavior should be repaired before relying on checked builds. Fixed-form preprocessing of tr_params.par and the external constrained solver/dependencies are required. EASYTRDF defaults to a 100000 evaluation budget; explicit controls are preferable for bounded experiments. No derivative-free constraint guarantee is inferred when CCODED requests derivatives."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified for reviewed TRDF material",
+          "spdx_expression": null,
+          "revision": "ef204368370f257c50260b0a04a063ed8fff4598",
+          "reviewed_on": "2026-11-05",
+          "notes": "No grant was identified in the reviewed README/defining files and the pinned tree has no separate LICENSE/COPYING file. Linked ALGENCAN and other solver components have separate terms that do not establish a grant for this implementation.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/README.md",
+              "sha256": "7ce6e81e4e80505e4c669a3d457776a6e0429e9a655c7be33c76faa20191570e"
+            },
+            {
+              "path": "src/TRDF.f",
+              "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/TRDF.f",
+              "sha256": "a2917e9cadaa67343cc17d486457de780a90c88037fa4b17823dbef57286b3aa"
+            },
+            {
+              "path": "src/functions.f",
+              "url": "https://github.com/fsobral/trdf/blob/ef204368370f257c50260b0a04a063ed8fff4598/src/functions.f",
+              "sha256": "dd412b84b964961f5572e11f3076c72b54cd014933b5e1c991028d15bb2e1350"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25843,12 +26428,82 @@
             ],
             "notes": "The README identifies Fortran, C++ and Python implementations and an extension that also optimizes lattice vectors. Reliability and speed claims remain upstream claims; detailed algorithm equivalence and physical model coverage need later review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "4241692173cccb42a9ae05974bfd62285ec2cd7b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reusable Fortran SQNM_OPTIMIZER takes externally computed objective values/gradients, retains displacement/gradient histories, diagonalizes history and Hessian subspaces and returns a stabilized quasi-Newton displacement. The caller applies X<-X+STEP and reevaluates; SQNM_STEP does not call a user objective or overwrite X. Initialization configures history length, step scale/floor and subspace threshold; CLOSE_SQNM releases buffers. An internal max-gradient cutoff of 1e-11 returns a zero step, but application convergence/budgets are otherwise caller responsibilities. Degenerate history/eigenvalue divisions need valid inputs; LAPACK failures STOP, with no returned status. Only this fixed-coordinate unconstrained smooth supplied-gradient optimizer is mapped, not variable-cell/atomistic wrappers or a rigorous lower-bound guarantee.",
+            "evidence": [
+              {
+                "path": "src/fortran/sqnm.f90",
+                "url": "https://github.com/moritzgubler/vc-sqnm/blob/4241692173cccb42a9ae05974bfd62285ec2cd7b/src/fortran/sqnm.f90",
+                "sha256": "58d0b71e8189a4c8ff8e5fdc64c6e9b92434b96e2a030f7741fd78b22eeb7dd6"
+              },
+              {
+                "path": "src/fortran/historylist.f90",
+                "url": "https://github.com/moritzgubler/vc-sqnm/blob/4241692173cccb42a9ae05974bfd62285ec2cd7b/src/fortran/historylist.f90",
+                "sha256": "ea66265970cb5052977fe86aa7302991d19298aa68a1eb24a960955769b0782c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sqnm_step",
+                "role": "public-entry-point",
+                "summary": "Public type-bound method on SQNM_OPTIMIZER in module SQNM. X/gradient/step use REAL(C_DOUBLE); X is INTENT(IN). Initialize with INTEGER(C_INT) dimensions/history and compatible real controls first, then close explicitly. No success/error output is provided.",
+                "signature": "CALL optimizer%sqnm_step(X, F_OF_X, DF_DX, DIR_OF_DESCENT)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/sqnm.f90",
+                    "line_start": 28,
+                    "line_end": 65
+                  },
+                  {
+                    "path": "src/fortran/sqnm.f90",
+                    "line_start": 68,
+                    "line_end": 79
+                  },
+                  {
+                    "path": "src/fortran/sqnm.f90",
+                    "line_start": 137,
+                    "line_end": 150
+                  }
+                ],
+                "path": "src/fortran/sqnm.f90",
+                "line_start": 137,
+                "line_end": 281,
+                "module": "sqnm",
+                "derived_type": "sqnm_optimizer",
+                "usage": "use iso_c_binding, only: c_int,c_double\nuse sqnm, only: sqnm_optimizer\ntype(sqnm_optimizer) :: opt\nreal(c_double) :: x(2),gradient(2),step(2),value\ninteger :: iteration\nx=[2.0_c_double,-1.0_c_double]\ncall opt%initialize_sqnm(2_c_int,5_c_int,0.1_c_double, &\n     0.001_c_double,1.0e-4_c_double)\ndo iteration=1,100\n  value=sum(x*x); gradient=2.0_c_double*x\n  if (maxval(abs(gradient)) < 1.0e-8_c_double) exit\n  call opt%sqnm_step(x,value,gradient,step)\n  x=x+step\nend do\ncall opt%close_sqnm()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The quadratic loop illustrates ownership of evaluation/update/stopping; it is not a checked driver. Reevaluate the final point if the loop budget is exhausted. Do not change the returned displacement independently without understanding the history consistency contract. Reinitializing an allocated object requires cleanup; zero/singular history and all helper kernels were not validated."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "4241692173cccb42a9ae05974bfd62285ec2cd7b",
+          "reviewed_on": "2026-11-05",
+          "notes": "Defining Fortran module explicitly grants GNU GPL version 3 or later; root GPL text inspected. Linked BLAS/LAPACK retain separate terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/moritzgubler/vc-sqnm/blob/4241692173cccb42a9ae05974bfd62285ec2cd7b/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "src/fortran/sqnm.f90",
+              "url": "https://github.com/moritzgubler/vc-sqnm/blob/4241692173cccb42a9ae05974bfd62285ec2cd7b/src/fortran/sqnm.f90",
+              "sha256": "58d0b71e8189a4c8ff8e5fdc64c6e9b92434b96e2a030f7741fd78b22eeb7dd6"
+            }
+          ]
         }
       },
       "imports": {}
