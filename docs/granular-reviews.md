@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 276 repositories now have 356 source-reviewed
+Reviewed on 2026-11-05. 284 repositories now have 368 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-268 repository cards now identify public routines and link their usage lines
+276 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Eight further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT and TREAT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 276 independently source-reviewed repositories now have an
+separately. All 284 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -300,6 +300,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | TREAT | `treat` | GNU GPL version 3 text |
 | GPKDE | `GridProjectedKDEModule::GridProjectedKDEType%ComputeDensity`, `GridProjectedKDEModule::GridProjectedKDEType%Initialize` | MIT |
 | qap | `qaph4` | GPL-3.0-only (package declaration) |
+| KernelyzeBase | `eigen_rankn_params_mod::eigen_rankn_params`, `brent_mod::brentZero` | AGPL-3.0-or-later; separate helper notices |
+| ttcross | `dmrgg_lib::dtt_dmrgg` | MIT |
+| GADfit | `gadfit::gadf_fit`, `ad::operator(*)` | Apache-2.0 |
+| Random Fields Generation Library | `randomFieldND::gen_Std_Gauss` | CeCILL-C root; bundled dependency terms separate |
+| libslam | `slam_interpolation::lagrange_interpolation`, `slam_interpolation::trigonometric_interpolation` | Apache-2.0 |
+| Spectrum-Revealing CUR | `carrqr` | MIT/BSD notices scoped to LUSOL; QR grant not separately identified |
+| TT Fortran core | `tt_lib::svd`, `tt_lib::dot` | MIT |
+| KronLinInv | `kronlininv::posteriormean`, `kronlininv::calcfactors` | GPL-3.0-or-later |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -595,6 +603,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [TREAT](https://github.com/plopezrios/treat) | L4a1a6 | CLI tail-regression analysis and bootstrap/analytic-tail-moment dispatch | Internal routines are not public APIs; known-tail/model assumptions, independence, MPI and LAPACK required. |
 | [GPKDE](https://github.com/upc-ghs/gpkde) | L4c1b | Grid-projected multivariate Gaussian-kernel density reconstruction | Initialized grids and shared module state; option-dependent scaling; not a normalization or boundary audit. |
 | [qap](https://github.com/mhahsler/qap) | G2b | Simulated-annealing permutation assignment heuristic | Symmetric matrices required by swap delta; R RNG/interrupt runtime; no optimality guarantee. |
+| [KernelyzeBase](https://github.com/kernelyze/kernelyze-base) | K4; F1b | Nystrom kernel approximation and explicit-status Brent root search | Strictly positive quadrature weights/nonzero retained singular values; concrete pure function/kernel objects required. |
+| [ttcross](https://github.com/savostyanov/ttcross) | K4 | MPI adaptive tensor-train cross interpolation | Callback and process partition must match; sampled-pivot stopping is not a global residual certificate. |
+| [GADfit](https://github.com/raullaasner/gadfit) | K1b1a1; H1 | AD-based Levenberg-Marquardt fitting and forward directional product derivatives | Global fitting means shared dataset parameters; active INDEX seeds and mode state matter; optional-argument guards need review. |
+| [Random Fields Generation Library](https://github.com/cottereau/randomField) | L6b14 | Gaussian-intended finite spectral random-field synthesis | Repeated spectral square roots, double XRANGE restoration and possible zero slab size require fixes and validation. |
+| [libslam](https://github.com/Space-Systems/libslam) | E1b; E1c | Global Lagrange polynomial and sine-product trigonometric interpolation | Distinct nodes required; select odd N for periodic trigonometric interpretation; shared error state can leave output unassigned. |
+| [Spectrum-Revealing CUR](https://github.com/Rioghasarig/sr-cur) | D5 | Fortran blocked column-pivoted QR component | Not the whole MATLAB CUR workflow; enforce LDA independently of defective guard; current driver fixes one thread. |
+| [TT Fortran core](https://github.com/oseledets/tt-fort) | K4; D1a4 | Dense tensor-to-TT SVD approximation and real core contractions | Explicit pointer-core cleanup; rank cap can override accuracy request; DOT returns a rank-one array. |
+| [KronLinInv](https://github.com/inverseproblem/KronLinInv) | L4c1a | Separable linear-Gaussian posterior factorization and mean contractions | Repair progress-report zero divisors; consistent covariance factors, OpenMP runtime and tensor ordering required. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1132,3 +1148,12 @@ triangular helper returns before solving. MCLUST log-density output is distinct
 from its unassigned-on-success HOOD scalar. TREAT remains a program entry point
 with internal analysis helpers. These are source reviews; no new calling sketch
 was compiled or run.
+
+Tensor and kernel approximation cards distinguish sampled/truncated approximations
+from global error guarantees. TT contractions preserve their rank-one array result
+type. The inspected Fortran component in SR-CUR is pivoted QR, not the complete
+CUR workflow. KronLinInv progress arithmetic and randomField geometry/amplitude
+findings need correction before meaningful numerical validation; the cards retain
+these limitations explicitly. GADfit global fitting refers to shared dataset
+parameters, with forward and reverse AD state treated separately. All newly added
+calling sketches remain uncompiled and unrun.

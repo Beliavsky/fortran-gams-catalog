@@ -12392,12 +12392,151 @@
             ],
             "notes": "The README describes separable rank-reduced representations and sign-regular kernels. Optimality and comparative error claims are author statements; the entry is classified as approximation rather than a generic interpolation solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K4",
+            "level": "source-reviewed",
+            "revision": "01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7",
+            "reviewed_on": "2026-11-05",
+            "notes": "EIGEN_RANKN_PARAMS forms sqrt(Wx)*K*sqrt(Wy), computes a dense SVD and constructs Nystrom coefficients for separated singular-function kernel approximation, with X_FUNC_WTS sized (NY,RANK) and Y_FUNC_WTS (NX,RANK). This is a quadrature-discretized approximation for a supplied concrete two-variable kernel; it is not a uniform/global minimax error certificate. Although input guards allow nonnegative weights, later code divides by their square roots, so supply strictly positive finite weights; retained singular values must be nonzero before reciprocal scaling. Rank must be positive and no larger than either point count. No extra guard handles zero retained singular values, numerical rank deficiency or ill-conditioned kernels. The review covers this selected approximation path, not every numerically-optimal/rank-reduction algorithm in the larger library.",
+            "evidence": [
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+                "sha256": "373bb0dd6539ebc0345fe48e00b840e7a5f38ab4a181129fc14a1bf722b4771e"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/kernel.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/kernel.f90",
+                "sha256": "05463e678bf3f7ada2c5c9a5bdd3b083f1a55b61fd739e08861c3fff09e2d6ab"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/kernel_gaussian.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/kernel_gaussian.f90",
+                "sha256": "acac1909a149933596ba5b48a27924e076e471ab0921b4d73e8ffd9c0ac962f2"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+                "sha256": "41cda5882b2c95e63423a603e7e3b0e6db2a50a99426c99b63e0157b61005862"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/constants.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/constants.f90",
+                "sha256": "ab4007c0198f91864fb9f8d855f98c445004b72e598da85a2ca018d8f0b7aa98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eigen_rankn_params",
+                "role": "public-entry-point",
+                "summary": "Public pure module Nystrom/SVD coefficient generator. Always request ERR_STAT/ERR_MSG and also ensure positive weights and usable retained singular values.",
+                "signature": "CALL eigen_rankn_params(KERNEL_TO_APPROX,RANK,X_POINTS,Y_POINTS, &\n     X_WEIGHTS,Y_WEIGHTS,X_FUNC_WTS,Y_FUNC_WTS, &\n     TRUNC_SING_VALS,ERR_STAT,ERR_MSG)",
+                "declarations": [
+                  {
+                    "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+                    "line_start": 70,
+                    "line_end": 98
+                  }
+                ],
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+                "line_start": 70,
+                "line_end": 214,
+                "module": "eigen_rankn_params_mod",
+                "usage": "use set_precision, only: wp\nuse constants_mod, only: err_msg_len\nuse kernel_gaussian_mod, only: kernel_gaussian\nuse eigen_rankn_params_mod, only: eigen_rankn_params\ntype(kernel_gaussian) :: gaussian\nreal(wp) :: x(3),y(3),w(3),xw(3,2),yw(3,2),singular_values(2)\ninteger :: status\ncharacter(len=err_msg_len) :: message\nx=[-1.0_wp,0.0_wp,1.0_wp]; y=x; w=1.0_wp/3.0_wp\ncall eigen_rankn_params(gaussian,2,x,y,w,w,xw,yw, &\n     singular_values,status,message)\nif(status/=0) error stop \"Kernel approximation failure\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The concrete Gaussian kernel uses its default parameter. Positive quadrature weights avoid the documented zero-weight division; rank/conditioning still need independent checks. Link the project SVD wrapper and compatible LAPACK. No kernel reconstruction, operator error or singular-value validation was performed."
+              }
+            ]
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7",
+            "reviewed_on": "2026-11-05",
+            "notes": "BRENTZERO finds a scalar bracketed zero using bisection, secant and inverse-quadratic steps with finite iteration and function-evaluation tracking. The function is a concrete object extending SINGLEVAR_FUNC with a pure EVAL binding, not a bare external callback. Endpoint roots return immediately; same-sign endpoints produce ERRCode=2 and quiet NaNs, and iteration exhaustion returns code 1 and NaNs. Require a continuous finite-valued function on the bracket, a valid tolerance and positive iteration budget; the sign check multiplies endpoint values, so extreme scaling/overflow needs attention. The convenience ZEROIN function discards status, so the sketch selects the explicit-status service. No multiple-root enumeration, discontinuity handling or independent residual certificate is claimed.",
+            "evidence": [
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+                "sha256": "e3041a903a65267544144da59d29d6a2c579ed52ec3c92b5786b435408b982c4"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/singlevar_func.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/singlevar_func.f90",
+                "sha256": "e48860016f1f84f7a249fda86e9df04041f8c9b25b3383dbf5a23356fbd4ce5e"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+                "sha256": "41cda5882b2c95e63423a603e7e3b0e6db2a50a99426c99b63e0157b61005862"
+              },
+              {
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/constants.f90",
+                "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/constants.f90",
+                "sha256": "ab4007c0198f91864fb9f8d855f98c445004b72e598da85a2ca018d8f0b7aa98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "brentZero",
+                "role": "public-entry-point",
+                "summary": "Public pure module bracketed root solver with explicit status and evaluation count. Supply a concrete function object with the matching pure EVAL override.",
+                "signature": "CALL brentZero(AX,BX,F,TOL,MAX_ITER,NEVAL,ERRCODE,XZERO,FZERO)",
+                "declarations": [
+                  {
+                    "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+                    "line_start": 79,
+                    "line_end": 94
+                  },
+                  {
+                    "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/singlevar_func.f90",
+                    "line_start": 48,
+                    "line_end": 62
+                  }
+                ],
+                "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+                "line_start": 79,
+                "line_end": 217,
+                "module": "brent_mod",
+                "usage": "use set_precision, only: wp\nuse brent_mod, only: brentZero\n! Declare and initialize FUNC as a concrete extension of SINGLEVAR_FUNC.\n! Provide its PURE scalar EVAL binding and a sign-changing bracket [a,b].\ncall brentZero(a,b,func,1.0e-10_wp,100,neval,status,root,value)\nif(status/=0) error stop \"Root search failure\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a setup fragment, not a complete function-type definition. Validate finite endpoint values and continuity before interpreting the returned point as a zero. No root/residual or failure-path test was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "AGPL-3.0-or-later; separate helper notices",
+          "spdx_expression": null,
+          "revision": "01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected Kernelyze approximation source explicitly grants AGPL version 3 or later. BRENT retains historical Forsythe/Malcolm/Moler/Brent/PDAS attributions, while SET_PRECISION reproduces a SIAM/Hanson-Hopkins acknowledgement/reuse notice. These distinctions are retained instead of assigning one simplified SPDX grant to every helper/dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/LICENSE",
+              "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+            },
+            {
+              "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+              "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/eigen_rankn_params.f90",
+              "sha256": "373bb0dd6539ebc0345fe48e00b840e7a5f38ab4a181129fc14a1bf722b4771e"
+            },
+            {
+              "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+              "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/brent.f90",
+              "sha256": "e3041a903a65267544144da59d29d6a2c579ed52ec3c92b5786b435408b982c4"
+            },
+            {
+              "path": "KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+              "url": "https://github.com/kernelyze/kernelyze-base/blob/01bb6c2bdabb2c139b245ebe0e25ebc1387a61b7/KernelyzeLibs/KernelyzeBase/KernelyzeBase/set_precision.f90",
+              "sha256": "41cda5882b2c95e63423a603e7e3b0e6db2a50a99426c99b63e0157b61005862"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13212,12 +13351,81 @@
             ],
             "notes": "The README documents tensor cross interpolation and separate MC/QMC/cross-integration experiments. Approximation and integration are distinct capabilities; no universal convergence or accuracy claim is made.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K4",
+            "level": "source-reviewed",
+            "revision": "9254e826fd9b49fadba70519fc6a3b7ff4348b44",
+            "reviewed_on": "2026-11-05",
+            "notes": "DMRGG_LIB::DTT_DMRGG adaptively samples a tensor-valued function at selected multi-indices, updates TT cross pivots/cores and increases bond ranks. It uses MPI distribution/communication and optional OpenMP callback evaluation; the callback has the positional convention FUN(M,IND,N,PAR). MAXRANK bounds growth and ACCURACY tests sampled pivot magnitude relative to a reference for three consecutive strikes, not a rigorous global residual bound over every tensor entry. The routine wipes an incoming nonempty TT state to rank-one initialization. Require initialized MPI with number of ranks strictly less than tensor dimension M, positive mode sizes, valid callback parameters, consistent precision and safe indices. Some diagnostics read ME before MPI_COMM_RANK initialization. This review covers the adaptive driver and inspected pivot/termination paths, not all lower-level max-volume/inversion kernels, every process partition or the optional quadrature application.",
+            "evidence": [
+              {
+                "path": "dmrgg.f90",
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/dmrgg.f90",
+                "sha256": "44e061706f1acfe78734cf9727c70b2e32c87a3ab8a92964975719fffdc5618e"
+              },
+              {
+                "path": "tt.f90",
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/tt.f90",
+                "sha256": "b2443adc4fafef1d60a2bf54bb8ac180515dc60779ce3b568c5bc14ca975b146"
+              },
+              {
+                "path": "ptype.f90",
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/ptype.f90",
+                "sha256": "01572f9ce7d24d05937361d618944fde73dc25a0e9545ba0f150d1c7e2297151"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/README.md",
+                "sha256": "973e2eb77181272e542c6ed7be51258af71d356bb77f78c3e95382274d6b0e29"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dtt_dmrgg",
+                "role": "public-entry-point",
+                "summary": "Public module MPI TT cross-interpolation driver. Callback must remain safe under the configured threading/parallel call pattern.",
+                "signature": "CALL dtt_dmrgg(ARG,FUN,PAR,ACCURACY,MAXRANK,MYBONDS, &\n     PIVOTING,NEVAL,QUAD,TRU)",
+                "declarations": [
+                  {
+                    "path": "dmrgg.f90",
+                    "line_start": 10,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "tt.f90",
+                    "line_start": 1,
+                    "line_end": 20
+                  }
+                ],
+                "path": "dmrgg.f90",
+                "line_start": 10,
+                "line_end": 691,
+                "module": "dmrgg_lib",
+                "usage": "use tt_lib, only: dtt,dealloc\nuse dmrgg_lib, only: dtt_dmrgg\ntype(dtt) :: approximation\ndouble precision :: parameters(1)\ndouble precision,external :: sampled_tensor\n! MPI_INIT must precede this collective call on matching ranks.\n! sampled_tensor(m,ind,n,parameters) returns a double precision value.\napproximation%m=3; approximation%n(1:3)=[2,2,2]\nparameters=1.0d0\ncall dtt_dmrgg(approximation,sampled_tensor,par=parameters, &\n     accuracy=1.0d-6,maxrank=4)\ncall dealloc(approximation)\n! MPI_FINALIZE follows after all collective work.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment omits callback definition and MPI setup intentionally; use fewer than three MPI ranks for these three modes. Pass PAR explicitly when the callback expects it, and use an exact matching callback signature/storage ABI. No tensor residual, function evaluation count, rank cap or MPI experiment was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "9254e826fd9b49fadba70519fc6a3b7ff4348b44",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT license names Savostyanov and Dolgov. Bundled MPFUN/MPFR and the BLAS/LAPACK/MPI dependencies retain their own terms and are outside this scoped license review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/savostyanov/ttcross/blob/9254e826fd9b49fadba70519fc6a3b7ff4348b44/LICENSE",
+              "sha256": "c7928935cf36090d4de6705fa74299a305bfbdc6e25cc4e93b45a052fde4e447"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14400,12 +14608,169 @@
             ],
             "notes": "The README explicitly uses global fitting to mean fitting multiple datasets with shared parameters. It does not establish guaranteed global-minimum optimization; modified Levenberg-Marquardt is the documented fitting method.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K1b1a1",
+            "level": "source-reviewed",
+            "revision": "2f2e6b771290ad87f56a5ebf00fc8df6c9bca367",
+            "reviewed_on": "2026-11-05",
+            "notes": "GADF_FIT performs modified Levenberg-Marquardt nonlinear least squares on model functions defined with ADVAR arithmetic. It forms weighted residuals/Jacobians, sums normal-equation contributions across images, solves a damped system and optionally applies a directional second-derivative/geodesic correction. With USE_AD true, the user supplies the model expression rather than analytic derivative routines. Global fitting here means simultaneous datasets with shared parameters, not global optimization. The selected sketch follows the author single-dataset Gaussian setup with error mode NONE; other weighting modes change the objective. Call GADF_INIT, add datasets, mark active parameters and then fit. Data arrays are pointer-associated on input and need valid lifetime/targets. Coarray and preprocessing support plus compatible numerical libraries are required. The code repeatedly combines PRESENT with optional-argument access in logical expressions; strict evaluation/absent-option safety needs separate audit. No complete numerical fit or termination/covariance validation was run.",
+            "evidence": [
+              {
+                "path": "fortran/gadfit/gadfit.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/gadfit.F90",
+                "sha256": "f53381a3b494c58dea9f033a1c69a364186bfdee9bddeea563c395ab59024e7d"
+              },
+              {
+                "path": "fortran/gadfit/automatic_differentiation.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/automatic_differentiation.F90",
+                "sha256": "3cf87514aa28e41090e97f2555148114fc4579f004b64f4fb1f9990fc51ea9e0"
+              },
+              {
+                "path": "fortran/gadfit/gadf_constants.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/gadf_constants.F90",
+                "sha256": "ec98aeae7b2d6809d84c371b351e408212356c8533d803292c4432348af6ae49"
+              },
+              {
+                "path": "fortran/gadfit/fitfunction.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/fitfunction.F90",
+                "sha256": "ce73db6b18e978797599528525f64bb294c5b5f8b6106de306ae56d8ebfaa282"
+              },
+              {
+                "path": "fortran/tests/1_gaussian.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/tests/1_gaussian.F90",
+                "sha256": "ba6f7c261982a9ebd0149fa04bc2ee13d2a4e8d4e78006d4efc0f03ce8d7bc48"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/README.md",
+                "sha256": "4a2d62b158bcb6143c8e53ac1bc67508a2fadb91dd25b5fa83d615022c8c0d10"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gadf_fit",
+                "role": "public-entry-point",
+                "summary": "Public module damped nonlinear-fit coordinator. Optional scalar tuning arguments such as LAMBDA are REAL32; internal model precision KP is configured separately.",
+                "signature": "CALL gadf_fit(LAMBDA,LAM_UP,LAM_DOWN,ACCTH,GRAD_CHI2,COS_PHI, &\n     REL_ERROR,REL_ERROR_GLOBAL,CHI2_REL,CHI2_ABS,DTD_MIN, &\n     LAM_INCS,UPHILL,MAX_ITER,DAMP_MAX,NIELSEN,UMNIGH, &\n     LOAD_BALANCING,USE_AD)",
+                "declarations": [
+                  {
+                    "path": "fortran/gadfit/gadfit.F90",
+                    "line_start": 502,
+                    "line_end": 511
+                  },
+                  {
+                    "path": "fortran/gadfit/gadfit.F90",
+                    "line_start": 39,
+                    "line_end": 52
+                  }
+                ],
+                "path": "fortran/gadfit/gadfit.F90",
+                "line_start": 502,
+                "line_end": 1035,
+                "module": "gadfit",
+                "usage": "use gadfit\n! Define FITFUNC extension and initialized model/data as in the pinned Gaussian example.\ncall gadf_init(model)\ncall gadf_add_dataset(x_data,y_data)\n! Set parameter values and active flags with GADF_SET first.\ncall gadf_set_errors(NONE)\ncall gadf_fit(0.1, max_iter=20, use_ad=.true.)\ncall gadf_close()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment omits the user model subclass and parameter setup; the author example is linked. Use valid persistent data targets, sufficient data and compatible coarray/runtime settings. Review optional-argument guards before relying on omitted options with strict checking. A stopped fit is not proof of a global minimum or calibrated parameter errors.",
+                "examples": [
+                  {
+                    "path": "fortran/tests/1_gaussian.F90",
+                    "line_start": 12,
+                    "line_end": 58
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "2f2e6b771290ad87f56a5ebf00fc8df6c9bca367",
+            "reviewed_on": "2026-11-05",
+            "notes": "The AD module overloads arithmetic on ADVAR, carrying primal VAL, directional derivative D and second directional derivative DD in forward mode, and recording a tape in reverse mode. The selected multiplication path explicitly applies first/second product rules and uses INDEX/=0 to mark active operands. Setting derivative seeds without a nonzero INDEX leaves an operand inactive. The sketch selects forward mode and direct multiplication rather than the integer-power path, whose derivative formula divides by X and Y and needs care at zero even for mathematically regular powers. This is automatic differentiation of the executed operations, not finite differences or symbolic differentiation, and does not make discontinuous branch choices differentiable. Shared module tape/mode state requires coordinated lifetime/thread use; reverse-mode tape capacity and all transcendental branches were not audited.",
+            "evidence": [
+              {
+                "path": "fortran/gadfit/automatic_differentiation.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/automatic_differentiation.F90",
+                "sha256": "3cf87514aa28e41090e97f2555148114fc4579f004b64f4fb1f9990fc51ea9e0"
+              },
+              {
+                "path": "fortran/gadfit/gadf_constants.F90",
+                "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/gadf_constants.F90",
+                "sha256": "ec98aeae7b2d6809d84c371b351e408212356c8533d803292c4432348af6ae49"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "operator(*)",
+                "role": "public-entry-point",
+                "summary": "Public module ADVAR multiplication generic; this entry selects two active ADVAR operands in forward mode. Result D/DD are directional derivatives.",
+                "signature": "Y = X1 * X2",
+                "declarations": [
+                  {
+                    "path": "fortran/gadfit/automatic_differentiation.F90",
+                    "line_start": 64,
+                    "line_end": 80
+                  },
+                  {
+                    "path": "fortran/gadfit/automatic_differentiation.F90",
+                    "line_start": 129,
+                    "line_end": 139
+                  },
+                  {
+                    "path": "fortran/gadfit/automatic_differentiation.F90",
+                    "line_start": 693,
+                    "line_end": 709
+                  }
+                ],
+                "path": "fortran/gadfit/automatic_differentiation.F90",
+                "line_start": 693,
+                "line_end": 718,
+                "module": "ad",
+                "usage": "use gadf_constants, only: kp\nuse ad, only: advar,operator(*),reverse_mode\ntype(advar) :: x,y\nreverse_mode=.false.\nx%val=2.0_kp; x%d=1.0_kp; x%dd=0.0_kp; x%index=1\ny=x*x\n! y%val, y%d and y%dd hold primal and first/second directional values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch explicitly selects forward mode and seeds one active direction. Do not change global mode while another fit/tape calculation is active. No analytic derivative comparison, reverse sweep or exceptional-value test was performed."
+              },
+              {
+                "procedure": "multiply_advar_advar",
+                "role": "implementation-helper",
+                "path": "fortran/gadfit/automatic_differentiation.F90",
+                "line_start": 693,
+                "line_end": 718,
+                "module": "ad"
+              },
+              {
+                "procedure": "power_advar_integer",
+                "role": "implementation-helper",
+                "path": "fortran/gadfit/automatic_differentiation.F90",
+                "line_start": 1033,
+                "line_end": 1059,
+                "module": "ad"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "2f2e6b771290ad87f56a5ebf00fc8df6c9bca367",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and selected Fortran header supply Apache 2.0 terms. Optional numerical/parallel libraries and any separate historical algorithm provenance are not fully audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/LICENSE",
+              "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+            },
+            {
+              "path": "fortran/gadfit/gadf_constants.F90",
+              "url": "https://github.com/raullaasner/gadfit/blob/2f2e6b771290ad87f56a5ebf00fc8df6c9bca367/fortran/gadfit/gadf_constants.F90",
+              "sha256": "ec98aeae7b2d6809d84c371b351e408212356c8533d803292c4432348af6ae49"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15227,12 +15592,105 @@
             ],
             "notes": "The README describes a spectral method and MPI/HDF5 build dependencies. Supported marginal/correlation combinations and statistical properties require separate tests.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6b14",
+            "level": "source-reviewed",
+            "revision": "865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected SHINOZUKA branch prepares spectral wave vectors/density weights, draws random phases and assembles cosine sums over spatial points through matrix products, scaled by the spectral spacing. It is a finite spectral random-field approximation intended to model Gaussian covariance structure, not an exact multivariate-normal factorization or a proven covariance match. GEN_STD_GAUSS normalizes coordinates by correlation lengths, dispatches the method and attempts to restore geometry. Material findings: its restoration multiplies RDF%XRANGE twice; the Shinozuka chunk/sample loops repeatedly replace SKMAT by SQRT(SKMAT), changing spectral amplitudes after the first chunk/sample; very many wave vectors can make XSLAB zero before division. Resolve these before validating/reusing the field distribution, multiple samples or normalized-coordinate round trips. Objects require fully initialized mesh/grid, positive correlation lengths, spectra, seed, sample-selection flags and associated output pointers. MPI/logging/FFTW/HDF5 dependencies are part of the build stack; alternatives were not fully reviewed.",
+            "evidence": [
+              {
+                "path": "SRC_LIB/randomFieldND.f90",
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/SRC_LIB/randomFieldND.f90",
+                "sha256": "bb0f944ffc3ffa000570b48644aa5ba9769c185173ed60f42f73fbd1cbb3d2c4"
+              },
+              {
+                "path": "SRC_LIB/type_RF.f90",
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/SRC_LIB/type_RF.f90",
+                "sha256": "4bd28fea1108adb286fd8c88b63fc4ec5db3a764a09e32245a022f08e5e93e45"
+              },
+              {
+                "path": "SRC_LIB/type_MESH.f90",
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/SRC_LIB/type_MESH.f90",
+                "sha256": "61205a667b9e85c4d7a1f4fad9b58c2f647d6e4c294583b3f53c34a6c4d5ddbf"
+              },
+              {
+                "path": "SRC_LIB/constants_RF.f90",
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/SRC_LIB/constants_RF.f90",
+                "sha256": "84e00e3a3c83a2f0457a1696396e351826f016bee115c77040b947fd50b4fcbb"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/README.md",
+                "sha256": "1e9b329d6e37de824df09e3b4fe52b8c79ade7a93d4025c70acd3ff0c7589997"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gen_Std_Gauss",
+                "role": "public-entry-point",
+                "summary": "Public module random-field dispatcher. The selected source path is SHINOZUKA; known restoration/amplitude findings make this an interface review rather than a validated sampling example.",
+                "signature": "CALL gen_Std_Gauss(RDF,MSH)",
+                "declarations": [
+                  {
+                    "path": "SRC_LIB/randomFieldND.f90",
+                    "line_start": 44,
+                    "line_end": 52
+                  },
+                  {
+                    "path": "SRC_LIB/type_RF.f90",
+                    "line_start": 11,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "SRC_LIB/type_MESH.f90",
+                    "line_start": 9,
+                    "line_end": 36
+                  }
+                ],
+                "path": "SRC_LIB/randomFieldND.f90",
+                "line_start": 44,
+                "line_end": 132,
+                "module": "randomFieldND",
+                "usage": "use randomFieldND, only: gen_Std_Gauss\n! RDF and MSH are initialized TYPE(RF)/TYPE(MESH) objects from project setup.\n! Select SHINOZUKA and resolve the recorded amplitude/geometry issues first.\ncall gen_Std_Gauss(rdf,msh)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Do not treat this interface fragment as a recommended verified sampler. Fix and test the repeated square-root and XRANGE restoration paths, require a positive slab size and use valid persistent associated coordinate/output arrays. No random sample, covariance, marginal normality or MPI test was run."
+              },
+              {
+                "procedure": "gen_Std_Gauss_Shinozuka",
+                "role": "implementation-helper",
+                "path": "SRC_LIB/randomFieldND.f90",
+                "line_start": 184,
+                "line_end": 337,
+                "module": "randomFieldND"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CeCILL-C root; bundled dependency terms separate",
+          "spdx_expression": null,
+          "revision": "865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides the CeCILL-C agreement. Bundled RANDLIB/RNGLIB, DCDFLIB, BLAS and external MPI/FFTW/HDF5 components have separate provenance; this scoped review does not attribute the root agreement to all those sources.",
+          "evidence": [
+            {
+              "path": "License.txt",
+              "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/License.txt",
+              "sha256": "6d042f4f5610b9d37acceea18ff84877f5d47f8641acc59395dbba548dd4a7e7",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/cottereau/randomField/blob/865ee27abad2d1cbdafb05b1e23fd02cf7b5dfc3/README.md",
+              "sha256": "1e9b329d6e37de824df09e3b4fe52b8c79ade7a93d4025c70acd3ff0c7589997"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35981,12 +36439,121 @@
             ],
             "notes": "The README gives only broad space-application scope and a build.sh entry point. The interpolation module comments identify linear, Hermite, Lagrange and Chebyshev methods; this review does not establish complete orbit propagation or validate astronomical conventions.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "3650b2e61f9d9401c5fc15814e60789bd91adfcc",
+            "reviewed_on": "2026-11-05",
+            "notes": "LAGRANGE_INTERPOLATION evaluates a global degree-at-most-N-1 polynomial through explicit products of cardinal basis factors and a weighted sum. It is not piecewise interpolation, a spline or an adaptive stencil. Require N>=1, finite data and distinct abscissae; no denominator/duplicate-node or conditioning checks protect the O(N**2) product formula. Module-global error control can return early with Y unassigned when an earlier error is pending. This mapping is the scalar interpolation component, not orbital/ephemeris modeling or a numerical stability guarantee for high-degree/equispaced grids.",
+            "evidence": [
+              {
+                "path": "src/math/slam_interpolation.f90",
+                "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/src/math/slam_interpolation.f90",
+                "sha256": "ddddf8141fa8b2e10e68a46402245ed80d1ebae3390032bbe2793b6591957854"
+              },
+              {
+                "path": "src/inout/slam_types.f90",
+                "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/src/inout/slam_types.f90",
+                "sha256": "f52fb9e49dfa9a2e4f92fe53afdf42a9cb2f74485979fc97a2b21ec1b31d3dea"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lagrange_interpolation",
+                "role": "public-entry-point",
+                "summary": "Public module global polynomial interpolation subroutine using the project DP kind.",
+                "signature": "CALL lagrange_interpolation(X_I,Y_I,N,X,Y)",
+                "declarations": [
+                  {
+                    "path": "src/math/slam_interpolation.f90",
+                    "line_start": 291,
+                    "line_end": 302
+                  },
+                  {
+                    "path": "src/inout/slam_types.f90",
+                    "line_start": 19,
+                    "line_end": 25
+                  }
+                ],
+                "path": "src/math/slam_interpolation.f90",
+                "line_start": 291,
+                "line_end": 332,
+                "module": "slam_interpolation",
+                "usage": "use slam_types, only: dp\nuse slam_interpolation, only: lagrange_interpolation\nreal(dp) :: nodes(3),values(3),estimate\nnodes=[0.0_dp,1.0_dp,2.0_dp]; values=nodes*nodes\ncall lagrange_interpolation(nodes,values,3,0.5_dp,estimate)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the error/string/math module dependencies and ensure there is no pending controlled-error return before reading ESTIMATE. Extrapolation is polynomial evaluation without an accuracy guarantee. No interpolation residual or stability study was run."
+              }
+            ]
+          },
+          {
+            "code": "E1c",
+            "level": "source-reviewed",
+            "revision": "3650b2e61f9d9401c5fc15814e60789bd91adfcc",
+            "reviewed_on": "2026-11-05",
+            "notes": "TRIGONOMETRIC_INTERPOLATION sums cardinal products sin((x-xk)/2)/sin((xi-xk)/2). For an odd number N of distinct nodes modulo 2*pi, these products lie in an integer-frequency trigonometric polynomial space. The comments advertise arbitrary N, but even N gives N-1 odd half-angle factors and anti-periodic rather than generally 2*pi-periodic basis functions; this review does not certify that path as a conventional periodic interpolant. Duplicate nodes modulo 2*pi cause zero denominators. The sketch selects three radian nodes. Shared controlled-error state can return without assigning Y; there is no local error/status or accuracy estimate.",
+            "evidence": [
+              {
+                "path": "src/math/slam_interpolation.f90",
+                "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/src/math/slam_interpolation.f90",
+                "sha256": "ddddf8141fa8b2e10e68a46402245ed80d1ebae3390032bbe2793b6591957854"
+              },
+              {
+                "path": "src/inout/slam_types.f90",
+                "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/src/inout/slam_types.f90",
+                "sha256": "f52fb9e49dfa9a2e4f92fe53afdf42a9cb2f74485979fc97a2b21ec1b31d3dea"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "trigonometric_interpolation",
+                "role": "public-entry-point",
+                "summary": "Public module sine-product interpolation; the selected sketch restricts N to an odd node count and uses radian arguments.",
+                "signature": "CALL trigonometric_interpolation(X_I,Y_I,N,X,Y)",
+                "declarations": [
+                  {
+                    "path": "src/math/slam_interpolation.f90",
+                    "line_start": 352,
+                    "line_end": 365
+                  },
+                  {
+                    "path": "src/inout/slam_types.f90",
+                    "line_start": 19,
+                    "line_end": 25
+                  }
+                ],
+                "path": "src/math/slam_interpolation.f90",
+                "line_start": 352,
+                "line_end": 392,
+                "module": "slam_interpolation",
+                "usage": "use slam_types, only: dp\nuse slam_interpolation, only: trigonometric_interpolation\nreal(dp) :: nodes(3),values(3),estimate,pi\npi=acos(-1.0_dp)\nnodes=[0.0_dp,2.0_dp*pi/3.0_dp,4.0_dp*pi/3.0_dp]\nvalues=sin(nodes)\ncall trigonometric_interpolation(nodes,values,3,pi/3.0_dp,estimate)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use distinct nodes modulo a full period, odd N for this selected periodic interpretation and no pending global error state. The even-N convention needs separate correction/validation if ordinary periodic interpolation is intended. No periodicity or interpolation error was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "3650b2e61f9d9401c5fc15814e60789bd91adfcc",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies Apache 2.0 terms; the selected module credits the Institute of Space Systems/TU Braunschweig authors. Optional astronomy and other third-party components are not fully audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/LICENSE",
+              "sha256": "18b0e377660194972de0b7e6f542cc6dcbfdee99235886198e7c49c4e273d305"
+            },
+            {
+              "path": "src/math/slam_interpolation.f90",
+              "url": "https://github.com/Space-Systems/libslam/blob/3650b2e61f9d9401c5fc15814e60789bd91adfcc/src/math/slam_interpolation.f90",
+              "sha256": "ddddf8141fa8b2e10e68a46402245ed80d1ebae3390032bbe2793b6591957854"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37585,12 +38152,82 @@
             ],
             "notes": "The README describes MATLAB-facing CUR code backed by Fortran LUSOL and random sketches. Claimed speedups over svds are upstream results; the CUR algorithm is not presented as entirely Fortran, and documented old MATLAB build environments may need adaptation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "1d3499eb196203f7cc2751619d042bd247a6f5b9",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external CARRQR routine computes a blocked column-pivoted QR representation: REDUCEQRCP selects/reduces candidate panels, the driver stores reflector coefficients and triangular factors, and UPDATEA applies the block update. JPVT maps the permuted columns; A is overwritten with factor/reflector storage, not an explicit Q. The current source hardcodes NTHD=1 and disables intended OpenMP paths, so no parallel communication-avoidance timing claim is made. Its LDA guard uses MIN(M,1) instead of MAX(1,M); callers must enforce LDA>=MAX(1,M) themselves. Require positive nonempty sizes and 1<=BLKMAX<=MIN(M,N); zero-sized cases are rejected by the block-size guard before the nominal quick return. This is the inspected Fortran QR component, not the full spectrum-revealing CUR workflow implemented elsewhere in the repository, a numerical rank certificate or an audit of all LUSOL/BLAS kernels.",
+            "evidence": [
+              {
+                "path": "src/carrqr.f90",
+                "url": "https://github.com/Rioghasarig/sr-cur/blob/1d3499eb196203f7cc2751619d042bd247a6f5b9/src/carrqr.f90",
+                "sha256": "871e17b2b874bd7ec3cadc36d34021b5380b55af29232e03af12d4edcbf9dcac"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Rioghasarig/sr-cur/blob/1d3499eb196203f7cc2751619d042bd247a6f5b9/README.md",
+                "sha256": "464b0504176e2c9196fc62c013fec2a7a5d34b34745aa5f4ab8ec181f3c1c712"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "carrqr",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 blocked pivoted-QR driver. INFO checks only a subset of admissibility conditions and is not an error/rank estimate.",
+                "signature": "CALL carrqr(M,N,BLKMAX,A,LDA,JPVT,TAU,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/carrqr.f90",
+                    "line_start": 3,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/carrqr.f90",
+                "line_start": 3,
+                "line_end": 134,
+                "usage": "double precision :: a(4,3),tau(3)\ninteger :: jpvt(3),info\nexternal :: carrqr\na(:,1)=[1.0d0,2.0d0,3.0d0,4.0d0]\na(:,2)=[1.0d0,0.0d0,1.0d0,0.0d0]\na(:,3)=[0.0d0,1.0d0,0.0d0,1.0d0]\ncall carrqr(4,3,2,a,4,jpvt,tau,info)\nif(info/=0) error stop \"CARRQR argument check\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the companion panel/update routines and compatible BLAS/LAPACK dependencies. Preserve A to check A(:,JPVT)=Q*R independently; that factorization identity and pivot quality were not tested. The sketch enforces adequate LDA rather than relying on the source guard."
+              },
+              {
+                "procedure": "reduceQrcp",
+                "role": "implementation-helper",
+                "path": "src/carrqr.f90",
+                "line_start": 141,
+                "line_end": 208
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT/BSD notices scoped to LUSOL; QR grant not separately identified",
+          "spdx_expression": null,
+          "revision": "1d3499eb196203f7cc2751619d042bd247a6f5b9",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE.md and README give MIT/BSD alternatives for LUSOL Fortran/interface code. The selected CARRQR file has a descriptive header without its own grant, while README also retains an inconsistent Common Public License reference. These findings are preserved without assuming all added QR/CUR components inherit the LUSOL license.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/Rioghasarig/sr-cur/blob/1d3499eb196203f7cc2751619d042bd247a6f5b9/LICENSE.md",
+              "sha256": "4f057a741999ffbdff6e7f668ad2c34e8f783aad4a5b3a66192be2027459eee6"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Rioghasarig/sr-cur/blob/1d3499eb196203f7cc2751619d042bd247a6f5b9/README.md",
+              "sha256": "464b0504176e2c9196fc62c013fec2a7a5d34b34745aa5f4ab8ec181f3c1c712"
+            },
+            {
+              "path": "src/carrqr.f90",
+              "url": "https://github.com/Rioghasarig/sr-cur/blob/1d3499eb196203f7cc2751619d042bd247a6f5b9/src/carrqr.f90",
+              "sha256": "871e17b2b874bd7ec3cadc36d34021b5380b55af29232e03af12d4edcbf9dcac"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37826,12 +38463,137 @@
             ],
             "notes": "The README warns that standalone use is not easy and includes customized PRIMME/Expokit libraries. It distinguishes four-byte-integer standalone builds from eight-byte MATLAB MEX builds; neither interoperability nor example eigenvalues were tested here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K4",
+            "level": "source-reviewed",
+            "revision": "e57e8593df6e78190c01f5aea1566ba2b126947f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected real-valued SVD(N,A,TT,TOL,RMAX) overload converts a dense flattened tensor into tensor-train cores by successive right-to-left matricization SVDs, singular-value truncation and propagation of scaled left factors. The optional rank cap can force more truncation than the tolerance request. This is a separated tensor approximation, not proof of a best global TT approximation or a complete review of all matrix/DMRG/complex operations. Positive mode sizes, consistent Fortran-order input length, safe integer dimension/workspace products and compatible BLAS/LAPACK are caller requirements. The DTT type holds pointer-backed cores and has no active finalizer; release with DEALLOC and do not assume intrinsic pointer copying provides independent ownership. Zero-norm input has a special zero-rank/deallocation return.",
+            "evidence": [
+              {
+                "path": "tt.f90",
+                "url": "https://github.com/oseledets/tt-fort/blob/e57e8593df6e78190c01f5aea1566ba2b126947f/tt.f90",
+                "sha256": "97fd806b5385bc10203f9fec6b285a0ac496631340f7aee73f7c3d7a836074bb"
+              },
+              {
+                "path": "ptype.f90",
+                "url": "https://github.com/oseledets/tt-fort/blob/e57e8593df6e78190c01f5aea1566ba2b126947f/ptype.f90",
+                "sha256": "0d8dc557640d0ff996620141cb95041b182473b054324fd70d2e912c681216e9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "svd",
+                "role": "public-entry-point",
+                "summary": "Public module generic; this card selects the dense real tensor-to-TT overload, not the in-place rounding overload. N is a vector of mode sizes and A is flattened dense storage.",
+                "signature": "CALL svd(N,A,TT,TOL,RMAX)",
+                "declarations": [
+                  {
+                    "path": "tt.f90",
+                    "line_start": 368,
+                    "line_end": 379
+                  },
+                  {
+                    "path": "tt.f90",
+                    "line_start": 12,
+                    "line_end": 20
+                  },
+                  {
+                    "path": "tt.f90",
+                    "line_start": 78,
+                    "line_end": 80
+                  }
+                ],
+                "path": "tt.f90",
+                "line_start": 368,
+                "line_end": 415,
+                "module": "tt_lib",
+                "usage": "use tt_lib, only: dtt,svd,dealloc\ntype(dtt) :: tensor\ndouble precision :: dense(8)\ndense=[1.0d0,2.0d0,3.0d0,4.0d0,5.0d0,6.0d0,7.0d0,8.0d0]\ncall svd([2,2,2],dense,tensor,1.0d-8,rmax=8)\n! Use tensor cores, then release their pointer-owned storage.\ncall dealloc(tensor)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This uses three two-point modes and real cores. Link the complete module dependency set, select matching floating/integer kinds and retain input for an independent reconstruction/error check. No tolerance, rank or compression benchmark was run."
+              },
+              {
+                "procedure": "dtt_svd0",
+                "role": "implementation-helper",
+                "path": "tt.f90",
+                "line_start": 368,
+                "line_end": 415,
+                "module": "tt_lib"
+              }
+            ]
+          },
+          {
+            "code": "D1a4",
+            "level": "source-reviewed",
+            "revision": "e57e8593df6e78190c01f5aea1566ba2b126947f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The real DOT(TT1,TT2) overload contracts compatible TT cores through successive DGEMM and transpose operations instead of expanding both tensors. Its result is a rank-one REAL(8) ARRAY, with length equal to the product of the four outer bond ranks; ordinary closed rank-one boundaries give a one-element array holding the scalar inner product. Matching core ranges, mode sizes, associated core storage and consistent bond dimensions are caller obligations; there is no comprehensive shape validation in the inspected routine. The selected real operation is not a review of conjugation conventions in the complex overload or a claim that arbitrary open-boundary contractions are scalars.",
+            "evidence": [
+              {
+                "path": "tt.f90",
+                "url": "https://github.com/oseledets/tt-fort/blob/e57e8593df6e78190c01f5aea1566ba2b126947f/tt.f90",
+                "sha256": "97fd806b5385bc10203f9fec6b285a0ac496631340f7aee73f7c3d7a836074bb"
+              },
+              {
+                "path": "ptype.f90",
+                "url": "https://github.com/oseledets/tt-fort/blob/e57e8593df6e78190c01f5aea1566ba2b126947f/ptype.f90",
+                "sha256": "0d8dc557640d0ff996620141cb95041b182473b054324fd70d2e912c681216e9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dot",
+                "role": "public-entry-point",
+                "summary": "Public TT generic returning a rank-one array for the real DTT pair, including the scalar-boundary case.",
+                "signature": "CONTRACTION = dot(TT1,TT2)",
+                "declarations": [
+                  {
+                    "path": "tt.f90",
+                    "line_start": 1245,
+                    "line_end": 1253
+                  },
+                  {
+                    "path": "tt.f90",
+                    "line_start": 96,
+                    "line_end": 98
+                  }
+                ],
+                "path": "tt.f90",
+                "line_start": 1245,
+                "line_end": 1284,
+                "module": "tt_lib",
+                "usage": "use tt_lib, only: dtt,svd,dot,dealloc\ntype(dtt) :: a,b\ndouble precision :: dense(4),inner(1)\ndense=[1.0d0,2.0d0,3.0d0,4.0d0]\ncall svd([2,2],dense,a,1.0d-8)\ncall svd([2,2],dense,b,1.0d-8)\ninner=dot(a,b)\ncall dealloc(a); call dealloc(b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The two tensors here have unit outer ranks, so INNER(1) is the intended scalar contraction. This is not valid scalar assignment syntax for arbitrary boundary ranks. No dense inner-product or roundoff comparison was performed."
+              },
+              {
+                "procedure": "dtt_dot",
+                "role": "implementation-helper",
+                "path": "tt.f90",
+                "line_start": 1245,
+                "line_end": 1284,
+                "module": "tt_lib"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "e57e8593df6e78190c01f5aea1566ba2b126947f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant names Oseledets, Savostyanov and Dolgov. Optional PRIMME, EXPOKIT, LAPACK and other bundled/external components have separate provenance not audited in this finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/oseledets/tt-fort/blob/e57e8593df6e78190c01f5aea1566ba2b126947f/LICENSE",
+              "sha256": "13b0764cc13045a5447ea254e4ca386e07edf323006481628afb8547eedfed8b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -39642,12 +40404,105 @@
             ],
             "notes": "The README limits the method to Gaussian/separability assumptions, with serial/OpenMP/MPI Fortran variants and LAPACK. It explicitly says the non-Julia implementations are unmaintained; the catalog preserves that scope/status rather than implying active Fortran development.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4c1a",
+            "level": "source-reviewed",
+            "revision": "c100f1a1d205cf595351efe668ce931542ee08d2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected shared-memory Fortran pipeline computes the posterior mean of a linear Gaussian inverse problem with three-factor Kronecker-separable forward/covariance structure. CALCFACTORS solves component systems, constructs generalized symmetric eigenvectors and diagonal 1/(1+lambda1*lambda2*lambda3) factors; POSTERIORMEAN contracts the observed-minus-prior-predicted data through these factors and adds the correction to MPRIOR. This is conditional multivariate Gaussian analysis, not general non-Gaussian Bayesian sampling, arbitrary covariance structure or a new inverse-problem validation. Caller arrays must have consistent tensor-product dimensions/order and positive-definite covariance factors. The mean routine uses integer progress divisors EVERYNIT/NTHR: small models or many threads can make this zero, and initial ETA calculations divide by a zero count. Repair/validate that reporting path before relying on it. OpenMP runtime symbols are used even outside directives. The README marks the non-Julia implementations unmaintained.",
+            "evidence": [
+              {
+                "path": "fortran/kronlininv.f08",
+                "url": "https://github.com/inverseproblem/KronLinInv/blob/c100f1a1d205cf595351efe668ce931542ee08d2/fortran/kronlininv.f08",
+                "sha256": "0e43a939affb58ef97a936a7c8192a37f3e477ca289f3c0463a4aa314cdd5615"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/inverseproblem/KronLinInv/blob/c100f1a1d205cf595351efe668ce931542ee08d2/README.md",
+                "sha256": "aa80a9679d3cd02b885fd67ffad4bdceaeef3d13604baf847cdd667c4b332f59"
+              },
+              {
+                "path": "fortran/test_kronlininv.f08",
+                "url": "https://github.com/inverseproblem/KronLinInv/blob/c100f1a1d205cf595351efe668ce931542ee08d2/fortran/test_kronlininv.f08",
+                "sha256": "ddf07e7718b4eaa4431a93abecbb0d18f0bf3889a065e22879240b17c9f25b75"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "posteriormean",
+                "role": "public-entry-point",
+                "summary": "Public module posterior-mean contraction routine. Supply previously computed factors and preallocated output; recorded progress-reporting arithmetic needs review before execution.",
+                "signature": "CALL posteriormean(U1,U2,U3,DIAGINVLAMBDA,Z1,Z2,Z3, &\n     G1,G2,G3,MPRIOR,DOBS,POSTM)",
+                "declarations": [
+                  {
+                    "path": "fortran/kronlininv.f08",
+                    "line_start": 630,
+                    "line_end": 638
+                  },
+                  {
+                    "path": "fortran/kronlininv.f08",
+                    "line_start": 73,
+                    "line_end": 85
+                  }
+                ],
+                "path": "fortran/kronlininv.f08",
+                "line_start": 630,
+                "line_end": 794,
+                "module": "kronlininv",
+                "usage": "use kronlininv, only: posteriormean\n! Initialize compatible forward/covariance factors and prior/data vectors.\n! Resolve the zero-divisor progress reporting before small-model testing.\ncall posteriormean(u1,u2,u3,diaginvlambda,z1,z2,z3, &\n     g1,g2,g3,mprior,dobs,postm)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is an interface fragment, not a checked inversion driver. Use CALCFACTORS output iUCmGtiCd1/2/3 as the Z factors, the documented tensor indexing, compatible LAPACK/BLAS and OpenMP settings. No posterior residual, covariance, probabilistic calibration or parallel test was run."
+              },
+              {
+                "procedure": "calcfactors",
+                "role": "public-entry-point",
+                "summary": "Public module preparatory Kronecker/Gaussian covariance factorization driver; numerical dependency errors can STOP.",
+                "signature": "CALL calcfactors(G1,G2,G3,CM1,CM2,CM3,CD1,CD2,CD3, &\n     U1,U2,U3,DIAGINVLAMBDA,IUCM1,IUCM2,IUCM3, &\n     IUCMGTICD1,IUCMGTICD2,IUCMGTICD3)",
+                "declarations": [
+                  {
+                    "path": "fortran/kronlininv.f08",
+                    "line_start": 184,
+                    "line_end": 195
+                  }
+                ],
+                "path": "fortran/kronlininv.f08",
+                "line_start": 184,
+                "line_end": 291,
+                "module": "kronlininv"
+              },
+              {
+                "procedure": "symgeneigvv",
+                "role": "implementation-helper",
+                "path": "fortran/kronlininv.f08",
+                "line_start": 815,
+                "line_end": 845
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "c100f1a1d205cf595351efe668ce931542ee08d2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The defining Fortran file explicitly grants GPL version 3 or later, and the root supplies GPL text. LAPACK, OpenMP, MPI and HDF5 components have separate terms; they are not fully audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/inverseproblem/KronLinInv/blob/c100f1a1d205cf595351efe668ce931542ee08d2/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "fortran/kronlininv.f08",
+              "url": "https://github.com/inverseproblem/KronLinInv/blob/c100f1a1d205cf595351efe668ce931542ee08d2/fortran/kronlininv.f08",
+              "sha256": "0e43a939affb58ef97a936a7c8192a37f3e477ca289f3c0463a4aa314cdd5615"
+            }
+          ]
         }
       },
       "imports": {}

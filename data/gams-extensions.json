@@ -540,6 +540,12 @@
       "parent": "G2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "K1b1a1": {
+      "label": "User provides no derivatives",
+      "parent": "K1b1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
