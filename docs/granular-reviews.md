@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Sixty repositories now have seventy-seven source-reviewed
+Reviewed on 2026-11-05. Sixty-eight repositories now have eighty-seven source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Fifty-nine repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A sixtieth, DDFSA, identifies the supplied
+Sixty-seven repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A sixty-eighth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All sixty independently source-reviewed repositories now have an
+separately. All sixty-eight independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -83,6 +83,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | gamma_f77 | `GAMMA_MOD::TGAMMA` (real Gamma in a selected 32-digit kind) | BSL-1.0 |
 | elliptic_k_using_agm_fortran | `elliptic_k_using_agm_fortran::elliptic_k` (REAL64 overload) | MIT; external dependency terms separate |
 | spherical_bessel_fortran | External `sbessj` (real spherical first-kind function) | LGPL-3.0-or-later routine; separate comparison-code notice |
+| MINPACK (certik) | External `hybrd1`, `lmder1`; `minpack` module interface reviewed | MIT and original MINPACK redistribution notices |
+| stroud_quad | `quad_mod::hermit` (Gauss-Hermite nodes/weights) | No license identified in reviewed material |
+| modern_quadpack | External `dqag` (bundled legacy double-precision entry) | No license identified in reviewed material |
+| fftlog-f90 | External `fhti`, `fftl` (log-grid sine/cosine library entries) | MIT root notice; inherited FFTLog components separate |
+| ellipFor | `elliptic::complete_elliptic_integrals` | GPL v3 project notice; CC-BY-SA-4.0 adapted components |
+| Polylogarithm | External `dli2` (real dilogarithm) | MIT |
+| FTLib | `ftlib_quadrature::trapezoidal_rule`, `::gaussian_quadrature` (scoped overloads) | No license identified in reviewed material |
+| spline_interpolation_fortran | External `splift`, `splint` | Source GPL v2 notices; inherited search terms unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -162,6 +170,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [gamma_f77](https://github.com/ckormanyos/gamma_f77) | C7a | Reciprocal-Gamma Horner expansion, recurrence, reflection and integer factorial branch | Poles return finite sentinel; large-argument INTEGER conversion/overflow unguarded. Last coefficient lacks kind suffix. File also contains a main program; separate module before reuse. No precision certification. |
 | [elliptic_k_using_agm_fortran](https://github.com/dscf-1224/elliptic_k_using_agm_fortran) | C14 | Direct/complementary AGM and elliptic-nome dispatch for complete first-kind K(k) | k is modulus, not parameter. Large negative k passes signed input to AGM; sketch uses positive k. Unpinned dependencies, unconditional REAL128 declarations and external algorithms need checking. |
 | [spherical_bessel_fortran](https://github.com/jlm785/spherical_bessel_fortran) | C10a3 | Real spherical j_n power series and upward recurrence | Half-integer cylindrical-order subset only. STOP on some errors/accuracy guards; no returned estimate. Guard is asymmetric in x. Complex/quad variants unreviewed. |
+| [MINPACK](https://github.com/certik/minpack) | F2; K1b1a2 | Hybrid root-solver setup/finite-difference/QR/dogleg dispatch; Jacobian-supplied Levenberg-Marquardt driver | Distinct callback contracts and workspace formulas. Small-step/cost tests do not certify residual accuracy. LMDER1 module callback intents conflict with classic preservation/abort semantics; external entry illustrated. |
+| [stroud_quad](https://github.com/ivan-pi/stroud_quad) | H2c | Gauss-Hermite root recurrence/Newton refinement and mirrored weights | Ten-iteration cap without convergence flag, altered initial estimate, pre-update derivative values and default-INTEGER normalization overflow risk. Prints diagnostics; rules not numerically checked. |
+| [modern_quadpack](https://github.com/nshaffer/modern_quadpack) | H2a1a1 | Legacy DQAG/DQAGE adaptive Gauss-Kronrod dispatch and largest-error bisection | Workspace/status/error-handler policy required. Error estimates are not rigorous bounds. High-level API and all kernels remain unreviewed. |
+| [fftlog-f90](https://github.com/coccoinomane/fftlog-f90) | J1a3 | FHTI setup and FFTL bias/reweight/transform/postscale path | Log-grid sine/cosine subset; RK ratio differs from KR product. Validate inputs despite OK flag. CLI only admits sine and adds different normalization. FFT/Gamma kernels unreviewed. |
+| [ellipFor](https://github.com/seantrim/ellipfor) | C14 | Complete first-/second-kind integral wrapper and reciprocal-parameter transforms | Input is parameter m, outputs complex; negative m unsupported. REAL128 internally required. Complete associated kernels and continuation accuracy not audited. |
+| [Polylogarithm](https://github.com/Expander/polylogarithm) | C19 | Real dilogarithm argument transformations and rational approximation | DLI2 returns real part above the real cut. Link log support for the complete source object. Complex/higher orders and claimed approximation error unverified. |
+| [FTLib](https://github.com/fradevita/FTLib) | H2a1b2; H2a1a2 | Sampled composite trapezoid and fixed-order callback Gauss-Legendre rule | Gaussian orders 1..5 only; no default/error estimate. Parent/submodule definitions need build checking; callback trapezoid body absent in reviewed submodule. No runnable support claimed. |
+| [spline_interpolation_fortran](https://github.com/jlm785/spline_interpolation_fortran) | E1a | Cubic-spline tridiagonal fit and value/derivative evaluation | Normal status is one. N>=4 for normal fit; reuse requires unchanged grid/workspace/boundary coefficients. End-cubic extrapolation flagged; repeated nodes can STOP. Integration not reviewed. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical

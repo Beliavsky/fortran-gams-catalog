@@ -72,6 +72,30 @@
       "parent": "C10a",
       "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=16",
       "reviewed_on": "2026-11-05"
+    },
+    "K1b": {
+      "label": "Nonlinear least squares",
+      "parent": "K1",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=23",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1b1": {
+      "label": "Unconstrained",
+      "parent": "K1b",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=23",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1b1a": {
+      "label": "Smooth functions",
+      "parent": "K1b1",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=23",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1b1a2": {
+      "label": "User provides first derivatives",
+      "parent": "K1b1a",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=23",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

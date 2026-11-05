@@ -420,12 +420,108 @@
             ],
             "notes": "The README explicitly limits this version to mu=0.5 (the sine-transform case). This mapping does not claim a general-order Hankel transform implementation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1a3",
+            "level": "source-reviewed",
+            "revision": "85c617abac1a6536f124f9bcc00b37b0f3cc9cec",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected FFTL entry reweights logarithmically spaced samples, dispatches FHTQ and postscales using logarithmic spacing, bias, kr and rk. FHTI initializes FFTPACK and complex-Gamma transform coefficients. With mu=+1/2 or -1/2 this is the logarithmically sampled sine/cosine transform subset J1a3, not a conventional equally spaced FFT or a certified infinite-domain quadrature. FHTI setup can be reused only while N/mu/q/spacing/kr stay fixed. Its OK flag is not a full validation certificate (N<=0 can still reach OK=true), so validate positive N, nonzero spacing and positive kr/rk. The command-line driver restricts mu to +1/2 despite a cosine hint in an error message, and applies its own physical normalization. Lower-level FHTQ, FFTPACK and complex-Gamma arithmetic are outside this review. No transform, ringing or round-trip check was run.",
+            "evidence": [
+              {
+                "path": "fftlog.f",
+                "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/fftlog.f",
+                "sha256": "c5b8215b358377b16535b869a17213968deb5ce7b078a639b7a9d89c7ad7c2eb",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "fftlog_driver.f90",
+                "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/fftlog_driver.f90",
+                "sha256": "2a77f5b63390a849eea5253c14998ec23b747f8989017dac92f2c5a4c9d3c92f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/README.md",
+                "sha256": "314d876010fbc4e1f375b4c08d0b2dd851221b832167778a4ac83db8a3b580be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fhti",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 setup. N/KROPT default INTEGER; MU/Q/DLNR/KR real double; KR may be adjusted. KROPT=1 selects quiet low-ringing adjustment. WSAVE needs 2*N+2*(N/2)+18 for Q=0, or 2*N+3*(N/2)+19 otherwise. Check logical OK and validate inputs independently.",
+                "signature": "CALL fhti(n,mu,q,dlnr,kr,kropt,wsave,ok)",
+                "declarations": [
+                  {
+                    "path": "fftlog.f",
+                    "line_start": 233,
+                    "line_end": 236
+                  },
+                  {
+                    "path": "fftlog.f",
+                    "line_start": 252,
+                    "line_end": 287
+                  }
+                ],
+                "path": "fftlog.f",
+                "line_start": 233,
+                "line_end": 470
+              },
+              {
+                "procedure": "fftl",
+                "role": "public-entry-point",
+                "summary": "External in-place transform of A(N). DIR=+1/-1 forward/backward; initialize WSAVE with FHTI first, using MU=+0.5 for sine or -0.5 for cosine. RK is r_center/k_center, not the product KR. Output uses the logarithmic grid and sqrt(2/pi) sine/cosine normalization documented here, distinct from the command-line driver extra scaling.",
+                "signature": "CALL fftl(n,a,rk,dir,wsave)",
+                "declarations": [
+                  {
+                    "path": "fftlog.f",
+                    "line_start": 473,
+                    "line_end": 475
+                  },
+                  {
+                    "path": "fftlog.f",
+                    "line_start": 505,
+                    "line_end": 533
+                  }
+                ],
+                "path": "fftlog.f",
+                "line_start": 473,
+                "line_end": 562,
+                "usage": "external :: fhti, fftl\ninteger, parameter :: n=16\ninteger :: i\nlogical :: ok\ndouble precision :: a(n), work(4*n+19), kr, rk, spacing, r\nkr=1.0d0\nspacing=0.1d0\ncall fhti(n,0.5d0,0.0d0,spacing,kr,1,work,ok)\nif (.not.ok) error stop \"FFTLog setup failed\"\nrk=1.0d0/kr\ndo i=1,n\n  r=exp((i-0.5d0*(n+1))*spacing)\n  a(i)=exp(-r*r)\nend do\ncall fftl(n,a,rk,1,work)",
+                "usage_notes": "Uncompiled interface fragment with r_center=1 and k_center=KR, so RK=1/KR after any setup adjustment. The short log range is illustrative, not an accuracy demonstration. Validate domain truncation, periodic-extension/ringing effects and grid/normalization before comparing transforms. Link FFTLOG plus bundled DRFFTI/DRFFTF/DRFFTB and CDGAMMA support. Never confuse RK ratio with KR product, or the library normalization with the CLI postprocessing."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice; inherited FFTLog components separate",
+          "spdx_expression": null,
+          "revision": "85c617abac1a6536f124f9bcc00b37b0f3cc9cec",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root notice is MIT for the 2015 wrapper distribution. fftlog.f credits original Andrew Hamilton software and bundled FFT/Gamma dependencies; all inherited component terms were not audited. Record the root MIT grant without asserting it supersedes upstream terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/LICENSE",
+              "sha256": "4ab4ccd28db44acdd383ad6cc0bc9ad602038dbb83bc62147c35ea5a15e25b61"
+            },
+            {
+              "path": "fftlog.f",
+              "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/fftlog.f",
+              "sha256": "c5b8215b358377b16535b869a17213968deb5ce7b078a639b7a9d89c7ad7c2eb",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/coccoinomane/fftlog-f90/blob/85c617abac1a6536f124f9bcc00b37b0f3cc9cec/README.md",
+              "sha256": "314d876010fbc4e1f375b4c08d0b2dd851221b832167778a4ac83db8a3b580be"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3163,12 +3259,108 @@
             ],
             "notes": "The README documents complete/incomplete K/E/F integrals and sn/cn/dn functions plus author comparison data. Its extensive tests are useful future driver candidates but have not been run for this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C14",
+            "level": "source-reviewed",
+            "revision": "c1ecd389b0a571813e98c0d92013def279b00e93",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected public complete_elliptic_integrals wrapper returns complete first-/second-kind integrals. For 0<=m<1 it dispatches associated Fukushima integrals and forms K=B+D, E=B+(1-m)*D; m=1 has explicit infinite K/unit E, and m>1 uses reciprocal-parameter/complement transformations for complex outputs. Input is parameter m=k*k, unlike modulus-input libraries. Negative m returns NaNs and is not supported. C14 records elliptic-integral evaluation; public incomplete/Jacobi entries and full associated-integral arithmetic remain unreviewed. The build uses REAL128 internally even for REAL64 outputs. Exact equality/branch-cut, near-singular and extreme-parameter accuracy was not validated. This is a wrapper/transformation review, not a complete kernel audit or execution test.",
+            "evidence": [
+              {
+                "path": "source/ellipFor_modules/elliptic.f90",
+                "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/source/ellipFor_modules/elliptic.f90",
+                "sha256": "d4af68b66c4dc74b0dbccd37922ae572248628e9265fa74175b99599437a3e16"
+              },
+              {
+                "path": "source/ellipFor_modules/xelbdj2_all_routines.f90",
+                "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/source/ellipFor_modules/xelbdj2_all_routines.f90",
+                "sha256": "089b24ff9d50f199553c509af03903c845efeae2393c2c71c1a0988242c5f4ba"
+              },
+              {
+                "path": "source/ellipFor_modules/kind_parameters.f90",
+                "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/source/ellipFor_modules/kind_parameters.f90",
+                "sha256": "2bee7113d218caa21ef802d30511882e6f242d2d73b652c66e7fdfa55077252a"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/README.md",
+                "sha256": "4b0b62c2b3ac79935e636b8cb6590f1f854f87dc8a21d810dea68a93c29000ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "complete_elliptic_integrals",
+                "role": "public-entry-point",
+                "summary": "Public elemental elliptic-module subroutine. REAL(dp) parameter M; COMPLEX(dp) outputs FC (complete K) and EC (complete E). DP=REAL64; QP=REAL128 internally. For the illustrated 0<=M<1 branch output imaginary parts are zero. There is no status argument; negative M gives NaNs and M=1 uses a complex-infinity representation for FC.",
+                "signature": "CALL complete_elliptic_integrals(m,Fc,Ec)",
+                "declarations": [
+                  {
+                    "path": "source/ellipFor_modules/elliptic.f90",
+                    "line_start": 121,
+                    "line_end": 140
+                  },
+                  {
+                    "path": "source/ellipFor_modules/kind_parameters.f90",
+                    "line_start": 1,
+                    "line_end": 10
+                  }
+                ],
+                "path": "source/ellipFor_modules/elliptic.f90",
+                "line_start": 121,
+                "line_end": 182,
+                "module": "elliptic",
+                "usage": "use kind_parameters, only: dp\nuse elliptic, only: complete_elliptic_integrals\ncomplex(dp) :: first_kind, second_kind\ncall complete_elliptic_integrals(0.25_dp,first_kind,second_kind)",
+                "usage_notes": "Uncompiled fragment. M=0.25 corresponds to modulus k=0.5; no reference comparison was performed. Build the associated-integral/kind modules and support for REAL128. Treat complex continuation and m>1 conventions as library-specific until branch behavior is independently checked. No advertised precision bound or Jacobi/incomplete scope was verified."
+              },
+              {
+                "procedure": "complete_elliptic_integrals_standard_input_range",
+                "module": "elliptic",
+                "role": "implementation-helper",
+                "path": "source/ellipFor_modules/elliptic.f90",
+                "line_start": 184,
+                "line_end": 215
+              },
+              {
+                "procedure": "elbdj2",
+                "module": "xelbdj2_all_routines",
+                "role": "implementation-evidence",
+                "summary": "Associated-integral dispatch target; complete arithmetic kernel not audited.",
+                "path": "source/ellipFor_modules/xelbdj2_all_routines.f90",
+                "line_start": 29,
+                "line_end": 62
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL v3 project notice; CC-BY-SA-4.0 adapted components",
+          "spdx_expression": null,
+          "revision": "c1ecd389b0a571813e98c0d92013def279b00e93",
+          "reviewed_on": "2026-11-05",
+          "notes": "README Legal section states GPLv3 for the repository and CC BY-SA 4.0 for Fukushima-derived associated-integral and Jacobi routines. Preserve those component terms; GPL version-only versus or-later scope and complete provenance were not resolved into one SPDX expression.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/README.md",
+              "sha256": "4b0b62c2b3ac79935e636b8cb6590f1f854f87dc8a21d810dea68a93c29000ba"
+            },
+            {
+              "path": "source/ellipFor_modules/xelbdj2_all_routines.f90",
+              "url": "https://github.com/seantrim/ellipFor/blob/c1ecd389b0a571813e98c0d92013def279b00e93/source/ellipFor_modules/xelbdj2_all_routines.f90",
+              "sha256": "089b24ff9d50f199553c509af03903c845efeae2393c2c71c1a0988242c5f4ba"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5835,12 +6027,92 @@
             ],
             "notes": "The README presents modernization goals and explicitly calls the high-level module incomplete. The entry covers existing QUADPACK functionality, not every proposed polymorphic interface.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1a1",
+            "level": "source-reviewed",
+            "revision": "2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected legacy DQAG entry checks workspace and dispatches DQAGE, which selects a Gauss-Kronrod rule, estimates integral/error, bisects the largest-error subinterval and maintains error ordering through DQPSRT. Termination compares summed estimated error with max(EPSABS,EPSREL*abs(result)); IER reports tolerance, subdivision, roundoff or integrand difficulties. H2a1a1 covers automatic finite-interval callback quadrature. An error estimate is not a rigorous bound and oscillatory/singular/discontinuous functions need appropriate handling. This is the bundled double-precision legacy entry, not the unfinished high-level quadrature API. Review covers control flow and rule dispatch, not every kernel or machine-constant/error-handler implementation. No integral was evaluated.",
+            "evidence": [
+              {
+                "path": "src/QUADPACK/dqag.f",
+                "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/src/QUADPACK/dqag.f",
+                "sha256": "625267148a1282a43ae348282cd8ff2bc794103eef4ed02c6e6f296a097d6809"
+              },
+              {
+                "path": "src/QUADPACK/dqage.f",
+                "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/src/QUADPACK/dqage.f",
+                "sha256": "1a66c327d0f5614149561e682809aed23c0e047c60d25d598b2596ded8ab27bd"
+              },
+              {
+                "path": "src/QUADPACK/dqk15.f",
+                "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/src/QUADPACK/dqk15.f",
+                "sha256": "471664a145516508ce6147f1a425d7d3d7f3afe50fd9584ffff020749f534276"
+              },
+              {
+                "path": "README.org",
+                "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/README.org",
+                "sha256": "243e43686f662989ea8f5ee07949f1f8b5a81a8939203bd861c72cf214e9b6e2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqag",
+                "role": "public-entry-point",
+                "summary": "External double-precision adaptive quadrature. F is a scalar DOUBLE PRECISION function of DOUBLE PRECISION x. KEY=1..6 selects 15/21/31/41/51/61-point rules (out-of-range values clamp). LIMIT>=1, LENW>=4*LIMIT, IWORK(LIMIT), WORK(LENW). Check IER, ABSERR, NEVAL and LAST. Nonzero status also calls legacy XERROR, whose policy must be considered when linking.",
+                "signature": "CALL dqag(f,a,b,epsabs,epsrel,key,result,abserr,neval,ier,limit,lenw,last,iwork,work)",
+                "declarations": [
+                  {
+                    "path": "src/QUADPACK/dqag.f",
+                    "line_start": 150,
+                    "line_end": 155
+                  },
+                  {
+                    "path": "src/QUADPACK/dqag.f",
+                    "line_start": 22,
+                    "line_end": 39
+                  }
+                ],
+                "path": "src/QUADPACK/dqag.f",
+                "line_start": 1,
+                "line_end": 182,
+                "usage": "external :: dqag\ndouble precision, external :: f\ninteger, parameter :: limit=100, lenw=4*limit\ninteger :: neval, ier, last, iwork(limit)\ndouble precision :: value, error, work(lenw)\ncall dqag(f,0.0d0,1.0d0,1.0d-10,1.0d-10,1, &\n  value,error,neval,ier,limit,lenw,last,iwork,work)",
+                "usage_notes": "Uncompiled fragment. Provide a scalar F, e.g. F(x)=x*x whose exact integral is 1/3, and link all QUADPACK dependencies including D1MACH/XERROR. No callback/integral/error-bound test was performed. Use machine constants appropriate to the build; the archive legacy support files need checking. Do not accept an estimate without inspecting IER and independent problem-specific checks."
+              },
+              {
+                "procedure": "dqage",
+                "role": "implementation-helper",
+                "path": "src/QUADPACK/dqage.f",
+                "line_start": 188,
+                "line_end": 340
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4",
+          "reviewed_on": "2026-11-05",
+          "notes": "No separate license file occurs in the inspected tree and no explicit license grant was identified in the reviewed README or legacy DQAG prologue. QUADPACK citations/Netlib provenance are not treated as a replacement permission notice; other source headers were not exhaustively audited.",
+          "evidence": [
+            {
+              "path": "README.org",
+              "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/README.org",
+              "sha256": "243e43686f662989ea8f5ee07949f1f8b5a81a8939203bd861c72cf214e9b6e2"
+            },
+            {
+              "path": "src/QUADPACK/dqag.f",
+              "url": "https://github.com/nshaffer/modern_quadpack/blob/2ce9eccfd3a5963002fd5b30547e2bdb72d0c7c4/src/QUADPACK/dqag.f",
+              "sha256": "625267148a1282a43ae348282cd8ff2bc794103eef4ed02c6e6f296a097d6809"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5881,12 +6153,104 @@
             ],
             "notes": "The README documents Jacobi, generalized Laguerre and Hermite rules using iterative polynomial-root methods. The author notes that newer rule-generation packages may offer advantages; no comparative accuracy or speed is asserted here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reviewed HERMIT generator constructs Gauss-Hermite nodes and weights for the exp(-x*x) weight: initial root estimates, Newton corrections via HROOT/HRECUR, mirrored nodes/weights, and Gamma-based normalization. H2c records quadrature rule construction, not an adaptive integral evaluator. HROOT uses at most ten Newton iterations with no returned convergence flag; derivative/polynomial values used in weights are from the last pre-update evaluation. The initial-root expression differs from the formula in its comment, and 2**(N-1) uses default INTEGER arithmetic, which can overflow for higher orders. It prints node diagnostics and performs no order/overflow validation. Only modest positive orders are illustrated. Jacobi/Laguerre generators and numerical moment checks are outside this review.",
+            "evidence": [
+              {
+                "path": "quad_mod.f90",
+                "url": "https://github.com/ivan-pi/stroud_quad/blob/b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7/quad_mod.f90",
+                "sha256": "bfc1227a5054bafec638ca7ff4122427f6be64fba1ffe9a92275350db75b6028"
+              },
+              {
+                "path": "quad_driver.f90",
+                "url": "https://github.com/ivan-pi/stroud_quad/blob/b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7/quad_driver.f90",
+                "sha256": "313b4c3f44fdf408db6d987fea6a542adc7a26883ac0a58cf78c9c0e13c88dbd"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ivan-pi/stroud_quad/blob/b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7/README.md",
+                "sha256": "ccded9963dcec14e1edc54b1f594936ab3dbf479186e99e3f120edd443fed06a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hermit",
+                "role": "public-entry-point",
+                "summary": "Public quad_mod rule generator. NN default INTEGER, X(NN)/A(NN) REAL64, optional REAL64 EPS (default machine epsilon). Produces descending/mirrored Hermite roots and weights; for integrating a weighted function compute sum(A*f(X)). There is no convergence/status output.",
+                "signature": "CALL hermit(nn, x, a, eps)",
+                "declarations": [
+                  {
+                    "path": "quad_mod.f90",
+                    "line_start": 326,
+                    "line_end": 334
+                  },
+                  {
+                    "path": "quad_mod.f90",
+                    "line_start": 8,
+                    "line_end": 19
+                  }
+                ],
+                "path": "quad_mod.f90",
+                "line_start": 326,
+                "line_end": 366,
+                "module": "quad_mod",
+                "examples": [
+                  {
+                    "path": "quad_driver.f90",
+                    "line_start": 25,
+                    "line_end": 27
+                  }
+                ],
+                "usage": "use quad_mod, only: wp, hermit\nreal(wp) :: nodes(4), weights(4), moment\ncall hermit(4,nodes,weights)\nmoment=sum(weights*nodes**2)",
+                "usage_notes": "Uncompiled modest-order fragment for the exp(-x*x)-weighted second moment; expected sqrt(pi)/2 was not checked. The routine generates a fixed rule, not error-controlled integration. Check node/weight moments and convergence before relying on results; higher orders risk integer/exponential overflow and the ten-iteration budget has no status."
+              },
+              {
+                "procedure": "hroot",
+                "module": "quad_mod",
+                "role": "implementation-helper",
+                "path": "quad_mod.f90",
+                "line_start": 375,
+                "line_end": 392
+              },
+              {
+                "procedure": "hrecur",
+                "module": "quad_mod",
+                "role": "implementation-helper",
+                "path": "quad_mod.f90",
+                "line_start": 397,
+                "line_end": 422
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7",
+          "reviewed_on": "2026-11-05",
+          "notes": "No separate LICENSE/COPYING file occurs in the pinned tree and no explicit grant was found in the reviewed README/module. Author and book citations establish attribution, not redistribution permission.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ivan-pi/stroud_quad/blob/b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7/README.md",
+              "sha256": "ccded9963dcec14e1edc54b1f594936ab3dbf479186e99e3f120edd443fed06a"
+            },
+            {
+              "path": "quad_mod.f90",
+              "url": "https://github.com/ivan-pi/stroud_quad/blob/b36291d94ffa8a81e5e8aed6d7afb37bc4c0b0e7/quad_mod.f90",
+              "sha256": "bfc1227a5054bafec638ca7ff4122427f6be64fba1ffe9a92275350db75b6028"
+            }
+          ]
         }
       },
       "imports": {}
@@ -7845,12 +8209,101 @@
             ],
             "notes": "The brief README identifies the source lineage and Fortran 90 adaptation. Dimensionality, boundary options and derivative interfaces are left unclassified pending more detailed review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "f6068b941876e9df2930eeae60017a5e9491780b",
+            "reviewed_on": "2026-11-05",
+            "notes": "SPLIFT assembles/factors a tridiagonal system for nodal second derivatives with user endpoint relations, solves it and recovers first derivatives; SPLINT locates intervals by hunt/bisection and evaluates cubic values/first/second derivatives. E1a records interpolating piecewise cubics, not smoothing. Use at least four strictly increasing nodes for the reviewed fit path. ISX=1 reuses the factorization only when nodes, workspace and endpoint coefficients are unchanged; validation is skipped on that reuse path. Success is IERR/KERR=1, not zero. SPLINT extrapolates the end cubic and returns KERR=2; equal adjacent nodes can STOP. N<4 fitting returns zero derivatives and IERR=2 rather than the normal cubic result. No interpolation, derivative or extrapolation accuracy was run; integration through SPLIQ is outside this mapping.",
+            "evidence": [
+              {
+                "path": "splift.f90",
+                "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/splift.f90",
+                "sha256": "d0ffb4e3343559b6d25f0db5aa461371c3118de36cf04a9d6e93c1eb2b5e656d"
+              },
+              {
+                "path": "splint.f90",
+                "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/splint.f90",
+                "sha256": "03068a1eaff391d7c660b4462a0a3c53c60f01ad5ea35a51b5ab8be14caf6e16"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/README.md",
+                "sha256": "42a5f1410fcd11eccac47f839435705a231c12439522800a5a68c1dbfde72399"
+              },
+              {
+                "path": "Readme",
+                "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/Readme",
+                "sha256": "a814f751a53b2d5797233664c59071b6e6c7ef4412dda684babba40d9c7747ad"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "splift",
+                "role": "public-entry-point",
+                "summary": "External spline constructor. REAL(selected_real_kind(12)) arrays X/Y/YP/YPP length N, W(N,3), default-INTEGER N/IERR/ISX. ISX=0 first call. Endpoint relations are YPP(1)=A1*YPP(2)+B1 and YPP(N)=AN*YPP(N-1)+BN; all zeros give natural endpoints. Check IERR=1.",
+                "signature": "CALL splift(x,y,yp,ypp,n,w,ierr,isx,a1,b1,an,bn)",
+                "declarations": [
+                  {
+                    "path": "splift.f90",
+                    "line_start": 29,
+                    "line_end": 52
+                  }
+                ],
+                "path": "splift.f90",
+                "line_start": 16,
+                "line_end": 161
+              },
+              {
+                "procedure": "splint",
+                "role": "public-entry-point",
+                "summary": "External evaluation of spline defined by X/Y/YPP. XI/YI/YPI/YPPI length NI; returns values and two derivatives. Queries may be unordered. KERR=1 normal, 2 extrapolation, 3 invalid NI. Preserve matching X/Y/YPP and check statuses before use.",
+                "signature": "CALL splint(x,y,ypp,n,xi,yi,ypi,yppi,ni,kerr)",
+                "declarations": [
+                  {
+                    "path": "splint.f90",
+                    "line_start": 29,
+                    "line_end": 43
+                  }
+                ],
+                "path": "splint.f90",
+                "line_start": 16,
+                "line_end": 168,
+                "usage": "integer, parameter :: rk=selected_real_kind(12), n=4\nexternal :: splift, splint\ninteger :: ierr, kerr\nreal(rk) :: x(n), y(n), yp(n), ypp(n), w(n,3)\nreal(rk) :: xi(1), yi(1), d1(1), d2(1)\nx=[0.0_rk,1.0_rk,2.0_rk,3.0_rk]\ny=x\ncall splift(x,y,yp,ypp,n,w,ierr,0,0.0_rk,0.0_rk,0.0_rk,0.0_rk)\nif (ierr /= 1) error stop \"spline fit failed\"\nxi=1.5_rk\ncall splint(x,y,ypp,n,xi,yi,d1,d2,1,kerr)\nif (kerr /= 1) error stop \"spline evaluation not in range\"",
+                "usage_notes": "Uncompiled in-range linear-data fragment. Expected value 1.5, first derivative one and second derivative zero were not checked. Link both external routines with matching kinds; SPLIQ is not needed for this sketch. Only reuse W with ISX=1 when the documented node/boundary conditions are unchanged. No Numerical Recipes-derived search licensing/accuracy audit was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Source GPL v2 notices; inherited search terms unresolved",
+          "spdx_expression": null,
+          "revision": "f6068b941876e9df2930eeae60017a5e9491780b",
+          "reviewed_on": "2026-11-05",
+          "notes": "Both reviewed headers state GNU Public License v2 without resolving version-only versus or-later. SPLINT attributes its hunt search to Numerical Recipes and earlier spline routines to Sandia; complete inherited terms were not established. No separate license file occurs in the pinned tree.",
+          "evidence": [
+            {
+              "path": "splift.f90",
+              "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/splift.f90",
+              "sha256": "d0ffb4e3343559b6d25f0db5aa461371c3118de36cf04a9d6e93c1eb2b5e656d"
+            },
+            {
+              "path": "splint.f90",
+              "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/splint.f90",
+              "sha256": "03068a1eaff391d7c660b4462a0a3c53c60f01ad5ea35a51b5ab8be14caf6e16"
+            },
+            {
+              "path": "Readme",
+              "url": "https://github.com/jlm785/spline_interpolation_fortran/blob/f6068b941876e9df2930eeae60017a5e9491780b/Readme",
+              "sha256": "a814f751a53b2d5797233664c59071b6e6c7ef4412dda684babba40d9c7747ad"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14958,12 +15411,167 @@
             ],
             "notes": "The README describes analytic/function-only Jacobian paths and explicitly directs modern development to fortran-lang/minpack. This historical/compiler-testing distribution is distinct from that modernized project.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "12f30bc2d6971fde7a32d59e80c635289376e14a",
+            "reviewed_on": "2026-11-05",
+            "notes": "HYBRD1 checks N/tolerance/workspace and configures HYBRD with dense forward-difference Jacobians, unit scaling, initial trust-region factor 100 and evaluation budget 200*(N+1). The inspected HYBRD driver dispatches FDJAC1, QR factorization and dogleg steps, with residual evaluations and progress tests. F2 records square nonlinear systems, not least-squares fitting or enumeration of every root. INFO=1 can indicate small relative steps, so independently inspect FVEC; it is not proof of a small residual or unique root. Negative callback IFLAG aborts. No finite-difference kernel, QR/dogleg arithmetic or numerical solve was fully verified.",
+            "evidence": [
+              {
+                "path": "src/hybrd1.f",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/hybrd1.f",
+                "sha256": "427ee1ab96f8583ccb661e76173758b8a98ae06af710bdce1acf8022ed27ac7b"
+              },
+              {
+                "path": "src/hybrd.f",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/hybrd.f",
+                "sha256": "dae9685deaf24a3625ab65fc25c896cf0416aee1e09c93be17204273a381f521"
+              },
+              {
+                "path": "src/minpack.f90",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/minpack.f90",
+                "sha256": "25ab273b86110369be56b102e0de9d9aa1b9f56509688003d9e17eed9fe37070"
+              },
+              {
+                "path": "examples/example_hybrd1.f90",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/examples/example_hybrd1.f90",
+                "sha256": "cc492b671552877b7e344f15c736fd4b182012ccb1d705883157d9dcc7cf5b14"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hybrd1",
+                "role": "public-entry-point",
+                "summary": "External double-precision square-system solver, also declared by module minpack. X(N) is input initial guess/output solution; FVEC(N) residual, WA length at least N*(3*N+13)/2. Default INTEGER dimensions/status. Check INFO and residuals. Callback FCN(N,X,FVEC,IFLAG) supplies values; no user Jacobian.",
+                "signature": "CALL hybrd1(fcn, n, x, fvec, tol, info, wa, lwa)",
+                "declarations": [
+                  {
+                    "path": "src/hybrd1.f",
+                    "line_start": 1,
+                    "line_end": 5
+                  },
+                  {
+                    "path": "src/minpack.f90",
+                    "line_start": 38,
+                    "line_end": 48
+                  }
+                ],
+                "path": "src/hybrd1.f",
+                "line_start": 1,
+                "line_end": 123,
+                "examples": [
+                  {
+                    "path": "examples/example_hybrd1.f90",
+                    "line_start": 18,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "examples/example_hybrd1.f90",
+                    "line_start": 57,
+                    "line_end": 76
+                  }
+                ],
+                "usage": "use minpack, only: hybrd1\nexternal :: fcn\ninteger, parameter :: n=2, lwa=n*(3*n+13)/2\ninteger :: info\ndouble precision :: x(n), residual(n), work(lwa), tol\nx=1.0d0\ntol=sqrt(epsilon(1.0d0))\ncall hybrd1(fcn,n,x,residual,tol,info,work,lwa)",
+                "usage_notes": "Uncompiled calling fragment. Supply a matching FCN implementation; the linked author example shows its signature and a nine-variable problem. Link the full MINPACK dependencies and use matching double precision/default INTEGER. Inspect INFO and norm of residual before accepting a root; this fragment intentionally makes no root-accuracy assertion."
+              },
+              {
+                "procedure": "hybrd",
+                "role": "implementation-helper",
+                "path": "src/hybrd.f",
+                "line_start": 197,
+                "line_end": 452
+              }
+            ]
+          },
+          {
+            "code": "K1b1a2",
+            "level": "source-reviewed",
+            "revision": "12f30bc2d6971fde7a32d59e80c635289376e14a",
+            "reviewed_on": "2026-11-05",
+            "notes": "LMDER1 configures LMDER for unconstrained nonlinear L2 least squares with supplied residual Jacobian, M>=N, relative cost/step tolerances and evaluation budget 100*(N+1). The inspected driver uses pivoted QR and Levenberg-Marquardt parameter/step dispatch. K1b1a2 records smooth unconstrained nonlinear least squares with user first derivatives, not arbitrary-objective optimization, bounds or rank-certified parameter identification. INFO=1..4 describe different normal stopping tests, not a zero-residual guarantee. The repository module callback interface declares IFLAG INTENT(IN) and both residual/Jacobian INTENT(OUT), conflicting with the classic preserve-the-unused-array/abort contract. The sketch uses the external routine and requires a correctly declared callback. No fit or Jacobian was checked and subordinate linear algebra is not audited.",
+            "evidence": [
+              {
+                "path": "src/lmder1.f",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/lmder1.f",
+                "sha256": "bd9bec43c803c20ab523410cd55476833bec63c96b10088c0d87c2a7c1df6ec4"
+              },
+              {
+                "path": "src/lmder.f",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/lmder.f",
+                "sha256": "bcb863d4e71751e9c2e8bc163f3606823b206d4ded525645704238694d4b2cca"
+              },
+              {
+                "path": "src/minpack.f90",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/src/minpack.f90",
+                "sha256": "25ab273b86110369be56b102e0de9d9aa1b9f56509688003d9e17eed9fe37070"
+              },
+              {
+                "path": "examples/example_lmder1.f90",
+                "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/examples/example_lmder1.f90",
+                "sha256": "eda50075cf791d2b7ad709d84e5598560543e1f71a976650c0312697ffc532ef"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lmder1",
+                "role": "public-entry-point",
+                "summary": "External double-precision Levenberg-Marquardt driver. M>=N>0; X(N), FVEC(M), FJAC(LDFJAC,N), LDFJAC>=M; IPVT(N); WA length >=5*N+M. Callback IFLAG=1 requests residuals, 2 Jacobian; preserve the other array and permit negative IFLAG termination. Use the external interface with that contract; the bundled module callback intents need correction.",
+                "signature": "CALL lmder1(fcn, m, n, x, fvec, fjac, ldfjac, tol, info, ipvt, wa, lwa)",
+                "declarations": [
+                  {
+                    "path": "src/lmder1.f",
+                    "line_start": 1,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "src/lmder1.f",
+                    "line_start": 30,
+                    "line_end": 40
+                  }
+                ],
+                "path": "src/lmder1.f",
+                "line_start": 1,
+                "line_end": 156,
+                "examples": [
+                  {
+                    "path": "examples/example_lmder1.f90",
+                    "line_start": 10,
+                    "line_end": 40
+                  }
+                ],
+                "usage": "external :: lmder1, fcn\ninteger, parameter :: m=3, n=2, lwa=5*n+m\ninteger :: info, pivots(n)\ndouble precision :: x(n), residual(m), jac(m,n), work(lwa), tol\nx=1.0d0\ntol=sqrt(epsilon(1.0d0))\ncall lmder1(fcn,m,n,x,residual,jac,m,tol,info,pivots,work,lwa)",
+                "usage_notes": "Uncompiled fragment; provide FCN(M,N,X,FVEC,FJAC,LDFJAC,IFLAG). Keep unused callback output storage defined; do not copy the module interface INTENT(OUT) declarations indiscriminately. Independently validate Jacobian and residual/cost; INFO alone is not parameter accuracy or full-rank certification. Link complete MINPACK support routines."
+              },
+              {
+                "procedure": "lmder",
+                "role": "implementation-helper",
+                "path": "src/lmder.f",
+                "line_start": 1,
+                "line_end": 452
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT and original MINPACK redistribution notices",
+          "spdx_expression": null,
+          "revision": "12f30bc2d6971fde7a32d59e80c635289376e14a",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE combines an MIT-style grant with the University of Chicago MINPACK redistribution notice, including documentation acknowledgment and other conditions. Preserve both notices; no single simplified SPDX expression is asserted.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/certik/minpack/blob/12f30bc2d6971fde7a32d59e80c635289376e14a/LICENSE",
+              "sha256": "0aa6aebec56cbc6816df4696ad20b6c5f1a054b067a7c3f04a2cbcca66f18b87"
+            }
+          ]
         }
       },
       "imports": {}
@@ -17957,12 +18565,196 @@
             ],
             "notes": "The short README is supplemented by the quadrature module interface for sampled/function input and Gaussian rules. These interface declarations do not establish the correctness of every implementation or broader numerical method in the repository.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "e83c7a494d36925c6f9fddfdbae80be8575dffe3",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected array overload accumulates 0.5*(x(i+1)-x(i))*(f(i)+f(i+1)), a composite trapezoidal integral of sampled data. H2a1b2 records nonautomatic grid-data quadrature, including nonuniform spacing, not a tolerance-driven callback integrator. Caller must provide ordered nodes and matching arrays; empty/singleton arrays produce zero. The parent declares a separate callback trapezoidal_rule_f but this submodule only supplies the array body. Plain FUNCTION headers in these submodules differ from the parent MODULE FUNCTION declarations and build compatibility was not checked. Mismatch handling delegates to an unreviewed print_error_message policy. No integral or build was executed.",
+            "evidence": [
+              {
+                "path": "src/ftlib_quadrature_trapezoidal.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature_trapezoidal.f90",
+                "sha256": "d5bb589490574835773159c76bcae6e2b27ea22a1a30c41ed3eff127a1acf0ce"
+              },
+              {
+                "path": "src/ftlib_quadrature.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature.f90",
+                "sha256": "7ac237c368fc1049bbb2f968236b5bd073dd1f02f3dca931102cd4899ec25e66"
+              },
+              {
+                "path": "src/ftlib_kinds.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_kinds.f90",
+                "sha256": "7ee099bd611a2e64071d946844df0f93d2da8449340fb5f3b89f44f7dffcefec"
+              },
+              {
+                "path": "src/ftlib_function.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_function.f90",
+                "sha256": "26ee1faa652a9775a83c135718491eb54af5cf6b4a857c3e346eda90d58614d4"
+              },
+              {
+                "path": "test/quadrature/test.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/test/quadrature/test.f90",
+                "sha256": "78df9ab5a996557e5185ea128c882bf84b3de6b166b4066054b989a8e887734d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/README.md",
+                "sha256": "3597c0ed037e19a44c4f0a0802caeff37ac92ffa982cf6e5f8925dfe1600874a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "trapezoidal_rule",
+                "role": "public-entry-point",
+                "summary": "Public generic in ftlib_quadrature, scoped to array samples X(:), F(:) in DP=selected_real_kind(15,307), returning one DP scalar. It supplies no error estimate/status and does not validate node order. This is distinct from the declared callback overload, whose body was not found in this submodule.",
+                "signature": "value = trapezoidal_rule(x,f)",
+                "declarations": [
+                  {
+                    "path": "src/ftlib_quadrature.f90",
+                    "line_start": 39,
+                    "line_end": 43
+                  },
+                  {
+                    "path": "src/ftlib_quadrature_trapezoidal.f90",
+                    "line_start": 8,
+                    "line_end": 16
+                  }
+                ],
+                "path": "src/ftlib_quadrature.f90",
+                "line_start": 13,
+                "line_end": 16,
+                "module": "ftlib_quadrature",
+                "examples": [
+                  {
+                    "path": "test/quadrature/test.f90",
+                    "line_start": 18,
+                    "line_end": 36
+                  }
+                ],
+                "usage": "use ftlib_kinds, only: dp\nuse ftlib_quadrature, only: trapezoidal_rule\nreal(dp) :: x(3), f(3), value\nx=[0.0_dp,0.5_dp,1.0_dp]\nf=x\nvalue=trapezoidal_rule(x,f)",
+                "usage_notes": "Uncompiled fragment with expected integral 0.5. Parent/submodule procedure-definition consistency and the missing callback binding need build checking before presenting this as runnable library support. Use matching ordered arrays; no truncation estimate or tolerance test was performed."
+              },
+              {
+                "procedure": "trapezoidal_rule_a",
+                "module": "ftlib_quadrature",
+                "role": "implementation-evidence",
+                "path": "src/ftlib_quadrature_trapezoidal.f90",
+                "line_start": 8,
+                "line_end": 30
+              }
+            ]
+          },
+          {
+            "code": "H2a1a2",
+            "level": "source-reviewed",
+            "revision": "e83c7a494d36925c6f9fddfdbae80be8575dffe3",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected 1D Gaussian path obtains tabulated Gauss-Legendre nodes/weights for N=1..5, maps them affinely from [-1,1] to the first two endpoint entries, evaluates a procedure pointer and scales the weighted sum by half the interval length. H2a1a2 records nonautomatic finite-interval callback quadrature; no tolerance/error estimator is present. Unsupported N has no SELECT CASE default and leaves rule data undefined. The callback pointer must be associated, endpoints must have at least two entries, and its optional parameter-array convention must match. Plain submodule FUNCTION versus parent MODULE FUNCTION consistency needs build checking; multidimensional behavior is unreviewed. No quadrature result was executed.",
+            "evidence": [
+              {
+                "path": "src/ftlib_quadrature_gauss.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature_gauss.f90",
+                "sha256": "92dec88911f5198b4d7fcde7b719a89d5d94114ad62815e8b3d92bc586a0308f"
+              },
+              {
+                "path": "src/ftlib_quadrature.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature.f90",
+                "sha256": "7ac237c368fc1049bbb2f968236b5bd073dd1f02f3dca931102cd4899ec25e66"
+              },
+              {
+                "path": "src/ftlib_kinds.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_kinds.f90",
+                "sha256": "7ee099bd611a2e64071d946844df0f93d2da8449340fb5f3b89f44f7dffcefec"
+              },
+              {
+                "path": "src/ftlib_function.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_function.f90",
+                "sha256": "26ee1faa652a9775a83c135718491eb54af5cf6b4a857c3e346eda90d58614d4"
+              },
+              {
+                "path": "test/quadrature/test.f90",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/test/quadrature/test.f90",
+                "sha256": "78df9ab5a996557e5185ea128c882bf84b3de6b166b4066054b989a8e887734d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/README.md",
+                "sha256": "3597c0ed037e19a44c4f0a0802caeff37ac92ffa982cf6e5f8925dfe1600874a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gaussian_quadrature",
+                "role": "public-entry-point",
+                "summary": "Public generic scoped to 1D endpoint vector X, type(function_type) F and default-INTEGER N=1..5. Callback is scalar function of DP X(:), optional DP ARGS(:); assign F%f and handle F%args consistently. Returns one DP scalar. The endpoints use X(1:2); this is not an array of integration nodes.",
+                "signature": "value = gaussian_quadrature(endpoints,f,n)",
+                "declarations": [
+                  {
+                    "path": "src/ftlib_quadrature.f90",
+                    "line_start": 44,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "src/ftlib_function.f90",
+                    "line_start": 8,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/ftlib_quadrature.f90",
+                "line_start": 18,
+                "line_end": 21,
+                "module": "ftlib_quadrature",
+                "examples": [
+                  {
+                    "path": "test/quadrature/test.f90",
+                    "line_start": 43,
+                    "line_end": 59
+                  }
+                ],
+                "usage": "use ftlib_kinds, only: dp\nuse ftlib_function, only: function_type, function_procedure\nuse ftlib_quadrature, only: gaussian_quadrature\nprocedure(function_procedure) :: integrand\ntype(function_type) :: f\nreal(dp) :: value\nf%f=>integrand\nallocate(f%args(0))\nvalue=gaussian_quadrature([0.0_dp,1.0_dp],f,3)",
+                "usage_notes": "Uncompiled fragment. Supply the exact callback interface linked above, for example integrand(x,args)=x(1)**2 with unused optional args. Its expected integral 1/3 was not checked. Limit N to 1..5; no unsupported-order status is returned. Resolve/check submodule declaration consistency and all parent bindings before claiming build support. No multidimensional or other-rule accuracy was established."
+              },
+              {
+                "procedure": "get_x_and_w",
+                "module": "ftlib_quadrature",
+                "role": "implementation-evidence",
+                "path": "src/ftlib_quadrature.f90",
+                "line_start": 60,
+                "line_end": 98
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "e83c7a494d36925c6f9fddfdbae80be8575dffe3",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned tree has no separately named LICENSE/COPYING file and no explicit grant was identified in the reviewed README/quadrature modules. Availability of code and a LAPACK dependency note do not establish project redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/README.md",
+              "sha256": "3597c0ed037e19a44c4f0a0802caeff37ac92ffa982cf6e5f8925dfe1600874a"
+            },
+            {
+              "path": "src/ftlib_quadrature.f90",
+              "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature.f90",
+              "sha256": "7ac237c368fc1049bbb2f968236b5bd073dd1f02f3dca931102cd4899ec25e66"
+            },
+            {
+              "path": "src/ftlib_quadrature_gauss.f90",
+              "url": "https://github.com/fradevita/FTLIB/blob/e83c7a494d36925c6f9fddfdbae80be8575dffe3/src/ftlib_quadrature_gauss.f90",
+              "sha256": "92dec88911f5198b4d7fcde7b719a89d5d94114ad62815e8b3d92bc586a0308f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23985,12 +24777,75 @@
             ],
             "notes": "The README identifies language implementations and function families with standard-library-only dependencies. It does not establish identical routine availability in every language, nor have its testing/performance claims been independently reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C19",
+            "level": "source-reviewed",
+            "revision": "5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected DLI2 maps real arguments to [0,1/2] through reciprocal/reflection identities, evaluates a fixed rational approximation and restores logarithmic/pi corrections. Explicit branches handle -1, zero and +1. C19 records the dilogarithm among other special functions; this is not arbitrary-order polylogarithm coverage. For real x>1 DLI2 returns the real part; the complex routine has a separate negative-imaginary branch value on the cut. The review scopes the real evaluator; complex continuation, higher orders and Clausen routines are not audited. The source approximation-error claim was not reproduced, and there is no returned error estimate or status. NaN/infinite/extreme overflow behavior was not checked.",
+            "evidence": [
+              {
+                "path": "src/fortran/Li2.f90",
+                "url": "https://github.com/Expander/polylogarithm/blob/5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f/src/fortran/Li2.f90",
+                "sha256": "ce6ef584617714d67a2e5cdf097d28b58dcb9c20ea1b78dcc02a571f55d24c8e"
+              },
+              {
+                "path": "src/fortran/log.f90",
+                "url": "https://github.com/Expander/polylogarithm/blob/5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f/src/fortran/log.f90",
+                "sha256": "a13f2324f35c800e74271254b64eee1830e042f21295fd485b4b77ae31e81d09"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Expander/polylogarithm/blob/5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f/README.md",
+                "sha256": "5f4409165b8348b2fdceb92b349c3a63bf1a98eb1165dee757c1d90d0a60ce6d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dli2",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION function of a DOUBLE PRECISION scalar, returning the real dilogarithm/real part on the real cut. Declare its return type explicitly. The source file also contains CDLI2 referencing CDLOG1P, so link log.f90 when compiling the whole Li2.f90 object even if only the real entry is called.",
+                "signature": "value = dli2(x)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/Li2.f90",
+                    "line_start": 19,
+                    "line_end": 22
+                  }
+                ],
+                "path": "src/fortran/Li2.f90",
+                "line_start": 19,
+                "line_end": 86,
+                "usage": "double precision, external :: dli2\ndouble precision :: value\nvalue=dli2(0.5d0)",
+                "usage_notes": "Uncompiled fragment. Li2(1/2)=pi**2/12-log(2)**2/2, but no comparison was executed. Compile/link the Fortran Li2 and log source objects, not only C/C++ variants. DLI2 is real-valued for x>1; use a separately reviewed complex interface if the cut imaginary part matters. The published/source error estimate is not a new catalog verification."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT license and reviewed Fortran file identify MIT terms. Preserve authorship/notice conditions; this is not an audit of all alternative implementations shipped in test directories.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Expander/polylogarithm/blob/5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f/LICENSE",
+              "sha256": "f9ae01bfa550144574123a1242afda4c58f2bed59b334b807e76277f122e47b1"
+            },
+            {
+              "path": "src/fortran/Li2.f90",
+              "url": "https://github.com/Expander/polylogarithm/blob/5ed2ca977fff734a2c5ce6e0ccceda9b8faf422f/src/fortran/Li2.f90",
+              "sha256": "ce6ef584617714d67a2e5cdf097d28b58dcb9c20ea1b78dcc02a571f55d24c8e"
+            }
+          ]
         }
       },
       "imports": {}
