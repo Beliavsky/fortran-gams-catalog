@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 164 repositories now have 198 source-reviewed
+Reviewed on 2026-11-05. 172 repositories now have 209 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-158 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Six further cards (DDFSA, CWT, polyfit, StatTools, GridSearch and
-PSOclassicG) identify supplied program entry points and keep their internal/benchmark
+165 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 164 independently source-reviewed repositories now have an
+separately. All 172 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -188,6 +188,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | pcgcoarray | `modcoarraysolver::cg%solve` | MIT; dependencies separate |
 | libid | External `iddr_qrpiv`, `iddr_id` | BSD-3-Clause |
 | maria-fortran | `maria_lr_tsvd_mod::dgersvd1` | MIT; backends separate |
+| FortRAND | `fr_random::random`, `fr_sampling::normal_dist` | LGPL version 3 text; version choice unresolved |
+| knuth-flrng | `RNFSTR`, `RNFARR` (F77 double-precision generator) | Public-domain dedication statement |
+| melg-64-fortran | `type_melg19937_64%initialize`, `%genrand64_real2` | MIT |
+| dsfmt_f03_interface | `dSFMT_init`, `get_rand_close_open`, `dSFMT_end` | BSD-3-Clause wrapper and C core |
+| nsmarkov-fortran | `mod_lcrouwenhorst::lcrouwenhorst`, `mod_lctauchen::lctauchen` | MIT-style text with citation request |
+| ACFbyFFT | `main` (file-based program); real FFT correlation paths | No license grant identified in reviewed material |
+| signal_subspace | `subspace::esprit_c`, `covariance::autocov_c` | MIT |
+| TOMS-Algorithm-675 | `SRCF`, `SRIF` (external square-root filtering routines) | ACM Software License Agreement per README |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -371,6 +379,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [pcgcoarray](https://github.com/jvdp1/pcgcoarray) | D2b1b | Coarray CG recurrence, row products and synchronized reductions | Zero initial guess, binary RHS and collective participation required. Sum of local L2 norms, image-1 solution assembly, quadratic iteration scratch and eigenvalue getter finding recorded. |
 | [libid](https://github.com/fastalgorithms/libid) | D5 | Fixed-rank pivoted Householder QR and interpolative-decomposition backsolve | A overwritten with packed coefficients; preserve original selected columns. Pivot swaps differ from composed column list; validate rank and approximation independently. |
 | [maria-fortran](https://github.com/sbudzinskiy/maria-fortran) | D6 | Caller-sketched randomized SVD with QR/LQ power steps and projected SVD dispatch | Caller forms A*Omega and supplies multiplication pointers. Flat buffers, both workspace queries, kc<=min(m,n) and intermediate error handling matter. |
+| [FortRAND](https://github.com/llamm-de/fortrand) | L6a21; L6a14 | Intrinsic uniform draws and Box-Muller/polar normal transforms | Every scalar draw reinitializes the intrinsic RNG; normal default/comment mismatch and zero-log endpoint recorded. |
+| [knuth-flrng](https://github.com/marcoxa/knuth-flrng) | L6a21 | Lag-100/37 floating-point recurrence, scalar seed expansion and warm-up | RNFARR requires at least 100 outputs; separate scalar wrapper reseeds on refill. COMMON state is shared. |
+| [melg-64-fortran](https://github.com/DSCF-1224/melg-64-fortran) | L6a21 | MELG19937-64 explicit state and upper-53-bit real conversion | Initialize before use; signed-wrap seed assumption. Other variants, jump polynomials and array seeds unreviewed. |
+| [dsfmt_f03_interface](https://github.com/jsspencer/dsfmt_f03_interface) | L6a21 | Buffered Fortran/C dSFMT uniform draws | Match C exponent and even minimum buffer size; reset on distribution changes. State-pointer copies do not create independent streams. |
+| [nsmarkov-fortran](https://github.com/gfell/nsmarkov-fortran) | M1a | Time-varying Rouwenhorst/Tauchen finite-state AR approximations | Builds grids and row-oriented transitions, not random paths; starts from zero. Validate dimensions, scales and probabilities. |
+| [ACFbyFFT](https://github.com/lingtikong/ACFbyFFT) | L10a2a1; L10b2a | Real FFT auto/cross correlation and lag normalization | Use centered input with -nave to avoid uninitialized-tail mean calculation. Bound lag count; output is not unit-variance normalized. |
+| [signal_subspace](https://github.com/scivision/signal_subspace) | L10a3a; L10a2a1 | Complex ESPRIT frequencies and delayed-window second moments | Pivot ABI and sigma extent require repair; covariance omits a window and uses N normalization. No mean removal. |
+| [TOMS-Algorithm-675](https://github.com/ivan-pi/TOMS-Algorithm-675) | L10a2e | Square-root covariance/information pre-array updates | Mapping scoped to scalar observations; triangular factors, workspace and mutable output-request flags matter. SRCF does not update state estimates. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -679,3 +695,23 @@ checking status before using a potentially unassigned result. The coarray card
 states its norm/ownership/file conventions and collective requirements.
 No upstream routine, fit, root, coarray solve or calling sketch in this batch
 was compiled or run.
+
+## Random streams and time-series conventions
+
+The random-generator cards distinguish intended distribution from verified sample
+quality. FortRAND reinitializes the intrinsic generator for every scalar draw,
+and the separate Knuth scalar wrapper reseeds on buffer refill. The selected
+Knuth sketch uses the explicit seed/bulk routines instead. MELG keeps recurrence
+state in an object; dSFMT wraps a C allocation whose pointer must not be treated
+as an independently copied stream. Neither source inspection nor an interface
+sketch certifies statistical independence or reference sequences.
+
+The time-series cards identify the operation actually implemented. NSMarkov
+constructs finite-state grids and transition probabilities without drawing paths.
+ACFbyFFT is a standalone file-based program; its sketches disable the faulty mean
+subtraction and assume already centered input. The signal_subspace covariance
+routine returns uncentered delayed-window second moments, while its ESPRIT path
+has recorded pivot-type and output-extent problems requiring repair. TOMS 675
+coverage is scoped to scalar observations and square-root filter updates, with
+SRCF providing a covariance/gain update rather than a complete state trajectory.
+All new calling sketches are source-inspected and were not compiled or run.

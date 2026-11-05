@@ -186,6 +186,54 @@
       "parent": "K1b2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "M1a": {
+      "label": "Discrete",
+      "parent": "M1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2a1": {
+      "label": "Autocorrelations and autocovariances",
+      "parent": "L10a2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10b2": {
+      "label": "Time domain analysis",
+      "parent": "L10b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10b2a": {
+      "label": "Summary statistics (e.g., cross-correlations)",
+      "parent": "L10b2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a3": {
+      "label": "Frequency domain analysis (search also class J1)",
+      "parent": "L10a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a3a": {
+      "label": "Spectral analysis",
+      "parent": "L10a3",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2e": {
+      "label": "State-space analysis (e.g., Kalman filtering)",
+      "parent": "L10a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10b": {
+      "label": "Two time series (search also classes L3b3c, L10c, and L10d)",
+      "parent": "L10",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

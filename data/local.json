@@ -7687,12 +7687,160 @@
             ],
             "notes": "The README distinguishes wrapping intrinsic uniform generation from algorithms for other distributions. It does not define an independent base generator family or establish stream independence.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "71b9328fc80a1ff24e9e037f82abf9d203445f5c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public random generic dispatches to intrinsic RANDOM_NUMBER for REAL(dp) scalar values and builds interval/list/integer variants from repeated scalar calls. L6a21 records intended uniform output. Every scalar draw first calls RANDOM_INIT(.false.,.false.), reinitializing the intrinsic generator rather than advancing an explicitly seeded local stream. This can defeat caller seeding, adds reseeding work and provides no guarantee of independent repeated values. Integer sampling scales a real draw with FLOOR; b<=a is rejected including a singleton interval, and b+1-a can overflow. No randomness, endpoint, stream-independence or compiler comparison was executed.",
+            "evidence": [
+              {
+                "path": "src/random.f90",
+                "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/src/random.f90",
+                "sha256": "7dda39ee9f5abd5f90043833e8e7bb7db4386e78ed2a8dc30b91d6dd194aeaaa"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/README.md",
+                "sha256": "21bb5bd688af6ebf2f7b12a077e88e05da6874cf376f3478fb8912fcbc9b9c3d"
+              },
+              {
+                "path": "DOCUMENTATION.md",
+                "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/DOCUMENTATION.md",
+                "sha256": "1b507cfb0d1d83f124610a7d7dffa6d918a97ad3d0fe7c5540848a090eed18f2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "random",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for no-argument REAL(dp) scalar output in [0,1). dp=SELECTED_REAL_KIND(15,300). It reinitializes the compiler intrinsic RNG on each draw; there is no generator-object or explicit seed argument.",
+                "signature": "u = random()",
+                "declarations": [
+                  {
+                    "path": "src/random.f90",
+                    "line_start": 13,
+                    "line_end": 28
+                  },
+                  {
+                    "path": "src/random.f90",
+                    "line_start": 35,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/random.f90",
+                    "line_start": 75,
+                    "line_end": 81
+                  }
+                ],
+                "path": "src/random.f90",
+                "line_start": 75,
+                "line_end": 83,
+                "module": "fr_random",
+                "usage": "use fr_random, only: random, dp\nreal(dp) :: u\nu=random()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Requires a compiler supporting RANDOM_INIT. This sketch describes the current per-draw reinitialization; it does not endorse its statistical independence or preserve an external RANDOM_SEED sequence. Interval/list overloads inherit that behavior. No sample quality, reproducibility or performance was measured."
+              },
+              {
+                "procedure": "random_int_interval",
+                "role": "implementation-helper",
+                "path": "src/random.f90",
+                "line_start": 133,
+                "line_end": 147,
+                "module": "fr_random"
+              }
+            ]
+          },
+          {
+            "code": "L6a14",
+            "level": "source-reviewed",
+            "revision": "71b9328fc80a1ff24e9e037f82abf9d203445f5c",
+            "reviewed_on": "2026-11-05",
+            "notes": "normal_dist dispatches to Box-Muller, Marsaglia-Bray polar rejection, or a Bernoulli-sum CLT approximation. The inspected BMA path transforms pairs of uniform values using sqrt(-2*log(u1)) and trigonometric components, then returns only the first component of each pair. L6a14 records normal-variate generation, not a verified distribution or an exact-normal claim for CLT. Despite its documentation comment naming MBA default, actual code defaults to BMA. Box-Muller does not guard u1=0. All paths inherit fr_random per-draw intrinsic reseeding; the sketch selects MBA, which rejects q<=0 and q>=1, but does not repair reseeding. No samples, moments or distribution tests were run.",
+            "evidence": [
+              {
+                "path": "src/sampling.f90",
+                "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/src/sampling.f90",
+                "sha256": "eccc462676d9b0b9e20b923bd18224cf5e16cfa509b7ab3af041d7673fc02c59"
+              },
+              {
+                "path": "src/random.f90",
+                "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/src/random.f90",
+                "sha256": "7dda39ee9f5abd5f90043833e8e7bb7db4386e78ed2a8dc30b91d6dd194aeaaa"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "normal_dist",
+                "role": "public-entry-point",
+                "summary": "Public REAL(dp) array-valued normal sampler with default-integer count and optional three-character method selector. BMA is the actual default; MBA selects polar rejection; CLT is an approximation. Returns N entries and allocates automatic temporary pairs.",
+                "signature": "samples = normal_dist(num_samples [, method])",
+                "declarations": [
+                  {
+                    "path": "src/sampling.f90",
+                    "line_start": 11,
+                    "line_end": 28
+                  },
+                  {
+                    "path": "src/sampling.f90",
+                    "line_start": 39,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/sampling.f90",
+                "line_start": 39,
+                "line_end": 73,
+                "module": "fr_sampling",
+                "usage": "use fr_sampling, only: normal_dist, dp\nreal(dp) :: samples(10)\nsamples=normal_dist(10,\"MBA\")",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build fr_random first. Positive sample count and finite arithmetic are caller assumptions. Selecting MBA avoids the BMA zero-log endpoint by its rejection test, but repeated intrinsic reseeding remains. The number of rejection trials has no explicit cap. No normal-law or independent-stream guarantee was tested."
+              },
+              {
+                "procedure": "box_muller_pair",
+                "role": "implementation-helper",
+                "path": "src/sampling.f90",
+                "line_start": 133,
+                "line_end": 145,
+                "module": "fr_sampling"
+              },
+              {
+                "procedure": "marsaglia_bray_pair",
+                "role": "implementation-helper",
+                "path": "src/sampling.f90",
+                "line_start": 97,
+                "line_end": 115,
+                "module": "fr_sampling"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL version 3 text; version choice unresolved",
+          "spdx_expression": null,
+          "revision": "71b9328fc80a1ff24e9e037f82abf9d203445f5c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides LGPL version 3 text; the reviewed README and source do not settle version-only versus or-later scope. Compiler intrinsic generator behavior is separate from the project notice.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/LICENSE.md",
+              "sha256": "ca54162d52c78567e96eec7101dc9bb85b2863861973ba42814f7321eec54ff6"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/README.md",
+              "sha256": "21bb5bd688af6ebf2f7b12a077e88e05da6874cf376f3478fb8912fcbc9b9c3d"
+            },
+            {
+              "path": "src/random.f90",
+              "url": "https://github.com/llamm-de/fortrand/blob/71b9328fc80a1ff24e9e037f82abf9d203445f5c/src/random.f90",
+              "sha256": "7dda39ee9f5abd5f90043833e8e7bb7db4386e78ed2a8dc30b91d6dd194aeaaa"
+            }
+          ]
         }
       },
       "imports": {}
@@ -11896,12 +12044,151 @@
             ],
             "notes": "The README identifies the bundled dSFMT C code, memory-allocation helpers and stream-equivalence tests. Those tests have not been run for this catalog; interface inclusion does not establish independent-stream quality.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "d691baf1ac458b4719a060d6cd89cf272ea8b538",
+            "reviewed_on": "2026-11-05",
+            "notes": "The Fortran wrapper allocates a C dSFMT state, seeds it through dsfmt_chk_init_gen_rand, and returns buffered [0,1) values from get_rand_close_open, refilling through the C array generator. L6a21 records this selected wrapper/dispatch path, not a full SIMD recurrence or period audit. DSFMT_MEXP must match across Fortran/C or initialization exits the process. Buffer length must be even and at least the C minimum; the wrapper raises short lengths but does not round odd lengths. Distribution-specific getters share one cache and require reset/reinitialization before switching, as the source warns. Intrinsic assignment copies the C pointer while copying the Fortran buffer, so it is not an independent clone and can cause aliasing/double cleanup. dSFMT_end deallocates an allocated store without checking; do not call before init or twice. No mixed-language stream comparison or sampling test was run.",
+            "evidence": [
+              {
+                "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/dSFMT_F03_interface/dSFMT_interface.F90",
+                "sha256": "012231d35dc1fcb71bd19a52a6f870bf595c5d563a7bc9373b98adbe1c5a5d61"
+              },
+              {
+                "path": "dSFMT-src-2.2.3/dSFMT.c",
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/dSFMT-src-2.2.3/dSFMT.c",
+                "sha256": "cde39cbd0e1b4ca30c300f8f6564f3ad96b7dd70e473717cf3e63dce6e6b1e08"
+              },
+              {
+                "path": "dSFMT_F03_interface/dSFMT_utils.c",
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/dSFMT_F03_interface/dSFMT_utils.c",
+                "sha256": "6c9b156767603e34b7a16e9ee0e70c13eb055fde795872f399c8fbdfe66f99d7"
+              },
+              {
+                "path": "README.rst",
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/README.rst",
+                "sha256": "77afa40769c71728ae9b055dbb113b6a11851d124930c12374c742af88d59f89"
+              },
+              {
+                "path": "test/testf.f90",
+                "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/test/testf.f90",
+                "sha256": "ee4555c56b108384991345d6707de0706b31edfa37b4f8cea7fed3eaaf6051a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dSFMT_init",
+                "role": "public-entry-point",
+                "summary": "Public initialization subroutine taking default-integer seed/store size and mutable dSFMT_t. Provide a supported even buffer size such as 50000 and matching DSFMT_MEXP build. C allocation failure has no checked status return.",
+                "signature": "CALL dSFMT_init(seed, rng_store_size, rng)",
+                "declarations": [
+                  {
+                    "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                    "line_start": 140,
+                    "line_end": 157
+                  },
+                  {
+                    "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                    "line_start": 165,
+                    "line_end": 182
+                  }
+                ],
+                "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                "line_start": 165,
+                "line_end": 223,
+                "module": "dSFMT_interface",
+                "examples": [
+                  {
+                    "path": "test/testf.f90",
+                    "line_start": 15,
+                    "line_end": 30
+                  }
+                ],
+                "usage": "use iso_c_binding, only: c_double\nuse dSFMT_interface, only: dSFMT_t,dSFMT_init,get_rand_close_open,dSFMT_end\ntype(dSFMT_t) :: rng\nreal(c_double) :: u\ncall dSFMT_init(7,50000,rng)\nu=get_rand_close_open(rng)\ncall dSFMT_end(rng)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build/link the Fortran wrapper, C utility and matching bundled dSFMT/configuration; observe SIMD alignment requirements for the chosen backend. Use one initialized object, one distribution and exactly one matching end call in this sketch. No copy-safe finalizer or independent-state assignment is provided. String serialization and Gaussian conversion paths were not audited."
+              },
+              {
+                "procedure": "get_rand_close_open",
+                "role": "public-entry-point",
+                "summary": "Public scalar function advancing an initialized object buffer. A cache refill sets its distribution mode, but this getter does not automatically convert an already-filled cache from another mode.",
+                "signature": "u = get_rand_close_open(rng)",
+                "declarations": [
+                  {
+                    "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                    "line_start": 355,
+                    "line_end": 370
+                  }
+                ],
+                "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                "line_start": 360,
+                "line_end": 382,
+                "module": "dSFMT_interface"
+              },
+              {
+                "procedure": "dSFMT_end",
+                "role": "public-entry-point",
+                "summary": "Public cleanup for an initialized live object. Not a checked idempotent destructor and not safe for aliased C-state copies.",
+                "signature": "CALL dSFMT_end(rng)",
+                "declarations": [
+                  {
+                    "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                    "line_start": 225,
+                    "line_end": 239
+                  }
+                ],
+                "path": "dSFMT_F03_interface/dSFMT_interface.F90",
+                "line_start": 225,
+                "line_end": 244,
+                "module": "dSFMT_interface"
+              },
+              {
+                "procedure": "dsfmt_fill_array_close_open",
+                "role": "implementation-helper",
+                "path": "dSFMT-src-2.2.3/dSFMT.c",
+                "line_start": 492,
+                "line_end": 496
+              },
+              {
+                "procedure": "dsfmt_chk_init_gen_rand",
+                "role": "implementation-helper",
+                "path": "dSFMT-src-2.2.3/dSFMT.c",
+                "line_start": 526,
+                "line_end": 544
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause wrapper and bundled core",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "d691baf1ac458b4719a060d6cd89cf272ea8b538",
+          "reviewed_on": "2026-11-05",
+          "notes": "Both pinned wrapper and bundled core carry three-clause redistribution/endorsement terms, as the README states. This review does not cover every extra serialization component or build dependency.",
+          "evidence": [
+            {
+              "path": "dSFMT_F03_interface/LICENSE.txt",
+              "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/dSFMT_F03_interface/LICENSE.txt",
+              "sha256": "1f1c864b9b65da911be7df2348c596320a14a171b8feef07b7d15c7881ad60a7"
+            },
+            {
+              "path": "dSFMT-src-2.2.3/LICENSE.txt",
+              "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/dSFMT-src-2.2.3/LICENSE.txt",
+              "sha256": "f28558971bbbcd9c947ea6603053a6ce077a481521503008628536bbb96755dd"
+            },
+            {
+              "path": "README.rst",
+              "url": "https://github.com/jsspencer/dSFMT_F03_interface/blob/d691baf1ac458b4719a060d6cd89cf272ea8b538/README.rst",
+              "sha256": "77afa40769c71728ae9b055dbb113b6a11851d124930c12374c742af88d59f89"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14483,12 +14770,103 @@
             ],
             "notes": "The README distinguishes integer/double-precision and Fortran 66/77 versions and describes a retrocomputing focus. No preference over modern generators or statistical/cryptographic certification is implied.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "e697d50f5053a7b49eebdb37af1ca256721270d7",
+            "reviewed_on": "2026-11-05",
+            "notes": "The F77 double-precision RNFARR copies a 100-value state, extends it by lag-100/37 modular floating-point additions and updates saved COMMON /RSTATE/. RNFSTR expands an integer seed, mixes its state and warms up the generator. L6a21 records floating-point uniform generation; the integer and Fortran-IV variants are not covered. RNFARR always writes its first 100 outputs regardless of N, so require N>=100 and seed explicitly first. Shared COMMON state is not independent per caller/thread. The separate scalar RNDNXD/RNDCYD convenience path reseeds to 314159 whenever its buffer refills, repeating blocks rather than continuously advancing; the sketch avoids it. No reference sequence, period, distribution or wrapper failure was run.",
+            "evidence": [
+              {
+                "path": "KFLRNGD/F77/knuth-frngdb.f",
+                "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/KFLRNGD/F77/knuth-frngdb.f",
+                "sha256": "0a76c787111c22a38139eb3753cd870bef1519f13fb7b301b3709ff978e0409d"
+              },
+              {
+                "path": "KFLRNGD/F77/kflrngd-rngnxt.f",
+                "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/KFLRNGD/F77/kflrngd-rngnxt.f",
+                "sha256": "eb0eae8c80d14cd5e20e07497b7ca979ab8d39054b4f4553967c2f904b8b0546"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/README.md",
+                "sha256": "945b19ad34e8728aa1a9f5a1b13bae223ac2831af856ae72ff27d7d9136673bb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RNFSTR",
+                "role": "public-entry-point",
+                "summary": "External default-integer seed initializer for the F77 floating-point generator. Initializes shared COMMON state, not an opaque generator object. Call before RNFARR.",
+                "signature": "CALL RNFSTR(SEED)",
+                "declarations": [
+                  {
+                    "path": "KFLRNGD/F77/knuth-frngdb.f",
+                    "line_start": 83,
+                    "line_end": 100
+                  }
+                ],
+                "path": "KFLRNGD/F77/knuth-frngdb.f",
+                "line_start": 83,
+                "line_end": 151,
+                "usage": "external :: rnfstr,rnfarr\ndouble precision :: buffer(1009)\ncall rnfstr(12345)\ncall rnfarr(buffer,1009)\n! For a buffered stream, retain a documented prefix and refill with RNFARR.\n! Do not use the reseeding scalar convenience wrapper as an equivalent stream.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the F77 double-precision source using fixed-form settings. RNFARR requires capacity and N of at least 100; no length/status validation is present. Respect the author/Knuth guidance on output consumption and generator caveats rather than asserting all outputs are independent. COMMON state is shared; no concurrency or bitwise-reference test was executed."
+              },
+              {
+                "procedure": "RNFARR",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION assumed-size output array and default-integer N. Uses/updates shared seeded state; writes at least 100 elements and has no status output.",
+                "signature": "CALL RNFARR(AA, N)",
+                "declarations": [
+                  {
+                    "path": "KFLRNGD/F77/knuth-frngdb.f",
+                    "line_start": 20,
+                    "line_end": 34
+                  }
+                ],
+                "path": "KFLRNGD/F77/knuth-frngdb.f",
+                "line_start": 20,
+                "line_end": 75
+              },
+              {
+                "procedure": "RNDCYD",
+                "role": "implementation-helper",
+                "path": "KFLRNGD/F77/kflrngd-rngnxt.f",
+                "line_start": 67,
+                "line_end": 88
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Public-domain dedication statement",
+          "spdx_expression": null,
+          "revision": "e697d50f5053a7b49eebdb37af1ca256721270d7",
+          "reviewed_on": "2026-11-05",
+          "notes": "COPYING states the code is put in the public domain as the original Knuth code. Record that wording without converting it into an unsupported CC0 SPDX identifier or a complete provenance audit.",
+          "evidence": [
+            {
+              "path": "COPYING",
+              "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/COPYING",
+              "sha256": "d7911933bdcdbc10b708ee04f3db23aef7b7eee6e261a8d8df125522fde8a792"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/README.md",
+              "sha256": "945b19ad34e8728aa1a9f5a1b13bae223ac2831af856ae72ff27d7d9136673bb"
+            },
+            {
+              "path": "KFLRNGD/F77/knuth-frngdb.f",
+              "url": "https://github.com/marcoxa/Knuth-FLRNG/blob/e697d50f5053a7b49eebdb37af1ca256721270d7/KFLRNGD/F77/knuth-frngdb.f",
+              "sha256": "0a76c787111c22a38139eb3753cd870bef1519f13fb7b301b3709ff978e0409d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14924,12 +15302,113 @@
             ],
             "notes": "The README identifies the MELG-64 family and original implementation. Equidistribution and statistical-quality results from its references have not been independently reproduced for this translation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "c3c0ac28df550fd56b233887fb57585a6595537e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected MELG19937-64 variant supplies masks/lags to an explicit-state XOR/shift recurrence with a lung word and four index-selector phases. Scalar initialize expands a seed into 311 INT64 words and lung state. Inherited genrand64_real2 takes the upper 53 output bits and scales by 2^-53 for an intended [0,1) grid. L6a21 records this variant and conversion, not a proof of maximal equidistribution or every parameter set. Initialize before use: public index/selector/lung and allocated state must remain consistent. Seed expansion uses signed multiplication/addition assuming modular wrapping. Other interval variants, array seeds, jump polynomials and statistical/reference tests are outside this review; no sequence was executed.",
+            "evidence": [
+              {
+                "path": "src/melg_64_utility.f90",
+                "url": "https://github.com/DSCF-1224/melg-64-fortran/blob/c3c0ac28df550fd56b233887fb57585a6595537e/src/melg_64_utility.f90",
+                "sha256": "76c2c03220d5577cba1ed343cee9378a357264108cf07d73a7245b3c9b0e0926"
+              },
+              {
+                "path": "src/melg19937_64.f90",
+                "url": "https://github.com/DSCF-1224/melg-64-fortran/blob/c3c0ac28df550fd56b233887fb57585a6595537e/src/melg19937_64.f90",
+                "sha256": "b86f136f5d6db4a72f6b0949d81f01429e796424d3d51f806934ecbee1e2a913"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/DSCF-1224/melg-64-fortran/blob/c3c0ac28df550fd56b233887fb57585a6595537e/README.md",
+                "sha256": "51e4630ba8bdf507fe2e2401f8100112007e86e4c2b407950b0006abb0f70829"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "genrand64_real2",
+                "role": "public-entry-point",
+                "summary": "Inherited public REAL(REAL64) scalar-output subroutine on type_melg19937_64. Initialize with an INT64 scalar seed, then each call advances object-owned recurrence state. This real2 path excludes 1 by upper-bit scaling.",
+                "signature": "CALL generator%genrand64_real2(harvest)",
+                "declarations": [
+                  {
+                    "path": "src/melg_64_utility.f90",
+                    "line_start": 84,
+                    "line_end": 109
+                  },
+                  {
+                    "path": "src/melg_64_utility.f90",
+                    "line_start": 745,
+                    "line_end": 757
+                  },
+                  {
+                    "path": "src/melg19937_64.f90",
+                    "line_start": 91,
+                    "line_end": 112
+                  }
+                ],
+                "path": "src/melg_64_utility.f90",
+                "line_start": 745,
+                "line_end": 759,
+                "module": "melg19937_64",
+                "derived_type": "type_melg19937_64",
+                "usage": "use iso_fortran_env, only: int64,real64\nuse melg19937_64, only: type_melg19937_64\ntype(type_melg19937_64) :: generator\nreal(real64) :: u\ncall generator%initialize(12345_int64)\ncall generator%genrand64_real2(u)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile melg_64_utility before melg19937_64, using supported BOZ/TRANSFER constants and intended integer wrap behavior. Do not directly edit state/index/selector/lung fields. No jump-distance, independent-stream, reference-bit or randomness-quality certificate follows from this source mapping."
+              },
+              {
+                "procedure": "initialize",
+                "role": "public-entry-point",
+                "summary": "Public inherited generic, shown for one INT64 seed. Reallocates/fills the state and resets selector/index; array-seed overload is outside the sketch.",
+                "signature": "CALL generator%initialize(seed)",
+                "declarations": [
+                  {
+                    "path": "src/melg_64_utility.f90",
+                    "line_start": 99,
+                    "line_end": 109
+                  },
+                  {
+                    "path": "src/melg_64_utility.f90",
+                    "line_start": 434,
+                    "line_end": 443
+                  }
+                ],
+                "path": "src/melg_64_utility.f90",
+                "line_start": 434,
+                "line_end": 469,
+                "module": "melg19937_64",
+                "derived_type": "type_melg19937_64"
+              },
+              {
+                "procedure": "genrand64_int64",
+                "role": "implementation-helper",
+                "path": "src/melg_64_utility.f90",
+                "line_start": 535,
+                "line_end": 706,
+                "module": "melg_64_utility"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "c3c0ac28df550fd56b233887fb57585a6595537e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies MIT terms for the Fortran translation. This scope does not certify every reference-code attribution or external generator property.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DSCF-1224/melg-64-fortran/blob/c3c0ac28df550fd56b233887fb57585a6595537e/LICENSE",
+              "sha256": "eea872987ab50f6c0a0557677bcd6393272679b949fb21dee6024520e5c7dcd4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15696,12 +16175,113 @@
             ],
             "notes": "The README distinguishes extensions of Rouwenhorst and Tauchen discretizations. This is transition/state approximation of a stochastic process, not a parameter-estimation routine for arbitrary Markov models.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "M1a",
+            "level": "source-reviewed",
+            "revision": "761d3a4806175d3eba60b2e651cfb0c1de62a70c",
+            "reviewed_on": "2026-11-05",
+            "notes": "lcrouwenhorst propagates unconditional standard deviations of a supplied time-varying AR(1), creates a finite symmetric state grid, and recursively constructs Rouwenhorst transition matrices. lctauchen instead forms time-varying grids and Gaussian bin probabilities using ERF. M1a records finite-state discrete stochastic-model construction for simulation, not random path generation or fitted AR parameters. Both assume y(0)=0; rho(1) does not set a stationary initial variance. Output trans(i,j,t) is row-oriented from period t-1 to t, with identical first-period rows. Caller must provide compatible T vectors, N>=2 states, nonzero innovations/variance and valid positive grid scales; no status, input validation or probability/moment check is returned. No chain or approximation-error test was run.",
+            "evidence": [
+              {
+                "path": "mod_lcrouwenhorst.f90",
+                "url": "https://github.com/gfell/nsmarkov-fortran/blob/761d3a4806175d3eba60b2e651cfb0c1de62a70c/mod_lcrouwenhorst.f90",
+                "sha256": "4a0883e98719a2a6e24a1d42bf4e7bd8ce949349b0d1f79ffcb4976b41e7c77a"
+              },
+              {
+                "path": "mod_lctauchen.f90",
+                "url": "https://github.com/gfell/nsmarkov-fortran/blob/761d3a4806175d3eba60b2e651cfb0c1de62a70c/mod_lctauchen.f90",
+                "sha256": "3cafe61b371cbbb8f0ebb9dc47f259e68fc1ac887fcaca5e8fa83b22008b7628"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/gfell/nsmarkov-fortran/blob/761d3a4806175d3eba60b2e651cfb0c1de62a70c/README.md",
+                "sha256": "a06fa8ef529b4f5848b40e327415b1f487ad06aaa7ce3b54466209c24c28c11a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lcrouwenhorst",
+                "role": "public-entry-point",
+                "summary": "Public module finite-state AR(1) approximation. Inputs rho(T), sigma_eps(T) use SELECTED_REAL_KIND(15,307); preallocate output y_grid(N,T), trans(N,N,T). The routine builds transition probabilities and grids; it does not draw observations.",
+                "signature": "CALL lcrouwenhorst(rho, sigma_eps, y_grid, trans)",
+                "declarations": [
+                  {
+                    "path": "mod_lcrouwenhorst.f90",
+                    "line_start": 1,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "mod_lcrouwenhorst.f90",
+                    "line_start": 24,
+                    "line_end": 35
+                  }
+                ],
+                "path": "mod_lcrouwenhorst.f90",
+                "line_start": 6,
+                "line_end": 109,
+                "module": "mod_lcrouwenhorst",
+                "usage": "use mod_lcrouwenhorst, only: lcrouwenhorst\ninteger, parameter :: dp=selected_real_kind(15,307),n=5,t=4\nreal(dp) :: rho(t),sigma_eps(t),grid(n,t),transition(n,n,t)\nrho=0.8_dp; sigma_eps=0.1_dp\ncall lcrouwenhorst(rho,sigma_eps,grid,transition)\n! Check nonnegativity, row sums and model moments independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use at least two states and one period with compatible shapes; avoid zero standard deviations in formulas that divide by sigma. The first grid represents a process starting from zero, not stationary initialization. The returned chain is an approximation to the continuous-valued AR process; neither transition probabilities nor moments were checked by execution."
+              },
+              {
+                "procedure": "lctauchen",
+                "role": "public-entry-point",
+                "summary": "Public alternative using normal-bin probabilities and omega(T) range multipliers. Uses the same row/time indexing and preallocated grid/transition outputs; positive sigma_eps and omega are required.",
+                "signature": "CALL lctauchen(rho, sigma_eps, omega, y_grid, trans)",
+                "declarations": [
+                  {
+                    "path": "mod_lctauchen.f90",
+                    "line_start": 6,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "mod_lctauchen.f90",
+                    "line_start": 26,
+                    "line_end": 36
+                  }
+                ],
+                "path": "mod_lctauchen.f90",
+                "line_start": 6,
+                "line_end": 97,
+                "module": "mod_lctauchen"
+              },
+              {
+                "procedure": "rhmat",
+                "role": "implementation-helper",
+                "path": "mod_lcrouwenhorst.f90",
+                "line_start": 80,
+                "line_end": 107
+              },
+              {
+                "procedure": "cdf_normal",
+                "role": "implementation-helper",
+                "path": "mod_lctauchen.f90",
+                "line_start": 99,
+                "line_end": 109,
+                "module": "mod_lctauchen"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT-style text with citation request",
+          "spdx_expression": null,
+          "revision": "761d3a4806175d3eba60b2e651cfb0c1de62a70c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned file identifies MIT terms and adds a numbered request to cite the package/paper. Preserve that supplied wording rather than silently replacing it with a bare standard template.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/gfell/nsmarkov-fortran/blob/761d3a4806175d3eba60b2e651cfb0c1de62a70c/LICENSE.md",
+              "sha256": "6283382328aa29df555d35d66fe8c99c8fe4d59f8e308c322c555179ad1edd93"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19301,12 +19881,141 @@
             ],
             "notes": "The README identifies Fortran kernels with C/Python interfaces and optional LAPACK building. Reported speed and precision differences between examples are not independently benchmarked here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a3a",
+            "level": "source-reviewed",
+            "revision": "e5c2d027f3ea4a49dbc9765cc6970247fee34fed",
+            "reviewed_on": "2026-11-05",
+            "notes": "The complex esprit_c path builds an uncentered delayed-sample Gram matrix, obtains its left singular subspace, solves normal equations for the shifted-subspace operator through LU/inversion, and estimates tone frequencies from eigenvalue angles. L10a3a records parametric spectral/frequency estimation, not a periodogram or the advertised but unreviewed RootMUSIC interface. Output folds frequency signs with ABS and does not sort tones. Source findings need repair: IPIV is declared COMPLEX rather than INTEGER for ZGETRF/ZGETRI, sigma(L) is assigned S(:L/2,1) with an incompatible extent, and the covariance builder omits a sliding window/divides by N. Error paths use ERROR STOP rather than returned status. No frequency, subspace or accuracy test was run.",
+            "evidence": [
+              {
+                "path": "src/subspace_complex.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/subspace_complex.f90",
+                "sha256": "2782794c333747327cb572d8beb11cf433ee1396bb698f23c4d9503c1211ad49"
+              },
+              {
+                "path": "src/subspace.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/subspace.f90",
+                "sha256": "045f5c8c8c5a5266f8b18b1eba303a28278c02f548e1fc576985ff1235fc49b7"
+              },
+              {
+                "path": "src/covariance.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/covariance.f90",
+                "sha256": "7a989ede21da800892d56d4fbb2f22a8566a4940df126fd1e9e42e337f312519"
+              },
+              {
+                "path": "src/comm.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/comm.f90",
+                "sha256": "4257222545ba0e1b947d8405f6fbd33d8761c76da26f66590218fc1801956f80"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/README.md",
+                "sha256": "863e4c67ca32701ef70d48bea96b5f87662a7edf89ec560fcba42c2950a48820"
+              },
+              {
+                "path": "test/RunSubspace.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/test/RunSubspace.f90",
+                "sha256": "03910d0437600f5c4add207aa8c92ed4767dbbf3b1ef53d91af8690cdee5a3d8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "esprit_c",
+                "role": "public-entry-point",
+                "summary": "Public module procedure implemented in a submodule, with C_DOUBLE_COMPLEX samples and C_DOUBLE frequency/sample-rate values. Inputs N samples, L modeled complex tones and M embedding size; outputs tones(L), sigma(L). Source fixes are required before treating this as a working driver.",
+                "signature": "CALL esprit_c(x, N, L, M, fs, tones, sigma)",
+                "declarations": [
+                  {
+                    "path": "src/subspace.f90",
+                    "line_start": 15,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "src/comm.f90",
+                    "line_start": 1,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/subspace_complex.f90",
+                "line_start": 9,
+                "line_end": 77,
+                "module": "subspace",
+                "usage": "use subspace, only: esprit_c\n! Supply complex(C_DOUBLE_COMPLEX) x(N), real(C_DOUBLE) fs/tones(L)/sigma(L).\n! Choose 1<=L<M<N and implement/check the recorded pivot/output repairs first.\ncall esprit_c(x,n,l,m,fs,tones,sigma)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment requiring source repair, not a checked frequency-estimation example. Compile the parent module and submodule and link compatible complex-double LAPACK/BLAS. Correct IPIV integer ABI and sigma extent/meaning, then independently validate covariance windows, model order, frequency sign/aliasing and residuals. No complete library API or RootMUSIC coverage is inferred."
+              }
+            ]
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "e5c2d027f3ea4a49dbc9765cc6970247fee34fed",
+            "reviewed_on": "2026-11-05",
+            "notes": "autocov_c builds outer products of reversed delayed complex sample windows with conjugate transpose and scales their sum by N. L10a2a1 records a lagged autocovariance-like matrix service, scoped to zero-mean input: no sample mean is removed. For N>M the loop uses N-M windows rather than all N-M+1 available windows and divides by N rather than its window count; this normalization/window convention is recorded rather than silently described as an unbiased estimate. N>=M>=1 and compatible storage are caller obligations. No covariance, PSD, normalization or sampling-distribution check was run.",
+            "evidence": [
+              {
+                "path": "src/covariance.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/covariance.f90",
+                "sha256": "7a989ede21da800892d56d4fbb2f22a8566a4940df126fd1e9e42e337f312519"
+              },
+              {
+                "path": "src/comm.f90",
+                "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/src/comm.f90",
+                "sha256": "4257222545ba0e1b947d8405f6fbd33d8761c76da26f66590218fc1801956f80"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "autocov_c",
+                "role": "public-entry-point",
+                "summary": "Public pure module delayed-window second-moment routine. x(N) and C(M,M) use complex(C_DOUBLE_COMPLEX); N/M use C_INT. Returns an uncentered matrix and no status. The real single-precision sibling is outside this selected interface.",
+                "signature": "CALL autocov_c(x, N, M, C)",
+                "declarations": [
+                  {
+                    "path": "src/covariance.f90",
+                    "line_start": 1,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "src/covariance.f90",
+                    "line_start": 18,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/comm.f90",
+                    "line_start": 1,
+                    "line_end": 7
+                  }
+                ],
+                "path": "src/covariance.f90",
+                "line_start": 18,
+                "line_end": 50,
+                "module": "covariance",
+                "usage": "use iso_c_binding, only: c_int,c_double_complex\nuse covariance, only: autocov_c\ncomplex(c_double_complex) :: x(8),c(3,3)\n! Fill x with finite centered data. The following only demonstrates call shape.\nx=cmplx(1.0,0.0,kind=c_double_complex)\ncall autocov_c(x,8_c_int,3_c_int,c)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The constant sample is not centered, so its result is a raw second moment, not a covariance estimate after mean removal. Correct/choose the window-count and normalization policy before statistical use. This mapping does not verify the companion ESPRIT solver; no numerical covariance was computed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "e5c2d027f3ea4a49dbc9765cc6970247fee34fed",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies MIT terms attributed to Michael Hirsch. BLAS/LAPACK and other dependencies are separate; no whole-dependency audit is implied.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/scivision/signal_subspace/blob/e5c2d027f3ea4a49dbc9765cc6970247fee34fed/LICENSE.txt",
+              "sha256": "9b8abe5a498800861d4c4d6c4f68a6057001ef8359520b27e0a63916d587c0c9"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21669,12 +22378,113 @@
             ],
             "notes": "The README identifies the original ACM algorithm and source/licensing reference. These are specialized filtering routines, not a general covariance-estimation or arbitrary-state-space package.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2e",
+            "level": "source-reviewed",
+            "revision": "523bb13734b73d8f3f10c0ad1847aa89c60de019",
+            "reviewed_on": "2026-11-05",
+            "notes": "SRCF forms a square-root covariance pre-array from R, C*S, A*S and B*Q (or a pre-multiplied B), triangularizes it with Householder helpers, and copies the updated lower factor S and optional combined-update gain K. SRIF constructs the corresponding information pre-array, triangularizes it and optionally solves for state X. L10a2e is scoped to scalar-observation (P=1) state-space filtering; the interfaces can also accept multiple observations, but no multivariate mapping is added here. SRCF updates covariance/gain only, not a complete observed-state trajectory. WITHK/WITHX are input requests that may be cleared by a condition estimate, leaving optional outputs unavailable. Inputs are triangular square-root/inverse-factor forms, not arbitrary covariance matrices; leading dimensions/workspace are caller responsibilities. No Kalman recursion, covariance identity or author driver was run.",
+            "evidence": [
+              {
+                "path": "src/SRCF.F",
+                "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/src/SRCF.F",
+                "sha256": "e31b1a3da979b72ebd75da5e44a6f7a7ffaa2455b722a0fb138cb5f6300f7197"
+              },
+              {
+                "path": "src/SRIF.F",
+                "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/src/SRIF.F",
+                "sha256": "c5f74def6d48ac5e4a859d0c8ffe5c2bd92a34b0289ebb86f039e7161d166e7a"
+              },
+              {
+                "path": "drivers/SRCF_DRIVER.F",
+                "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/drivers/SRCF_DRIVER.F",
+                "sha256": "f7407ef36845f315f224f4fefb1cac6b4f044486db07c3262f1b84c8313de3a3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/README.md",
+                "sha256": "36cb8ac4a2a7724b4a01606e7b0ea0d5dbb72c9958cd22d5f3b34fcae61f7cef"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SRCF",
+                "role": "public-entry-point",
+                "summary": "External double-precision combined covariance update. S lower factor is overwritten; WITHK requests K and can be set false. MULTBQ=true means B already supplies the required B*Q product. For positive dimensions, WRK needs at least (P+N) rows and (P+N+M) columns.",
+                "signature": "CALL SRCF(S, LDS, A, LDA, B, LDB, Q, LDQ, C, LDC, R, LDR, &\n          N, M, P, K, LDK, WRK, LDW, MULTBQ, WITHK, TOL)",
+                "declarations": [
+                  {
+                    "path": "src/SRCF.F",
+                    "line_start": 1,
+                    "line_end": 2
+                  },
+                  {
+                    "path": "src/SRCF.F",
+                    "line_start": 23,
+                    "line_end": 30
+                  }
+                ],
+                "path": "src/SRCF.F",
+                "line_start": 1,
+                "line_end": 132,
+                "examples": [
+                  {
+                    "path": "drivers/SRCF_DRIVER.F",
+                    "line_start": 64,
+                    "line_end": 94
+                  }
+                ],
+                "usage": "external :: srcf\ndouble precision :: s(1,1),a(1,1),b(1,1),q(1,1),c(1,1),r(1,1),k(1,1),work(2,3)\nlogical :: withk,multbq\ns=1.0d0; a=0.9d0; b=0.1d0; q=0.3d0; c=1.0d0; r=0.2d0\nwithk=.true.; multbq=.false.\ncall srcf(s,1,a,1,b,1,q,1,c,1,r,1,1,1,1,k,1,work,2,multbq,withk,1.0d-12)\n! Inspect withk before using k; s is an updated factor, not a state estimate.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Scalar interface sketch using square-root factors. Link the supplied NAG-style helpers, DTRCO and compatible BLAS. With P=1 this is a univariate observation stream even if a larger application uses a vector state. There is no INFO/output-accuracy flag; inspect WITHK and independently verify factor/gain conventions. Larger triangular factors require correct stored triangles and sufficient workspace."
+              },
+              {
+                "procedure": "SRIF",
+                "role": "public-entry-point",
+                "summary": "External square-root information update. T upper information factor and optional X are updated; requires AINV and inverse noise-factor conventions. WITHX can be cleared by conditioning, and MULTAB/MULTRC select pre-multiplied inputs.",
+                "signature": "CALL SRIF(T, LDT, AINV, LDA, B, LDB, RINV, LDR, C, LDC, &\n          QINV, LDQ, X, RINVY, W, N, M, P, WRK, LDW, &\n          MULTAB, MULTRC, WITHX, TOL)",
+                "declarations": [
+                  {
+                    "path": "src/SRIF.F",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "src/SRIF.F",
+                    "line_start": 24,
+                    "line_end": 32
+                  }
+                ],
+                "path": "src/SRIF.F",
+                "line_start": 1,
+                "line_end": 148
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "ACM Software License Agreement per README",
+          "spdx_expression": null,
+          "revision": "523bb13734b73d8f3f10c0ad1847aa89c60de019",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned README explicitly makes use subject to the linked ACM Software License Agreement. The repository does not supply a separate license text; this records that scoped notice rather than inferring MIT/BSD terms for the Netlib-distributed implementation.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/README.md",
+              "sha256": "36cb8ac4a2a7724b4a01606e7b0ea0d5dbb72c9958cd22d5f3b34fcae61f7cef"
+            },
+            {
+              "path": "src/SRCF.F",
+              "url": "https://github.com/ivan-pi/TOMS-Algorithm-675/blob/523bb13734b73d8f3f10c0ad1847aa89c60de019/src/SRCF.F",
+              "sha256": "e31b1a3da979b72ebd75da5e44a6f7a7ffaa2455b722a0fb138cb5f6300f7197"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24017,12 +24827,178 @@
             ],
             "notes": "The usage document specifies column, lag, mean-subtraction and complex-input controls and FFTW 3.1.2. Correlation computation is not a complete time-series model fitting or forecasting system.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "bdfe202ffccd21aff3fdaaabbd482fb464f525c1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected real-data path zero-pads and transforms file columns, multiplies each spectrum by its conjugate, inverse-transforms and divides lag k by N-k. L10a2a1 records autocorrelation/autocovariance summaries. Values are not divided by lag-zero variance and therefore are not necessarily unit-normalized correlations. The default mean path sums the entire allocated capacity, including undefined unused tail entries; the sketch uses -nave and already-centered data. Contrary to README wording, oversized nacf is not clamped and can divide by zero or exceed valid sample ranges. Lag time is copied from the time column without checking uniform spacing. Complex paths/FFTW kernels are outside this review. No correlation was executed.",
+            "evidence": [
+              {
+                "path": "main.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/main.f90",
+                "sha256": "235c8020d345d763929f29d483af79dea82612447e6d8b561b85a54fafe74863"
+              },
+              {
+                "path": "real.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/real.f90",
+                "sha256": "1ee58e2340bfc0a8c43365b70aa8b077bd2d79fdd96a6bd4e86020d9bd0f01ce"
+              },
+              {
+                "path": "real_cross.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/real_cross.f90",
+                "sha256": "5cb87de3d879c77084d192423390cf2250db4665b7daf6d9e4c6a88e3129064b"
+              },
+              {
+                "path": "vardef.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/vardef.f90",
+                "sha256": "7604a3343c57f8fddea84532d7e07c93b24d8413a7cfa6bc4fcdaed120c62cca"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/README",
+                "sha256": "6f8871060a609e64fa07c981068d840ecb0a0a34b18e57805cbae6ccddfa43e5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "main",
+                "role": "program-entry-point",
+                "summary": "Standalone acf command operating on numeric file columns and a time column. Select data columns for autocorrelation. This is a file-based program, not an array-valued library API. The sketch disables the broken mean-subtraction path and assumes centered data.",
+                "signature": "acf -nave -n lag_count -o output_file input_file columns",
+                "declarations": [
+                  {
+                    "path": "main.f90",
+                    "line_start": 13,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "main.f90",
+                    "line_start": 35,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "README",
+                    "line_start": 8,
+                    "line_end": 33
+                  }
+                ],
+                "path": "main.f90",
+                "line_start": 1,
+                "line_end": 131,
+                "usage": "acf -nave -n 10 -o correlation.dat centered.dat 2",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Command sketch: provide a numeric file with an evenly spaced time column 1 and at least ten samples; data columns must already be centered if covariance-like output is wanted. Link FFTW legacy Fortran entry points and supply fftw3.f. Enforce 1<=lag_count<=sample count yourself. Output index one is zero lag, so ten outputs cover lags 0 through 9, not 0 through 10."
+              },
+              {
+                "procedure": "real_fft_2_acf",
+                "role": "implementation-helper",
+                "path": "real.f90",
+                "line_start": 1,
+                "line_end": 92
+              }
+            ]
+          },
+          {
+            "code": "L10b2a",
+            "level": "source-reviewed",
+            "revision": "bdfe202ffccd21aff3fdaaabbd482fb464f525c1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected real-data path zero-pads and transforms file columns, multiplies conjugate(first spectrum) by the second spectrum, inverse-transforms and divides lag k by N-k. L10b2a records two-series cross-correlation summary statistics. Values are not divided by lag-zero variance and therefore are not necessarily unit-normalized correlations. The default mean path sums the entire allocated capacity, including undefined unused tail entries; the sketch uses -nave and already-centered data. Contrary to README wording, oversized nacf is not clamped and can divide by zero or exceed valid sample ranges. Lag time is copied from the time column without checking uniform spacing. Complex paths/FFTW kernels are outside this review. No correlation was executed.",
+            "evidence": [
+              {
+                "path": "main.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/main.f90",
+                "sha256": "235c8020d345d763929f29d483af79dea82612447e6d8b561b85a54fafe74863"
+              },
+              {
+                "path": "real.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/real.f90",
+                "sha256": "1ee58e2340bfc0a8c43365b70aa8b077bd2d79fdd96a6bd4e86020d9bd0f01ce"
+              },
+              {
+                "path": "real_cross.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/real_cross.f90",
+                "sha256": "5cb87de3d879c77084d192423390cf2250db4665b7daf6d9e4c6a88e3129064b"
+              },
+              {
+                "path": "vardef.f90",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/vardef.f90",
+                "sha256": "7604a3343c57f8fddea84532d7e07c93b24d8413a7cfa6bc4fcdaed120c62cca"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/README",
+                "sha256": "6f8871060a609e64fa07c981068d840ecb0a0a34b18e57805cbae6ccddfa43e5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "main",
+                "role": "program-entry-point",
+                "summary": "Standalone acf command operating on numeric file columns and a time column. Select two data columns with -cross. This is a file-based program, not an array-valued library API. The sketch disables the broken mean-subtraction path and assumes centered data.",
+                "signature": "acf -cross -nave -n lag_count -o output_file input_file columns",
+                "declarations": [
+                  {
+                    "path": "main.f90",
+                    "line_start": 13,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "main.f90",
+                    "line_start": 35,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "README",
+                    "line_start": 8,
+                    "line_end": 33
+                  }
+                ],
+                "path": "main.f90",
+                "line_start": 1,
+                "line_end": 131,
+                "usage": "acf -cross -nave -n 10 -o correlation.dat centered.dat 2 3",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Command sketch: provide a numeric file with an evenly spaced time column 1 and at least ten samples; data columns must already be centered if covariance-like output is wanted. Link FFTW legacy Fortran entry points and supply fftw3.f. Enforce 1<=lag_count<=sample count yourself. Output index one is zero lag, so ten outputs cover lags 0 through 9, not 0 through 10."
+              },
+              {
+                "procedure": "real_fft_2_ccf",
+                "role": "implementation-helper",
+                "path": "real_cross.f90",
+                "line_start": 1,
+                "line_end": 92
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "bdfe202ffccd21aff3fdaaabbd482fb464f525c1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed files identify the author but supply no explicit reuse grant, and no separately named LICENSE/COPYING appears in the pinned tree. FFTW is a separately linked dependency with its own terms.",
+          "evidence": [
+            {
+              "path": "README",
+              "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/README",
+              "sha256": "6f8871060a609e64fa07c981068d840ecb0a0a34b18e57805cbae6ccddfa43e5"
+            },
+            {
+              "path": "main.f90",
+              "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/main.f90",
+              "sha256": "235c8020d345d763929f29d483af79dea82612447e6d8b561b85a54fafe74863"
+            },
+            {
+              "path": "real.f90",
+              "url": "https://github.com/lingtikong/ACFbyFFT/blob/bdfe202ffccd21aff3fdaaabbd482fb464f525c1/real.f90",
+              "sha256": "1ee58e2340bfc0a8c43365b70aa8b077bd2d79fdd96a6bd4e86020d9bd0f01ce"
+            }
+          ]
         }
       },
       "imports": {}
