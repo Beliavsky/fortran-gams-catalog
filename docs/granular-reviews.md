@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 220 repositories now have 271 source-reviewed
+Reviewed on 2026-11-05. 228 repositories now have 282 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-213 repository cards now identify public routines and link their usage lines
+221 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 220 independently source-reviewed repositories now have an
+separately. All 228 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -244,6 +244,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fortran-weno | `weno_square_mod::weno_square_type%init/%calc_ideal_coefs/%reconstruct` | No license grant identified in reviewed material |
 | polynomial_arnoldi | `polynomial_arnoldi::gmres`, restricted to external `Poisson2D` | No license grant identified in reviewed material |
 | tri_indices | `mod_tri_indices::pack_tri_indices`, `unpack_tri_indices`; selected INT64 overloads | MIT |
+| NSWC | `DREXP`, `DLNREL` | Availability notice; explicit reuse grant unresolved |
+| SLATEC | `special_functions::ALNREL`, `SPENC` | Government disclaimer; reuse grant unresolved |
+| special_functions (ameli) | AMOS `ZBESJ`, `ZBESK` (split-real complex interface) | BSD-3-Clause root; bundled AMOS scope separate |
+| GGQ | `chebyshev_quad::chebquad` | No explicit project reuse grant identified |
+| StochOptim | `Evolutionary` constructor and `%optimize` (serial DE/rand1) | MIT |
+| dfsaneacc | `bmqrf::bmqr`, `extractQ`, `extractR`, `bmqrsolve` | GPL-3 package metadata |
+| MINUIT | `MNINIT`, `MNPARM`, `MNEXCM`, `MNSTAT`, `MNPOUT` | GPL version 2 text; version scope unresolved |
+| Statlib | AS241 `PPND7`, `PPND16` | Royal Statistical Society no-fee distribution permission |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -483,6 +491,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fortran-weno](https://github.com/dongli/fortran-weno) | E2a | Tensor-polynomial WENO-Z reconstruction from 2D cell averages | Resolve inversion helper's unassigned success IERR before relying on setup. Uses REAL(16) setup; no positivity or accuracy guarantee. |
 | [polynomial_arnoldi](https://github.com/loiseaujc/polynomial_arnoldi) | D2 | Restarted GMRES with reorthogonalized Arnoldi and Givens rotations | Poisson2D-only external operator API; internal tolerance, no returned status. Zero RHS and inner-cycle budget boundaries need care. |
 | [tri_indices](https://github.com/yymmt742/tri_indices) | D1b9 | Index mapping for upper-triangle packed matrix storage | Index service only, without copying matrix values. Integer intermediates can overflow; inverse uses default-real SQRT even for INT64. |
+| [NSWC](https://github.com/jacobwilliams/nswc) | C4b | Cancellation-aware double-precision exponential-minus-one and log-one-plus transformations | No returned status; logarithm requires finite a > -1. |
+| [SLATEC](https://github.com/MehdiChinoune/SLATEC) | C4b; C5 | Single-precision log-one-plus and real Spence dilogarithm branches | ALNREL can ERROR STOP; SPENC returns a real continuation, not a complex branch. |
+| [special_functions (ameli)](https://github.com/ameli/special_functions) | C10a4; C10b4 | AMOS J/K sequences for complex argument and nonnegative real orders; distinct scaling and underflow conventions | Split real/imaginary arrays; inspect IERR and NZ and link the AMOS dependencies. |
+| [GGQ](https://github.com/JamesCBremerJr/GGQ) | H2c | Generalized Chebyshev rule construction from discretization-weighted basis samples | Requires weighted samples and an initialized discretization; no positive-weight guarantee. |
+| [StochOptim](https://github.com/keurfonluu/stochoptim) | G2i | Serial bound-constrained differential evolution, explicitly selecting DE/rand1 | Strictly positive bound widths; biased boundary repair and objective-offset-dependent stopping. |
+| [dfsaneacc](https://github.com/cran/dfsaneacc) | D5; D9a1 | Pivoted Householder QR support and its full-column-rank least-squares branch; nonlinear solver remains R code | Requires REXIT hooks; least-squares claim restricted to full column rank. |
+| [MINUIT](https://github.com/ramos/minuit) | G1b1a | Unbounded smooth minimization through the derivative-free SIMPLEX command | Shared state and precision-dependent callbacks; covariance status is separate from command status. |
+| [Statlib](https://github.com/jacobwilliams/statlib) | L5a2n | AS241 inverse standard-normal distribution functions | Finite 0<P<1; invalid inputs return a zero sentinel with IFAULT. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -937,3 +953,12 @@ arbitrary-matrix or unrestricted sparse-solver interface.
 All new sketches remain uncompiled and unrun. Source review and linked upstream
 examples do not establish numerical accuracy, successful builds or complete
 component-license provenance. The generated ledger retains pins and file hashes.
+
+The special-function interfaces retain their actual precision, scaling and error
+conventions: AMOS J and K use different KODE=2 factors, and AS241 returns a zero
+sentinel with IFAULT for invalid probabilities. The GGQ sketch requires weighted
+basis data and an initialized Legendre discretization; it is not an automatic
+integrand-to-rule example. The dfsaneacc mappings describe its Fortran QR support,
+not the R nonlinear algorithm, and require compatible REXIT error hooks. MINUIT
+command status and covariance quality are recorded separately. All new usage
+sketches are source-inspected and were not compiled or run.

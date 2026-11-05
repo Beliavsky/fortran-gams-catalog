@@ -3525,12 +3525,88 @@
             ],
             "notes": "The README describes rule construction, accuracy objectives and BLAS/LAPACK/ID dependencies. Reported accuracy is an author statement, not an independently checked result.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "7e4a7373417b7e5ac532d672372815b1574cefba",
+            "reviewed_on": "2026-11-05",
+            "notes": "chebyshev_quad::chebquad constructs a generalized Chebyshev quadrature rule from a Legendre piecewise discretization and sampled basis values already multiplied by square roots of discretization weights. It forms moments, uses interpolative decomposition to select nodes and a least-squares solve for weights, then sorts node/weight pairs. Raw unweighted function samples do not satisfy this interface. This is rule construction, not the nonlinear Gaussian-rule stage or a guaranteed positive-weight formula. Internal rank tolerance is machine epsilon; no status output, positivity proof, independent exactness check or execution result is supplied.",
+            "evidence": [
+              {
+                "path": "chebquad.f90",
+                "url": "https://github.com/JamesCBremerJr/GGQ/blob/7e4a7373417b7e5ac532d672372815b1574cefba/chebquad.f90",
+                "sha256": "73e9a1e236cfd67e9e1dbdae3921b240c2405e233032230ecda0717cf274c548"
+              },
+              {
+                "path": "legepw.f90",
+                "url": "https://github.com/JamesCBremerJr/GGQ/blob/7e4a7373417b7e5ac532d672372815b1574cefba/legepw.f90",
+                "sha256": "6234fe3ce3e698a4cf871f542ddd789d78ef2ce6c4f848f4a07211ec4d3c15fb"
+              },
+              {
+                "path": "test_gaussquad.f90",
+                "url": "https://github.com/JamesCBremerJr/GGQ/blob/7e4a7373417b7e5ac532d672372815b1574cefba/test_gaussquad.f90",
+                "sha256": "cf9812bd511b50b03479a216d014d3b015b06f848a75494bc7c5b3f939884b70"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "chebquad",
+                "role": "public-entry-point",
+                "summary": "Module subroutine returning allocatable nodes and weights. Initialize the discretization and supply the correctly weighted basis matrix before calling. Dependencies include the repository Legendre/linear-algebra modules and compatible BLAS/LAPACK.",
+                "signature": "CALL chebquad(disc, nfuns, vals, nquad, xs, whts)",
+                "declarations": [
+                  {
+                    "path": "chebquad.f90",
+                    "line_start": 30,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "legepw.f90",
+                    "line_start": 105,
+                    "line_end": 132
+                  }
+                ],
+                "path": "chebquad.f90",
+                "line_start": 30,
+                "line_end": 117,
+                "module": "chebyshev_quad",
+                "examples": [
+                  {
+                    "path": "test_gaussquad.f90",
+                    "line_start": 121,
+                    "line_end": 149
+                  }
+                ],
+                "usage": "use legepw, only: legepw_disc\nuse chebyshev_quad, only: chebquad\ntype(legepw_disc) :: disc\ndouble precision, allocatable :: vals(:,:), xs(:), whts(:)\ninteger :: nfuns, nquad\n! Initialize disc and vals: basis samples times sqrt(discretization weights).\ncall chebquad(disc, nfuns, vals, nquad, xs, whts)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Initialization protocol only, not a complete integrand driver. Follow the pinned upstream weighted-basis/QR preparation example. No positive-weight or exactness guarantee is inferred from node selection."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit project reuse grant identified",
+          "spdx_expression": null,
+          "revision": "7e4a7373417b7e5ac532d672372815b1574cefba",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit project reuse grant was identified in the reviewed README or defining module. Bundled third-party numerical components may have their own terms; their inclusion does not license the project as a whole.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/JamesCBremerJr/GGQ/blob/7e4a7373417b7e5ac532d672372815b1574cefba/README.md",
+              "sha256": "57b4102352cdfee1b978e37dbc27e71deaaf14b6445905957cb25b0b76a794c2"
+            },
+            {
+              "path": "chebquad.f90",
+              "url": "https://github.com/JamesCBremerJr/GGQ/blob/7e4a7373417b7e5ac532d672372815b1574cefba/chebquad.f90",
+              "sha256": "73e9a1e236cfd67e9e1dbdae3921b240c2405e233032230ecda0717cf274c548"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23745,12 +23821,176 @@
             ],
             "notes": "The README documents obsolescent constructs and a patch intended to match an older Debian build. Those compatibility and result-equivalence statements have not been reproduced here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b1a",
+            "level": "source-reviewed",
+            "revision": "b51132c529f8b14f31b2ffcd8dd95f468d958dfe",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected unconstrained SIMPLEX command uses MINUIT reflection, expansion and contraction without user derivatives. Initialize shared state and define positive-step, unbounded parameters (limits both zero), then issue MNEXCM. Its IERFLG reports command outcome; MNSTAT ISTAT instead reports covariance quality and must not be mistaken for convergence. The simplex spread/call-budget stopping rules are not an optimality proof or strict per-call hard cap. Shared COMMON state and preprocessed precision conventions require a compatible build and callback ABI; this is not a reentrant interface or a review of MIGRAD/HESSE/MINOS.",
+            "evidence": [
+              {
+                "path": "mnexcm.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnexcm.F",
+                "sha256": "c4a224441380a19ea8d0ad63bef6029889d7b2cf67be169326364de994ed3f10"
+              },
+              {
+                "path": "mninit.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mninit.F",
+                "sha256": "5ab1c77332dcbeab0b39cfcd5da01a0cca895f842bea8c8250fa8d0e3c5043ca"
+              },
+              {
+                "path": "mnparm.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnparm.F",
+                "sha256": "83d4678f16a8766423effbdf3bd63423cd516e800c6e5e9e9ae3ebda20f1c06b"
+              },
+              {
+                "path": "mnsimp.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnsimp.F",
+                "sha256": "367b303e2b7a37cc778f5456941c0c8247fb0287ca55cd52d6f4616511779ef4"
+              },
+              {
+                "path": "mnstat.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnstat.F",
+                "sha256": "8ab18b6cd470c844fedd0597c5d0ffd0ce90410700fc0faa01c3270653bdf043"
+              },
+              {
+                "path": "mnpout.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnpout.F",
+                "sha256": "9dcc3285bc005b1fd7cd4f8d2fdad91fd987c636f7823a71278bca74173b626a"
+              },
+              {
+                "path": "minuit/d506dp.inc",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/minuit/d506dp.inc",
+                "sha256": "b164bc71798169b4a5ea5ab744112f3b90b4b27ce9daf45d3301f7f58e7af56e"
+              },
+              {
+                "path": "mnamin.F",
+                "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/mnamin.F",
+                "sha256": "bb5411ddb411d08a47600531a17ecd0339d19005afeb76df637b3070793ff3c7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "MNEXCM",
+                "role": "public-entry-point",
+                "summary": "External command dispatcher. Supply FCN(NPAR,GIN,F,X,IFLAG,FUTIL) and an external FUTIL procedure with signatures matching the selected MINUIT precision build. Default pilot configuration selects double precision.",
+                "signature": "CALL MNEXCM(FCN, COMAND, PLIST, LLIST, IERFLG, FUTIL)",
+                "declarations": [
+                  {
+                    "path": "mnexcm.F",
+                    "line_start": 28,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "minuit/d506dp.inc",
+                    "line_start": 18,
+                    "line_end": 24
+                  }
+                ],
+                "path": "mnexcm.F",
+                "line_start": 28,
+                "line_end": 473,
+                "usage": "external :: fcn, futil\ninteger :: ierr\ndouble precision :: args(2)\ncall mninit(5,6,7)\ncall mnparm(1,\"x\",-1.2d0,0.1d0,0.0d0,0.0d0,ierr)\nif (ierr /= 0) error stop \"Parameter definition failed\"\ncall mnparm(2,\"y\",1.0d0,0.1d0,0.0d0,0.0d0,ierr)\nif (ierr /= 0) error stop \"Parameter definition failed\"\nargs = [1000.0d0,0.1d0]\ncall mnexcm(fcn,\"SIMPLEX\",args,2,ierr,futil)\nif (ierr /= 0) error stop \"MINUIT command failed\"\n! Retrieve parameter values with MNPOUT; MNSTAT ISTAT is covariance quality.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback/setup fragment, not a complete Rosenbrock driver. Supply compatible FCN/FUTIL implementations and link the complete preprocessed MINUIT build. FCN writes F for the passed X and uses the configured real precision. This review selected unbounded positive-step parameters; it does not certify error estimates or bounded transformations."
+              },
+              {
+                "procedure": "MNINIT",
+                "role": "public-entry-point",
+                "summary": "Initializes shared MINUIT state and I/O unit numbers.",
+                "signature": "CALL MNINIT(I1, I2, I3)",
+                "declarations": [
+                  {
+                    "path": "mninit.F",
+                    "line_start": 37,
+                    "line_end": 48
+                  }
+                ],
+                "path": "mninit.F",
+                "line_start": 37,
+                "line_end": 129
+              },
+              {
+                "procedure": "MNPARM",
+                "role": "public-entry-point",
+                "summary": "Defines external parameter; a nonpositive step fixes it, while limits A=B=0 select an unbounded variable.",
+                "signature": "CALL MNPARM(K, CNAMJ, UK, WK, A, B, IERFLG)",
+                "declarations": [
+                  {
+                    "path": "mnparm.F",
+                    "line_start": 28,
+                    "line_end": 42
+                  }
+                ],
+                "path": "mnparm.F",
+                "line_start": 28,
+                "line_end": 223
+              },
+              {
+                "procedure": "MNSTAT",
+                "role": "public-entry-point",
+                "summary": "Reports objective, spread estimate, error definition and parameter counts. ISTAT is covariance status, not minimizer exit status.",
+                "signature": "CALL MNSTAT(FMIN, FEDM, ERRDEF, NPARI, NPARX, ISTAT)",
+                "declarations": [
+                  {
+                    "path": "mnstat.F",
+                    "line_start": 13,
+                    "line_end": 28
+                  }
+                ],
+                "path": "mnstat.F",
+                "line_start": 13,
+                "line_end": 45
+              },
+              {
+                "procedure": "MNPOUT",
+                "role": "public-entry-point",
+                "summary": "Retrieves parameter name/value/error/limits and internal index; negative internal index indicates an undefined parameter.",
+                "signature": "CALL MNPOUT(IUEXT, CHNAM, VAL, ERR, XLOLIM, XUPLIM, IUINT)",
+                "declarations": [
+                  {
+                    "path": "mnpout.F",
+                    "line_start": 13,
+                    "line_end": 28
+                  }
+                ],
+                "path": "mnpout.F",
+                "line_start": 13,
+                "line_end": 65
+              },
+              {
+                "procedure": "MNSIMP",
+                "role": "implementation-helper",
+                "path": "mnsimp.F",
+                "line_start": 28,
+                "line_end": 215
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 2 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "b51132c529f8b14f31b2ffcd8dd95f468d958dfe",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root COPYING supplies GPL version 2 text. The reviewed README does not resolve a version-only versus or-later choice or a complete CERN component provenance audit.",
+          "evidence": [
+            {
+              "path": "COPYING",
+              "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/COPYING",
+              "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ramos/minuit/blob/b51132c529f8b14f31b2ffcd8dd95f468d958dfe/README.md",
+              "sha256": "e0cc78337ec0f89bf870545164a89c178122aa458fe848d3738e445e91fb42a5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26548,12 +26788,135 @@
             ],
             "notes": "DESCRIPTION identifies large-scale nonlinear systems and the published secant-acceleration method. The R interface and compiled components are not assumed to be a separately documented standalone Fortran solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "78ae3f22eceb3340172d03ffa348c3134bb431cc",
+            "reviewed_on": "2026-11-05",
+            "notes": "The Fortran bmqrf module supplies column-pivoted Householder QR support, not the nonlinear DFSANE algorithm implemented in R. bmqr overwrites A with a compact factorization, stores reflector factors in gam and column permutation in p, and estimates rank using a scaled threshold of about 100 machine epsilons. extractQ/extractR expose the rank-sized factors. Restrict this reviewed interface to n>=m>=1, lda>=n and mlim>=m; it is not a reviewed wide-matrix routine. Failure hooks call REXIT and need the R runtime or a deliberately compatible replacement. No standalone compilation or factorization residual was checked.",
+            "evidence": [
+              {
+                "path": "src/qr.f95",
+                "url": "https://github.com/cran/dfsaneacc/blob/78ae3f22eceb3340172d03ffa348c3134bb431cc/src/qr.f95",
+                "sha256": "f8db71f3d884cee6c00e035c2f10489948d4e68e67a2b66107d0ea837735bc6a"
+              },
+              {
+                "path": "R/dfsaneacc.R",
+                "url": "https://github.com/cran/dfsaneacc/blob/78ae3f22eceb3340172d03ffa348c3134bb431cc/R/dfsaneacc.R",
+                "sha256": "254b4002423ad91ff748664f28f2c77ca781e4bc7976e6d03af916bb0233bb30"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bmqr",
+                "role": "public-entry-point",
+                "summary": "Module QR routine with C binding but no VALUE scalar attributes. Fortran callers use ordinary module argument passing; C callers must match by-reference scalars.",
+                "signature": "CALL bmqr(n, m, mlim, lda, A, gam, p, rank)",
+                "declarations": [
+                  {
+                    "path": "src/qr.f95",
+                    "line_start": 8,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/qr.f95",
+                "line_start": 8,
+                "line_end": 109,
+                "module": "bmqrf",
+                "usage": "use iso_c_binding, only: c_int, c_double\nuse bmqrf, only: bmqr, extractQ, extractR\nreal(c_double) :: a(3,2), gam(2), q(3,2), r(2,2)\ninteger(c_int) :: p(2), rank\na(:,1) = [1.0_c_double,0.0_c_double,1.0_c_double]\na(:,2) = [0.0_c_double,1.0_c_double,1.0_c_double]\ncall bmqr(3_c_int,2_c_int,2_c_int,3_c_int,a,gam,p,rank)\nif (rank /= 2_c_int) error stop \"Full rank required here\"\ncall extractQ(3_c_int,2_c_int,2_c_int,3_c_int,a,gam,rank,3_c_int,q)\ncall extractR(2_c_int,2_c_int,3_c_int,a,rank,2_c_int,r)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Requires compatible REXIT error hooks. Preserve the original A for a permutation-aware A(:,p) versus Q*R residual check. Only rank columns/rows of extracted factors are assigned; numerical rank is heuristic."
+              },
+              {
+                "procedure": "extractQ",
+                "role": "public-entry-point",
+                "summary": "Forms the first rank columns of the orthogonal factor.",
+                "signature": "CALL extractQ(n, m, mlim, lda, A, gam, rank, ldq, Q)",
+                "declarations": [
+                  {
+                    "path": "src/qr.f95",
+                    "line_start": 114,
+                    "line_end": 123
+                  }
+                ],
+                "path": "src/qr.f95",
+                "line_start": 114,
+                "line_end": 137,
+                "module": "bmqrf"
+              },
+              {
+                "procedure": "extractR",
+                "role": "public-entry-point",
+                "summary": "Extracts the first rank rows of the upper trapezoidal factor.",
+                "signature": "CALL extractR(m, mlim, lda, A, rank, ldr, R)",
+                "declarations": [
+                  {
+                    "path": "src/qr.f95",
+                    "line_start": 142,
+                    "line_end": 150
+                  }
+                ],
+                "path": "src/qr.f95",
+                "line_start": 142,
+                "line_end": 160,
+                "module": "bmqrf"
+              }
+            ]
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "78ae3f22eceb3340172d03ffa348c3134bb431cc",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected full-column-rank branch of bmqrf::bmqrsolve forms Q-transpose b, back-substitutes through R and permutes the solution back using p. This supports unconstrained L2 least squares for n>=m and rank=m. The rank-deficient branch is outside this review. It supplies no residual/condition estimate or ordinary status result, and error handling can call the R runtime REXIT hook. The nonlinear solver in this repository is R code, not this Fortran routine.",
+            "evidence": [
+              {
+                "path": "src/qr.f95",
+                "url": "https://github.com/cran/dfsaneacc/blob/78ae3f22eceb3340172d03ffa348c3134bb431cc/src/qr.f95",
+                "sha256": "f8db71f3d884cee6c00e035c2f10489948d4e68e67a2b66107d0ea837735bc6a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bmqrsolve",
+                "role": "public-entry-point",
+                "summary": "Solves using previously extracted pivoted QR factors; this mapping is restricted to rank=m.",
+                "signature": "CALL bmqrsolve(n, m, rank, ldq, Q, ldr, R, p, b, x)",
+                "declarations": [
+                  {
+                    "path": "src/qr.f95",
+                    "line_start": 464,
+                    "line_end": 472
+                  }
+                ],
+                "path": "src/qr.f95",
+                "line_start": 464,
+                "line_end": 567,
+                "module": "bmqrf",
+                "usage": "! After bmqr/extractQ/extractR with n>=m and rank=m:\n! Import bmqrsolve from bmqrf; use matching C_INT/C_DOUBLE arrays.\ncall bmqrsolve(n, m, rank, ldq, q, ldr, r, p, b, x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Factorization protocol fragment; initialize all factors and dimensions first and provide compatible REXIT hooks. Preserve original A and b for an independent residual check. Rank-deficient/minimum-norm behavior is not claimed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3 (package metadata)",
+          "spdx_expression": null,
+          "revision": "78ae3f22eceb3340172d03ffa348c3134bb431cc",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned DESCRIPTION declares License: GPL-3. This records the package metadata rather than resolving all component terms or an only-versus-or-later SPDX choice from a full license notice.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/dfsaneacc/blob/78ae3f22eceb3340172d03ffa348c3134bb431cc/DESCRIPTION",
+              "sha256": "bd57c2eb07729aa1671e408ce4d4b10541538c82737365f36ac40002d0254b85"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37418,12 +37781,78 @@
             ],
             "notes": "The README is supplemented by source prologues for IPMPAR, complex Bessel/Gamma evaluation, linear-equation solution and singular-value methods. These support broad divisions only; historical portability/test statements have not been independently reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C4b",
+            "level": "source-reviewed",
+            "revision": "a01effe358232e16b536f73328178f088b26d1ec",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected double-precision DREXP and DLNREL implementations evaluate exp(x)-1 and log(1+a) with rational approximations near zero and rearranged elementary formulas elsewhere. DLNREL requires finite a > -1; neither routine returns a domain/overflow status. This records stable elementary transformations, not all special functions in the monolithic library. No accuracy estimate or execution check was made.",
+            "evidence": [
+              {
+                "path": "src/nswc.f",
+                "url": "https://github.com/jacobwilliams/nswc/blob/a01effe358232e16b536f73328178f088b26d1ec/src/nswc.f",
+                "sha256": "5a3f47273dbd8dfdfb13770a1c9a091852844da18f886f7d195cd2bbc0270b2d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DREXP",
+                "role": "public-entry-point",
+                "summary": "Double-precision exp(x)-1 function; no error-status argument. Large positive arguments can overflow.",
+                "signature": "value = DREXP(X)",
+                "declarations": [
+                  {
+                    "path": "src/nswc.f",
+                    "line_start": 3781,
+                    "line_end": 3787
+                  }
+                ],
+                "path": "src/nswc.f",
+                "line_start": 3781,
+                "line_end": 3835,
+                "usage": "double precision, external :: drexp\ndouble precision :: value\nvalue = drexp(1.0d-8)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the selected routine or a compatible library. This source review does not establish error bounds."
+              },
+              {
+                "procedure": "DLNREL",
+                "role": "public-entry-point",
+                "summary": "Double-precision log(1+a) function. Supply finite a > -1; no input-validation status is provided.",
+                "signature": "value = DLNREL(A)",
+                "declarations": [
+                  {
+                    "path": "src/nswc.f",
+                    "line_start": 3951,
+                    "line_end": 3957
+                  }
+                ],
+                "path": "src/nswc.f",
+                "line_start": 3951,
+                "line_end": 4000,
+                "usage": "double precision, external :: dlnrel\ndouble precision :: value\nvalue = dlnrel(1.0d-8)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Preserve the valid domain; the small-argument rational branch does not make invalid logarithms safe."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit reuse grant identified",
+          "spdx_expression": null,
+          "revision": "a01effe358232e16b536f73328178f088b26d1ec",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README describes availability without cost to the scientific community. This does not itself establish redistribution or modification permission; no explicit reuse grant was identified in the reviewed notice.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/jacobwilliams/nswc/blob/a01effe358232e16b536f73328178f088b26d1ec/README.md",
+              "sha256": "e2a14e68e3280c1bd0eab1a7319b3f06647aaef96e7542e6563db681045b8aa2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38859,12 +39288,141 @@
             ],
             "notes": "The short README is supplemented by pinned FNLIB and QUADPACK documentation. Only these documented broad mathematical areas are assigned now; a claim of comprehensive modernization does not establish that every original SLATEC algorithm is complete or verified in this snapshot.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C4b",
+            "level": "source-reviewed",
+            "revision": "43ff98105b4598c1f90136e3fffb3ca307a71eec",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reviewed implementation uses a Chebyshev expansion for abs(x)<=0.375 and LOG(1+x) elsewhere. X<=-1 triggers ERROR STOP, not a returned status. The old commented near-boundary warning is inactive. This review covers the selected routine and module interface, not all dependency kernels or numerical accuracy.",
+            "evidence": [
+              {
+                "path": "src/special_functions/alnrel.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/special_functions/alnrel.f90",
+                "sha256": "440c09a8531cb399b9cda52f7325ff93779c52a37dfcd19163ddce948c34fb46"
+              },
+              {
+                "path": "src/special_functions/special_functions.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/special_functions/special_functions.f90",
+                "sha256": "a58d63f19ab2190d54183d0f4a7573386f5c9fde07597ed3eef0c161b54d5b47"
+              },
+              {
+                "path": "src/service/service.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/service/service.f90",
+                "sha256": "d975f0bf0aa823721a1ff8f12466bf1735a927ca87ffd4352f079337e4e8eab9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ALNREL",
+                "role": "public-entry-point",
+                "summary": "Real(SP) elemental log(1+x) function. Import the service kind and special_functions module.",
+                "signature": "value = ALNREL(X)",
+                "declarations": [
+                  {
+                    "path": "src/special_functions/alnrel.f90",
+                    "line_start": 41,
+                    "line_end": 41
+                  },
+                  {
+                    "path": "src/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "src/service/service.f90",
+                    "line_start": 3,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/special_functions/alnrel.f90",
+                "line_start": 2,
+                "line_end": 65,
+                "module": "special_functions",
+                "usage": "use service, only: SP\nuse special_functions, only: ALNREL\nreal(SP) :: value\nvalue = ALNREL(1.0e-5_SP)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The reviewed implementation uses a Chebyshev expansion for abs(x)<=0.375 and LOG(1+x) elsewhere. X<=-1 triggers ERROR STOP, not a returned status. The old commented near-boundary warning is inactive."
+              }
+            ]
+          },
+          {
+            "code": "C5",
+            "level": "source-reviewed",
+            "revision": "43ff98105b4598c1f90136e3fffb3ca307a71eec",
+            "reviewed_on": "2026-11-05",
+            "notes": "The implementation evaluates the integral of -log(1-y)/y using interval transformations and Chebyshev evaluation. For x>1 it supplies a real continuation, not a complex principal-branch dilogarithm. The sketch stays within x<=1. No numerical-status argument is returned. This review covers the selected routine and module interface, not all dependency kernels or numerical accuracy.",
+            "evidence": [
+              {
+                "path": "src/special_functions/spenc.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/special_functions/spenc.f90",
+                "sha256": "d6ddb6f7d6a11569844421cbd3d0c2a7e393f6fd232bb798d3153c57a59a06ee"
+              },
+              {
+                "path": "src/special_functions/special_functions.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/special_functions/special_functions.f90",
+                "sha256": "a58d63f19ab2190d54183d0f4a7573386f5c9fde07597ed3eef0c161b54d5b47"
+              },
+              {
+                "path": "src/service/service.f90",
+                "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/src/service/service.f90",
+                "sha256": "d975f0bf0aa823721a1ff8f12466bf1735a927ca87ffd4352f079337e4e8eab9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SPENC",
+                "role": "public-entry-point",
+                "summary": "Real(SP) elemental Spence dilogarithm function. Import the service kind and special_functions module.",
+                "signature": "value = SPENC(X)",
+                "declarations": [
+                  {
+                    "path": "src/special_functions/spenc.f90",
+                    "line_start": 50,
+                    "line_end": 50
+                  },
+                  {
+                    "path": "src/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "src/service/service.f90",
+                    "line_start": 3,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/special_functions/spenc.f90",
+                "line_start": 2,
+                "line_end": 96,
+                "module": "special_functions",
+                "usage": "use service, only: SP\nuse special_functions, only: SPENC\nreal(SP) :: value\nvalue = SPENC(0.5_SP)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The implementation evaluates the integral of -log(1-y)/y using interval transformations and Chebyshev evaluation. For x>1 it supplies a real continuation, not a complex principal-branch dilogarithm. The sketch stays within x<=1. No numerical-status argument is returned."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Government disclaimer; reuse grant unresolved",
+          "spdx_expression": null,
+          "revision": "43ff98105b4598c1f90136e3fffb3ca307a71eec",
+          "reviewed_on": "2026-11-05",
+          "notes": "The disclaimer identifies government laboratories and disclaims warranty. No explicit redistribution/reuse grant was identified in these reviewed files; government association alone is not recorded as a public-domain license.",
+          "evidence": [
+            {
+              "path": "DISCLAIMER",
+              "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/DISCLAIMER",
+              "sha256": "f2421afdb3cd3dcfdf03901dc4ec58971647ad996cef6ecad93566cd154da349"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/MehdiChinoune/SLATEC/blob/43ff98105b4598c1f90136e3fffb3ca307a71eec/README",
+              "sha256": "e8b47dc96662cdfb25b306e47ed925cbac4aee3a84ec01b807279c04da011993"
+            }
+          ]
         }
       },
       "imports": {}
@@ -39241,12 +39799,109 @@
             ],
             "notes": "The README documents Python/Cython APIs and a Fortran/C build toolchain. Individual functions may use different compiled backends; coverage, GIL-related behavior and platform tests have not been independently reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C10a4",
+            "level": "source-reviewed",
+            "revision": "47221423a58c6b12785507b2234cc81d9def5770",
+            "reviewed_on": "2026-11-05",
+            "notes": "Computes J of complex argument and nonnegative real orders FNU through FNU+N-1. KODE=2 instead returns exp(-abs(Im(z)))*J. NZ counts the trailing underflowed sequence entries. The inspected AMOS driver validates arguments, applies range checks and dispatches to its dependent kernels. IERR=0 means normal completion; 1 invalid input, 2 overflow, 3 precision warning with a computed result, 4 excessive argument/order loss, and 5 algorithm failure. This is the underlying split-real Fortran API, not the Python interface. No kernel-wide audit or numerical test was performed.",
+            "evidence": [
+              {
+                "path": "special_functions/_extern/amos/double_precision/zbesj.f",
+                "url": "https://github.com/ameli/special_functions/blob/47221423a58c6b12785507b2234cc81d9def5770/special_functions/_extern/amos/double_precision/zbesj.f",
+                "sha256": "baa92a4b8a8acbfd3ce2cb57a6921c6da4264fbe06e80d3a3019ab176603a292"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZBESJ",
+                "role": "public-entry-point",
+                "summary": "External double-precision AMOS sequence driver using separate real and imaginary input/output arrays. Require N>=1, FNU>=0, and KODE=1 or 2; inspect both IERR and NZ.",
+                "signature": "CALL ZBESJ(ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)",
+                "declarations": [
+                  {
+                    "path": "special_functions/_extern/amos/double_precision/zbesj.f",
+                    "line_start": 157,
+                    "line_end": 161
+                  },
+                  {
+                    "path": "special_functions/_extern/amos/double_precision/zbesj.f",
+                    "line_start": 30,
+                    "line_end": 60
+                  }
+                ],
+                "path": "special_functions/_extern/amos/double_precision/zbesj.f",
+                "line_start": 2,
+                "line_end": 276,
+                "usage": "double precision :: yr(2), yi(2)\ninteger :: nz, ierr\nexternal :: zbesj\ncall zbesj(1.0d0, 0.5d0, 0.0d0, 1, 2, yr, yi, nz, ierr)\nif (ierr /= 0) error stop \"AMOS status requires attention\"\n! Inspect nz before interpreting underflowed entries.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Computes J of complex argument and nonnegative real orders FNU through FNU+N-1. KODE=2 instead returns exp(-abs(Im(z)))*J. NZ counts the trailing underflowed sequence entries. The sketch rejects warnings as well as errors. Link the compatible AMOS dependency set and machine constants; the single driver file is insufficient."
+              }
+            ]
+          },
+          {
+            "code": "C10b4",
+            "level": "source-reviewed",
+            "revision": "47221423a58c6b12785507b2234cc81d9def5770",
+            "reviewed_on": "2026-11-05",
+            "notes": "Computes K of nonzero complex argument and nonnegative real orders. KODE=2 returns exp(z)*K, a different scaling from ZBESJ. With nonpositive real part, underflows counted in NZ need not occupy a contiguous trailing block. The inspected AMOS driver validates arguments, applies range checks and dispatches to its dependent kernels. IERR=0 means normal completion; 1 invalid input, 2 overflow, 3 precision warning with a computed result, 4 excessive argument/order loss, and 5 algorithm failure. This is the underlying split-real Fortran API, not the Python interface. No kernel-wide audit or numerical test was performed.",
+            "evidence": [
+              {
+                "path": "special_functions/_extern/amos/double_precision/zbesk.f",
+                "url": "https://github.com/ameli/special_functions/blob/47221423a58c6b12785507b2234cc81d9def5770/special_functions/_extern/amos/double_precision/zbesk.f",
+                "sha256": "7230a0c31649471216a18101159aacf73eb1eada435052cb7bd514458b577b3d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZBESK",
+                "role": "public-entry-point",
+                "summary": "External double-precision AMOS sequence driver using separate real and imaginary input/output arrays. Require N>=1, FNU>=0, and KODE=1 or 2; inspect both IERR and NZ.",
+                "signature": "CALL ZBESK(ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)",
+                "declarations": [
+                  {
+                    "path": "special_functions/_extern/amos/double_precision/zbesk.f",
+                    "line_start": 158,
+                    "line_end": 161
+                  },
+                  {
+                    "path": "special_functions/_extern/amos/double_precision/zbesk.f",
+                    "line_start": 30,
+                    "line_end": 63
+                  }
+                ],
+                "path": "special_functions/_extern/amos/double_precision/zbesk.f",
+                "line_start": 2,
+                "line_end": 286,
+                "usage": "double precision :: yr(2), yi(2)\ninteger :: nz, ierr\nexternal :: zbesk\ncall zbesk(1.0d0, 0.5d0, 0.0d0, 2, 2, yr, yi, nz, ierr)\nif (ierr /= 0) error stop \"AMOS status requires attention\"\n! Inspect nz before interpreting underflowed entries.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Computes K of nonzero complex argument and nonnegative real orders. KODE=2 returns exp(z)*K, a different scaling from ZBESJ. With nonpositive real part, underflows counted in NZ need not occupy a contiguous trailing block. The sketch rejects warnings as well as errors. Link the compatible AMOS dependency set and machine constants; the single driver file is insufficient."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root; bundled AMOS scope separate",
+          "spdx_expression": null,
+          "revision": "47221423a58c6b12785507b2234cc81d9def5770",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies a BSD three-clause license. The selected routines are bundled AMOS code with separate upstream provenance; this scoped finding does not assign the root license to every AMOS component.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/ameli/special_functions/blob/47221423a58c6b12785507b2234cc81d9def5770/LICENSE.txt",
+              "sha256": "435fc5acded0085b797a55235d5bd423b10dd2cf420ae7a0498daf67919a51b3"
+            },
+            {
+              "path": "README.rst",
+              "url": "https://github.com/ameli/special_functions/blob/47221423a58c6b12785507b2234cc81d9def5770/README.rst",
+              "sha256": "57cbddc5e1b5845ed74d40574bbf0ca84258ae60b8879e4101d875d5c18e6858"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44823,12 +45478,128 @@
             ],
             "notes": "The README distinguishes optimization from sampling and describes MPI population parallelism via a preprocessor option. Example solutions do not establish general convergence or independent-chain quality; no numerical or scaling study was performed here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "3c80a7aa86c950187fa5c78e849688043930e01c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected serial Evolutionary%optimize(solver=\"de\",strategy=\"rand1\") path performs stochastic bound-constrained global search with differential mutation, binomial crossover and greedy replacement. Explicitly request DE: the default solver is CPSO. DE/rand1 needs at least four population members. Bounds must have strictly positive widths to avoid normalization division by zero. The inspected boundary repair replaces offending normalized coordinates with uniform [0,1] draws rather than projection or uniform [-1,1]. Termination includes an absolute objective threshold and iteration budget; neither proves global optimality. MPI and other solvers are outside this mapping.",
+            "evidence": [
+              {
+                "path": "src/lib/stochoptim.f90",
+                "url": "https://github.com/keurfonluu/StochOptim/blob/3c80a7aa86c950187fa5c78e849688043930e01c/src/lib/stochoptim.f90",
+                "sha256": "aa179b156a3bb68cd1c80bdee1645037b40da9e04a1706a8134c2dd334527a94"
+              },
+              {
+                "path": "src/lib/forlab.f90",
+                "url": "https://github.com/keurfonluu/StochOptim/blob/3c80a7aa86c950187fa5c78e849688043930e01c/src/lib/forlab.f90",
+                "sha256": "d5b6127e8fc26f558811fadf6c0a97a731c9cff30a5eaf11a2de686993166b58"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Evolutionary",
+                "role": "public-entry-point",
+                "summary": "Generic constructor storing objective callback, bounds and controls. Keep the callback valid for the lifetime of the optimizer.",
+                "signature": "ea = Evolutionary(func, lower, upper, popsize=..., max_iter=..., eps1=..., eps2=...)",
+                "declarations": [
+                  {
+                    "path": "src/lib/stochoptim.f90",
+                    "line_start": 242,
+                    "line_end": 250
+                  },
+                  {
+                    "path": "src/lib/stochoptim.f90",
+                    "line_start": 28,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "src/lib/stochoptim.f90",
+                    "line_start": 57,
+                    "line_end": 88
+                  },
+                  {
+                    "path": "src/lib/forlab.f90",
+                    "line_start": 30,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/lib/stochoptim.f90",
+                "line_start": 242,
+                "line_end": 304,
+                "module": "stochoptim",
+                "usage": "use forlab, only: RPRE\nuse stochoptim, only: Evolutionary\ntype(Evolutionary) :: ea\n! Supply objective(x) returning REAL(RPRE) for REAL(RPRE) x(:).\nea = Evolutionary(objective, [-2.0_RPRE,-2.0_RPRE], &\n     [2.0_RPRE,2.0_RPRE], popsize=10, max_iter=100, eps2=1.0e-8_RPRE)\ncall ea%optimize(solver=\"de\", strategy=\"rand1\", F=0.5_RPRE, CR=0.9_RPRE)\n! Inspect ea%xopt, ea%gfit and ea%iflag.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The objective implementation is not supplied. The absolute eps2 criterion depends on objective offset; budget exhaustion is not an optimality certificate. Set F/CR explicitly: initialized local controls can retain values across calls. The kind module uses numeric kind values, requiring a compatible compiler."
+              },
+              {
+                "procedure": "optimize",
+                "role": "public-entry-point",
+                "summary": "Type-bound coordinator; the selected DE branch dispatches the serial evolution kernel and records best point, objective and termination flag.",
+                "signature": "CALL ea%optimize(solver=\"de\", strategy=\"rand1\", F=..., CR=...)",
+                "declarations": [
+                  {
+                    "path": "src/lib/stochoptim.f90",
+                    "line_start": 497,
+                    "line_end": 503
+                  },
+                  {
+                    "path": "src/lib/stochoptim.f90",
+                    "line_start": 57,
+                    "line_end": 88
+                  }
+                ],
+                "path": "src/lib/stochoptim.f90",
+                "line_start": 497,
+                "line_end": 675,
+                "module": "stochoptim",
+                "derived_type": "Evolutionary"
+              },
+              {
+                "procedure": "de",
+                "role": "implementation-helper",
+                "path": "src/lib/stochoptim.f90",
+                "line_start": 853,
+                "line_end": 977,
+                "module": "stochoptim"
+              },
+              {
+                "procedure": "de_mutation",
+                "role": "implementation-helper",
+                "path": "src/lib/stochoptim.f90",
+                "line_start": 797,
+                "line_end": 851,
+                "module": "stochoptim"
+              },
+              {
+                "procedure": "constrain_de",
+                "role": "implementation-helper",
+                "path": "src/lib/stochoptim.f90",
+                "line_start": 760,
+                "line_end": 767,
+                "module": "stochoptim"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "3c80a7aa86c950187fa5c78e849688043930e01c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice permits reuse subject to its notice and disclaimer conditions. This records the project notice, not a complete provenance audit of every supporting numerical kernel.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/keurfonluu/StochOptim/blob/3c80a7aa86c950187fa5c78e849688043930e01c/LICENSE",
+              "sha256": "72e7fdc971dc0eb447901de708a948a5c364d9aa46880517d9cd58c78facd48e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45572,12 +46343,78 @@
             ],
             "notes": "The distribution index distinguishes Fortran from other-language algorithms and warns of differing interfaces, precision and machine constants. Collection membership does not verify every transcription, correction or current compiler configuration.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L5a2n",
+            "level": "source-reviewed",
+            "revision": "04b9d9dc1b4de0f6bed427e539f997f8e363abf6",
+            "reviewed_on": "2026-11-05",
+            "notes": "Algorithm AS241 PPND7 and PPND16 approximate the standard-normal quantile using central and tail rational branches. PPND7 uses default REAL, PPND16 DOUBLE PRECISION. Supply finite 0<P<1: endpoints/out-of-range probabilities return zero with IFAULT=1 rather than infinite quantiles. NaNs are not explicitly validated, and subtraction 1-P loses information near one. This mapping is inverse normal CDF evaluation, not a random-number generator or a new accuracy validation of the header precision claims.",
+            "evidence": [
+              {
+                "path": "src/241.f",
+                "url": "https://github.com/jacobwilliams/StatLib/blob/04b9d9dc1b4de0f6bed427e539f997f8e363abf6/src/241.f",
+                "sha256": "24c28dbd77de4c3121c6a5f4338838023f7edefcf6ac9975249bb11ee7597277"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PPND7",
+                "role": "public-entry-point",
+                "summary": "Default-REAL standard-normal quantile function with integer IFAULT output.",
+                "signature": "value = PPND7(P, IFAULT)",
+                "declarations": [
+                  {
+                    "path": "src/241.f",
+                    "line_start": 1,
+                    "line_end": 12
+                  }
+                ],
+                "path": "src/241.f",
+                "line_start": 1,
+                "line_end": 73,
+                "usage": "real, external :: ppnd7\nreal :: value\ninteger :: ifault\nvalue = ppnd7(0.975,ifault)\nif (ifault /= 0) error stop \"Invalid probability\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the matching default-real ABI and finite strictly interior probabilities. A zero result on error is not a valid endpoint quantile."
+              },
+              {
+                "procedure": "PPND16",
+                "role": "public-entry-point",
+                "summary": "Double-precision AS241 normal quantile function; always inspect IFAULT.",
+                "signature": "value = PPND16(P, IFAULT)",
+                "declarations": [
+                  {
+                    "path": "src/241.f",
+                    "line_start": 76,
+                    "line_end": 95
+                  }
+                ],
+                "path": "src/241.f",
+                "line_start": 76,
+                "line_end": 191,
+                "usage": "double precision, external :: ppnd16\ndouble precision :: value\ninteger :: ifault\nvalue = ppnd16(0.975d0,ifault)\nif (ifault /= 0) error stop \"Invalid probability\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use double precision probabilities strictly between zero and one. Near-one rounding and absent NaN validation remain caller concerns; no accuracy experiment was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Royal Statistical Society no-fee distribution permission",
+          "spdx_expression": null,
+          "revision": "04b9d9dc1b4de0f6bed427e539f997f8e363abf6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README states that the Royal Statistical Society holds copyright and permits distribution provided no fee is charged. This is not recorded as public-domain status or an unrestricted permissive license; the finding is scoped to the reviewed archived AS241 routines.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/jacobwilliams/StatLib/blob/04b9d9dc1b4de0f6bed427e539f997f8e363abf6/README.md",
+              "sha256": "3a7610739638a7882bdb3185fc6dbb91ec2c08d26f72f5155936542c2736f322"
+            }
+          ]
         }
       },
       "imports": {}

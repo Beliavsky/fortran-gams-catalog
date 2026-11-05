@@ -324,6 +324,30 @@
       "parent": "N5",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "C10a4": {
+      "label": "Complex argument, real order",
+      "parent": "C10a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "C10b4": {
+      "label": "Complex argument, real order",
+      "parent": "C10b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L5a2": {
+      "label": "Inverse distribution functions, sparsity functions",
+      "parent": "L5a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L5a2n": {
+      "label": "Negative binomial, normal, normal order statistics",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
