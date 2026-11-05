@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 228 repositories now have 282 source-reviewed
+Reviewed on 2026-11-05. 236 repositories now have 295 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-221 repository cards now identify public routines and link their usage lines
+229 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 228 independently source-reviewed repositories now have an
+separately. All 236 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -252,6 +252,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | dfsaneacc | `bmqrf::bmqr`, `extractQ`, `extractR`, `bmqrsolve` | GPL-3 package metadata |
 | MINUIT | `MNINIT`, `MNPARM`, `MNEXCM`, `MNSTAT`, `MNPOUT` | GPL version 2 text; version scope unresolved |
 | Statlib | AS241 `PPND7`, `PPND16` | Royal Statistical Society no-fee distribution permission |
+| Numerical_utilities | `kahan_summation_m::kahan_summation`, `%add/%val`, `kahan_babushka_sum`; `online_variance_m::online_variance%add/%mean/%var/%sample_var` | GPL version 3 text; version scope unresolved |
+| Fortran-variable-transformation | `variable_transformation_mo::yeo_johnson_lambda`, `box_cox_lambda`, lambda selectors and `rnorm` | MIT |
+| RKAdaptiveMethods | `rk54DormandMod::rk54DormandEachStep` (autonomous systems only in this review) | No license grant identified in reviewed material |
+| SESAM | `utilclc::mkcov`, `mkcovweight` (Gram products, not automatic statistical covariance) | CeCILL-2.0 |
+| appell | External `HYP_2F1`, `HYP_2F1_SUBROUTINE`; module supplies precision/helpers | GPL-3.0-or-later package metadata |
+| fortran-gmm-em | `gmmEM::fit`, `initRandomGaussians`; `linalg::gramSchmidt` | GPL-3.0-or-later |
+| spharm-interp | External `ylgndr`, `sheval3d` (basis/expansion evaluation, not MATLAB fit) | Apache-2.0 |
+| EqualSpherePartition | `ACM_EqualSphere::eq_sphere`; appended demonstration main must be separated for library use | No license grant identified in reviewed material |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -499,6 +507,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [dfsaneacc](https://github.com/cran/dfsaneacc) | D5; D9a1 | Pivoted Householder QR support and its full-column-rank least-squares branch; nonlinear solver remains R code | Requires REXIT hooks; least-squares claim restricted to full column rank. |
 | [MINUIT](https://github.com/ramos/minuit) | G1b1a | Unbounded smooth minimization through the derivative-free SIMPLEX command | Shared state and precision-dependent callbacks; covariance status is separate from command status. |
 | [Statlib](https://github.com/jacobwilliams/statlib) | L5a2n | AS241 inverse standard-normal distribution functions | Finite 0<P<1; invalid inputs return a zero sentinel with IFAULT. |
+| [Numerical_utilities](https://github.com/osada-yum/numerical_utilities) | A3a; L1a1a; L1a1b | Compensated REAL64 summation and univariate Welford mean/variance | Functional accumulator addition needs reassignment; covariance cross-update discrepancy excluded from supported algorithm scope. |
+| [Fortran-variable-transformation](https://github.com/tkdhss111/fortran-variable-transformation) | L4a1a5; L6a14 | Yeo-Johnson/Box-Cox transformations and Box-Muller normal generation | Yeo-Johnson likelihood weights log standard deviation incorrectly relative to its Jacobian; RNG lacks zero-uniform guard. |
+| [RKAdaptiveMethods](https://github.com/KayeJLLI/RKAdaptiveMethods) | I1a1a | Selected embedded explicit RK single-step routine for autonomous systems | Stage calls reuse t; exact-zero endpoints are rejected by IEEE_IS_NORMAL. Global controls and RHS replacement required. |
+| [SESAM](https://github.com/brankart/sesam) | D1b6 | Unweighted and diagonally weighted column Gram products | Weights are squared; no automatic centering or covariance normalization. Preprocessed precision/configuration dependencies. |
+| [appell](https://github.com/cran/appell) | C19 | Complex Gauss nonconfluent hypergeometric evaluation | External wrapper, REXIT dependency, no numerical status; real branch-cut arguments shifted below the cut. |
+| [fortran-gmm-em](https://github.com/jonas-finkler/fortran-gmm-em) | L4c1a; D5 | Gaussian-mixture EM and modified Gram-Schmidt orthogonalization | EM has no iteration cap/status; Gram-Schmidt has no rank or zero-residual check. |
+| [spharm-interp](https://github.com/ahbarnett/spharm-interp) | C9; K6a1 | Normalized associated Legendre functions and spherical-harmonic expansion evaluation | Fortran evaluator scope; scattered-point coefficient fitting is MATLAB. Normalization and lower-triangle storage matter. |
+| [EqualSpherePartition](https://github.com/gongzheng-justin/EqualSpherePartition) | P | Unit-sphere representative points from zonal partition construction | Points only, not cell boundaries or a verified area/diameter guarantee; combined source contains a main program. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -962,3 +978,16 @@ integrand-to-rule example. The dfsaneacc mappings describe its Fortran QR suppor
 not the R nonlinear algorithm, and require compatible REXIT error hooks. MINUIT
 command status and covariance quality are recorded separately. All new usage
 sketches are source-inspected and were not compiled or run.
+
+The compensated-summation bindings return new objects and require reassignment;
+the supported streaming-statistics mapping is univariate. The separately reviewed
+covariance recurrence accumulates two old-mean deltas and needs correction.
+The Yeo-Johnson selector has a relative likelihood/Jacobian coefficient discrepancy.
+The Box-Cox objective instead differs by an overall positive factor that alone
+does not change its maximizer; its selector still requires strictly positive data.
+The selected adaptive RK routine is limited to autonomous equations because its stage times are unchanged;
+its normal-value test also rejects zero/subnormal endpoints. SESAM's Gram products
+use squared weights and do not center or normalize statistical data. The spherical
+harmonic Fortran routines evaluate bases/expansions; MATLAB performs the repository's
+scattered-point least-squares fit. These findings and the new calling sketches are
+source reviews, not compilation or numerical checks.

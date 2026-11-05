@@ -348,6 +348,48 @@
       "parent": "L5a2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L4a": {
+      "label": "One-dimensional data",
+      "parent": "L4",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1": {
+      "label": "Raw data",
+      "parent": "L4a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1a": {
+      "label": "Parametric analysis",
+      "parent": "L4a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1a5": {
+      "label": "Transformation selection (e.g., for normality)",
+      "parent": "L4a1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4c": {
+      "label": "Multi-dimensional data (search also classes L4b and L7a1)",
+      "parent": "L4",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4c1": {
+      "label": "Independent data",
+      "parent": "L4c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4c1a": {
+      "label": "Parametric analysis",
+      "parent": "L4c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

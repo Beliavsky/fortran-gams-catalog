@@ -11504,12 +11504,118 @@
             ],
             "notes": "The README describes least-squares fitting followed by expansion evaluation. Drivers use MATLAB/Octave with Fortran MEX kernels; author demonstration errors are not catalog-verified results.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C9",
+            "level": "source-reviewed",
+            "revision": "1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected ylgndr recurrence evaluates normalized associated Legendre functions for nonnegative degree/order, n<=nmax and 0<=m<=n, at finite x in [-1,1]. The normalization is sqrt(2*n+1)*sqrt((n-m)!/(n+m)!)*P_nm(x), with the negative diagonal square-root recurrence incorporating the Condon-Shortley sign. Only the lower triangle of y is assigned; other entries are undefined. There is no domain/status check or derivative output in this selected routine. This Fortran special-function mapping is separate from the MATLAB scattered-point fit and does not establish high-degree stability by execution.",
+            "evidence": [
+              {
+                "path": "yrecursion.f",
+                "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/yrecursion.f",
+                "sha256": "fd29e9ff27d28f26d6e7bbf3730c341cfa62db7fe7958fe11189cbf478fee8be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ylgndr",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 associated-Legendre evaluator. Supply nmax>=0, finite -1<=x<=1 and y(0:nmax,0:nmax); read only entries with m<=n.",
+                "signature": "CALL ylgndr(nmax, x, y)",
+                "declarations": [
+                  {
+                    "path": "yrecursion.f",
+                    "line_start": 197,
+                    "line_end": 221
+                  }
+                ],
+                "path": "yrecursion.f",
+                "line_start": 197,
+                "line_end": 240,
+                "usage": "integer, parameter :: nmax=3\ndouble precision :: y(0:nmax,0:nmax)\nexternal :: ylgndr\ncall ylgndr(nmax,0.25d0,y)\n! Read y(n,m) only for 0<=m<=n<=nmax.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The normalized functions differ from raw associated Legendre polynomials. This routine does not return derivatives or a numerical status. Match the implementation REAL*8 ABI; do not interpret the unassigned upper triangle."
+              }
+            ]
+          },
+          {
+            "code": "K6a1",
+            "level": "source-reviewed",
+            "revision": "1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected sheval3d/ sheval3d0 pair evaluates an already supplied spherical-harmonic expansion at one point using ylgndr and exp(i*m*phi) recurrence, combining both positive and negative orders. This is fitted-function evaluation (K6a1), not the scattered-point least-squares coefficient solve: the repository implements that solve in MATLAB. Coefficients use mpole(0:nterms,-nterms:nterms) and only abs(m)<=n is read. The basis omits the usual 1/sqrt(4*pi) factor. The helper comment about scaling by 1/sqrt(2*l+1) is not reflected in an extra scaling operation after ylgndr. No output status, coefficient fit or approximation-error check was performed.",
+            "evidence": [
+              {
+                "path": "spharmbasics.f",
+                "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/spharmbasics.f",
+                "sha256": "2764e6aeaa7b057ee03f4149ca1f269eadc2021decf2583cb8aeb58313c04778"
+              },
+              {
+                "path": "yrecursion.f",
+                "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/yrecursion.f",
+                "sha256": "fd29e9ff27d28f26d6e7bbf3730c341cfa62db7fe7958fe11189cbf478fee8be"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/README.md",
+                "sha256": "06035e51529c596fe108a52086e14da6d39473b9f4923e1f3831ef476cdc7145"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sheval3d",
+                "role": "public-entry-point",
+                "summary": "External single-point complex expansion evaluator. ctheta is cos(theta), not theta; phi is azimuth in radians. Coefficients must match the pinned basis normalization.",
+                "signature": "CALL sheval3d(mpole, nterms, ctheta, phi, pot)",
+                "declarations": [
+                  {
+                    "path": "spharmbasics.f",
+                    "line_start": 255,
+                    "line_end": 280
+                  }
+                ],
+                "path": "spharmbasics.f",
+                "line_start": 255,
+                "line_end": 304,
+                "usage": "integer, parameter :: nterms=2\ncomplex(kind(0.0d0)) :: coeff(0:nterms,-nterms:nterms), value\nexternal :: sheval3d\ncoeff=cmplx(0.0d0,0.0d0,kind(0.0d0))\ncoeff(0,0)=cmplx(1.0d0,0.0d0,kind(0.0d0))\ncoeff(1,0)=cmplx(0.5d0,0.0d0,kind(0.0d0))\ncall sheval3d(coeff,nterms,0.25d0,0.5d0,value)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply nterms>=0 and finite ctheta in [-1,1]. Link spharmbasics and yrecursion with compiler support for REAL*8/COMPLEX*16 and compatible storage. Coefficients here are prescribed, not fitted; the MATLAB CG workflow is outside this Fortran interface."
+              },
+              {
+                "procedure": "sheval3d0",
+                "role": "implementation-helper",
+                "path": "spharmbasics.f",
+                "line_start": 309,
+                "line_end": 364
+              },
+              {
+                "procedure": "ylgndr",
+                "role": "implementation-helper",
+                "path": "yrecursion.f",
+                "line_start": 197,
+                "line_end": 240
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root notice credits the Simons Foundation and named Fortran contributors and supplies Apache License version 2.0. This finding records the reviewed project notice, not every upstream historical component or external MATLAB tool.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ahbarnett/spharm-interp/blob/1c2ba54dbcd19ff6d7d57f582f7ddb8b6809a320/LICENSE",
+              "sha256": "a2b12c9aa43e015f6862f2f57451d6863d44ac4e859b0dce19cc7ae1886b8ce0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -16301,12 +16407,94 @@
             ],
             "notes": "The README lists several explicit embedded Runge-Kutta schemes and reference outputs. Printed high-precision reference values are not evidence that every implemented method attains that accuracy.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "496a0df902e2edfcfa68c3b154c76d51e4519f45",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected rk54DormandEachStep forms seven explicit stages and two embedded endpoint estimates, scales their difference with global rtol/atol and proposes/rejects a step. The inspected stage calls all pass t unchanged rather than t+c_i*h, so this mapping is restricted to autonomous systems such as the bundled Pleiades RHS; general time-dependent ODEs require correction. DyDtMod::dev is a compiled dependency to replace, not a callback argument. Global atol has only 50 slots, controls/counters need initialization, and the IEEE_IS_NORMAL endpoint check rejects exact zero and subnormals as well as NaNs/infinities. Zero estimated error also enters err**(-1/6) without a separate guard. No claimed order, trajectory accuracy or success was verified by execution.",
+            "evidence": [
+              {
+                "path": "Fortran/rk54Dormand.f90",
+                "url": "https://github.com/kayejlli/RKAdaptiveMethods/blob/496a0df902e2edfcfa68c3b154c76d51e4519f45/Fortran/rk54Dormand.f90",
+                "sha256": "2a9d347e73f05500e92979a9a0cfd16ef4ef7ee889a00317ab5743c216f0b61d"
+              },
+              {
+                "path": "Fortran/GlobalCommon.f90",
+                "url": "https://github.com/kayejlli/RKAdaptiveMethods/blob/496a0df902e2edfcfa68c3b154c76d51e4519f45/Fortran/GlobalCommon.f90",
+                "sha256": "afbc7d9eb92a9088f74ff7351891fcb6d4ec0949f1a49a74f5a5b85e8e3e9da7"
+              },
+              {
+                "path": "Fortran/DyDt.f90",
+                "url": "https://github.com/kayejlli/RKAdaptiveMethods/blob/496a0df902e2edfcfa68c3b154c76d51e4519f45/Fortran/DyDt.f90",
+                "sha256": "fedae147af69730133c7ee112a2a92fd270d12e725a60a719bfa09eaf854cdfe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rk54DormandEachStep",
+                "role": "public-entry-point",
+                "summary": "One attempted REAL(KIND=8) autonomous IVP step. Consume yn only if test and rerun are both false; hnew is a proposal and may be unassigned on a fatal early return. The routine is stateful through GlobalCommonMod.",
+                "signature": "CALL rk54DormandEachStep(t, y0, yn, h, hnew, rerun, test)",
+                "declarations": [
+                  {
+                    "path": "Fortran/rk54Dormand.f90",
+                    "line_start": 67,
+                    "line_end": 80
+                  },
+                  {
+                    "path": "Fortran/GlobalCommon.f90",
+                    "line_start": 23,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "Fortran/DyDt.f90",
+                    "line_start": 11,
+                    "line_end": 25
+                  }
+                ],
+                "path": "Fortran/rk54Dormand.f90",
+                "line_start": 67,
+                "line_end": 208,
+                "module": "rk54DormandMod",
+                "usage": "use GlobalCommonMod, only: rtol, atol, MinStepSize, MaxStepSize, Evaluated\nuse rk54DormandMod, only: rk54DormandEachStep\nreal(kind=8) :: t, h, hnew\nreal(kind=8) :: y0(28), yn(28)\nlogical :: rerun, test\nrtol=1.0d-8; atol=1.0d-10\nMinStepSize=1.0d-10; MaxStepSize=0.1d0; Evaluated=0\n! Initialize the 28-component autonomous Pleiades state (see pinned README).\nt=0.0d0; h=1.0d-3\ncall rk54DormandEachStep(t,y0,yn,h,hnew,rerun,test)\nif (test) error stop \"Fatal step failure\"\n! If rerun, retry from unchanged t/y0 with hnew; otherwise accept yn.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Initialization/acceptance protocol fragment, not a complete integrator. Supply the documented 28-component state or replace the compiled RHS and keep dimension<=50. This source passes unchanged t to all stages and rejects zero endpoints via IEEE_IS_NORMAL; review these limitations before use."
+              },
+              {
+                "procedure": "dev",
+                "role": "implementation-helper",
+                "path": "Fortran/DyDt.f90",
+                "line_start": 11,
+                "line_end": 52,
+                "module": "DyDtMod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "496a0df902e2edfcfa68c3b154c76d51e4519f45",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit reuse grant was identified in the reviewed README or selected implementation, and the pinned tree has no separately named LICENSE/COPYING file. Method citations and public source access do not establish reuse terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/kayejlli/RKAdaptiveMethods/blob/496a0df902e2edfcfa68c3b154c76d51e4519f45/README.md",
+              "sha256": "33395eaf53e7684d0fbac01ba025966901a5fc0a6e267b169f5b233f11a04361"
+            },
+            {
+              "path": "Fortran/rk54Dormand.f90",
+              "url": "https://github.com/kayejlli/RKAdaptiveMethods/blob/496a0df902e2edfcfa68c3b154c76d51e4519f45/Fortran/rk54Dormand.f90",
+              "sha256": "2a9d347e73f05500e92979a9a0cfd16ef4ef7ee889a00317ab5743c216f0b61d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24887,12 +25075,187 @@
             ],
             "notes": "The README documents mixture components, covariance data and parallel build options. Convergence, initialization sensitivity and statistical model selection are not verified by this documentation review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L4c1a",
+            "level": "source-reviewed",
+            "revision": "473ff4e032ab0d8472c87b1f580fc82db1d73cf2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected fit routine estimates a multivariate Gaussian mixture by alternating E-step log-density/log-sum-exp responsibilities and M-step weighted means/covariances, with BLAS products and Cholesky-derived precisions. This supports parametric analysis of independent multidimensional observations. It is not K-means or a proof of finding the global likelihood maximum. Components must be allocated and initialized before fit; empty-component responsibility sums can divide by zero and covariance factorization failures STOP. regCovar is a module variable initially zero. The stopping condition is a signed likelihood improvement per sample, with no iteration cap or returned convergence status, so a decreasing/nonfinite objective can also end iteration. No fit or statistical validation was run.",
+            "evidence": [
+              {
+                "path": "src/gmmEM.f90",
+                "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/gmmEM.f90",
+                "sha256": "e6245edf7da31f78686d4dd2be9c74ff229cb47fc2c9fb83a56d909ebee16fad"
+              },
+              {
+                "path": "src/precision.f90",
+                "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/precision.f90",
+                "sha256": "a4093ae08e0b0e5252c5bbca37c1a34406a51c5ddb4703f6c9c4d6256d027f15"
+              },
+              {
+                "path": "src/emExample.f90",
+                "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/emExample.f90",
+                "sha256": "624187e8c8493f520ad4701a0a5dc844d48253da1be92fa0af3e58b85b909289"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fit",
+                "role": "public-entry-point",
+                "summary": "Module EM driver using samples(dimension,nSamples) and an initialized array of gaussian objects. Writes likelihood progress to standard output. Requires compatible BLAS/LAPACK.",
+                "signature": "CALL fit(dimension, nSamples, samples, nGaussians, gaussians, eps)",
+                "declarations": [
+                  {
+                    "path": "src/gmmEM.f90",
+                    "line_start": 17,
+                    "line_end": 40
+                  },
+                  {
+                    "path": "src/precision.f90",
+                    "line_start": 17,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/gmmEM.f90",
+                "line_start": 37,
+                "line_end": 67,
+                "module": "gmmEM",
+                "examples": [
+                  {
+                    "path": "src/emExample.f90",
+                    "line_start": 23,
+                    "line_end": 54
+                  }
+                ],
+                "usage": "use precision, only: dp\nuse gmmEM, only: gaussian, initRandomGaussians, fit, regCovar\ntype(gaussian) :: components(2)\nreal(dp) :: samples(2,100)\n! Initialize finite, nondegenerate data in samples(:,1:100).\nregCovar=1.0e-8_dp\ncall initRandomGaussians(2,2,0.1_dp,components)\ncall fit(2,100,samples,2,components,1.0e-6_dp)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Data initialization fragment; no dataset or fitted result is supplied. Positive regularization can help conditioning but does not guard every empty-component or nonfinite case. There is no iteration limit/status argument, and initialization and shared regularization affect results."
+              },
+              {
+                "procedure": "initRandomGaussians",
+                "role": "public-entry-point",
+                "summary": "Allocates component arrays, gives equal initial weights and identity covariances, and samples means scaled by initVar (which is not used as a covariance variance here).",
+                "signature": "CALL initRandomGaussians(dimension, nGaussians, initVar, gaussians)",
+                "declarations": [
+                  {
+                    "path": "src/gmmEM.f90",
+                    "line_start": 173,
+                    "line_end": 176
+                  }
+                ],
+                "path": "src/gmmEM.f90",
+                "line_start": 173,
+                "line_end": 192,
+                "module": "gmmEM"
+              },
+              {
+                "procedure": "E",
+                "role": "implementation-helper",
+                "path": "src/gmmEM.f90",
+                "line_start": 70,
+                "line_end": 103,
+                "module": "gmmEM"
+              },
+              {
+                "procedure": "M",
+                "role": "implementation-helper",
+                "path": "src/gmmEM.f90",
+                "line_start": 105,
+                "line_end": 152,
+                "module": "gmmEM"
+              },
+              {
+                "procedure": "gaussianFromCovariance",
+                "role": "implementation-helper",
+                "path": "src/gmmEM.f90",
+                "line_start": 214,
+                "line_end": 244,
+                "module": "gmmEM"
+              },
+              {
+                "procedure": "logSumExp",
+                "role": "implementation-helper",
+                "path": "src/gmmEM.f90",
+                "line_start": 289,
+                "line_end": 301,
+                "module": "gmmEM"
+              }
+            ]
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "473ff4e032ab0d8472c87b1f580fc82db1d73cf2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The linalg::gramSchmidt routine extends an existing set of orthonormal columns using modified Gram-Schmidt: each new vector is repeatedly projected against prior columns using the CURRENT residual, then normalized. It returns orthonormal columns only, not an R factor. Require 0<=nu<=n<=d, normalized independent existing columns, and independent residual vectors. There is no rank detection, reorthogonalization, zero-norm check or returned status, so dependent/nearly dependent inputs need caller treatment. This selected small module routine is distinct from the repository mixture estimator and is not a BLAS/LAPACK eigenvalue review.",
+            "evidence": [
+              {
+                "path": "src/linalg.f90",
+                "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/linalg.f90",
+                "sha256": "b94d4b841203d680e676819eb648790fc9bfa9e3ac5e2cc040597987c994ae87"
+              },
+              {
+                "path": "src/precision.f90",
+                "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/precision.f90",
+                "sha256": "a4093ae08e0b0e5252c5bbca37c1a34406a51c5ddb4703f6c9c4d6256d027f15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gramSchmidt",
+                "role": "public-entry-point",
+                "summary": "Module routine filling u(:,nu+1:n) from v while preserving the first nu initialized orthonormal columns.",
+                "signature": "CALL gramSchmidt(d, n, nu, v, u)",
+                "declarations": [
+                  {
+                    "path": "src/linalg.f90",
+                    "line_start": 43,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "src/precision.f90",
+                    "line_start": 17,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/linalg.f90",
+                "line_start": 43,
+                "line_end": 61,
+                "module": "linalg",
+                "usage": "use precision, only: dp\nuse linalg, only: gramSchmidt\nreal(dp) :: v(3,2), u(3,2)\nv(:,1)=[1.0_dp,1.0_dp,0.0_dp]\nv(:,2)=[0.0_dp,1.0_dp,1.0_dp]\nu=0.0_dp\ncall gramSchmidt(3,2,0,v,u)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The independent-column sketch avoids a zero residual but was not executed. A full build of linalg also contains LAPACK references and needs its normal link dependencies; this routine itself uses array arithmetic. Validate orthogonality/residuals independently and avoid rank-deficient inputs."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "473ff4e032ab0d8472c87b1f580fc82db1d73cf2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The defining source headers explicitly permit GPL version 3 or any later version; the root contains the GPL version 3 text. Optional BLAS/LAPACK implementations retain their own licensing terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "src/gmmEM.f90",
+              "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/gmmEM.f90",
+              "sha256": "e6245edf7da31f78686d4dd2be9c74ff229cb47fc2c9fb83a56d909ebee16fad"
+            },
+            {
+              "path": "src/linalg.f90",
+              "url": "https://github.com/Jonas-Finkler/fortran-gmm-EM/blob/473ff4e032ab0d8472c87b1f580fc82db1d73cf2/src/linalg.f90",
+              "sha256": "b94d4b841203d680e676819eb648790fc9bfa9e3ac5e2cc040597987c994ae87"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26430,12 +26793,86 @@
             ],
             "notes": "The README identifies a cut-down ACM_EqualSphere module based on the Leopardi method. Equal-area partitioning does not itself establish a spherical quadrature rule or integration-error guarantee.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "da407f40793810c522d558dff4ed353a34ee6161",
+            "reviewed_on": "2026-11-05",
+            "notes": "ACM_EqualSphere::eq_sphere generates representative Cartesian points for a recursive-zonal equal-area sphere partition construction: polar caps, rounded collar populations, latitude midpoints, azimuthal offsets and unit-vector normalization. The output is only a point array, not region boundaries, a mesh or a covering-radius certificate. GAMS P has no narrower subclass in the imported/reviewed taxonomy. It validates a positive row count and exactly three columns by printing and STOP, handles the first few small counts specially, and relies on positive collar populations in GCD/offset divisions. Exact equal areas, all population edge cases and the diameter bound were not validated by execution. The source file also contains a demonstration main program, so linking it unchanged with another main would duplicate the program entry point.",
+            "evidence": [
+              {
+                "path": "ACM_EqualSphere.f90",
+                "url": "https://github.com/GongZheng-Justin/EqualSpherePartition/blob/da407f40793810c522d558dff4ed353a34ee6161/ACM_EqualSphere.f90",
+                "sha256": "4c0e544f87bd3c6bfe57bcbcfbaffb04a656e5566b84adf008ad3044450d67ec"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/GongZheng-Justin/EqualSpherePartition/blob/da407f40793810c522d558dff4ed353a34ee6161/README.md",
+                "sha256": "8a79a7d41b1fa1ece707413a18ee7b0a69eb8f7ad2764e167ae7c7118b5bff81"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eq_sphere",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine filling Point(n,3) with unit-sphere representative coordinates; the module kind is the literal value 8. Separate the module from the appended demonstration program for library reuse.",
+                "signature": "CALL eq_sphere(Point)",
+                "declarations": [
+                  {
+                    "path": "ACM_EqualSphere.f90",
+                    "line_start": 18,
+                    "line_end": 29
+                  }
+                ],
+                "path": "ACM_EqualSphere.f90",
+                "line_start": 27,
+                "line_end": 88,
+                "module": "ACM_EqualSphere",
+                "examples": [
+                  {
+                    "path": "ACM_EqualSphere.f90",
+                    "line_start": 109,
+                    "line_end": 123
+                  }
+                ],
+                "usage": "use ACM_EqualSphere, only: eq_sphere\nreal(kind=8) :: points(20,3)\ncall eq_sphere(points)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile a module-only source extracted from the supplied combined module/program file, with a compiler whose kind 8 matches the implementation. Points are representative coordinates; the routine does not return partition cells or independently verify equal areas. Invalid shapes terminate via STOP."
+              },
+              {
+                "procedure": "gcd",
+                "role": "implementation-helper",
+                "path": "ACM_EqualSphere.f90",
+                "line_start": 93,
+                "line_end": 103,
+                "module": "ACM_EqualSphere"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "da407f40793810c522d558dff4ed353a34ee6161",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README and source identify the author and cite the partition algorithm, but no explicit reuse grant was identified and the pinned tree has no separately named LICENSE/COPYING file. Algorithm citations and public source access do not establish a project license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/GongZheng-Justin/EqualSpherePartition/blob/da407f40793810c522d558dff4ed353a34ee6161/README.md",
+              "sha256": "8a79a7d41b1fa1ece707413a18ee7b0a69eb8f7ad2764e167ae7c7118b5bff81"
+            },
+            {
+              "path": "ACM_EqualSphere.f90",
+              "url": "https://github.com/GongZheng-Justin/EqualSpherePartition/blob/da407f40793810c522d558dff4ed353a34ee6161/ACM_EqualSphere.f90",
+              "sha256": "4c0e544f87bd3c6bfe57bcbcfbaffb04a656e5566b84adf008ad3044450d67ec"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31466,12 +31903,165 @@
             ],
             "notes": "The README identifies pure transformation functions and golden-section maximum-likelihood parameter estimation. Valid input domains, likelihood assumptions and handling of degenerate data are not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L4a1a5",
+            "level": "source-reviewed",
+            "revision": "d9ffa11a62858c813600925b3a23a14f6d6112c1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The module provides fixed-lambda Yeo-Johnson and Box-Cox transformations plus lambda selectors using golden-section maximization on [-3,3] with tolerance 0.001. This supports transformation selection, but it is not a validated maximum-likelihood estimator: both internal objectives compute sqrt(sample variance) into var_z. In the Yeo-Johnson objective, -0.5*n*log(var_z) therefore weights log standard deviation by half the usual coefficient relative to the unchanged Jacobian term, changing the optimization criterion. In the Box-Cox selector the geometric-mean scaling absorbs the Jacobian and the same factor is an overall positive likelihood scaling, which by itself leaves the maximizing lambda unchanged. The Box-Cox selector also computes log(x) before any positivity shift, unlike box_cox_lambda which shifts a nonpositive dataset by 1-min(x). Constant/short data, nonpositive selector inputs, overflow, near-zero cancellation and convergence/global optimality are not guarded. The sketch deliberately uses fixed lambdas and does not recommend the Yeo-Johnson selector without objective correction and validation; the Box-Cox selector still requires strictly positive data.",
+            "evidence": [
+              {
+                "path": "src/variable_transformation_mo.f90",
+                "url": "https://github.com/tkdhss111/fortran-variable-transformation/blob/d9ffa11a62858c813600925b3a23a14f6d6112c1/src/variable_transformation_mo.f90",
+                "sha256": "d6fdd0a949de4a4e6905b7d20a2df77e3c7f1256233bc1a9866cc9e193ca44a2"
+              },
+              {
+                "path": "test/unit_test.f90",
+                "url": "https://github.com/tkdhss111/fortran-variable-transformation/blob/d9ffa11a62858c813600925b3a23a14f6d6112c1/test/unit_test.f90",
+                "sha256": "facd9f43700e177bca88179a4ef39bd45a4cc93e65a770edf473b206a29a9629"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "yeo_johnson_lambda",
+                "role": "public-entry-point",
+                "summary": "Default-REAL elemental scalar transformation; accepts arrays by elemental application and supports both signs of x. Lambda close to zero or two uses logarithmic branches.",
+                "signature": "z = yeo_johnson_lambda(x, lambda)",
+                "declarations": [
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 1,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 68,
+                    "line_end": 72
+                  }
+                ],
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 68,
+                "line_end": 88,
+                "module": "variable_transformation_mo",
+                "usage": "use variable_transformation_mo, only: yeo_johnson_lambda, box_cox_lambda\nreal :: x(3), yj(3), bc(3)\nx = [-1.0,0.0,2.0]\nyj = yeo_johnson_lambda(x,0.5)\n! The Box-Cox routine shifts this dataset to positive values first.\nbc = box_cox_lambda(x,0.5)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Fixed-lambda illustration only; it does not exercise the selectors with the objective discrepancy. Default REAL, approximate equality near special lambdas and cancellation/overflow behavior are part of the actual interface."
+              },
+              {
+                "procedure": "box_cox_lambda",
+                "role": "public-entry-point",
+                "summary": "Default-REAL array function. Shifts all data by 1-min(x) if the minimum is nonpositive; optional eps defaults to 0.01 and selects the log branch when abs(lambda)<eps.",
+                "signature": "z = box_cox_lambda(x, lambda, eps)",
+                "declarations": [
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 142,
+                    "line_end": 150
+                  }
+                ],
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 142,
+                "line_end": 172,
+                "module": "variable_transformation_mo"
+              },
+              {
+                "procedure": "opt_yeo_johnson_lambda",
+                "role": "public-entry-point",
+                "summary": "Returns a bounded golden-section lambda estimate; the objective coefficient discrepancy in this review must be addressed before relying on it.",
+                "signature": "lambda = opt_yeo_johnson_lambda(x)",
+                "declarations": [
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 90,
+                    "line_end": 94
+                  }
+                ],
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 90,
+                "line_end": 123,
+                "module": "variable_transformation_mo"
+              },
+              {
+                "procedure": "opt_box_cox_lambda",
+                "role": "public-entry-point",
+                "summary": "Lambda selector requiring strictly positive, nonconstant data with at least two entries; it does not apply the fixed-lambda routine positivity shift.",
+                "signature": "lambda = opt_box_cox_lambda(x, eps)",
+                "declarations": [
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 174,
+                    "line_end": 181
+                  }
+                ],
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 174,
+                "line_end": 223,
+                "module": "variable_transformation_mo"
+              },
+              {
+                "procedure": "golden_section_search",
+                "role": "implementation-helper",
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 229,
+                "line_end": 284,
+                "module": "variable_transformation_mo"
+              }
+            ]
+          },
+          {
+            "code": "L6a14",
+            "level": "source-reviewed",
+            "revision": "d9ffa11a62858c813600925b3a23a14f6d6112c1",
+            "reviewed_on": "2026-11-05",
+            "notes": "rnorm generates default-REAL normal variates by the Box-Muller sine/cosine transform of intrinsic RANDOM_NUMBER uniforms, then applies mean and sd (defaults zero and one). It handles odd lengths by discarding the second member of the last pair. RANDOM_NUMBER can return zero, but the code does not reject/resample u1=0 before log(u1); negative n, sd<0, exceptional values and seed reproducibility are not validated. This mapping records the implemented generator, not a distributional test or a portable reproducibility guarantee.",
+            "evidence": [
+              {
+                "path": "src/variable_transformation_mo.f90",
+                "url": "https://github.com/tkdhss111/fortran-variable-transformation/blob/d9ffa11a62858c813600925b3a23a14f6d6112c1/src/variable_transformation_mo.f90",
+                "sha256": "d6fdd0a949de4a4e6905b7d20a2df77e3c7f1256233bc1a9866cc9e193ca44a2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rnorm",
+                "role": "public-entry-point",
+                "summary": "Default-REAL vector function using the intrinsic random stream and Box-Muller transform.",
+                "signature": "z = rnorm(n, mean, sd)",
+                "declarations": [
+                  {
+                    "path": "src/variable_transformation_mo.f90",
+                    "line_start": 308,
+                    "line_end": 313
+                  }
+                ],
+                "path": "src/variable_transformation_mo.f90",
+                "line_start": 308,
+                "line_end": 334,
+                "module": "variable_transformation_mo",
+                "usage": "use variable_transformation_mo, only: rnorm\nreal :: draws(4)\n! Set RANDOM_SEED explicitly if reproducibility is required.\ndraws = rnorm(4,mean=0.0,sd=1.0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The implementation needs a zero-uniform guard before it can promise finite outputs on every intrinsic RNG draw. Seed layout and random sequences are compiler-dependent. No randomness or distribution test was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "d9ffa11a62858c813600925b3a23a14f6d6112c1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Hisashi Takeda and supplies the standard permission, notice-retention and warranty clauses. This is a scoped project notice finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tkdhss111/fortran-variable-transformation/blob/d9ffa11a62858c813600925b3a23a14f6d6112c1/LICENSE",
+              "sha256": "792c088d60db7b8f1b9eaf28602b71f1498d69d0cab547ab45e13c29c21f9977"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35287,12 +35877,119 @@
             ],
             "notes": "The README identifies a collection of assimilation operations requiring NetCDF Fortran and EnsDAM. Python interfaces are described as in development; a full end-to-end forecasting model or verified implementation of every assimilation scheme is not inferred.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "81302c6f2976aba9a91b168b44fedefe53d04da6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected utilclc routines compute a column Gram product S-transpose*S and its weighted analogue S-transpose*diag(w**2)*S using DOT_PRODUCT. Despite the names mkcov/mkcovweight, the routines neither subtract means nor divide by a sample-count denominator: raw input is not automatically converted to statistical covariance. Weights are applied to BOTH vectors and hence squared, not used once. Shapes are partly checked through printerror2; callers should supply full ncols-by-ncols outputs and matching row weights. Precision is the preprocessed SESAM BIGREAL/kr setting, with repository module/configuration and error-hook dependencies. This maps elementary matrix multiplication, not the full data-assimilation system or an automatic covariance estimator.",
+            "evidence": [
+              {
+                "path": "src/utilclc.F90",
+                "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/src/utilclc.F90",
+                "sha256": "5878242a35bf3173361ad8096fd9b30753a074c28f87d15f6ccd8dc71bec38be",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/config.main.h90",
+                "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/src/config.main.h90",
+                "sha256": "724a537ed83fc61a37b727414f7f7f7e3b03cf5eb2ef5ffbaa3185ac37428d90",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/param.control.h90",
+                "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/src/param.control.h90",
+                "sha256": "f27c388e3e1d067d2d7c11bb9c7145cbad3a76f090aa854df7f0f6447fdc81dc",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/mod_main.F90",
+                "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/src/mod_main.F90",
+                "sha256": "5647425833a164468576918098ba04898079c3cd76110334f4f32cad63c585c9",
+                "source_encoding": "cp1252"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mkcov",
+                "role": "public-entry-point",
+                "summary": "Public module Gram-matrix subroutine; output dimensions must not exceed the number of input columns. Use a full square output for the complete product.",
+                "signature": "CALL mkcov(cov, matsr)",
+                "declarations": [
+                  {
+                    "path": "src/utilclc.F90",
+                    "line_start": 47,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "src/utilclc.F90",
+                    "line_start": 60,
+                    "line_end": 72
+                  },
+                  {
+                    "path": "src/config.main.h90",
+                    "line_start": 58,
+                    "line_end": 63
+                  },
+                  {
+                    "path": "src/param.control.h90",
+                    "line_start": 99,
+                    "line_end": 113
+                  }
+                ],
+                "path": "src/utilclc.F90",
+                "line_start": 60,
+                "line_end": 91,
+                "module": "utilclc",
+                "usage": "use mod_main, only: kr\nuse utilclc, only: mkcov, mkcovweight\nreal(kr) :: a(3,2), gram(2,2), weighted(2,2), w(3)\na(:,1)=[1.0_kr,2.0_kr,3.0_kr]\na(:,2)=[0.0_kr,1.0_kr,1.0_kr]\nw=[1.0_kr,2.0_kr,1.0_kr]\ncall mkcov(gram,a)\ncall mkcovweight(weighted,a,w)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build within a consistently preprocessed SESAM configuration with required modules/error hooks. Weighted results use w**2. Center and normalize explicitly if a statistical covariance is intended; this sketch leaves the data uncentered."
+              },
+              {
+                "procedure": "mkcovweight",
+                "role": "public-entry-point",
+                "summary": "Weighted Gram product with squared diagonal weights, not a one-weight-per-observation covariance formula.",
+                "signature": "CALL mkcovweight(covweight, matsr, vectsweight)",
+                "declarations": [
+                  {
+                    "path": "src/utilclc.F90",
+                    "line_start": 95,
+                    "line_end": 110
+                  }
+                ],
+                "path": "src/utilclc.F90",
+                "line_start": 95,
+                "line_end": 132,
+                "module": "utilclc"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CeCILL version 2.0",
+          "spdx_expression": "CECILL-2.0",
+          "revision": "81302c6f2976aba9a91b168b44fedefe53d04da6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root agreement identifies version 2.0 dated 2006-09-05; the defining source explicitly permits use, modification and redistribution under CeCILL. This records the reviewed project terms rather than a full audit of optional linked dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/LICENSE.txt",
+              "sha256": "7e766f182f902958d4095f4526e73420b4c235780d020f1bd11cb46f0431bebe",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "src/utilclc.F90",
+              "url": "https://github.com/brankart/sesam/blob/81302c6f2976aba9a91b168b44fedefe53d04da6/src/utilclc.F90",
+              "sha256": "5878242a35bf3173361ad8096fd9b30753a074c28f87d15f6ccd8dc71bec38be",
+              "source_encoding": "cp1252"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38251,12 +38948,280 @@
             ],
             "notes": "The README marks Kahan summation, compensated one-pass statistics and Welford updates as implemented and points to a demo. Stability and parallel-reduction behavior remain untested; broad arithmetic/statistical coverage is recorded.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "A3a",
+            "level": "source-reviewed",
+            "revision": "d639dc5b06a323b8727eff24e405b5b13cd3a65d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected REAL64 summation object implements compensated addition: subtract the stored compensation from the incoming addend, form the new sum and recover the lost low part. Public operator(+) and the add binding return a new object; they do not mutate the receiver. kahan_babushka_sum uses a magnitude-dependent correction accumulated alongside a scalar sum. A3a records compensated standard-precision arithmetic, not arbitrary precision or interval arithmetic. Compiler reassociation/unsafe floating-point optimizations can defeat these compensation steps. The separate Klein routine prints that its implementation may be incomplete and is excluded. No rounding-error experiment or compilation was performed.",
+            "evidence": [
+              {
+                "path": "src/kahan_summation_m.f90",
+                "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/src/kahan_summation_m.f90",
+                "sha256": "d57baba9833235bec6b23fc625307f3c115c76a8c153eb57f689af99efd4c591"
+              },
+              {
+                "path": "example/demo_kahan_summation.f90",
+                "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/example/demo_kahan_summation.f90",
+                "sha256": "0e26a99521221ff67e97435c7f962dd0b7ecc712ac5164e467e819cc295ba7ac"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "kahan_summation",
+                "role": "public-entry-point",
+                "summary": "Generic constructor for a REAL64 compensated scalar accumulator. Default construction also starts at zero; use reassignment when adding.",
+                "signature": "acc = kahan_summation(value)",
+                "declarations": [
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 1,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 29,
+                    "line_end": 40
+                  }
+                ],
+                "path": "src/kahan_summation_m.f90",
+                "line_start": 29,
+                "line_end": 33,
+                "module": "kahan_summation_m",
+                "usage": "use iso_fortran_env, only: real64\nuse kahan_summation_m, only: kahan_summation\ntype(kahan_summation) :: acc\nreal(real64) :: total\nacc = kahan_summation(0.0_real64)\nacc = acc + 1.0_real64\nacc = acc + 1.0e-12_real64\ntotal = acc%val()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The addition returns a new value and must be assigned back. Use finite inputs and floating-point settings preserving compensation arithmetic; no accuracy guarantee or fast-math compatibility is inferred.",
+                "examples": [
+                  {
+                    "path": "example/demo_kahan_summation.f90",
+                    "line_start": 1,
+                    "line_end": 20
+                  }
+                ]
+              },
+              {
+                "procedure": "add",
+                "role": "public-entry-point",
+                "summary": "Pure type-bound function also exposed as operator(+); returns the updated accumulator.",
+                "signature": "updated = acc%add(value)",
+                "declarations": [
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 7,
+                    "line_end": 17
+                  },
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 38,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/kahan_summation_m.f90",
+                "line_start": 38,
+                "line_end": 46,
+                "module": "kahan_summation_m",
+                "derived_type": "kahan_summation"
+              },
+              {
+                "procedure": "val",
+                "role": "public-entry-point",
+                "summary": "Returns the stored compensated running sum.",
+                "signature": "total = acc%val()",
+                "declarations": [
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 34,
+                    "line_end": 36
+                  }
+                ],
+                "path": "src/kahan_summation_m.f90",
+                "line_start": 34,
+                "line_end": 37,
+                "module": "kahan_summation_m",
+                "derived_type": "kahan_summation"
+              },
+              {
+                "procedure": "kahan_babushka_sum",
+                "role": "public-entry-point",
+                "summary": "REAL64 assumed-shape array summation with a magnitude-dependent correction; empty arrays return zero.",
+                "signature": "total = kahan_babushka_sum(arr)",
+                "declarations": [
+                  {
+                    "path": "src/kahan_summation_m.f90",
+                    "line_start": 68,
+                    "line_end": 73
+                  }
+                ],
+                "path": "src/kahan_summation_m.f90",
+                "line_start": 68,
+                "line_end": 87,
+                "module": "kahan_summation_m"
+              }
+            ]
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "d639dc5b06a323b8727eff24e405b5b13cd3a65d",
+            "reviewed_on": "2026-11-05",
+            "notes": "online_variance stores a count and updates the mean with delta/count as samples arrive. The constructor processes an array by repeatedly calling the same add method. mean() requires at least one observation and uses ERROR STOP on an empty accumulator. This is a streaming arithmetic location summary, not a significance test or compensated implementation; REAL64 is imported from ISO_FORTRAN_ENV. No execution or statistical-accuracy validation was performed.",
+            "evidence": [
+              {
+                "path": "src/online_variance_m.f90",
+                "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/src/online_variance_m.f90",
+                "sha256": "222576c625ba8d8e10f84cdcc86a5df199231647da90505bb8b2f455b51bb430"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "Type-bound REAL64 running-mean query; call add at least once before querying.",
+                "signature": "value = stats%mean()",
+                "declarations": [
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 6,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 40,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/online_variance_m.f90",
+                "line_start": 40,
+                "line_end": 46,
+                "module": "online_variance_m",
+                "derived_type": "online_variance",
+                "usage": "use iso_fortran_env, only: real64\nuse online_variance_m, only: online_variance\ntype(online_variance) :: stats\nreal(real64) :: mean\ncall stats%add(1.0_real64)\ncall stats%add(3.0_real64)\nmean = stats%mean()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default type initialization supplies the empty state. Querying an empty accumulator terminates via ERROR STOP; no numerical status is returned."
+              },
+              {
+                "procedure": "add",
+                "role": "public-entry-point",
+                "summary": "Mutates the count, running mean and centered second-moment accumulator.",
+                "signature": "CALL stats%add(new_val)",
+                "declarations": [
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 29,
+                    "line_end": 36
+                  }
+                ],
+                "path": "src/online_variance_m.f90",
+                "line_start": 29,
+                "line_end": 39,
+                "module": "online_variance_m",
+                "derived_type": "online_variance"
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "d639dc5b06a323b8727eff24e405b5b13cd3a65d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The same online_variance object uses the Welford delta times updated-delta recurrence for M2. var() divides M2 by count, whereas sample_var() divides by count-1; both require at least two observations and otherwise ERROR STOP. This mapping covers only the univariate streaming dispersion routines. The separately inspected online_covariance module adds the product of two OLD-mean deltas to its cross accumulator instead of an old/new-mean product; that covariance implementation needs correction and is not promoted as a checked covariance algorithm. No computation was run.",
+            "evidence": [
+              {
+                "path": "src/online_variance_m.f90",
+                "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/src/online_variance_m.f90",
+                "sha256": "222576c625ba8d8e10f84cdcc86a5df199231647da90505bb8b2f455b51bb430"
+              },
+              {
+                "path": "src/online_covariance_m.f90",
+                "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/src/online_covariance_m.f90",
+                "sha256": "33d203e29bd7f392b66bbea0c71a0699ecb5ef725bb20b317b9dcd60d6487456"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "var",
+                "role": "public-entry-point",
+                "summary": "REAL64 population-variance query, with a source-enforced minimum count of two even though a single-point population variance is mathematically defined.",
+                "signature": "value = stats%var()",
+                "declarations": [
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 6,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 47,
+                    "line_end": 52
+                  }
+                ],
+                "path": "src/online_variance_m.f90",
+                "line_start": 47,
+                "line_end": 53,
+                "module": "online_variance_m",
+                "derived_type": "online_variance",
+                "usage": "use iso_fortran_env, only: real64\nuse online_variance_m, only: online_variance\ntype(online_variance) :: stats\nreal(real64) :: population_variance, sample_variance\ncall stats%add(1.0_real64)\ncall stats%add(3.0_real64)\npopulation_variance = stats%var()\nsample_variance = stats%sample_var()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The two queries use different denominators. Both terminate if fewer than two samples were added. This is the univariate module, not the covariance module with the cross-update discrepancy."
+              },
+              {
+                "procedure": "sample_var",
+                "role": "public-entry-point",
+                "summary": "REAL64 sample-variance query using denominator count-1; requires at least two observations.",
+                "signature": "value = stats%sample_var()",
+                "declarations": [
+                  {
+                    "path": "src/online_variance_m.f90",
+                    "line_start": 54,
+                    "line_end": 59
+                  }
+                ],
+                "path": "src/online_variance_m.f90",
+                "line_start": 54,
+                "line_end": 60,
+                "module": "online_variance_m",
+                "derived_type": "online_variance"
+              },
+              {
+                "procedure": "add_online_variance",
+                "role": "implementation-helper",
+                "path": "src/online_variance_m.f90",
+                "line_start": 29,
+                "line_end": 39,
+                "module": "online_variance_m"
+              },
+              {
+                "procedure": "add_pair_online_variance",
+                "module": "online_covariance_m",
+                "role": "implementation-evidence",
+                "path": "src/online_covariance_m.f90",
+                "line_start": 35,
+                "line_end": 48
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "d639dc5b06a323b8727eff24e405b5b13cd3a65d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies GPL version 3 text. The reviewed README and defining modules do not settle version-only versus or-later project terms. This finding is not a provenance audit of every MPI/statistical component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/osada-yum/Numerical_utilities/blob/d639dc5b06a323b8727eff24e405b5b13cd3a65d/README.md",
+              "sha256": "bdeeae946b62b61da98c6c92af4fb4091b2ad6103965a56fa8b68c67d1219e38"
+            }
+          ]
         }
       },
       "imports": {}
@@ -39751,12 +40716,107 @@
             ],
             "notes": "DESCRIPTION identifies the wrapped Fortran authors and distinct hypergeometric implementations. Parameter domains, branch conventions and numerical failure modes require later procedure-level review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C19",
+            "level": "source-reviewed",
+            "revision": "f1bfd62382ad8d3e965eadd01ca60be83e66d399",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected external HYP_2F1 and HYP_2F1_SUBROUTINE evaluate the Gauss (nonconfluent) hypergeometric function for complex parameters and argument. The driver selects transformed power expansions near zero, one or infinity, with a remaining complex-plane path. Real z>=1 is shifted to an infinitesimal negative imaginary part, explicitly choosing a side of the branch cut. Undefined denominator parameters call REXIT and there is no returned numerical-status/error-estimate argument. C19 is used because the GAMS C11 branch is specifically confluent hypergeometric functions; this is not that class. The selected wrapper/dispatch review does not validate every expansion, singular limit or the separate Appell F1 ODE path.",
+            "evidence": [
+              {
+                "path": "src/hyp_2F1.f90",
+                "url": "https://github.com/cran/appell/blob/f1bfd62382ad8d3e965eadd01ca60be83e66d399/src/hyp_2F1.f90",
+                "sha256": "50a099e18d283d13c07ed3cf4cef254395874b154b7ed00794a259c926e2cfd6"
+              },
+              {
+                "path": "R/hyp2f1.R",
+                "url": "https://github.com/cran/appell/blob/f1bfd62382ad8d3e965eadd01ca60be83e66d399/R/hyp2f1.R",
+                "sha256": "5104053c21dee25e80709d13efcf1d8651bffba34e418499eace9dcf79658f21"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "HYP_2F1_SUBROUTINE",
+                "role": "public-entry-point",
+                "summary": "External complex double-precision Gauss hypergeometric wrapper. Import PR from HYP_2F1_MODULE for kinds; the wrapper itself is external, not a module procedure. Requires compatible REXIT error support.",
+                "signature": "CALL HYP_2F1_SUBROUTINE(A, B, C, Z, VAL)",
+                "declarations": [
+                  {
+                    "path": "src/hyp_2F1.f90",
+                    "line_start": 1874,
+                    "line_end": 1880
+                  },
+                  {
+                    "path": "src/hyp_2F1.f90",
+                    "line_start": 19,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/hyp_2F1.f90",
+                "line_start": 1874,
+                "line_end": 1883,
+                "usage": "use HYP_2F1_MODULE, only: PR\ncomplex(PR) :: a,b,c,z,value\nexternal :: HYP_2F1_SUBROUTINE\na=cmplx(0.5_PR,0.0_PR,PR)\nb=cmplx(1.0_PR,0.0_PR,PR)\nc=cmplx(2.0_PR,0.0_PR,PR)\nz=cmplx(0.25_PR,0.0_PR,PR)\ncall HYP_2F1_SUBROUTINE(a,b,c,z,value)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the compatible implementation and REXIT support. This avoids the branch cut and obvious denominator singularities; it does not test analytic continuation, singular limits or accuracy. HYP_2F1_MODULE supplies constants/helpers, not the external function interface."
+              },
+              {
+                "procedure": "HYP_2F1",
+                "role": "public-entry-point",
+                "summary": "Recursive external COMPLEX(PR) function dispatching transformed Gauss hypergeometric expansions; an explicit function interface or matching external result declaration is needed by direct callers.",
+                "signature": "value = HYP_2F1(A, B, C, Z)",
+                "declarations": [
+                  {
+                    "path": "src/hyp_2F1.f90",
+                    "line_start": 1690,
+                    "line_end": 1703
+                  }
+                ],
+                "path": "src/hyp_2F1.f90",
+                "line_start": 1690,
+                "line_end": 1818
+              },
+              {
+                "procedure": "HYP_PS_ZERO",
+                "role": "implementation-helper",
+                "path": "src/hyp_2F1.f90",
+                "line_start": 1151,
+                "line_end": 1192
+              },
+              {
+                "procedure": "HYP_PS_ONE",
+                "role": "implementation-helper",
+                "path": "src/hyp_2F1.f90",
+                "line_start": 1266,
+                "line_end": 1360
+              },
+              {
+                "procedure": "HYP_PS_INFINITY",
+                "role": "implementation-helper",
+                "path": "src/hyp_2F1.f90",
+                "line_start": 1435,
+                "line_end": 1533
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later (package metadata)",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "f1bfd62382ad8d3e965eadd01ca60be83e66d399",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>= 3) and names the Fortran component contributors. This records the package-level declaration, not an independent provenance audit of every historically bundled algorithm.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/appell/blob/f1bfd62382ad8d3e965eadd01ca60be83e66d399/DESCRIPTION",
+              "sha256": "2f250cb5b7d8a68d82a7536d4ce19d16dc825d51525f1a48858d5764f877ec02"
+            }
+          ]
         }
       },
       "imports": {}
