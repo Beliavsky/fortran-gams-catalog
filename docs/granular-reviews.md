@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 148 repositories now have 176 source-reviewed
+Reviewed on 2026-11-05. 156 repositories now have 187 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-144 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Four further cards (DDFSA, CWT, polyfit and
-StatTools) identify supplied program entry points and keep their internal/benchmark
+150 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Six further cards (DDFSA, CWT, polyfit, StatTools, GridSearch and
+PSOclassicG) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 148 independently source-reviewed repositories now have an
+separately. All 156 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -172,6 +172,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fftlog | External `fhti`, `fht`, `fftl` (logarithmic grids) | CC0 additions; numerical-component notices separate |
 | FortranCWT | `A19CWT::rA19CWT_zerobc` | GPL v3 text; version choice unresolved |
 | wavepack | `wavepack::wavelet` (Morlet path) | MIT root; older restrictive source notices retained |
+| fOptimize | `mOptimize::biss_1d`, `::newton_1d` (printed solutions) | GPL v3 text; version choice unresolved |
+| Minimization | `SteepestDescent::Steep`, `GradientCalculator::CalculateGradient` | No license grant identified |
+| fortran-grid-search | `GridSearch` program; edit its linked model calls | GPL-3.0-or-later |
+| Particle-Swarm-Optimization-Fortran-95 | `PSOclassicG` program; included `fitness` is internal | MIT |
+| MMA-in-Fortran | `MMA_Routines::MMA_Sub` (DP, one outer step) | Academic-use statement; grant unresolved |
+| l-bfgs-b_wrapper_f90 | `LBFGSB_module::lbfgsb` (objective/gradient/observer callbacks) | BSD core notice; wrapper grant unresolved |
+| osqp-fortran | `OSQP::OSQP_settings`, `::OSQP_solve`, `::OSQP_cleanup` | No wrapper license grant identified |
+| quadprog | `quad_prog::quadprog` (Fortran generic) | GPL v3 root; GPL-2.0-or-later core notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -339,6 +347,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fftlog](https://github.com/emsig/fftlog) | J; J1a3 | Gamma-ratio multipliers, periodic logarithmic Hankel and half-order sine/cosine transforms | In-place data; initialize workspace and retain adjusted kr. Logarithmic-grid assumptions and singular/Nyquist handling matter. |
 | [FortranCWT](https://github.com/wangyun1995/FortranCWT) | J | Real zero-boundary CBSW transform via spline coefficients and cumulative sums | Allocatable outputs use scale-first zero-based indexing; no status. Only selected A19 path reviewed. |
 | [wavepack](https://github.com/zoziha/wavepack) | J | Mean removal, FFT/daughter/inverse Morlet transform and cone of influence | Time-first output; enforce 65535 scratch bound. Mutable default controls, dependency branch and source notices recorded. |
+| [fOptimize](https://github.com/volpatto/foptimize) | G1a1a; G1a1c | Interior-point scalar interval reduction and derivative-supplied Newton stationary-point search | Results printed, not returned. Saved controls persist; Newton requires its nominally optional output unit. Stationarity alone does not identify a minimum. |
+| [Minimization](https://github.com/bramvandeput/minimization) | G1b1a; H1 | Finite-difference negative-gradient steps and central-gradient evaluation | Source-defined objective, POINTER arrays and fixed difference step. Undefined initial gradient copy, pointer leaks and misleading limit message recorded. |
+| [fortran-grid-search](https://github.com/jonbmay/fortran-grid-search) | G2i | Cell-center Cartesian sampling, best-cell retention and hierarchical refinement | Program reads Input.txt; sample model is 3D. Uninitialized MisExit/argument-parser state and optional-argument hazards need attention; no global guarantee. |
+| [Particle-Swarm-Optimization-Fortran-95](https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95) | G2i | Inertial/personal/global-best velocity update and box-restricted objective evaluations | Program parameters are source-defined. VTR records but does not stop iterations; NIR=0 report indexing and partial NFE count recorded. |
+| [MMA-in-Fortran](https://github.com/JeffreyGuevaraCorzo/MMA-in-Fortran) | G2h3b1b | Moving asymptotes, reciprocal first-derivative model and primal-dual subproblem dispatch | One step, not complete optimization; rank-two allocatable columns and history required. LAPACK overwrite/INTENT mismatch; no returned inner status. |
+| [l-bfgs-b_wrapper_f90](https://github.com/snljty/l-bfgs-b_wrapper_f90) | G1b1b; G2h1a2 | Unbounded/box-constrained SETULB reverse-communication callback dispatch | func_tol is FACTR, max_cyc counts FG requests. Objective declaration mismatch and observer access before first evaluation recorded. Core not fully audited. |
+| [osqp-fortran](https://github.com/osqp/osqp-fortran) | G2e1 | Positive-definite convex-QP subset through one-based CSC Fortran/C setup and solve bridge | Match backend kinds/configuration; bridge temporarily mutates INTENT(IN) indices. Setup-failure and process-exit paths require repair; inspect solver info as well as status. |
+| [quadprog](https://github.com/pedro-ricardo/quadprog) | G2e1 | Row-constraint/sign conversion, bound appending and Cholesky QP setup/dispatch | Near-zero Hessian diagonals are changed, not validated. Equality-check logic can miss violations; res is criterion output, not constraint residual. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -601,3 +617,25 @@ Transform grids, normalization and index order must be read before comparing
 results: logarithmic periodic samples, finite uniform samples with zero-boundary
 extension, and time-first versus scale-first coefficients are different contracts.
 No generator, transform or calling sketch in this batch was compiled or run.
+
+## Optimization interfaces and independent stopping checks
+
+The reviewed scalar routines print their solutions rather than returning them.
+Newton convergence to a stationary point does not distinguish a minimum from a
+maximum. Minimization estimates gradients internally, so its optimizer is mapped
+to the no-user-derivatives leaf even though it steps along an estimated gradient.
+Its derivative service receives a separate H1 mapping.
+
+GridSearch and PSOclassicG are standalone source-configured search programs.
+G2i records global-search intent without promising a global optimum. In contrast,
+MMA_Sub performs one approximation/subproblem step and needs an outer driver with
+fresh values, first derivatives, iterate history and stopping checks. The mapped
+nonlinear-constraint leaf does not assert that this implementation accepts explicit
+equalities. The author main's one-step limit is not a convergence demonstration.
+
+The L-BFGS-B wrapper exposes FACTR under the name func_tol and counts evaluation
+requests under max_cyc. The QP cards distinguish bridge success from solver
+optimality, and criterion/objective values from independently computed feasibility
+residuals. Detailed cards retain initialization, argument-intent, optional-argument
+and reporting findings. No upstream routine, optimizer or calling sketch in this
+batch was compiled or run.

@@ -21886,12 +21886,124 @@
             ],
             "notes": "The README explicitly limits the routines to academic use without further improvements. Its local search, derivative-free and quasi-Newton methods are not treated as globally convergent production solvers.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1a1a",
+            "level": "source-reviewed",
+            "revision": "ac00b6ef7703d250084e24d91e858b5bfd7085d8",
+            "reviewed_on": "2026-11-05",
+            "notes": "biss_1d compares objective values at two interior points separated by 20 percent of the current interval, then discards one side until interval width falls below tolerance. G1a1a records a derivative-free scalar minimization search on a suitable unimodal bracket, not a root bisection despite its name. imode=1 minimizes; other values maximize. The routine prints the estimate and optionally writes iteration data, but returns neither a minimizer argument nor a success flag. Initialized local tol/kmax/mode variables have implicit SAVE, so omitted optional settings can inherit previous calls. Iteration exhaustion uses STOP; no bracket/unimodality/NaN validation is supplied. The similarly named golden routine has an unguarded optional-unit write and is not the recommended entry here. No objective or bracket reduction was executed.",
+            "evidence": [
+              {
+                "path": "src/optimize.f90",
+                "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/src/optimize.f90",
+                "sha256": "7b0970fbd2c68c712c383837c6972f2c006935dbe4baccbdb42bfb2f3fc7f8b3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/README.md",
+                "sha256": "ba6ddf508e0f1b5e21659dd922efd682bf64701005137180c4bdb40888745ae5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "biss_1d",
+                "role": "public-entry-point",
+                "summary": "Public REAL*8 scalar-objective module subroutine. Optional controls set interval tolerance, iteration limit, minimization/maximization and output unit. Prints the result rather than returning it. Use positive tolerance, ordered finite endpoints and a suitable unimodal objective.",
+                "signature": "CALL biss_1d(f, a, b [, itol, ikmax, imode, id])",
+                "declarations": [
+                  {
+                    "path": "src/optimize.f90",
+                    "line_start": 1,
+                    "line_end": 21
+                  }
+                ],
+                "path": "src/optimize.f90",
+                "line_start": 9,
+                "line_end": 74,
+                "module": "mOptimize",
+                "usage": "use mOptimize, only: biss_1d\n! Provide objective(x): REAL*8 scalar input INTENT(IN), REAL*8 result.\ncall biss_1d(objective, -2.0d0, 2.0d0, &\n             itol=1.0d-6, ikmax=100, imode=1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment, not a complete driver. Pass all saved controls explicitly for predictable repeated calls. The estimate is printed; callers needing a returned minimizer must adapt the interface. Bracket width is a stopping rule, not a verified objective-error bound. No numerical result or unimodality check was run."
+              },
+              {
+                "procedure": "golden_1d",
+                "role": "implementation-helper",
+                "path": "src/optimize.f90",
+                "line_start": 148,
+                "line_end": 214,
+                "module": "mOptimize"
+              }
+            ]
+          },
+          {
+            "code": "G1a1c",
+            "level": "source-reviewed",
+            "revision": "ac00b6ef7703d250084e24d91e858b5bfd7085d8",
+            "reviewed_on": "2026-11-05",
+            "notes": "newton_1d takes f0 as the objective, f as its first derivative and fprime as its second derivative, then performs x <- x - f/fprime until the first derivative is small. G1a1c records this derivative-supplied smooth scalar stationary-point search as a minimization primitive. It does not establish positive curvature or reject maxima/saddles. Zero second derivative and iteration exhaustion use STOP; initialized local tolerance/limit are saved across calls. The optional output unit id is used unconditionally inside the iteration, so supply a valid id. Results are printed rather than returned. No stationary point, minimum or Newton convergence was numerically checked.",
+            "evidence": [
+              {
+                "path": "src/optimize.f90",
+                "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/src/optimize.f90",
+                "sha256": "7b0970fbd2c68c712c383837c6972f2c006935dbe4baccbdb42bfb2f3fc7f8b3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/README.md",
+                "sha256": "ba6ddf508e0f1b5e21659dd922efd682bf64701005137180c4bdb40888745ae5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "newton_1d",
+                "role": "public-entry-point",
+                "summary": "Public module Newton stationary-point routine. Three REAL*8 scalar callbacks are objective, first derivative and second derivative respectively. Supply id even though it is declared optional, since the loop writes it unconditionally.",
+                "signature": "CALL newton_1d(f0, f, fprime, x0 [, itol, ikmax, id])",
+                "declarations": [
+                  {
+                    "path": "src/optimize.f90",
+                    "line_start": 216,
+                    "line_end": 236
+                  }
+                ],
+                "path": "src/optimize.f90",
+                "line_start": 216,
+                "line_end": 275,
+                "module": "mOptimize",
+                "usage": "use mOptimize, only: newton_1d\n! Supply objective, derivative and curvature with the linked scalar interfaces.\n! Choose a start in a region with positive curvature.\ncall newton_1d(objective, derivative, curvature, 1.0d0, &\n                itol=1.0d-6, ikmax=100, id=31)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment. The routine opens newton31.dat and prints its final estimate. A small derivative alone does not identify a minimum; verify curvature and objective behavior independently. Explicit tolerance/limit avoid inheriting saved settings. No line search or global safeguard is implemented in this inspected path."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 text; version choice unresolved",
+          "spdx_expression": null,
+          "revision": "ac00b6ef7703d250084e24d91e858b5bfd7085d8",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GPL version 3 text; the reviewed module and README do not settle version-only versus or-later scope. No more specific SPDX choice is inferred.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/LICENSE",
+              "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/README.md",
+              "sha256": "ba6ddf508e0f1b5e21659dd922efd682bf64701005137180c4bdb40888745ae5"
+            },
+            {
+              "path": "src/optimize.f90",
+              "url": "https://github.com/volpatto/fOptimize/blob/ac00b6ef7703d250084e24d91e858b5bfd7085d8/src/optimize.f90",
+              "sha256": "7b0970fbd2c68c712c383837c6972f2c006935dbe4baccbdb42bfb2f3fc7f8b3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22575,12 +22687,119 @@
             ],
             "notes": "The README identifies Svanberg-derived routines, LAPACK SGESV/DGESV dependencies and an academic-use scope. Its cited convergence results are not treated as independently established for this adaptation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h3b1b",
+            "level": "source-reviewed",
+            "revision": "1882c43056d475cec949b3721ede4365a1bc8850",
+            "reviewed_on": "2026-11-05",
+            "notes": "The double-precision MMA_Sub generic builds moving asymptotes from iterate history, bounds a move interval, splits objective/constraint derivatives into reciprocal approximation coefficients, and dispatches the resulting subproblem to a primal-dual barrier/Newton routine. G2h3b1b records smooth nonlinear inequality-constrained minimization with supplied first derivatives; no equality support is inferred from the class title. This call performs one MMA subproblem step, not a complete outer optimizer: callers update values, gradients, history and stopping checks. Inputs are allocatable rank-two column arrays plus an m-by-n Jacobian. Inner iterations and fixed epsimin have no returned convergence flag. SolverDP passes INTENT(IN) A/B to overwriting DGESV, an intent mismatch needing repair; helper/kernel correctness is not certified. The supplied main sets maxoutit=1 and is not evidence of a converged optimum. No MMA step or KKT residual was run.",
+            "evidence": [
+              {
+                "path": "MMA_Routines.f90",
+                "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/MMA_Routines.f90",
+                "sha256": "f6b044398f3150df5484ea3d343f7bde943a60259a85161ccd4f846353fa2044"
+              },
+              {
+                "path": "MMA_Main.f90",
+                "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/MMA_Main.f90",
+                "sha256": "e8f24246dbe470836882bbd101e6a8b4ea2ed76d948d654d660690f7647d3704"
+              },
+              {
+                "path": "MMA_Variables.f90",
+                "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/MMA_Variables.f90",
+                "sha256": "771afc41767b946c744b0f31fc8bf409d557013da5b0d0da6769964ab83c056e"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/README.md",
+                "sha256": "e3165a0a638c1f0d17542ee80b42a6c50c1621d3efc50e8097acbfbe73e31d22"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "MMA_Sub",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for double precision. Most vector arguments are allocatable matrices with one column, not rank-one arrays. low/upp retain asymptote state and output allocatables are replaced; xold1/xold2 and iter are managed by the caller.",
+                "signature": "CALL MMA_Sub(xmma, ymma, zmma, lam, xsi, eta, mu, zet, s, low, upp, &\n             m, n, iter, xval, xmin, xmax, xold1, xold2, &\n             f0val, df0dx, fval, dfdx, a0, a, c, d)",
+                "declarations": [
+                  {
+                    "path": "MMA_Routines.f90",
+                    "line_start": 25,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "MMA_Routines.f90",
+                    "line_start": 352,
+                    "line_end": 353
+                  },
+                  {
+                    "path": "MMA_Routines.f90",
+                    "line_start": 412,
+                    "line_end": 439
+                  }
+                ],
+                "path": "MMA_Routines.f90",
+                "line_start": 352,
+                "line_end": 559,
+                "module": "MMA_Routines",
+                "examples": [
+                  {
+                    "path": "MMA_Main.f90",
+                    "line_start": 49,
+                    "line_end": 69
+                  }
+                ],
+                "usage": "use MMA_Routines, only: MMA_Sub\n! Double-precision allocatable columns: xval/xmin/xmax/xold1/xold2/df0dx/low/upp(n,1).\n! fval/a/c/d(m,1), dfdx(m,n); matching allocatable outputs and scalar controls.\n! Supply current function values, gradients and valid history before each step.\ncall MMA_Sub(xmma, ymma, zmma, lam, xsi, eta, mu, zet, s, low, upp, &\n             m, n, iter, xval, xmin, xmax, xold1, xold2, &\n             f0val, df0dx, fval, dfdx, a0, a, c, d)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment, not a complete driver. Maintain an outer loop and independent feasibility/KKT checks. Inspect/fix SolverDP argument intents before relying on its destructive DGESV call; link compatible LAPACK/BLAS. The inner Newton formulas, line search, every dimension case and companion real overload were not fully audited. No optimality or global-convergence claim follows from this mapping."
+              },
+              {
+                "procedure": "SubSolveDP",
+                "role": "implementation-helper",
+                "path": "MMA_Routines.f90",
+                "line_start": 917,
+                "line_end": 959,
+                "module": "MMA_Routines"
+              },
+              {
+                "procedure": "SolverDP",
+                "role": "implementation-helper",
+                "path": "MMA_Routines.f90",
+                "line_start": 1478,
+                "line_end": 1495,
+                "module": "MMA_Routines"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Academic-use statement; no explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "1882c43056d475cec949b3721ede4365a1bc8850",
+          "reviewed_on": "2026-11-05",
+          "notes": "README says the adaptation is intended for academic purposes only and attributes Svanberg original MATLAB code. No separately named LICENSE/COPYING file or explicit redistribution grant was identified in the pinned tree; do not infer a license from the original algorithm publication.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/README.md",
+              "sha256": "e3165a0a638c1f0d17542ee80b42a6c50c1621d3efc50e8097acbfbe73e31d22"
+            },
+            {
+              "path": "MMA_Routines.f90",
+              "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/MMA_Routines.f90",
+              "sha256": "f6b044398f3150df5484ea3d343f7bde943a60259a85161ccd4f846353fa2044"
+            },
+            {
+              "path": "MMA_Main.f90",
+              "url": "https://github.com/jeffreyguevaracorzo/MMA-in-Fortran/blob/1882c43056d475cec949b3721ede4365a1bc8850/MMA_Main.f90",
+              "sha256": "e8f24246dbe470836882bbd101e6a8b4ea2ed76d948d654d660690f7647d3704"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26039,12 +26258,140 @@
             ],
             "notes": "The README describes configurable storage/stopping thresholds and replacement of the example forward model. A finite parameter grid does not establish an optimum over a continuous domain, and early stopping can intentionally leave grid points unexplored.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "0c60346b14eb8e8e28464bb25bc522a2708c6d69",
+            "reviewed_on": "2026-11-05",
+            "notes": "The program samples cell-center Cartesian grids, ranks objective misfits, retains a chosen number of best cells, and refines their coordinate intervals at successive levels, reusing central model values when applicable. G2i records global-search intent for nonconvex objectives, not a proof of global coverage or convergence after discarding cells. The supplied Example computes Euclidean distance to a three-component fixed aim; users replace source calls. MisExit is not initialized on the ordinary no-target-exit path before being read. ReadCLA tests arg before its first assignment, and Example uses optional arguments in logical expressions without guaranteed short-circuit safety. No run, target flag or search accuracy was checked.",
+            "evidence": [
+              {
+                "path": "src/main.f90",
+                "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/src/main.f90",
+                "sha256": "d7abcf9cca77041f37fc7d572fc970369ac737ada36072670e26f8991ba9f586"
+              },
+              {
+                "path": "src/subs.f90",
+                "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/src/subs.f90",
+                "sha256": "c82de4c11f43af9455aac7272922931e4bb96384fc2bdaeb59bebe18ce28097c"
+              },
+              {
+                "path": "src/sims.f90",
+                "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/src/sims.f90",
+                "sha256": "0a0292a7aa74c0d4e3b4f06a53c31ef74c3a84aca660ae14c4f3b677029ce533"
+              },
+              {
+                "path": "Input.txt",
+                "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/Input.txt",
+                "sha256": "6f12a8e6b21f7d3b56c4a5d8e8e39309a6526a6a857cc8b2c87527dd90c72d47"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/README.md",
+                "sha256": "eac5783aff8a79904d0c95445bb8953dd84990e15be4e56497a3bf884692c66f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GridSearch",
+                "role": "program-entry-point",
+                "summary": "Standalone serial grid-refinement program reading Input.txt. Edit its two calls to the problem-specific sims::Example routine to substitute a model/misfit. It writes model/misfit files; this is not a linkable callback-driven optimizer API.",
+                "signature": "./GridSearch [options]",
+                "declarations": [
+                  {
+                    "path": "src/main.f90",
+                    "line_start": 19,
+                    "line_end": 40
+                  },
+                  {
+                    "path": "Input.txt",
+                    "line_start": 1,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/sims.f90",
+                    "line_start": 26,
+                    "line_end": 38
+                  }
+                ],
+                "path": "src/main.f90",
+                "line_start": 19,
+                "line_end": 178,
+                "usage": "# Build the supplied sources/Makefile, and run beside Input.txt.\n# Edit the two Example calls and the model routine for another objective.\n./GridSearch",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Program invocation only. Use positive per-axis grid counts, valid intervals and 1<=Cells<=total models. The example assumes a three-component aim. Before relying on this program, initialize MisExit and inspect absent-optional-argument handling and command-line parsing recorded below. The number of grid models grows as the product of per-axis counts."
+              },
+              {
+                "procedure": "CalcGrid",
+                "role": "implementation-helper",
+                "path": "src/subs.f90",
+                "line_start": 26,
+                "line_end": 49,
+                "module": "subs"
+              },
+              {
+                "procedure": "GenerateModels",
+                "role": "implementation-helper",
+                "path": "src/subs.f90",
+                "line_start": 52,
+                "line_end": 80,
+                "module": "subs"
+              },
+              {
+                "procedure": "MisfitAnalysis",
+                "role": "implementation-helper",
+                "path": "src/subs.f90",
+                "line_start": 83,
+                "line_end": 102,
+                "module": "subs"
+              },
+              {
+                "procedure": "UpdateSetup",
+                "role": "implementation-helper",
+                "path": "src/subs.f90",
+                "line_start": 224,
+                "line_end": 240,
+                "module": "subs"
+              },
+              {
+                "procedure": "Example",
+                "role": "implementation-helper",
+                "path": "src/sims.f90",
+                "line_start": 26,
+                "line_end": 68,
+                "module": "sims"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "0c60346b14eb8e8e28464bb25bc522a2708c6d69",
+          "reviewed_on": "2026-11-05",
+          "notes": "The defining program and helper headers explicitly permit GPL version 3 or later, matching the supplied root GPL text.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "src/main.f90",
+              "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/src/main.f90",
+              "sha256": "d7abcf9cca77041f37fc7d572fc970369ac737ada36072670e26f8991ba9f586"
+            },
+            {
+              "path": "src/subs.f90",
+              "url": "https://github.com/JonBMay/Fortran-Grid-Search/blob/0c60346b14eb8e8e28464bb25bc522a2708c6d69/src/subs.f90",
+              "sha256": "c82de4c11f43af9455aac7272922931e4bb96384fc2bdaeb59bebe18ce28097c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26084,12 +26431,177 @@
             ],
             "notes": "The README describes configurable test functions, finite-difference derivatives and optional gnuplot output. Its suggestion that ever-smaller derivative steps improve accuracy is not treated as a floating-point guarantee; convergence and default example behavior were not checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b1a",
+            "level": "source-reviewed",
+            "revision": "e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d",
+            "reviewed_on": "2026-11-05",
+            "notes": "Steep repeatedly estimates a gradient by central differences of the selected source-defined objective and takes a negative-gradient step. A fixed config gamma is used when nonzero; zero selects a secant-based step update. G1b1a records smooth unconstrained minimization without user-supplied derivatives: the internal finite differences do not make it a derivative-supplied API. The objective is edited in MatFunction or RastriginFunction rather than passed as a callback. Source findings include copying uninitialized gradient into gradientOld on the first iteration, pointer targets repeatedly allocated without release in CalculateGradient, and an unguarded denominator in adaptive gamma. It stops on coordinate change/iteration limit but prints the same convergence message in either case, with no returned optimizer/status. The conjugate module freezes one Hessian and is outside this nonlinear-minimizer claim. No minimization was run.",
+            "evidence": [
+              {
+                "path": "SteepestDescent.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/SteepestDescent.f90",
+                "sha256": "967a33339dde81b303ce476c9d7d03f701b78067313b4806d8cba87d61bf71a3"
+              },
+              {
+                "path": "GradientCalculator.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/GradientCalculator.f90",
+                "sha256": "4823eecfc0b8abbcda0fe13fe0d4a58f7d3317ba37c916b5ffad1fe3147f3406"
+              },
+              {
+                "path": "ConfigHandler.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/ConfigHandler.f90",
+                "sha256": "598668b0d0e054e29a42b574bb64fc44e5ab031ebc990fb0812d2493f045f972"
+              },
+              {
+                "path": "MatFunction.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/MatFunction.f90",
+                "sha256": "feb04c3ebc8ecd259d40543a79c2ceaf3c294002c8cabb2cc0871d95b949eff3"
+              },
+              {
+                "path": "ConjugateGradient.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/ConjugateGradient.f90",
+                "sha256": "5c35ee26ba3960f502a177540b4c511c3f95b65797a21e9b834c3313ecc69cb7"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/README.md",
+                "sha256": "c93fa408ab11b6051715857543b5351f6d86cbd97eebf6445eadaecc4cd3f9f8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Steep",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine consuming ConfigType. Prints the final vector and overwrites Vectors.txt; no solution/status argument. The sketch uses the two-variable default objective and fixed positive gamma, but does not repair the recorded initialization/allocation findings.",
+                "signature": "CALL Steep(config)",
+                "declarations": [
+                  {
+                    "path": "SteepestDescent.f90",
+                    "line_start": 10,
+                    "line_end": 23
+                  },
+                  {
+                    "path": "ConfigHandler.f90",
+                    "line_start": 10,
+                    "line_end": 17
+                  }
+                ],
+                "path": "SteepestDescent.f90",
+                "line_start": 19,
+                "line_end": 78,
+                "module": "SteepestDescent",
+                "usage": "use ConfigHandler, only: ConfigType\nuse SteepestDescent, only: Steep\ntype(ConfigType) :: config\nconfig%order=2; config%x1=[0.0d0,0.0d0]\nconfig%mode=\"default\"; config%direction=\"min\"; config%list=\"off\"\nconfig%gamma=0.01d0; config%convergeLimit=1.0d-6; config%iterationmax=100\ncall Steep(config)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build ConfigHandler, objective modules and GradientCalculator before SteepestDescent. Resolve the first-iteration undefined gradient copy and pointer lifecycle before treating this as a checked driver. Fixed gamma avoids the adaptive-step division but does not certify descent/convergence. Output says convergence even at the limit; verify results independently."
+              },
+              {
+                "procedure": "CalculateGradient",
+                "role": "implementation-helper",
+                "path": "GradientCalculator.f90",
+                "line_start": 18,
+                "line_end": 53,
+                "module": "GradientCalculator"
+              },
+              {
+                "procedure": "Formula",
+                "role": "implementation-helper",
+                "path": "MatFunction.f90",
+                "line_start": 14,
+                "line_end": 21,
+                "module": "MatFunction"
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d",
+            "reviewed_on": "2026-11-05",
+            "notes": "CalculateGradient perturbs each component by a fixed h=0.0000001 and forms (f(x+h e_i)-f(x-h e_i))/(2h), using a source-defined default or Rastrigin objective. H1 records first numerical derivatives, not automatic differentiation or user-provided gradients. The separate config h does not control this routine; it is used by the Hessian routine instead. Inputs and outputs are POINTER arrays, and the routine allocates a new gradient and scratch x without releasing their previous targets. The default objective accesses two components, so use two-dimensional input for the sketch. Unknown modes leave gradient unassigned. No truncation/roundoff error estimate or step-size study was executed.",
+            "evidence": [
+              {
+                "path": "GradientCalculator.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/GradientCalculator.f90",
+                "sha256": "4823eecfc0b8abbcda0fe13fe0d4a58f7d3317ba37c916b5ffad1fe3147f3406"
+              },
+              {
+                "path": "ConfigHandler.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/ConfigHandler.f90",
+                "sha256": "598668b0d0e054e29a42b574bb64fc44e5ab031ebc990fb0812d2493f045f972"
+              },
+              {
+                "path": "MatFunction.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/MatFunction.f90",
+                "sha256": "feb04c3ebc8ecd259d40543a79c2ceaf3c294002c8cabb2cc0871d95b949eff3"
+              },
+              {
+                "path": "RastriginFunction.f90",
+                "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/RastriginFunction.f90",
+                "sha256": "139cf201116e89fc30c4b55a62a1c7d631f176afbd7ea208b06a51af6727bf91"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CalculateGradient",
+                "role": "public-entry-point",
+                "summary": "Public module central-difference gradient routine. Input must be a REAL(8) pointer array; output gradient is also a pointer allocated by the routine. Use supported mode and correct objective dimension. It is not an assumed-shape allocatable-output API.",
+                "signature": "CALL CalculateGradient(config, input, gradient)",
+                "declarations": [
+                  {
+                    "path": "GradientCalculator.f90",
+                    "line_start": 9,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "ConfigHandler.f90",
+                    "line_start": 12,
+                    "line_end": 17
+                  },
+                  {
+                    "path": "MatFunction.f90",
+                    "line_start": 14,
+                    "line_end": 18
+                  }
+                ],
+                "path": "GradientCalculator.f90",
+                "line_start": 18,
+                "line_end": 53,
+                "module": "GradientCalculator",
+                "usage": "use ConfigHandler, only: ConfigType\nuse GradientCalculator, only: CalculateGradient\ntype(ConfigType) :: config\nreal(8), pointer :: input(:), gradient(:) => null()\nconfig%mode=\"default\"\nallocate(input(2)); input=[0.0d0,0.0d0]\ncall CalculateGradient(config, input, gradient)\ndeallocate(input,gradient)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The internal scratch pointer x is not deallocated by the implementation; repeated calls leak storage. An already associated output gradient target can also be lost. No automatic error/optimal-step estimate is returned. Match REAL(8) to the compiler kind conventions; no derivative value was independently checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The source attributes Bram van de Put, but no explicit license grant was identified in the reviewed material and no separately named LICENSE/COPYING appears in the pinned tree.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/README.md",
+              "sha256": "c93fa408ab11b6051715857543b5351f6d86cbd97eebf6445eadaecc4cd3f9f8"
+            },
+            {
+              "path": "SteepestDescent.f90",
+              "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/SteepestDescent.f90",
+              "sha256": "967a33339dde81b303ce476c9d7d03f701b78067313b4806d8cba87d61bf71a3"
+            },
+            {
+              "path": "GradientCalculator.f90",
+              "url": "https://github.com/BramvandePut/Minimization/blob/e48bef3466dcf3e16eafffbdc0dbf8abb7fda44d/GradientCalculator.f90",
+              "sha256": "4823eecfc0b8abbcda0fe13fe0d4a58f7d3317ba37c916b5ffad1fe3147f3406"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29122,12 +29634,160 @@
             ],
             "notes": "The README documents function, gradient and printing callbacks, bounds and termination controls. This is a wrapper of L-BFGS-B, not an independently validated new algorithm; no granular method mapping or checked driver is claimed.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The wrapper allocates limited-memory/work arrays and translates SETULB reverse-communication requests into objective/gradient callbacks, with an observation callback after each SETULB call. G1b1b records smooth unconstrained minimization with first derivatives when bound_stat is omitted or zero. The inspected scope is wrapper dispatch, not every L-BFGS-B line-search/factorization kernel. func_tol is passed directly as FACTR, whose backend test multiplies by machine epsilon; it is not an absolute function tolerance. max_cyc counts FG requests rather than accepted steps, and default zero is unlimited. print_sub can observe f/g before the first evaluation. The objective interface is declared under func_val, not dummy name func_sub; inspect/fix this mismatch before relying on callback checks. No fit or optimization was compiled/run.",
+            "evidence": [
+              {
+                "path": "LBFGSB_wrapper.F90",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB_wrapper.F90",
+                "sha256": "c60b1385be49b189f438782f2c5a6b3e2366dc213cd899f8ed133458dea85fd8"
+              },
+              {
+                "path": "LBFGSB.f",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB.f",
+                "sha256": "c85d31c47e750ba8583771a31a399c4529a0e93af0bb5b02b92d6ed2c85d21de"
+              },
+              {
+                "path": "test.F90",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/test.F90",
+                "sha256": "ecfe3e998807e68827a72ea5bdd2bb3588e1622768ee9c6f78be35ea65e92c2a"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/README",
+                "sha256": "593682228d73d259ec1f403be4154b0097aeb9992c811ca02d0ae6aaf5f4d44e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lbfgsb",
+                "role": "public-entry-point",
+                "summary": "Public module wrapper requiring objective(n,x,f), gradient(n,x,g), and observer(n,x,f,g,task,ind_cyc) subroutines. x is updated in place. info=0 is normal completion, 1 internal error, -1 FG-request limit; independently check convergence and bounds.",
+                "signature": "CALL lbfgsb(n, x, func_sub, grad_sub, print_sub, info, &\n            [func_tol, grad_tol, num_corr, max_cyc, &\n             bound_stat, x_lower, x_upper, print_level])",
+                "declarations": [
+                  {
+                    "path": "LBFGSB_wrapper.F90",
+                    "line_start": 160,
+                    "line_end": 195
+                  }
+                ],
+                "path": "LBFGSB_wrapper.F90",
+                "line_start": 160,
+                "line_end": 321,
+                "module": "LBFGSB_module",
+                "examples": [
+                  {
+                    "path": "test.F90",
+                    "line_start": 10,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "test.F90",
+                    "line_start": 31,
+                    "line_end": 53
+                  }
+                ],
+                "usage": "use LBFGSB_module, only: lbfgsb\ninteger :: info\ndouble precision :: x(2)\n! Supply objective, gradient and observer with the linked interfaces.\nx=[0.0d0,0.0d0]\ncall lbfgsb(2, x, objective, gradient, observer, info, &\n            func_tol=1.0d7, grad_tol=1.0d-6, max_cyc=100)\nif (info /= 0) error stop \"L-BFGS-B wrapper stopped\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment. Preprocess the .F90 wrapper and link SETULB plus its BLAS/LINPACK support. The declared objective-interface name differs from the actual dummy; repair or validate its declaration before treating the fragment as a working driver. Observer must avoid reading f/g on an initial FG request before evaluation. FACTR=1e7 is dimensionless relative stopping control, not function error 1e7. No residual, projected gradient or bound check was executed."
+              }
+            ]
+          },
+          {
+            "code": "G2h1a2",
+            "level": "source-reviewed",
+            "revision": "e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The wrapper allocates limited-memory/work arrays and translates SETULB reverse-communication requests into objective/gradient callbacks, with an observation callback after each SETULB call. G2h1a2 records smooth box-constrained minimization with first derivatives, using bound_stat=1/2/3 and explicit lower/upper arrays. The inspected scope is wrapper dispatch, not every L-BFGS-B line-search/factorization kernel. func_tol is passed directly as FACTR, whose backend test multiplies by machine epsilon; it is not an absolute function tolerance. max_cyc counts FG requests rather than accepted steps, and default zero is unlimited. print_sub can observe f/g before the first evaluation. The objective interface is declared under func_val, not dummy name func_sub; inspect/fix this mismatch before relying on callback checks. No fit or optimization was compiled/run.",
+            "evidence": [
+              {
+                "path": "LBFGSB_wrapper.F90",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB_wrapper.F90",
+                "sha256": "c60b1385be49b189f438782f2c5a6b3e2366dc213cd899f8ed133458dea85fd8"
+              },
+              {
+                "path": "LBFGSB.f",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB.f",
+                "sha256": "c85d31c47e750ba8583771a31a399c4529a0e93af0bb5b02b92d6ed2c85d21de"
+              },
+              {
+                "path": "test.F90",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/test.F90",
+                "sha256": "ecfe3e998807e68827a72ea5bdd2bb3588e1622768ee9c6f78be35ea65e92c2a"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/README",
+                "sha256": "593682228d73d259ec1f403be4154b0097aeb9992c811ca02d0ae6aaf5f4d44e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lbfgsb",
+                "role": "public-entry-point",
+                "summary": "Public module wrapper requiring objective(n,x,f), gradient(n,x,g), and observer(n,x,f,g,task,ind_cyc) subroutines. x is updated in place. info=0 is normal completion, 1 internal error, -1 FG-request limit; independently check convergence and bounds.",
+                "signature": "CALL lbfgsb(n, x, func_sub, grad_sub, print_sub, info, &\n            [func_tol, grad_tol, num_corr, max_cyc, &\n             bound_stat, x_lower, x_upper, print_level])",
+                "declarations": [
+                  {
+                    "path": "LBFGSB_wrapper.F90",
+                    "line_start": 160,
+                    "line_end": 195
+                  }
+                ],
+                "path": "LBFGSB_wrapper.F90",
+                "line_start": 160,
+                "line_end": 321,
+                "module": "LBFGSB_module",
+                "examples": [
+                  {
+                    "path": "test.F90",
+                    "line_start": 10,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "test.F90",
+                    "line_start": 31,
+                    "line_end": 53
+                  }
+                ],
+                "usage": "use LBFGSB_module, only: lbfgsb\ninteger :: info\ndouble precision :: x(2)\n! Supply objective, gradient and observer with the linked interfaces.\nx=[0.0d0,0.0d0]\ncall lbfgsb(2, x, objective, gradient, observer, info, &\n            func_tol=1.0d7, grad_tol=1.0d-6, max_cyc=100, &\n            bound_stat=[2,2], x_lower=[-1.0d0,-1.0d0], &\n            x_upper=[1.0d0,1.0d0])\nif (info /= 0) error stop \"L-BFGS-B wrapper stopped\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment. Preprocess the .F90 wrapper and link SETULB plus its BLAS/LINPACK support. The declared objective-interface name differs from the actual dummy; repair or validate its declaration before treating the fragment as a working driver. Observer must avoid reading f/g on an initial FG request before evaluation. FACTR=1e7 is dimensionless relative stopping control, not function error 1e7. No residual, projected gradient or bound check was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause core notice; wrapper grant unresolved",
+          "spdx_expression": null,
+          "revision": "e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0",
+          "reviewed_on": "2026-11-05",
+          "notes": "The bundled core explicitly names New/Modified/3-clause BSD and refers to an attached License.txt that is absent from this pinned tree. The reviewed wrapper/README do not identify a separate explicit wrapper grant. Preserve this scope distinction rather than licensing all files by inference.",
+          "evidence": [
+            {
+              "path": "LBFGSB.f",
+              "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB.f",
+              "sha256": "c85d31c47e750ba8583771a31a399c4529a0e93af0bb5b02b92d6ed2c85d21de"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/README",
+              "sha256": "593682228d73d259ec1f403be4154b0097aeb9992c811ca02d0ae6aaf5f4d44e"
+            },
+            {
+              "path": "LBFGSB_wrapper.F90",
+              "url": "https://github.com/snljty/L-BFGS-B_wrapper_f90/blob/e30b7a69c8eb3a7924b217bed73ca6b85bfa6dc0/LBFGSB_wrapper.F90",
+              "sha256": "c60b1385be49b189f438782f2c5a6b3e2366dc213cd899f8ed133458dea85fd8"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29257,12 +29917,164 @@
             ],
             "notes": "The README specifies a positive-semidefinite quadratic objective and two-sided linear constraints. This maps the wrapper to optimization; backend-version compatibility and individual solver procedures need separate review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2e1",
+            "level": "source-reviewed",
+            "revision": "9cf256e548b5044f40095eff316fcf9d0bcff851",
+            "reviewed_on": "2026-11-05",
+            "notes": "OSQP_solve passes one-based CSC P/A arrays and l<=A*x<=u data through a C bridge to OSQP setup/solve, then copies primal/dual values and solver information back. G2e1 is scoped to the positive-definite convex-QP subset, as in the pinned two-variable demo; the README also advertises broader semidefinite problems. This is an interface/dispatch review, not an audit of the external OSQP iteration or factorization. Supply upper-triangular P and matching integer/real build modes. C temporarily decrements and restores pointer/row arrays despite Fortran INTENT(IN); storage must be writable. If setup fails, osqp_status is uninitialized and solution pointers can still be dereferenced; a nonzero solve return invokes process exit. status=0 alone does not establish optimality: inspect info%status_val and residuals. Optional resolve paths are outside this review. No QP or mixed-language ABI test was run.",
+            "evidence": [
+              {
+                "path": "src/osqpf.F90",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/src/osqpf.F90",
+                "sha256": "d088733f8e933f6292934d51604dd432ef222e24cf5fd30c8d2d43dcf401efe1"
+              },
+              {
+                "path": "src/osqp_f2c.c",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/src/osqp_f2c.c",
+                "sha256": "5e89f89e289729c75546b497b3037eded1560da9077b42f8aa5d4b5921727e1e"
+              },
+              {
+                "path": "src/osqpf_types.F90",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/src/osqpf_types.F90",
+                "sha256": "12444daa5160653ad6b3c00e989556a1d08640e3a052b4d225fedcad93bdbd76"
+              },
+              {
+                "path": "demo/osqp_demo_fortran.F90",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/demo/osqp_demo_fortran.F90",
+                "sha256": "afbc233b19263e3a29c71524437bb109f0530300fc13b12e574ffd641cfc2df9"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/README.md",
+                "sha256": "94cb4b514cadde9e402239ccb6ef1ab640789e52df3657d05b4a17b2ad580d9f"
+              },
+              {
+                "path": "CMakeLists.txt",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/CMakeLists.txt",
+                "sha256": "c80dd714a9e7a01869e1560d4cd9f7c55f3c1c941bccd6537384bc8a540c3424"
+              },
+              {
+                "path": ".gitmodules",
+                "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/.gitmodules",
+                "sha256": "7be9f910df6cf5b089fff477c765896693f9c460f77fdb9e20d22d8e08947ced"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "OSQP_solve",
+                "role": "public-entry-point",
+                "summary": "Public module convex-QP wrapper. P/A use one-based CSC with n+1 column pointers; x(n), y(m), info and data are mutable. Call OSQP_settings first and OSQP_cleanup after a valid solve lifecycle. Precision/index kind switches must match the C backend.",
+                "signature": "CALL OSQP_solve(n, m, P_ptr, P_row, P_val, q, &\n                A_ptr, A_row, A_val, l, u, x, y, info, data, status)",
+                "declarations": [
+                  {
+                    "path": "src/osqpf.F90",
+                    "line_start": 199,
+                    "line_end": 215
+                  },
+                  {
+                    "path": "src/osqpf.F90",
+                    "line_start": 17,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "src/osqpf_types.F90",
+                    "line_start": 35,
+                    "line_end": 53
+                  }
+                ],
+                "path": "src/osqpf.F90",
+                "line_start": 199,
+                "line_end": 230,
+                "module": "OSQP",
+                "examples": [
+                  {
+                    "path": "demo/osqp_demo_fortran.F90",
+                    "line_start": 27,
+                    "line_end": 47
+                  },
+                  {
+                    "path": "demo/osqp_demo_fortran.F90",
+                    "line_start": 58,
+                    "line_end": 83
+                  }
+                ],
+                "usage": "use OSQP\n! Allocate/build writable one-based CSC arrays and matching x/y/info/data/settings.\n! Select scalar/index kinds as in the preprocessed pinned author demo.\ncall OSQP_settings(settings, data, status)\nif (status /= 0) error stop \"OSQP settings failed\"\ncall OSQP_solve(n, m, P_ptr, P_row, P_val, q, &\n                A_ptr, A_row, A_val, l, u, x, y, info, data, status)\n! Inspect status, info%status_val and residuals before using the solution.\ncall OSQP_cleanup(data, status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface/lifecycle fragment. Inspect/fix setup-failure handling and the CSC INTENT mismatch before treating this as a checked driver. Follow the pinned demo for upper-triangular P, one-based indices and compile-time modes. The OSQP dependency is a git submodule; its core and generated configuration must be compatible. The bridge requires allocate_solution enabled and may terminate the process on solve errors. No warm-start/resolve or failure recovery was validated."
+              },
+              {
+                "procedure": "OSQP_settings",
+                "role": "public-entry-point",
+                "summary": "Public settings-copy routine allocating a C settings object inside data; configure matching backend options first.",
+                "signature": "CALL OSQP_settings(settings, data, status)",
+                "declarations": [
+                  {
+                    "path": "src/osqpf.F90",
+                    "line_start": 186,
+                    "line_end": 189
+                  }
+                ],
+                "path": "src/osqpf.F90",
+                "line_start": 186,
+                "line_end": 195,
+                "module": "OSQP"
+              },
+              {
+                "procedure": "OSQP_cleanup",
+                "role": "public-entry-point",
+                "summary": "Public cleanup routine for valid solver/settings objects after successful initialization. This review does not establish repeated cleanup or partial-failure safety.",
+                "signature": "CALL OSQP_cleanup(data, status)",
+                "declarations": [
+                  {
+                    "path": "src/osqpf.F90",
+                    "line_start": 267,
+                    "line_end": 269
+                  }
+                ],
+                "path": "src/osqpf.F90",
+                "line_start": 267,
+                "line_end": 276,
+                "module": "OSQP"
+              },
+              {
+                "procedure": "osqp_f2c_solve",
+                "role": "implementation-helper",
+                "path": "src/osqp_f2c.c",
+                "line_start": 111,
+                "line_end": 244
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No wrapper license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "9cf256e548b5044f40095eff316fcf9d0bcff851",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit wrapper license grant or separately named LICENSE/COPYING was identified in the pinned wrapper tree. OSQP itself is a separate submodule; its license does not automatically establish terms for this wrapper adaptation.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/README.md",
+              "sha256": "94cb4b514cadde9e402239ccb6ef1ab640789e52df3657d05b4a17b2ad580d9f"
+            },
+            {
+              "path": "src/osqpf.F90",
+              "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/src/osqpf.F90",
+              "sha256": "d088733f8e933f6292934d51604dd432ef222e24cf5fd30c8d2d43dcf401efe1"
+            },
+            {
+              "path": "src/osqp_f2c.c",
+              "url": "https://github.com/osqp/osqp-fortran/blob/9cf256e548b5044f40095eff316fcf9d0bcff851/src/osqp_f2c.c",
+              "sha256": "5e89f89e289729c75546b497b3037eded1560da9077b42f8aa5d4b5921727e1e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29303,12 +30115,97 @@
             ],
             "notes": "The README requires editing dimensions and search bounds to match the chosen fitness function and supplies benchmark examples. Reported example convergence is not a general global-optimality or parameter-selection guarantee.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The source initializes a swarm uniformly in a box, updates velocities from inertia, personal best and global best, clips velocities and evaluates only particles currently inside the box. Best-so-far values are updated for minimization; positions themselves are not clamped or reflected. G2i records a stochastic global-search heuristic, not guaranteed global optimization or smoothness-specific local convergence. The compiled program always completes max_iter iterations: VTR only records the first qualifying iteration, not termination. If that never occurs NIR=0, yet reports index gbest_val_store(0), outside the one-based array. NFE counting stops after the target is recorded even though work continues. No swarm, benchmark or repeatability test was run.",
+            "evidence": [
+              {
+                "path": "Fortran codes/PSOclassicG.f95",
+                "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/Fortran codes/PSOclassicG.f95",
+                "sha256": "b8b88e375d6b767ff265ba18a6a8e5b4ee6791fee2c4742fae9c49ac37cffd5d"
+              },
+              {
+                "path": "Fortran codes/fitness.f95",
+                "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/Fortran codes/fitness.f95",
+                "sha256": "18962f43d9035e37f822eab3e1ee86ebdb6f50bdee3c95473818d8f6ccf5e5c6"
+              },
+              {
+                "path": "Fortran codes/timestamp.f95",
+                "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/Fortran codes/timestamp.f95",
+                "sha256": "0373b1a149bee631aba7e06287ad298578547c4e8a5c314226ae80e9375511fc"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/README.md",
+                "sha256": "8c5ad969cd7f441dcd4071a7b086a2e8c6f13bfc204b37895f8d09cf2d5db80b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PSOclassicG",
+                "role": "program-entry-point",
+                "summary": "Standalone particle-swarm minimization program. Dimension, swarm size, iteration count and bounds are source parameters; fitness and timestamp are included internal procedures, not external library callbacks. Writes a timestamped directory of convergence and result files.",
+                "signature": "./PSOclassicG_output",
+                "declarations": [
+                  {
+                    "path": "Fortran codes/PSOclassicG.f95",
+                    "line_start": 47,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "Fortran codes/PSOclassicG.f95",
+                    "line_start": 89,
+                    "line_end": 100
+                  },
+                  {
+                    "path": "Fortran codes/fitness.f95",
+                    "line_start": 2,
+                    "line_end": 10
+                  }
+                ],
+                "path": "Fortran codes/PSOclassicG.f95",
+                "line_start": 1,
+                "line_end": 364,
+                "usage": "# From the Fortran codes directory, with included fitness/timestamp sources.\n# Edit fitness, dimensions and bounds, and address the recorded NIR indexing.\ngfortran PSOclassicG.f95 -o PSOclassicG_output\n./PSOclassicG_output",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build/run sketch, not a validated command result. The report reads gbest_val_store(NIR) even when NIR remains zero; guard this path before running unchecked inputs. The program uses SYSTEM to create a directory, so shell/path behavior is platform dependent. Reproducible seeding and independent repeated trials are not supplied by this sketch."
+              },
+              {
+                "procedure": "fitness",
+                "role": "implementation-helper",
+                "path": "Fortran codes/fitness.f95",
+                "line_start": 2,
+                "line_end": 100
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root MIT notice agrees with the README license label. This source review covers the main search/report path and included fitness interface, not all benchmarks or platform shell behavior.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/LICENSE",
+              "sha256": "faccdba4c66c7e85a234e6c533aa8eb5e724b900e9f524affd37b7e54a09f082"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/zaman13/Particle-Swarm-Optimization-Fortran-95/blob/ee815c04b1e2fcc90ba7e7ae89a875643fa5c9b1/README.md",
+              "sha256": "8c5ad969cd7f441dcd4071a7b086a2e8c6f13bfc204b37895f8d09cf2d5db80b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29769,12 +30666,127 @@
             ],
             "notes": "The README documents equality/inequality constraints, bounds and error codes and a BLAS dependency. Interface examples and memory-leak claims were not reproduced; the exact admissible Hessian class needs source-level review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2e1",
+            "level": "source-reviewed",
+            "revision": "c3efea23fe380287d84e2e9804d0119a4597f7f3",
+            "reviewed_on": "2026-11-05",
+            "notes": "The quadprog generic copies the Hessian, changes signs/transposes row-oriented constraints, appends bound inequalities when requested, allocates workspace, and dispatches to Goldfarb/Idnani qpgen2 with Cholesky-based positive-definite setup. G2e1 records strictly convex QP with linear equality/inequality constraints, not indefinite or general nonlinear optimization. H_check changes every near-zero diagonal to 1e-10; this is not a valid general positive-definiteness test and can change the problem. constrain_check misses some positive equality residuals because its two-sided test uses AND incorrectly. res is qpgen2 criterion/objective output, not an independently computed feasibility residual despite wrapper wording. The C adapter copies only qeq constraint rows and is outside the shown Fortran API. This review covers wrapper and core setup/dispatch rather than every active-set update. No QP or feasibility/KKT check was run.",
+            "evidence": [
+              {
+                "path": "src/quad_prog.f90",
+                "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/src/quad_prog.f90",
+                "sha256": "e7a9545957ac40786c1ec2a4264bbb1c68b53047d853a75e17f8884b0f97db84"
+              },
+              {
+                "path": "src/solve_qp.f",
+                "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/src/solve_qp.f",
+                "sha256": "a7f13fe7b7dfdd6e7a3ef8c5bfeedd662eb8eee677cbf8fc630328ad061a5ee8"
+              },
+              {
+                "path": "examples/ftest.f90",
+                "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/examples/ftest.f90",
+                "sha256": "cda580a9ba8037f6f1b52594e3db5536d2695f510ac064d7b2efe19ec698abb9"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/README.md",
+                "sha256": "8ae7af36b34d9c753dbf503378df3017bbbd7adaa3009ab5eb80093a49f2a273"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "quadprog",
+                "role": "public-entry-point",
+                "summary": "Public module generic for double-precision QP. Aeq(q,n) stores equality rows first then <= inequality rows; beq(q) matches them. Optional bound-vector overload takes lb/ub together before x. Use a genuinely symmetric positive-definite H, and independently inspect constraints after err=0.",
+                "signature": "CALL quadprog(n, q, qeq, H, f, Aeq, beq, [lb, ub,] x, tol, res, err)",
+                "declarations": [
+                  {
+                    "path": "src/quad_prog.f90",
+                    "line_start": 51,
+                    "line_end": 69
+                  },
+                  {
+                    "path": "src/quad_prog.f90",
+                    "line_start": 125,
+                    "line_end": 137
+                  },
+                  {
+                    "path": "src/quad_prog.f90",
+                    "line_start": 175,
+                    "line_end": 187
+                  }
+                ],
+                "path": "src/quad_prog.f90",
+                "line_start": 175,
+                "line_end": 236,
+                "module": "quad_prog",
+                "examples": [
+                  {
+                    "path": "examples/ftest.f90",
+                    "line_start": 18,
+                    "line_end": 34
+                  }
+                ],
+                "usage": "use quad_prog, only: quadprog\ninteger :: err\ndouble precision :: h(2,2), f(2), aeq(1,2), beq(1), x(2), criterion\nh=reshape([2.0d0,0.0d0,0.0d0,2.0d0],[2,2])\nf=[-2.0d0,-4.0d0]; aeq(1,:)=[1.0d0,1.0d0]; beq=[2.0d0]\nerr=0\ncall quadprog(2,1,0,h,f,aeq,beq,[0.0d0,0.0d0], &\n              [3.0d0,3.0d0],x,1.0d-8,criterion,err)\nif (err /= 0) error stop \"quadprog failed\"\n! Independently verify Aeq*x<=beq, bounds and optimality.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile util, solve_qp and quad_prog in order, with fixed/free source formats as supplied. The sketch starts with a positive-definite diagonal Hessian so it avoids the diagonal patch, but it does not repair the wrapper equality checker. Preserve original problem data and compute feasibility/KKT residuals yourself. Do not interpret the qp_res_correction helper as a general constraint-residual calculation."
+              },
+              {
+                "procedure": "H_check",
+                "role": "implementation-helper",
+                "path": "src/quad_prog.f90",
+                "line_start": 242,
+                "line_end": 258,
+                "module": "quad_prog"
+              },
+              {
+                "procedure": "constrain_check",
+                "role": "implementation-helper",
+                "path": "src/quad_prog.f90",
+                "line_start": 262,
+                "line_end": 315,
+                "module": "quad_prog"
+              },
+              {
+                "procedure": "qpgen2",
+                "role": "implementation-helper",
+                "path": "src/solve_qp.f",
+                "line_start": 84,
+                "line_end": 133,
+                "module": "solve_qp"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL v3 root text; GPL-2.0-or-later solver notices",
+          "spdx_expression": null,
+          "revision": "c3efea23fe380287d84e2e9804d0119a4597f7f3",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GPL version 3 text while the defining bundled solver explicitly permits GPL version 2 or later. Preserve file-specific scope; no version-only/or-later choice for the complete wrapper is inferred from the root text.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/LICENSE",
+              "sha256": "e57f1c320b8cf8798a7d2ff83a6f9e06a33a03585f6e065fea97f1d86db84052"
+            },
+            {
+              "path": "src/solve_qp.f",
+              "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/src/solve_qp.f",
+              "sha256": "a7f13fe7b7dfdd6e7a3ef8c5bfeedd662eb8eee677cbf8fc630328ad061a5ee8"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/pedro-ricardo/quadprog/blob/c3efea23fe380287d84e2e9804d0119a4597f7f3/README.md",
+              "sha256": "8ae7af36b34d9c753dbf503378df3017bbbd7adaa3009ab5eb80093a49f2a273"
+            }
+          ]
         }
       },
       "imports": {}
