@@ -10159,12 +10159,127 @@
             ],
             "notes": "The README documents HFTI, NNLS, BVLS and related routines and modern interfaces. Additional SVD/rotation utilities are noted but not all mapped to separate classes in this review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D9b1",
+            "level": "source-reviewed",
+            "revision": "b8f44aba027093be485556e3cebd409c17050e82",
+            "reviewed_on": "2026-11-05",
+            "notes": "The legacy NNLS routine initializes x=0, selects columns using the largest positive dual-gradient component, applies Householder transformations, solves the passive triangular system, and uses a feasibility interpolation/Givens update loop to move nonpositive coefficients back to the zero set. It returns a residual norm and mode, supporting constrained L2 linear least squares D9b1 with x>=0. A and b are overwritten by orthogonal transformations. Mode=1 succeeds, 2 rejects nonpositive M/N, and 3 reports the 3*N iteration limit. Leading dimensions/workspace extents remain caller obligations. This review follows active-set control and the included transformation helpers, not a numerical proof or a complete audit of all package solvers. The simplified module wrapper was inspected but shares a file with a test main; the calling sketch uses the independently linkable legacy routine. No fit or KKT/residual check was executed.",
+            "evidence": [
+              {
+                "path": "legacy/nnls.f",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/nnls.f",
+                "sha256": "ae863589d8a96397b7f804373eb439e3ca750bc9f97a275a9ca21d6d7ec6c9d1"
+              },
+              {
+                "path": "legacy/h12.f",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/h12.f",
+                "sha256": "9fe136efdcd6663471e1d7d0ecf350ea64cbc46ee3223cf31836c8e73aa8b132"
+              },
+              {
+                "path": "legacy/g1.f",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/g1.f",
+                "sha256": "cc53b14e455e4dff661dbc75d2a039be1928de1724dd9fd66b30913227db630c"
+              },
+              {
+                "path": "legacy/diff.f",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/diff.f",
+                "sha256": "2fc1953dd94498932e8ed9da1d4a0e8d1d3c5f20c4d2150bef417c8f0ec5f9d1"
+              },
+              {
+                "path": "src/least_squares_mod.f90",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/src/least_squares_mod.f90",
+                "sha256": "d065fa5c8e56d9725255cc3768378ccad1676697312121c2605587038ead0599"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/README.md",
+                "sha256": "8b3e3d6a289659d368c5af70eba8b091c2c6efda9d6cbd245751bea569fead8e"
+              },
+              {
+                "path": "legacy/README",
+                "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/README",
+                "sha256": "f94f24680a1e0c266841780e9585628a1efd69946c7504f368f691cba525e227"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "NNLS",
+                "role": "public-entry-point",
+                "summary": "External double-precision nonnegative least-squares subroutine. Supply A(MDA,N), b(M), x(N), dual/work w(N), zz(M), index(N) and scalar rnorm/mode. Keep copies of A/b for an independent residual or optimality check after the call.",
+                "signature": "CALL NNLS(A, MDA, M, N, B, X, RNORM, W, ZZ, INDEX, MODE)",
+                "declarations": [
+                  {
+                    "path": "legacy/nnls.f",
+                    "line_start": 19,
+                    "line_end": 48
+                  },
+                  {
+                    "path": "legacy/nnls.f",
+                    "line_start": 51,
+                    "line_end": 63
+                  }
+                ],
+                "path": "legacy/nnls.f",
+                "line_start": 51,
+                "line_end": 324,
+                "usage": "external :: nnls\ndouble precision :: a(3,2), b(3), x(2), rnorm, w(2), zz(3)\ninteger :: index(2), mode\na(:,1) = [1.0d0, 0.0d0, 1.0d0]\na(:,2) = [0.0d0, 1.0d0, 1.0d0]\nb = [1.0d0, 2.0d0, 2.9d0]\ncall nnls(a, 3, 3, 2, b, x, rnorm, w, zz, index, mode)\nif (mode /= 1) error stop \"NNLS failed or exhausted iterations\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile/link the NNLS, H12, G1 and DIFF legacy subroutines, avoiding unrelated example main programs. Match default-integer and double-precision ABI. The modern wrapper in src/least_squares_mod.f90 requires separating its embedded test program before using that complete object in another main. Mode=1 alone is not an independently checked feasibility/KKT or accuracy certificate."
+              },
+              {
+                "procedure": "H12",
+                "role": "implementation-helper",
+                "path": "legacy/h12.f",
+                "line_start": 37,
+                "line_end": 91
+              },
+              {
+                "procedure": "G1",
+                "role": "implementation-helper",
+                "path": "legacy/g1.f",
+                "line_start": 1,
+                "line_end": 42
+              },
+              {
+                "procedure": "nnls",
+                "role": "implementation-helper",
+                "path": "src/least_squares_mod.f90",
+                "line_start": 299,
+                "line_end": 326,
+                "module": "least_squares_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "b8f44aba027093be485556e3cebd409c17050e82",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and legacy notices attribute Lawson/Hanson and the SIAM book, but no explicit license grant was identified and no separately named LICENSE appears in the pinned tree. Netlib availability or a publication citation alone is not recorded as a redistribution license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/README.md",
+              "sha256": "8b3e3d6a289659d368c5af70eba8b091c2c6efda9d6cbd245751bea569fead8e"
+            },
+            {
+              "path": "legacy/README",
+              "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/README",
+              "sha256": "f94f24680a1e0c266841780e9585628a1efd69946c7504f368f691cba525e227"
+            },
+            {
+              "path": "legacy/nnls.f",
+              "url": "https://github.com/ivan-pi/fortran_lsp/blob/b8f44aba027093be485556e3cebd409c17050e82/legacy/nnls.f",
+              "sha256": "ae863589d8a96397b7f804373eb439e3ca750bc9f97a275a9ca21d6d7ec6c9d1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15508,12 +15623,138 @@
             ],
             "notes": "The README requires a user-supplied matrix-vector product and describes residual-based polishing. Its maximal-precision and robustness claims have not been independently reproduced.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "8779d64f2cd4479f9108c998e3eff44049a5d9be",
+            "reviewed_on": "2026-11-05",
+            "notes": "rs_lanczos creates real vector views over output columns and invokes the iterator sequentially for the lowest requested eigenpairs of a matrix supplied by callback. The inspected core performs a three-term Lanczos update with orthogonalization, reduces to a tridiagonal problem and dispatches Ritz extraction/polishing. D4a1 records real-symmetric ordinary eigenproblems, not nonsymmetric/generalized solvers. Callback ADD controls overwrite versus accumulation and must be honored. The output named variance is filled by residual using vector_norm, so it is a residual norm rather than a squared variance. There is no public success flag; maxstep does not bound all later polishing work. Saved RNG/recurrence state prevents assuming reentrancy. The wrapper seed packing is normalized to a valid odd final seed by vector_random_fill before LAPACK use. Restart/range mode and complex variants are outside the usage sketch. No eigenpair or independent residual was computed.",
+            "evidence": [
+              {
+                "path": "lib/rs_lanczos.f90",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/lib/rs_lanczos.f90",
+                "sha256": "06d9793baad9baddbf59de95916ebe54f04f72083aac09d01d579f3671a68719"
+              },
+              {
+                "path": "lib/lanczos_iterator.f90",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/lib/lanczos_iterator.f90",
+                "sha256": "a6a7db4869cc58c29f56b1c2711009379c31fcba20aade1b3d66a1c7d06bd5fe"
+              },
+              {
+                "path": "lib/lanczos_m.f90",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/lib/lanczos_m.f90",
+                "sha256": "b4d463fd60372eb64eec8d59e36f963e56620e0678d1dcf2bcd99555752ebc0a"
+              },
+              {
+                "path": "lib/vector_m.f90",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/lib/vector_m.f90",
+                "sha256": "ffe16cbd169a28117b1200972442935d775f629003dcf3f6923be32e7009dfa2"
+              },
+              {
+                "path": "test_programs/test_lanczos.f90",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/test_programs/test_lanczos.f90",
+                "sha256": "317e59c37a0a88a17b7242b36365188785f76287a974494ae13577d44fe65547"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/README.md",
+                "sha256": "88891fb3da104d059dc27207b339c7e5b9a53680f8666b7ac68485f71568a76f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rs_lanczos",
+                "role": "public-entry-point",
+                "summary": "External real-symmetric matrix-free eigensolver. Supply double-precision eval(nevec), evec(n,nevec), residual-norm output variance(nevec), resolution, callback and controls. Its optional dummies require an explicit interface, as supplied in the author test. Use all-at-once mode in this sketch.",
+                "signature": "CALL rs_lanczos(n, nevec, eval, evec, variance, resolution, &\n                matvec, maxstep, report, seed [, range, nocheck])",
+                "declarations": [
+                  {
+                    "path": "lib/rs_lanczos.f90",
+                    "line_start": 1,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "lib/rs_lanczos.f90",
+                    "line_start": 14,
+                    "line_end": 46
+                  },
+                  {
+                    "path": "test_programs/test_lanczos.f90",
+                    "line_start": 48,
+                    "line_end": 61
+                  }
+                ],
+                "path": "lib/rs_lanczos.f90",
+                "line_start": 1,
+                "line_end": 161,
+                "examples": [
+                  {
+                    "path": "test_programs/test_lanczos.f90",
+                    "line_start": 17,
+                    "line_end": 31
+                  },
+                  {
+                    "path": "test_programs/test_lanczos.f90",
+                    "line_start": 110,
+                    "line_end": 119
+                  }
+                ],
+                "usage": "! Provide the explicit rs_lanczos interface linked above.\n! matvec(n,input,output,add) must compute output=A*input if add=.false.,\n! and output=output+A*input if add=.true.\ninteger, parameter :: n=10, nevec=2\ndouble precision :: eval(nevec), evec(n,nevec), residual(nevec), resolution\n! Use a symmetric operator, for example diagonal entries 1,...,n.\ncall rs_lanczos(n, nevec, eval, evec, residual, resolution, &\n                matvec, 100, 0, 0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface/callback fragment, not a complete driver: copy the pinned explicit interface and implement matvec with the stated ADD semantics. Build the package modules and link its configured BLAS/LAPACK dependencies. Use 1<=nevec<=n and evaluate returned residuals independently; no public success flag certifies convergence. This sketch omits resume/range mode, whose reuse of arrays declared INTENT(OUT) requires further validation. Saved state is not safe to assume independent across concurrent calls."
+              },
+              {
+                "procedure": "lanczos_iterate",
+                "role": "implementation-helper",
+                "path": "lib/lanczos_m.f90",
+                "line_start": 13,
+                "line_end": 101,
+                "module": "lanczos_m"
+              },
+              {
+                "procedure": "residual",
+                "role": "implementation-helper",
+                "path": "lib/lanczos_m.f90",
+                "line_start": 137,
+                "line_end": 159,
+                "module": "lanczos_m"
+              },
+              {
+                "procedure": "lanczos_iterator",
+                "role": "implementation-helper",
+                "path": "lib/lanczos_iterator.f90",
+                "line_start": 108,
+                "line_end": 180
+              },
+              {
+                "procedure": "vector_random_fill",
+                "role": "implementation-helper",
+                "path": "lib/vector_m.f90",
+                "line_start": 137,
+                "line_end": 170,
+                "module": "vector_m"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT; numerical backend notices separate",
+          "spdx_expression": "MIT",
+          "revision": "8779d64f2cd4479f9108c998e3eff44049a5d9be",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned MIT notice attributes F. D. M. Haldane. The selected solver uses BLAS/LAPACK helpers and optional configuration not covered by this project-notice review; no backend license audit is implied.",
+          "evidence": [
+            {
+              "path": "LICENSE-MIT",
+              "url": "https://github.com/lanczos-iterator/Lanczos_Iterator/blob/8779d64f2cd4479f9108c998e3eff44049a5d9be/LICENSE-MIT",
+              "sha256": "790f95e2740d9e488e11ae811775248d104b04f1f15087ef2e1e3b6ec441452e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -18327,12 +18568,83 @@
             ],
             "notes": "The README documents MKL dependencies and optional PARDISO/METIS features and says testing was mainly on small datasets. Matrix storage support does not alone establish general-purpose sparse-solver coverage.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D1b4",
+            "level": "source-reviewed",
+            "revision": "3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public native csrmv helper scales y by beta, then accumulates alpha times CSR row products for normal operation or scatters them for transpose operation. Symmetric storage additionally reflects off-diagonal contributions. D1b4 records this matrix-vector product, scoped to normal general one-based CSR in the sketch. Row pointers are supplied as separate begin/end arrays with exclusive ends; indices and vector extents are not validated. The helper uses y INTENT(INOUT) and reads it even when beta=0, so initialize y. The object crssparse mult wrapper inspected in parallel declares y INTENT(OUT) before passing it to an accumulating routine: that wrapper needs an intent repair and is not the recommended entry shown here. MKL/PARDISO, factorization and iterative-solver paths remain outside this review. No matrix product was run.",
+            "evidence": [
+              {
+                "path": "src/modsparse_helpers.f90",
+                "url": "https://github.com/jvdp1/libsparse/blob/3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a/src/modsparse_helpers.f90",
+                "sha256": "5679f496e5b9b56975d9ed3a8329b545f8c72c62352c4bb2631461cae0d677cd"
+              },
+              {
+                "path": "src/modsparse.f90",
+                "url": "https://github.com/jvdp1/libsparse/blob/3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a/src/modsparse.f90",
+                "sha256": "8833b3280f65e50b9e9a2ce3ee4feb9fc2d4ddce8ddc2cbd5d563bfa43ef18f6"
+              },
+              {
+                "path": "src/modsparse_crs.f90",
+                "url": "https://github.com/jvdp1/libsparse/blob/3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a/src/modsparse_crs.f90",
+                "sha256": "ceb4cac59bb5c890dc96dffe4f62f54eecbf8d08b8cb44ad6aab1d57897fd978"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "csrmv",
+                "role": "public-entry-point",
+                "summary": "Public module routine accepting raw CSR values/column indices and separate pntrb/pntre vectors. For general normal multiplication matdescra(1)=G and transa=N. With _DP=1, wp is REAL64; integer indices use INT32. Supply an initialized output vector even if beta is zero.",
+                "signature": "CALL csrmv(transa, m, k, alpha, matdescra, val, indx, &\n           pntrb, pntre, x, beta, y)",
+                "declarations": [
+                  {
+                    "path": "src/modsparse_helpers.f90",
+                    "line_start": 4,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/modsparse_helpers.f90",
+                    "line_start": 133,
+                    "line_end": 145
+                  }
+                ],
+                "path": "src/modsparse_helpers.f90",
+                "line_start": 133,
+                "line_end": 190,
+                "module": "modsparse_helpers",
+                "usage": "use iso_fortran_env, only: real64, int32\nuse modsparse_helpers, only: csrmv\nreal(real64) :: values(3), x(2), y(2)\ninteger(int32) :: columns(3), begins(2), ends(2)\ncharacter :: descriptor(6)\n! Match a library build with _DP=1. Matrix rows: [2,0], [1,3].\nvalues = [2.0_real64, 1.0_real64, 3.0_real64]\ncolumns = [1_int32, 1_int32, 2_int32]\nbegins = [1_int32, 2_int32]; ends = [2_int32, 4_int32]\ndescriptor = \" \"; descriptor(1) = \"G\"\nx = [4.0_real64, 5.0_real64]; y = 0.0_real64\ncall csrmv(\"N\", 2, 2, 1.0_real64, descriptor, values, columns, &\n           begins, ends, x, 0.0_real64, y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile this module with preprocessing and precision matching the actual arguments; _DP=0 instead selects REAL32. Ensure one-based valid columns, ordered row bounds and adequate x/y extents yourself. This raw public helper avoids the recorded object-wrapper intent issue; it does not validate other descriptor/transpose paths, threading or numerical accuracy."
+              },
+              {
+                "procedure": "multgenv_csr",
+                "role": "implementation-helper",
+                "path": "src/modsparse_crs.f90",
+                "line_start": 319,
+                "line_end": 366
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; backend notices separate",
+          "spdx_expression": "MIT",
+          "revision": "3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant covers the library and explicitly records permission for its adapted modspainv component. This scoped native-helper review does not audit separately linked MKL/PARDISO or other optional dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jvdp1/libsparse/blob/3d93e03a0e7e7b66cc791c054dc45eb5d0a9d70a/LICENSE",
+              "sha256": "4ec6c356a6b223bb20226f10e7b6aec8ab017ab9876c4f3030636cd6793ffe8d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31675,12 +31987,107 @@
             ],
             "notes": "The README identifies a work in progress with dense conversion and multiplication for two storage formats, drawing on SPARSKIT. It does not establish a complete SPARSKIT interface or general sparse-system solver.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b4",
+            "level": "source-reviewed",
+            "revision": "0376c839c6900ec54b9f5b7fb147871b0824a704",
+            "reviewed_on": "2026-11-05",
+            "notes": "CSRMatrix%multiply delegates to the bundled SPARSKIT AMUX row dot-product kernel. The inspected dense constructor counts exact nonzeros, allocates CSR storage and calls DNSCSR. D1b4 records general real CSR multiplication, not a solver or an audit of diagonal-storage routines. Both raw construction and multiplication rely on valid dimensions, one-based row/column indices and matching storage lengths. Conversion ierr values are discarded by the wrapper; the raw constructor cannot infer trailing all-zero columns and MAXVAL of empty col_ind cannot describe an all-zero matrix without explicit ncol. The sketch uses a small nonempty dense matrix. No conversion/product or author example was executed.",
+            "evidence": [
+              {
+                "path": "src/Spoof.f90",
+                "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/src/Spoof.f90",
+                "sha256": "ff986250dc3f21afd578a01a6e4651a677ddf9c368fc31060fc695d108af694b"
+              },
+              {
+                "path": "src/sparskit.f90",
+                "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/src/sparskit.f90",
+                "sha256": "d7a961c71937f1a1bd8d1a6c31ea15181079f081c3742cee88e4185622632b14"
+              },
+              {
+                "path": "example/example.f90",
+                "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/example/example.f90",
+                "sha256": "716552b26480a840515e9b3e0a71f1433d46c5b1efca6f553e48267371950a4a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "multiply",
+                "role": "public-entry-point",
+                "summary": "Public CSRMatrix binding returning a vector of nrow entries from a vector of ncol entries. Use the module d kind, selected for roughly double precision. The dense constructor shown creates one-based CSR; it tests exact zero rather than using a drop tolerance.",
+                "signature": "product = matrix%multiply(vector)",
+                "declarations": [
+                  {
+                    "path": "src/Spoof.f90",
+                    "line_start": 17,
+                    "line_end": 31
+                  },
+                  {
+                    "path": "src/Spoof.f90",
+                    "line_start": 86,
+                    "line_end": 99
+                  },
+                  {
+                    "path": "src/Spoof.f90",
+                    "line_start": 115,
+                    "line_end": 120
+                  }
+                ],
+                "path": "src/Spoof.f90",
+                "line_start": 115,
+                "line_end": 121,
+                "module": "Spoof",
+                "derived_type": "CSRMatrix",
+                "examples": [
+                  {
+                    "path": "example/example.f90",
+                    "line_start": 2,
+                    "line_end": 18
+                  }
+                ],
+                "usage": "use Spoof, only: CSRMatrix, d\ntype(CSRMatrix) :: matrix\nreal(d) :: dense(2,2), x(2), y(2)\ndense = reshape([2.0_d, 1.0_d, 0.0_d, 3.0_d], [2,2])\nx = [4.0_d, 5.0_d]\nmatrix = CSRMatrix(dense)\ny = matrix%multiply(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link both Spoof and its sparskit module. If constructing from raw arrays, provide explicit ncol when zero trailing columns exist and validate CSR structure yourself. Match selected-real/default-integer kinds to the bundled REAL(8)/INTEGER(4) kernel ABI. Discarded conversion statuses, empty matrices, malformed indices and diagonal-storage behavior were not tested."
+              },
+              {
+                "procedure": "AMUX",
+                "role": "implementation-helper",
+                "path": "src/sparskit.f90",
+                "line_start": 169,
+                "line_end": 226,
+                "module": "sparskit"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT wrapper and LGPL-noticed SPARSKIT component",
+          "spdx_expression": null,
+          "revision": "0376c839c6900ec54b9f5b7fb147871b0824a704",
+          "reviewed_on": "2026-11-05",
+          "notes": "The wrapper/root notice is MIT, but the bundled sparskit module explicitly says it was copied under the GNU Lesser General Public License without specifying a version in that header. Preserve both scoped notices; the root MIT text is not treated as the sole license of all bundled code.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/LICENSE",
+              "sha256": "ebbb9022839e10163834957adb3ef2b6685a78a6cb6560c785c904c85900b5c9"
+            },
+            {
+              "path": "src/Spoof.f90",
+              "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/src/Spoof.f90",
+              "sha256": "ff986250dc3f21afd578a01a6e4651a677ddf9c368fc31060fc695d108af694b"
+            },
+            {
+              "path": "src/sparskit.f90",
+              "url": "https://github.com/samharrison7/spoof/blob/0376c839c6900ec54b9f5b7fb147871b0824a704/src/sparskit.f90",
+              "sha256": "d7a961c71937f1a1bd8d1a6c31ea15181079f081c3742cee88e4185622632b14"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31718,12 +32125,111 @@
             ],
             "notes": "The brief README supports only sparse matrix assembly at a broad level. Storage formats, assembly interfaces, linear solvers and performance characteristics need individual source/documentation review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b9",
+            "level": "source-reviewed",
+            "revision": "340b3ee6b97cec28e325685ada8eb92ab8601820",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected array_to_sparse_line converts a dense row/column vector into one-based index/value storage, dropping entries with ABS(value)<=tolerance; the reverse routine zeros a dense vector and sums contributions at stored indices. D1b9 records storage-mode conversion for sparse lines, which are the matrix assembly building blocks, not a sparse equation solver or completed CSR/CSC exporter. Default tolerance is 1e-8. sparse_line_to_array evaluates SIZE(array) before testing allocation, so the caller must supply an already allocated dense array. Public indices/counters are not validated. The separate assemble_sparse_line sets lcount=1 even for an empty line and its sorter has a fixed 50-integer stack; those assembly paths are outside the round-trip sketch. No conversion or assembled matrix was run.",
+            "evidence": [
+              {
+                "path": "src/sparseSET.f90",
+                "url": "https://github.com/dorivalpiedadeneto/sparseSET/blob/340b3ee6b97cec28e325685ada8eb92ab8601820/src/sparseSET.f90",
+                "sha256": "0fb67d6286f7e2477a2b51d99226864767b7eec8276d29247cb2dae60be97edb"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/dorivalpiedadeneto/sparseSET/blob/340b3ee6b97cec28e325685ada8eb92ab8601820/README.md",
+                "sha256": "98ffb0aecc695e8f51702ecbfe8b9d0beefa50078b20dabd3f5d0d686da7a470"
+              },
+              {
+                "path": "doc/remarks.md",
+                "url": "https://github.com/dorivalpiedadeneto/sparseSET/blob/340b3ee6b97cec28e325685ada8eb92ab8601820/doc/remarks.md",
+                "sha256": "a8f4f05a351120708ded72334e734fa86000cf7022e3d044724f1ed1ac7609ac"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "array_to_sparse_line",
+                "role": "public-entry-point",
+                "summary": "Public module conversion from REAL(spdp) dense vector to sparse_line, with optional drop tolerance. spdp=8 and spip=4 are hardcoded kind numbers. The retained positions are increasing and marked assembled. Use valid line allocation/length and a nonnegative tolerance.",
+                "signature": "CALL array_to_sparse_line(array, sp_line [, tolerance])",
+                "declarations": [
+                  {
+                    "path": "src/sparseSET.f90",
+                    "line_start": 7,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/sparseSET.f90",
+                    "line_start": 30,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/sparseSET.f90",
+                    "line_start": 661,
+                    "line_end": 665
+                  }
+                ],
+                "path": "src/sparseSET.f90",
+                "line_start": 661,
+                "line_end": 692,
+                "module": "sparseset",
+                "usage": "use sparseset, only: sparse_line, spdp, allocate_sparse_line, &\n                     array_to_sparse_line, sparse_line_to_array, deallocate_sparse_line\ntype(sparse_line) :: line\nreal(spdp) :: values(4)\nreal(spdp), allocatable :: restored(:)\nvalues = [1.0_spdp, 0.0_spdp, -2.0_spdp, 3.0_spdp]\ncall allocate_sparse_line(line, 4, 4)\nallocate(restored(4))\ncall array_to_sparse_line(values, line, 0.0_spdp)\ncall sparse_line_to_array(line, restored)\ncall deallocate_sparse_line(line)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Preallocate restored: the reverse routine calls SIZE before ALLOCATED. With positive tolerance this conversion intentionally loses small entries, so round trips are not exact in general. Kind numbers are compiler dependent. The sketch avoids empty assembly and caller-supplied invalid indices; no equality test or allocation-failure behavior was run."
+              },
+              {
+                "procedure": "sparse_line_to_array",
+                "role": "public-entry-point",
+                "summary": "Public sparse-line to allocatable dense-vector conversion. Sums duplicate index contributions, but requires the array already allocated on entry because SIZE is tested first. Valid indices must lie in 1:sp_line%length.",
+                "signature": "CALL sparse_line_to_array(sp_line, array)",
+                "declarations": [
+                  {
+                    "path": "src/sparseSET.f90",
+                    "line_start": 645,
+                    "line_end": 648
+                  }
+                ],
+                "path": "src/sparseSET.f90",
+                "line_start": 645,
+                "line_end": 659,
+                "module": "sparseset"
+              },
+              {
+                "procedure": "allocate_sparse_line",
+                "role": "implementation-helper",
+                "path": "src/sparseSET.f90",
+                "line_start": 146,
+                "line_end": 166,
+                "module": "sparseset"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause",
+          "spdx_expression": "BSD-2-Clause",
+          "revision": "340b3ee6b97cec28e325685ada8eb92ab8601820",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root BSD 2-Clause grant agrees with the defining source header. The reviewed functionality is sparse-line conversion; placeholder compressed-format types and all assembly/resize procedures were not audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/dorivalpiedadeneto/sparseSET/blob/340b3ee6b97cec28e325685ada8eb92ab8601820/LICENSE",
+              "sha256": "a4de188637ecd12b8aa05c4a034a42d5ba2bc5241ad9459ae75bbec37eea94e8"
+            },
+            {
+              "path": "src/sparseSET.f90",
+              "url": "https://github.com/dorivalpiedadeneto/sparseSET/blob/340b3ee6b97cec28e325685ada8eb92ab8601820/src/sparseSET.f90",
+              "sha256": "0fb67d6286f7e2477a2b51d99226864767b7eec8276d29247cb2dae60be97edb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31763,12 +32269,102 @@
             ],
             "notes": "The distribution README identifies dtls, psvd and ptls and required BLAS/LINPACK components. It treats both the coefficient matrix and right-hand side as potentially inaccurate; current compiler behavior and individual rank/tolerance decisions remain untested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D9a4",
+            "level": "source-reviewed",
+            "revision": "be5bb35b3a86052df986eadf4a540da5eeec362c",
+            "reviewed_on": "2026-11-05",
+            "notes": "DTLS works on the augmented matrix [A B], optionally reduces it by LINPACK QR, calls DSVDC for its singular vectors, selects/lowers approximation rank according to tolerance and singular-value multiplicity, and transforms/solves the right-singular-vector partition for X. This is total least squares allowing perturbations in both A and B, not ordinary fixed-A residual least squares. D9a4 follows the Netlib vanhuffel index, which lists DTLS under D9a1 and D9a4; this claim uses its other-approximation leaf for the errors-in-variables contract. The driver checks dimensions and reports IERR/IWARN; it overwrites C, rank and tolerances. NUMEPS is fixed at 1e-16. Core QR/SVD and all HOUSH/TR2 kernels are dependencies, not fully audited here. Rank changes and scaling affect interpretation; no TLS fit or backward error was computed.",
+            "evidence": [
+              {
+                "path": "src/dtls.f",
+                "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/src/dtls.f",
+                "sha256": "8c2a66ca008e8e7079d5e27a21b6e3278116441ca7ee24162c3ffd2fe4db17ac"
+              },
+              {
+                "path": "doc/dtls-doc.txt",
+                "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/doc/dtls-doc.txt",
+                "sha256": "2fba3a7fe3761fdcb5d2ecff5c7f255e055dea12d095c1ca4c6c4d68af82e9c5"
+              },
+              {
+                "path": "examples/dtls-example.f",
+                "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/examples/dtls-example.f",
+                "sha256": "e76fe749b696aca552a290e9f5a6907c821bdc523fb9a7e500610011a5c22f34"
+              },
+              {
+                "path": "readme.txt",
+                "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/readme.txt",
+                "sha256": "8577c62aefdbf04eb29974d9db78cb16d42e18ff87a758754ef67e0bcbbeee46"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DTLS",
+                "role": "public-entry-point",
+                "summary": "External double-precision total least-squares driver for MxN data A and MxL responses B stored together in C(LDC,N+L). LDC>=MAX(M,N+L), LDX>=N, S has N+L entries and WRK has N+L+M entries. COMPRT controls rank/tolerance computation. Inspect both error and warning outputs.",
+                "signature": "CALL DTLS(C, LDC, M, N, L, S, X, LDX, WRK, RANK, &\n          TOL1, TOL2, COMPRT, IERR, IWARN)",
+                "declarations": [
+                  {
+                    "path": "src/dtls.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "doc/dtls-doc.txt",
+                    "line_start": 47,
+                    "line_end": 75
+                  },
+                  {
+                    "path": "doc/dtls-doc.txt",
+                    "line_start": 131,
+                    "line_end": 173
+                  }
+                ],
+                "path": "src/dtls.f",
+                "line_start": 1,
+                "line_end": 174,
+                "examples": [
+                  {
+                    "path": "examples/dtls-example.f",
+                    "line_start": 2,
+                    "line_end": 32
+                  }
+                ],
+                "usage": "external :: dtls\ndouble precision :: c(3,2), s(2), x(1,1), work(5), tol1, tol2\ninteger :: rank, ierr, iwarn\nc(:,1) = [1.0d0, 2.0d0, 3.0d0]\nc(:,2) = [2.0d0, 4.1d0, 5.9d0]\nrank = 0; tol1 = 1.0d-10; tol2 = 1.0d-10\n! R computes rank while using the supplied absolute tol1.\ncall dtls(c, 3, 3, 1, 1, s, x, 1, work, rank, tol1, tol2, \"R\", ierr, iwarn)\nif (ierr /= 0) error stop \"DTLS failed\"\n! Review iwarn, rank and scaling before interpreting x.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link DTLS with the required legacy LINPACK, BLAS and HOUSH/TR2 routines; match integer/double ABI. Keep original augmented data for independent checks. This sketch supplies an absolute rank tolerance; other COMPRT modes can interpret tol1 as data-error standard deviation. IERR=0 does not mean rank was retained or that preprocessing assumptions hold; the statistical errors-in-variables interpretation needs appropriate scaling/whitening."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "be5bb35b3a86052df986eadf4a540da5eeec362c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned files attribute Sabine Van Huffel and describe Netlib distribution and required LINPACK/BLAS routines, but no explicit project license grant was identified. No separately named LICENSE appears in the pinned tree; backend terms are separate.",
+          "evidence": [
+            {
+              "path": "readme.txt",
+              "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/readme.txt",
+              "sha256": "8577c62aefdbf04eb29974d9db78cb16d42e18ff87a758754ef67e0bcbbeee46"
+            },
+            {
+              "path": "doc/dtls-doc.txt",
+              "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/doc/dtls-doc.txt",
+              "sha256": "2fba3a7fe3761fdcb5d2ecff5c7f255e055dea12d095c1ca4c6c4d68af82e9c5"
+            },
+            {
+              "path": "src/dtls.f",
+              "url": "https://github.com/ivan-pi/vanhuffel/blob/be5bb35b3a86052df986eadf4a540da5eeec362c/src/dtls.f",
+              "sha256": "8c2a66ca008e8e7079d5e27a21b6e3278116441ca7ee24162c3ffd2fe4db17ac"
+            }
+          ]
         }
       },
       "imports": {}
@@ -34496,12 +35092,172 @@
             ],
             "notes": "The README documents overloaded vector operations, lengths/angles, normals, projections and precision choices. Broad algebra/geometry scope does not certify degeneracy handling, cancellation accuracy or accelerator behavior for every procedure.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1a4",
+            "level": "source-reviewed",
+            "revision": "e92556a5892301b89a78fce92932c52f5bf7d8c6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected shared include implements the ordinary dot product by three component products and additions. The R8P module preprocesses vector_RPP/RPP into vector_R8P/R8P and provides this binding publicly on the vector type. D1a4 records this 3D vector operation, not arbitrary-length arrays or all geometric methods. This ordinary path has no scaling or compensated-product correction; separate accurate variants are not covered. PENF defines the actual precision kind, and source preprocessing/dependency configuration must match. No product, floating-point range check, device kernel or author example was run.",
+            "evidence": [
+              {
+                "path": "src/lib/vecfor_RPP.INC",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/src/lib/vecfor_RPP.INC",
+                "sha256": "94084bb0ab2af6fcb8ed8accf53e7d3b1ba72714639375888e60b6ac092e7801"
+              },
+              {
+                "path": "src/lib/vecfor_R8P.F90",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/src/lib/vecfor_R8P.F90",
+                "sha256": "2fd3d8e6212f3a6c17a97013c8c5d8b14909527c5432d22e84fb8cf4ce35ee11"
+              },
+              {
+                "path": "docs/examples/snippets/products.f90",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/docs/examples/snippets/products.f90",
+                "sha256": "c6e3143689a88f4710e7f2f63730d6c40ad2eeadcf14def19a5db138e4d7d724"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dotproduct",
+                "role": "public-entry-point",
+                "summary": "Elemental type-bound scalar product of two three-component Cartesian vectors, also exposed as the .dot. operator. This card selects the double-precision R8P module; the evidence file is a shared include, not a standalone module.",
+                "signature": "product = a%dotproduct(b)",
+                "declarations": [
+                  {
+                    "path": "src/lib/vecfor_R8P.F90",
+                    "line_start": 3,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "src/lib/vecfor_RPP.INC",
+                    "line_start": 71,
+                    "line_end": 84
+                  },
+                  {
+                    "path": "src/lib/vecfor_RPP.INC",
+                    "line_start": 1641,
+                    "line_end": 1645
+                  }
+                ],
+                "path": "src/lib/vecfor_RPP.INC",
+                "line_start": 1628,
+                "line_end": 1646,
+                "module": "vecfor_R8P",
+                "derived_type": "vector_R8P",
+                "examples": [
+                  {
+                    "path": "docs/examples/snippets/products.f90",
+                    "line_start": 1,
+                    "line_end": 15
+                  }
+                ],
+                "usage": "use vecfor_R8P, only: vector_R8P, R8P\ntype(vector_R8P) :: a, b\nreal(R8P) :: product\na%x=1.0_R8P; a%y=2.0_R8P; a%z=3.0_R8P\nb%x=4.0_R8P; b%y=5.0_R8P; b%z=6.0_R8P\nproduct = a%dotproduct(b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the author build to preprocess the R8P module and find its include/PENF dependency. Components are 3D Cartesian values; this binding does not apply spherical-coordinate conventions. Ordinary products can overflow or lose accuracy through cancellation; no promise from separately named accurate variants or GPU forms is inherited."
+              }
+            ]
+          },
+          {
+            "code": "D1a11",
+            "level": "source-reviewed",
+            "revision": "e92556a5892301b89a78fce92932c52f5bf7d8c6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected shared include implements the Cartesian cross product by the three antisymmetric component differences. The R8P module preprocesses vector_RPP/RPP into vector_R8P/R8P and provides this binding publicly on the vector type. D1a11 records this 3D vector operation, not arbitrary-length arrays or all geometric methods. This ordinary path has no scaling or compensated-product correction; separate accurate variants are not covered. PENF defines the actual precision kind, and source preprocessing/dependency configuration must match. No product, floating-point range check, device kernel or author example was run.",
+            "evidence": [
+              {
+                "path": "src/lib/vecfor_RPP.INC",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/src/lib/vecfor_RPP.INC",
+                "sha256": "94084bb0ab2af6fcb8ed8accf53e7d3b1ba72714639375888e60b6ac092e7801"
+              },
+              {
+                "path": "src/lib/vecfor_R8P.F90",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/src/lib/vecfor_R8P.F90",
+                "sha256": "2fd3d8e6212f3a6c17a97013c8c5d8b14909527c5432d22e84fb8cf4ce35ee11"
+              },
+              {
+                "path": "docs/examples/snippets/products.f90",
+                "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/docs/examples/snippets/products.f90",
+                "sha256": "c6e3143689a88f4710e7f2f63730d6c40ad2eeadcf14def19a5db138e4d7d724"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "crossproduct",
+                "role": "public-entry-point",
+                "summary": "Elemental type-bound three-dimensional Cartesian cross product, also exposed as the .cross. operator. This card selects the double-precision R8P module; the evidence file is a shared include, not a standalone module.",
+                "signature": "cross = a%crossproduct(b)",
+                "declarations": [
+                  {
+                    "path": "src/lib/vecfor_R8P.F90",
+                    "line_start": 3,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "src/lib/vecfor_RPP.INC",
+                    "line_start": 71,
+                    "line_end": 84
+                  },
+                  {
+                    "path": "src/lib/vecfor_RPP.INC",
+                    "line_start": 1619,
+                    "line_end": 1625
+                  }
+                ],
+                "path": "src/lib/vecfor_RPP.INC",
+                "line_start": 1603,
+                "line_end": 1626,
+                "module": "vecfor_R8P",
+                "derived_type": "vector_R8P",
+                "examples": [
+                  {
+                    "path": "docs/examples/snippets/products.f90",
+                    "line_start": 1,
+                    "line_end": 15
+                  }
+                ],
+                "usage": "use vecfor_R8P, only: vector_R8P, R8P\ntype(vector_R8P) :: a, b\ntype(vector_R8P) :: cross\na%x=1.0_R8P; a%y=2.0_R8P; a%z=3.0_R8P\nb%x=4.0_R8P; b%y=5.0_R8P; b%z=6.0_R8P\ncross = a%crossproduct(b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the author build to preprocess the R8P module and find its include/PENF dependency. Components are 3D Cartesian values; this binding does not apply spherical-coordinate conventions. Ordinary products can overflow or lose accuracy through cancellation; no promise from separately named accurate variants or GPU forms is inherited."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Multiple GPL/BSD/MIT options subject to README use categories",
+          "spdx_expression": null,
+          "revision": "e92556a5892301b89a78fce92932c52f5bf7d8c6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README distinguishes GPL v3 for FOSS projects from BSD 2-Clause/BSD 3-Clause/MIT options for closed-source/commercial uses and invites choosing a suitable license. Preserve that stated policy and the supplied texts rather than flattening it to an unconditional SPDX OR expression. PENF dependency notices were not audited here.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/README.md",
+              "sha256": "2937aae8a800b79c991c328023fab35d016b6fc43d8154f5eca565cfa346a134"
+            },
+            {
+              "path": "LICENSE.gpl3.md",
+              "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/LICENSE.gpl3.md",
+              "sha256": "ccb349b4132ed7737f25e5adebfe61f3d52dca33708df1e50352320438d1d4c2"
+            },
+            {
+              "path": "LICENSE.bsd-2.md",
+              "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/LICENSE.bsd-2.md",
+              "sha256": "7f9a938f2dcf7eec8e0a905c454cf0428277ee021cf84a5af6d6bb2de2347916"
+            },
+            {
+              "path": "LICENSE.bsd-3.md",
+              "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/LICENSE.bsd-3.md",
+              "sha256": "2d3ffa08cc1862809fc56412a94d2fed5d8172558029226c4c3ca44131a3a821"
+            },
+            {
+              "path": "LICENSE.mit.md",
+              "url": "https://github.com/szaghi/VecFor/blob/e92556a5892301b89a78fce92932c52f5bf7d8c6/LICENSE.mit.md",
+              "sha256": "4854f89382afdc44d716b7b10436c71a25c95533c22f107db64538fe05151657"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38220,12 +38976,134 @@
             ],
             "notes": "The README documents overloaded operations and explicitly limits input types/orders to those needed by the author. It includes mechanics transformations and utility helpers; no general symbolic tensor engine, universal rank support or benchmarked speed advantage is inferred.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1a4",
+            "level": "source-reviewed",
+            "revision": "651a7dbfde884bee4a01c9aeb75cdcecbddffffb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public in1 generic selects the rank-one/rank-one overload when passed a scalar result and two REAL(8) vectors of length iDm. The implementation zeroes the result and sums component products, supporting D1a4 (dot product). Explicit iDm determines the dummy extents; actual vector compatibility is not validated and no status or compensated summation is provided. Other rank combinations under the same generic do not inherit this source review. No dot product or continuum-mechanics example was run.",
+            "evidence": [
+              {
+                "path": "comMath.f",
+                "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/comMath.f",
+                "sha256": "f0b4b7697a17085eebac5b17ce8340d8f24849158ec9ad93fe61baa4fbd7fc47"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/README.md",
+                "sha256": "84e21fab3f7dab3e980236cafc423511e2a85108c8b4d2c5643ec3300cd7f2b8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "in1",
+                "role": "public-entry-point",
+                "summary": "Public module generic, shown for vector dot product with scalar REAL(8) output. The first argument is the output; iDm is a separate default-integer dimension. It is a subroutine, not a scalar-valued function.",
+                "signature": "CALL in1(result, vector_a, vector_b, iDm)",
+                "declarations": [
+                  {
+                    "path": "comMath.f",
+                    "line_start": 9,
+                    "line_end": 11
+                  },
+                  {
+                    "path": "comMath.f",
+                    "line_start": 44,
+                    "line_end": 51
+                  },
+                  {
+                    "path": "comMath.f",
+                    "line_start": 511,
+                    "line_end": 519
+                  }
+                ],
+                "path": "comMath.f",
+                "line_start": 511,
+                "line_end": 530,
+                "module": "comMath",
+                "usage": "use comMath, only: in1\nreal(8) :: a(3), b(3), product\na = [1.0d0, 2.0d0, 3.0d0]\nb = [4.0d0, 5.0d0, 6.0d0]\ncall in1(product, a, b, 3)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build comSub before comMath using the source-format settings needed by these .f files; the full comMath object also contains LAPACK-dependent inversion routines. Supply compatible extents/kinds and finite values. This review does not certify reduction accuracy or other tensor overloads."
+              }
+            ]
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "651a7dbfde884bee4a01c9aeb75cdcecbddffffb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected vector/vector dyad overload assigns result(i,j)=a(i)*b(j), and the rank-two/rank-two overload assigns result(i,j,k,l)=A(i,j)*B(k,l). D1b6 records these outer-product forms of matrix/tensor multiplication, explicitly not an ordinary contracted matrix product. The overloads use a common square/cubic dimension iDm and fixed REAL(8) dummies, with no validation/status. Storage for rank-four output grows as iDm**4. Spectral decomposition, inverse and contractions remain outside this review. No outer product was executed.",
+            "evidence": [
+              {
+                "path": "comMath.f",
+                "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/comMath.f",
+                "sha256": "f0b4b7697a17085eebac5b17ce8340d8f24849158ec9ad93fe61baa4fbd7fc47"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/README.md",
+                "sha256": "84e21fab3f7dab3e980236cafc423511e2a85108c8b4d2c5643ec3300cd7f2b8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dyad",
+                "role": "public-entry-point",
+                "summary": "Public outer-product generic, shown for two REAL(8) vectors and a REAL(8) matrix output. The result is the first argument. A separate matrix-input overload produces a rank-four tensor with a different shape, not matrix multiplication by contraction.",
+                "signature": "CALL dyad(result, vector_a, vector_b, iDm)",
+                "declarations": [
+                  {
+                    "path": "comMath.f",
+                    "line_start": 62,
+                    "line_end": 66
+                  },
+                  {
+                    "path": "comMath.f",
+                    "line_start": 822,
+                    "line_end": 830
+                  }
+                ],
+                "path": "comMath.f",
+                "line_start": 822,
+                "line_end": 842,
+                "module": "comMath",
+                "usage": "use comMath, only: dyad\nreal(8) :: a(2), b(2), outer(2,2)\na = [1.0d0, 2.0d0]; b = [3.0d0, 4.0d0]\ncall dyad(outer, a, b, 2)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The result is a column/row outer product: there is no summed index. Match iDm and actual extents, and keep result storage separate from intent-in operands. Build/link dependencies of the containing module remain necessary even for this small overload."
+              },
+              {
+                "procedure": "dyad_ord22",
+                "role": "implementation-helper",
+                "path": "comMath.f",
+                "line_start": 845,
+                "line_end": 869,
+                "module": "comMath"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "651a7dbfde884bee4a01c9aeb75cdcecbddffffb",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE and README identify MIT terms. The containing module uses comSub and links numerical dependencies for unrelated paths; this records the project notice without auditing those backends.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/LICENSE",
+              "sha256": "c55099d232fc2c332a91a3a2e39cd3f87323eb1f939e76893f384c07a84a9205"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/CfKu/tensor-algebra/blob/651a7dbfde884bee4a01c9aeb75cdcecbddffffb/README.md",
+              "sha256": "84e21fab3f7dab3e980236cafc423511e2a85108c8b4d2c5643ec3300cd7f2b8"
+            }
+          ]
         }
       },
       "imports": {}

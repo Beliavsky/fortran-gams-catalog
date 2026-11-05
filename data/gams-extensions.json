@@ -150,6 +150,18 @@
       "parent": "L10a1c",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "D1a4": {
+      "label": "Dot product (inner product)",
+      "parent": "D1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D9a4": {
+      "label": "Other",
+      "parent": "D9a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

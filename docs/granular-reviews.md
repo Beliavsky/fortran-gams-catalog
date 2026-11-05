@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 132 repositories now have 155 source-reviewed
+Reviewed on 2026-11-05. 140 repositories now have 165 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-128 repository cards now identify public routines and link their usage lines
+136 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Four further cards (DDFSA, CWT, polyfit and
 StatTools) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 132 independently source-reviewed repositories now have an
+separately. All 140 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -156,6 +156,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FortVSH | `VSH::LEGENDRE`, `::SHGLQ` | BSD-3-Clause |
 | Butterworth-Filter | External `buttlp`, `buttfilt` (normalized forward filter) | GPL-3.0-or-later |
 | RKSUITE | `rksuite_90::setup`, `::range_integrate`, `::collect_garbage` | Custom free scientific-use/citation notice |
+| libsparse | `modsparse_helpers::csrmv` (native raw-CSR helper) | MIT root; optional backends separate |
+| SPOOF | `Spoof::CSRMatrix%multiply` | MIT wrapper; bundled SPARSKIT LGPL notice |
+| sparseSET | `sparseset::array_to_sparse_line`, `::sparse_line_to_array` | BSD-2-Clause |
+| tensor-algebra | `comMath::in1` (vector dot), `::dyad` (outer products) | MIT |
+| VecFor | `vecfor_R8P::vector_R8P%dotproduct`, `%crossproduct` | GPL/BSD/MIT options under README use categories |
+| fortran_lsp | External legacy `NNLS` | No license grant identified in reviewed material |
+| vanhuffel | External `DTLS` | No license grant identified in reviewed material |
+| lanczos_iterator | External `rs_lanczos` (real symmetric, matrix-free) | MIT; backends separate |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -307,6 +315,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FortVSH](https://github.com/justinelfritz/FortVSH) | C3a2; H2c | Ordinary Legendre recurrence and Gauss-Legendre node/weight generation | Validate degree/count. Fixed Newton tolerance/cap with no convergence status; other harmonic/coupling routines unreviewed. |
 | [Butterworth-Filter](https://github.com/youshanliu/Butterworth-Filter) | L10a1c3 | Low-pass coefficient construction and causal recursive forward filtering | Normalize a(0)=1. Zero history; no streaming state or status. Validate cutoff/order; high-order conditioning unverified. |
 | [RKSUITE](https://github.com/jacobwilliams/rksuite) | I1a1a | F90 setup, requested-output driver and explicit embedded-RK error-control paths | Stateful pointers need cleanup; callback is a function, not the F77 subroutine API. Stiffness warning is not stiff-solver support. |
+| [libsparse](https://github.com/jvdp1/libsparse) | D1b4 | Native raw-CSR scaled matrix-vector row/scatter loops | Use initialized y and valid one-based CSR. The object mult wrapper has an INTENT(OUT) accumulation mismatch; the sketch uses the public native helper. |
+| [SPOOF](https://github.com/samharrison7/spoof) | D1b4 | CSR object dispatch and SPARSKIT AMUX row products | Conversion statuses discarded; validate extents/indices. Empty raw matrices and zero trailing columns need explicit handling. |
+| [sparseSET](https://github.com/dorivalpiedadeneto/SparseSet) | D1b9 | Dense/sparse line conversion with thresholding and duplicate accumulation | Preallocate dense output before SIZE check. Drop tolerance loses small values; empty assembly and fixed sorter stack are outside the sketch. |
+| [tensor-algebra](https://github.com/cfku/tensor-algebra) | D1a4; D1b6 | Vector dot-product loop and vector/matrix dyadic outer products | Output first, separate dimension, REAL(8). Outer products do not contract indices; unrelated solver/decomposition paths unreviewed. |
+| [VecFor](https://github.com/szaghi/VecFor) | D1a4; D1a11 | Shared-include R8P dot and Cartesian cross products | Three components only; requires preprocessing and PENF. Accurate-product/device variants and cancellation/range behavior unverified. |
+| [fortran_lsp](https://github.com/ivan-pi/fortran_lsp) | D9b1 | NNLS active/passive sets, Householder/Givens updates and triangular solve | A/b overwritten; mode=1 succeeds. Workspace/ABI checks required; simplified wrapper source includes a test main. |
+| [vanhuffel](https://github.com/ivan-pi/vanhuffel) | D9a4 | Augmented-data QR/SVD dispatch, rank adjustment and TLS solution recovery | Perturbs both A and B; not ordinary fixed-A residual minimization. Inspect IERR/IWARN and scaling; backend kernels not fully audited. |
+| [lanczos_iterator](https://github.com/lanczos-iterator/lanczos_iterator) | D4a1 | Matrix-free real-symmetric wrapper, recurrence and Ritz/residual dispatch | ADD callback semantics; variance output is a residual norm. Saved state, polishing work and absent success flag require care. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -522,3 +538,28 @@ examples. libcoulcc's raw status-returning interface is shown because its
 convenience wrappers have source findings.
 No upstream routine, derivative, filter, interpolation or ODE example in this
 batch was compiled or run.
+
+## Sparse storage, vector products and least-squares contracts
+
+The native libsparse helper and the SPOOF object use different CSR interfaces:
+separate begin/end pointers versus a single row-pointer array. Their cards
+record the actual indices, kinds and output initialization requirements.
+The libsparse sketch avoids its object wrapper's output-intent mismatch.
+sparseSET's reviewed round trip is a storage conversion, with drop tolerance
+and an allocated-output precondition, rather than a solver mapping.
+
+Dot products use D1a4; VecFor's Cartesian cross product uses D1a11. Tensor dyads
+use D1b6 with explicit outer-product semantics. These services do not imply
+that unrelated inverse, spectral or geometric routines have been reviewed.
+The D1a4 and D9a4 taxonomy additions follow the
+[Netlib GAMS index](https://netlib.org/bib/gams.html).
+
+NNLS constrains x to be nonnegative while holding the original data matrix
+fixed in the mathematical problem. DTLS instead permits perturbing both A and B.
+The [Netlib vanhuffel index](https://netlib.org/vanhuffel/) lists DTLS under
+D9a1 and D9a4; the catalog uses D9a4 here to make its total-least-squares scope
+explicit. Lanczos requires a symmetric operator with overwrite/accumulate
+callback semantics; its variance-named output is a residual norm. The seed
+path was followed through its downstream normalization, so the wrapper's seed
+packing is not presented as an uncorrected random-seed defect.
+No upstream routine or calling sketch in this batch was compiled or run.
