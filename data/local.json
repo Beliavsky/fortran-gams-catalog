@@ -14233,12 +14233,182 @@
             ],
             "notes": "The README distinguishes convenience/performance-oriented array interfaces and an educational matrix module explicitly unsuitable for HPC use. Individual eigenvalue, Pfaffian and random-generation routines need separate review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "8ed2e797077b28d11743c68ee109ca48ed04e6d2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The real inverse overload copies the input, dispatches DGETRF, queries DGETRI workspace and calls DGETRI to form an explicit inverse. D2a1 records general real nonsymmetric matrix inversion, which is included under GAMS linear-system classes. Input is preserved and an allocated result is returned. Nonsquare or LAPACK failures call MATRIX_ERROR, which prints and STOPs, rather than returning INFO to the caller. Empty matrices are not handled as a separate valid case; use a nonempty square matrix. No condition estimate, residual, near-singularity test or complete backend kernel audit was performed. The containing module unconditionally imports f95_pfapack even though this inverse path uses LAPACK. No inverse or author program was run.",
+            "evidence": [
+              {
+                "path": "Matrix/matrix_mod_array_lapack.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_array_lapack.f90",
+                "sha256": "a13a0db5f0bff6ace6c1f00852d424cad3f9fb3fdbef39892fec77034e08e74d"
+              },
+              {
+                "path": "Matrix/matrix_mod_array.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_array.f90",
+                "sha256": "b4d3a1907258682da3c31a3f99f0706a8a93625ded8a498f9aa360451df1b081"
+              },
+              {
+                "path": "Matrix/matrix_mod_common.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_common.f90",
+                "sha256": "0065eb3e63108dd69a59582ae053900eedc530ab1168912afbc31d7f0dc056bb"
+              },
+              {
+                "path": "Matrix/README.md",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/README.md",
+                "sha256": "f4634dfa4de3ed0491280d1d3e82fb797ea2a7d70c8ea9f3db11e98dfe7ac7de"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "inverse",
+                "role": "public-entry-point",
+                "summary": "Public matrix_mod_array generic, shown for the REAL(dp) rank-two overload. dp=REAL64 from matrix_mod_common. Returns an allocatable array and has no status argument.",
+                "signature": "ainv = inverse(a)",
+                "declarations": [
+                  {
+                    "path": "Matrix/matrix_mod_array.f90",
+                    "line_start": 8,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_array.f90",
+                    "line_start": 71,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_array_lapack.f90",
+                    "line_start": 801,
+                    "line_end": 811
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_common.f90",
+                    "line_start": 5,
+                    "line_end": 12
+                  }
+                ],
+                "path": "Matrix/matrix_mod_array_lapack.f90",
+                "line_start": 801,
+                "line_end": 841,
+                "module": "matrix_mod_array",
+                "usage": "use iso_fortran_env, only: real64\nuse matrix_mod_array, only: inverse\nreal(real64) :: a(2,2)\nreal(real64),allocatable :: ainv(:,:)\na=reshape([2.0_real64,0.0_real64,1.0_real64,3.0_real64],[2,2])\nainv=inverse(a)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete source module with its required PFAPACK module and matching LAPACK/BLAS kinds/integer ABI; checked-in binary .mod/.a files are not portable substitutes. N must be positive. Errors can terminate the host process. A returned array is not a condition-number or residual certificate, and explicit inversion is not required merely to solve AX=B."
+              },
+              {
+                "procedure": "matrix_error",
+                "role": "implementation-helper",
+                "path": "Matrix/matrix_mod_common.f90",
+                "line_start": 59,
+                "line_end": 68,
+                "module": "matrix_mod_common"
+              }
+            ]
+          },
+          {
+            "code": "D2c1",
+            "level": "source-reviewed",
+            "revision": "8ed2e797077b28d11743c68ee109ca48ed04e6d2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The complex inverse overload copies the input, dispatches ZGETRF, queries ZGETRI workspace and calls ZGETRI to form an explicit inverse. D2c1 records general complex non-Hermitian matrix inversion, which is included under GAMS linear-system classes. Input is preserved and an allocated result is returned. Nonsquare or LAPACK failures call MATRIX_ERROR, which prints and STOPs, rather than returning INFO to the caller. Empty matrices are not handled as a separate valid case; use a nonempty square matrix. No condition estimate, residual, near-singularity test or complete backend kernel audit was performed. The containing module unconditionally imports f95_pfapack even though this inverse path uses LAPACK. No inverse or author program was run.",
+            "evidence": [
+              {
+                "path": "Matrix/matrix_mod_array_lapack.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_array_lapack.f90",
+                "sha256": "a13a0db5f0bff6ace6c1f00852d424cad3f9fb3fdbef39892fec77034e08e74d"
+              },
+              {
+                "path": "Matrix/matrix_mod_array.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_array.f90",
+                "sha256": "b4d3a1907258682da3c31a3f99f0706a8a93625ded8a498f9aa360451df1b081"
+              },
+              {
+                "path": "Matrix/matrix_mod_common.f90",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_common.f90",
+                "sha256": "0065eb3e63108dd69a59582ae053900eedc530ab1168912afbc31d7f0dc056bb"
+              },
+              {
+                "path": "Matrix/README.md",
+                "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/README.md",
+                "sha256": "f4634dfa4de3ed0491280d1d3e82fb797ea2a7d70c8ea9f3db11e98dfe7ac7de"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "inverse",
+                "role": "public-entry-point",
+                "summary": "Public matrix_mod_array generic, shown for the COMPLEX(dp) rank-two overload. dp=REAL64 from matrix_mod_common. Returns an allocatable array and has no status argument.",
+                "signature": "ainv = inverse(a)",
+                "declarations": [
+                  {
+                    "path": "Matrix/matrix_mod_array.f90",
+                    "line_start": 8,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_array.f90",
+                    "line_start": 71,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_array_lapack.f90",
+                    "line_start": 760,
+                    "line_end": 770
+                  },
+                  {
+                    "path": "Matrix/matrix_mod_common.f90",
+                    "line_start": 5,
+                    "line_end": 12
+                  }
+                ],
+                "path": "Matrix/matrix_mod_array_lapack.f90",
+                "line_start": 760,
+                "line_end": 799,
+                "module": "matrix_mod_array",
+                "usage": "use iso_fortran_env, only: real64\nuse matrix_mod_array, only: inverse\ncomplex(real64) :: a(2,2)\ncomplex(real64),allocatable :: ainv(:,:)\na=reshape(cmplx([2.0_real64,0.0_real64,1.0_real64,3.0_real64],0.0_real64,kind=real64),[2,2])\nainv=inverse(a)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete source module with its required PFAPACK module and matching LAPACK/BLAS kinds/integer ABI; checked-in binary .mod/.a files are not portable substitutes. N must be positive. Errors can terminate the host process. A returned array is not a condition-number or residual certificate, and explicit inversion is not required merely to solve AX=B."
+              },
+              {
+                "procedure": "matrix_error",
+                "role": "implementation-helper",
+                "path": "Matrix/matrix_mod_common.f90",
+                "line_start": 59,
+                "line_end": 68,
+                "module": "matrix_mod_common"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "8ed2e797077b28d11743c68ee109ca48ed04e6d2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The supplied source copyright notice specifies GPL version 3, without an or-later option, alongside the root GPL v3 text. This scope does not assign those terms to external PFAPACK/LAPACK/BLAS libraries.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "Matrix/Copyright",
+              "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/Copyright",
+              "sha256": "6637c10e640975336fdd2958e90916937fa49aa81591a35cfbd81bc1b933cb6b"
+            },
+            {
+              "path": "Matrix/matrix_mod_common.f90",
+              "url": "https://github.com/KNAnagnostop/FortranMatrix/blob/8ed2e797077b28d11743c68ee109ca48ed04e6d2/Matrix/matrix_mod_common.f90",
+              "sha256": "0065eb3e63108dd69a59582ae053900eedc530ab1168912afbc31d7f0dc056bb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -20493,12 +20663,192 @@
             ],
             "notes": "The README separately demonstrates natural/prescribed-slope splines and regression. No method is treated as simultaneously interpolating and statistically fitting the same problem without its appropriate interface.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "3ce958219240248a029e2a171b7d1051ade02cb8",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public linear_interp type inherits initialization and scalar/array interpolate methods. Initialization copies monotonic x/y data; scalar interpolation locates/hunts a neighboring interval and dispatches li_raw_interp, which evaluates the two-point affine formula. E1a records univariate piecewise-linear polynomial interpolation, not global high-degree polynomials or cubic spline boundary options. Equal interval endpoints return the first ordinate; the sketch instead requires distinct ascending nodes and in-range queries. The scalar wrapper calls raw_interp without checking a locate/hunt error, and locate references SIZE and endpoint elements before its allocation guard, so successful initialization is essential. Errors are managed through optional ferror objects, with default behavior controlled by that dependency. No interpolation value, extrapolation policy or error path was executed.",
+            "evidence": [
+              {
+                "path": "src/curvefit_interp.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/src/curvefit_interp.f90",
+                "sha256": "6ccdee311738772fe64981b508571486f9f1665f7e0fcca7f3d038917685066d"
+              },
+              {
+                "path": "src/curvefit_core.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/src/curvefit_core.f90",
+                "sha256": "27626952b8aec0d0d3d6e1a62a1595db1abed746c89d7b3d78bf850f7a3155a9"
+              },
+              {
+                "path": "examples/curvefit_linear_interp_example.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/examples/curvefit_linear_interp_example.f90",
+                "sha256": "d060a3f4e267b882ebc4b520d18107a4b244d0365f06bb010f95d4aee1e424d2"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/README.md",
+                "sha256": "de7ceb2c63097bd4a2a9f06082ccf2a164822dfafba9f55734071bc05c91497d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "interpolate",
+                "role": "public-entry-point",
+                "summary": "Inherited public type-bound generic on curvefit_interp::linear_interp, shown for a REAL64 scalar query. initialize copies REAL64 x/y vectors; optional ERR is a polymorphic ferror errors object. The object stores data and mutable search history.",
+                "signature": "yy = interp%interpolate(pt [, err])",
+                "declarations": [
+                  {
+                    "path": "src/curvefit_interp.f90",
+                    "line_start": 104,
+                    "line_end": 125
+                  },
+                  {
+                    "path": "src/curvefit_interp.f90",
+                    "line_start": 195,
+                    "line_end": 199
+                  },
+                  {
+                    "path": "src/curvefit_interp.f90",
+                    "line_start": 464,
+                    "line_end": 469
+                  },
+                  {
+                    "path": "src/curvefit_interp.f90",
+                    "line_start": 725,
+                    "line_end": 730
+                  }
+                ],
+                "path": "src/curvefit_interp.f90",
+                "line_start": 725,
+                "line_end": 742,
+                "module": "curvefit_interp",
+                "derived_type": "linear_interp",
+                "examples": [
+                  {
+                    "path": "examples/curvefit_linear_interp_example.f90",
+                    "line_start": 19,
+                    "line_end": 27
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse curvefit_interp, only: linear_interp\ntype(linear_interp) :: interp\nreal(real64) :: x(3),y(3),value\nx=[0.0_real64,1.0_real64,2.0_real64]\ny=[0.0_real64,2.0_real64,3.0_real64]\ncall interp%initialize(x,y)\nvalue=interp%interpolate(0.5_real64)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide at least two distinct monotonic nodes, matching vector lengths and successful initialization before every interpolation. Use the optional error manager according to the linked ferror configuration; do not continue after an initialization failure. This sketch stays in range and does not certify extrapolation or the polynomial/cubic classes. Build the archived library with its pinned dependencies rather than assuming the single module is standalone."
+              },
+              {
+                "procedure": "li_raw_interp",
+                "role": "implementation-helper",
+                "path": "src/curvefit_interp.f90",
+                "line_start": 834,
+                "line_end": 849,
+                "module": "curvefit_interp"
+              },
+              {
+                "procedure": "im_locate",
+                "role": "implementation-helper",
+                "path": "src/curvefit_interp.f90",
+                "line_start": 542,
+                "line_end": 599,
+                "module": "curvefit_interp"
+              }
+            ]
+          },
+          {
+            "code": "K1a1a2",
+            "level": "source-reviewed",
+            "revision": "3ce958219240248a029e2a171b7d1051ade02cb8",
+            "reviewed_on": "2026-11-05",
+            "notes": "The rank-one x/y overload of linear_least_squares initializes a zero result, checks matching lengths, copies y and calls polynomial%fit_thru_zero with degree one, then extracts coefficient two. K1a1a2 records this dispatch to an unconstrained univariate polynomial least-squares fit restricted to y=a*x. It does not estimate an intercept and is not the separate multivariable SVD overload. The polynomial kernel lives in the external nonlin dependency and is not independently audited here; the source review establishes the wrapper contract and dispatch, not rank detection or numerical accuracy. Error paths can return the initialized zero slope, so a zero result alone is not a success flag. No fit or supplied plotting example was run.",
+            "evidence": [
+              {
+                "path": "src/curvefit_regression.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/src/curvefit_regression.f90",
+                "sha256": "1fb3bb94be2d8d8add346e5ba1101b2ddc96fe2e292f575e57e9f9d80ddd567e"
+              },
+              {
+                "path": "src/curvefit_core.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/src/curvefit_core.f90",
+                "sha256": "27626952b8aec0d0d3d6e1a62a1595db1abed746c89d7b3d78bf850f7a3155a9"
+              },
+              {
+                "path": "examples/curvefit_lls_scalar_example.f90",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/examples/curvefit_lls_scalar_example.f90",
+                "sha256": "122f340bc550621c984878e3c4be341d6fd4d056c6197487f17b5817d75b4e07"
+              },
+              {
+                "path": ".gitmodules",
+                "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/.gitmodules",
+                "sha256": "fba6d628954839697eb2c4caa04f0fd34be89649b7cc91738aee310e511f3cba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "linear_least_squares",
+                "role": "public-entry-point",
+                "summary": "Public generic, selected for REAL64 rank-one X and Y and a scalar REAL64 slope. Optional polymorphic ferror ERR carries errors. This overload fits through the origin; there is no intercept output.",
+                "signature": "slope = linear_least_squares(x, y [, err])",
+                "declarations": [
+                  {
+                    "path": "src/curvefit_regression.f90",
+                    "line_start": 8,
+                    "line_end": 22
+                  },
+                  {
+                    "path": "src/curvefit_regression.f90",
+                    "line_start": 89,
+                    "line_end": 92
+                  },
+                  {
+                    "path": "src/curvefit_regression.f90",
+                    "line_start": 1407,
+                    "line_end": 1411
+                  }
+                ],
+                "path": "src/curvefit_regression.f90",
+                "line_start": 1407,
+                "line_end": 1452,
+                "module": "curvefit_regression",
+                "examples": [
+                  {
+                    "path": "examples/curvefit_lls_scalar_example.f90",
+                    "line_start": 23,
+                    "line_end": 29
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse curvefit_regression, only: linear_least_squares\nreal(real64) :: x(3),y(3),slope\nx=[1.0_real64,2.0_real64,3.0_real64]\ny=[2.0_real64,4.0_real64,6.0_real64]\nslope=linear_least_squares(x,y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the required nonlin polynomial, linalg and error-management dependencies. Use nonempty compatible data with a nondegenerate predictor. This is a wrapper-level review: the external fit_thru_zero implementation was not newly inspected or verified by execution. Supply/check ERR when recovery from errors is needed; default error behavior belongs to ferror. No intercept, residual, uncertainty or rank certificate is returned by this scalar wrapper."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; version choice unresolved",
+          "spdx_expression": null,
+          "revision": "3ce958219240248a029e2a171b7d1051ade02cb8",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root contains GPL version 3 text. The inspected README and defining modules do not settle a version-only versus or-later choice, and external nonlin/ferror components are separate.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/LICENSE",
+              "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/README.md",
+              "sha256": "de7ceb2c63097bd4a2a9f06082ccf2a164822dfafba9f55734071bc05c91497d"
+            },
+            {
+              "path": "src/curvefit_regression.f90",
+              "url": "https://github.com/jchristopherson/curvefit/blob/3ce958219240248a029e2a171b7d1051ade02cb8/src/curvefit_regression.f90",
+              "sha256": "1fb3bb94be2d8d8add346e5ba1101b2ddc96fe2e292f575e57e9f9d80ddd567e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21555,12 +21905,89 @@
             ],
             "notes": "The README explicitly distinguishes nonnegative low-rank approximation from nonnegative matrix factorization. MARIA-related build dependencies and algorithmic results are not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K",
+            "level": "source-reviewed",
+            "revision": "dc0c54ea975370bd7f54b259d931ef54bc03a9f8",
+            "reviewed_on": "2026-11-05",
+            "notes": "nn_lrma_svd forms A=U*VT, applies an entrywise nonnegativity transformation and takes a truncated SVD, returning factors with singular values absorbed into U. METHOD=1 clips at zero; other methods reflect, clip at a positive shift or add a shift derived from the largest negative entry. K records the selected constrained low-rank approximation step. This routine performs one projection/truncation step, not an internally converged optimizer or a least-squares fit against a preserved original target; no narrower global-best approximation claim is inferred. METHOD=1 may regain negative entries after rank truncation, so repeat/control convergence at application level. Both real/integer workspace queries are supported via either length=-1, but zero-size/rank early returns precede query outputs. DGESDD error is not checked before copying factors and a following DDGMM call can overwrite IERR. Flat column-major buffers and actual capacities are caller obligations. No approximation, singular values or convergence test was run.",
+            "evidence": [
+              {
+                "path": "src/nonnegative/matrix/sub/nonnegative_matrix_sub.f90",
+                "url": "https://github.com/sbudzinskiy/LRAP/blob/dc0c54ea975370bd7f54b259d931ef54bc03a9f8/src/nonnegative/matrix/sub/nonnegative_matrix_sub.f90",
+                "sha256": "28c7cb3b0f65e08ae47ccce4bf94de10c1abd839ae3869ad3d2a53e446d399af"
+              },
+              {
+                "path": "src/nonnegative/matrix/nonnegative_matrix_mod.f90",
+                "url": "https://github.com/sbudzinskiy/LRAP/blob/dc0c54ea975370bd7f54b259d931ef54bc03a9f8/src/nonnegative/matrix/nonnegative_matrix_mod.f90",
+                "sha256": "3c61d1dc988e6fac44962d2af1de062d579a5cf1c66faaf790e07c43dc198663"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/sbudzinskiy/LRAP/blob/dc0c54ea975370bd7f54b259d931ef54bc03a9f8/README.md",
+                "sha256": "961aeefaa99ebcb3feb37a8a5cc7678132df5be00c51aab552500bad158ab096"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "nn_lrma_svd",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine implemented in a submodule. REAL(MARIA DP) contiguous rank-one storage for U(M,R), VT(R,N), with leading dimensions LDU/LDVT. Query real WORK(1) and integer IWORK(1), then supply sufficient storage; U/VT are overwritten.",
+                "signature": "CALL nn_lrma_svd(method, m, n, r, u, ldu, vt, ldvt, &\n                 work, lwork, iwork, liwork, ierr [, shift_ratio])",
+                "declarations": [
+                  {
+                    "path": "src/nonnegative/matrix/nonnegative_matrix_mod.f90",
+                    "line_start": 1,
+                    "line_end": 4
+                  },
+                  {
+                    "path": "src/nonnegative/matrix/nonnegative_matrix_mod.f90",
+                    "line_start": 22,
+                    "line_end": 41
+                  },
+                  {
+                    "path": "src/nonnegative/matrix/sub/nonnegative_matrix_sub.f90",
+                    "line_start": 123,
+                    "line_end": 139
+                  }
+                ],
+                "path": "src/nonnegative/matrix/sub/nonnegative_matrix_sub.f90",
+                "line_start": 47,
+                "line_end": 191,
+                "module": "nonnegative_matrix_mod",
+                "usage": "use maria_kinds_mod, only: dp\nuse nonnegative_matrix_mod, only: nn_lrma_svd\nreal(dp) :: u(2),vt(2),query(1)\nreal(dp),allocatable :: work(:)\ninteger :: iq(1),ierr,lw,liw\ninteger,allocatable :: iw(:)\nu=[1.0_dp,-1.0_dp]; vt=[1.0_dp,2.0_dp]\ncall nn_lrma_svd(1,2,2,1,u,2,vt,1,query,-1,iq,-1,ierr)\nif(ierr/=0) error stop \"query failed\"\nlw=ceiling(query(1)); liw=iq(1); allocate(work(lw),iw(liw))\ncall nn_lrma_svd(1,2,2,1,u,2,vt,1,work,lw,iw,liw,ierr)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the pinned MARIA-Fortran dependency, parent module and submodule. This is one alternating-projection step, not a completed nonnegative low-rank approximation driver. Correct/check SVD error propagation before relying on IERR; independently inspect factor finiteness, product rank and negative entries. Use positive sizes/rank when querying workspaces."
+              },
+              {
+                "procedure": "distance_to_nn",
+                "role": "implementation-helper",
+                "path": "src/nonnegative/matrix/sub/nonnegative_matrix_sub.f90",
+                "line_start": 7,
+                "line_end": 43,
+                "module": "nonnegative_matrix_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "dc0c54ea975370bd7f54b259d931ef54bc03a9f8",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies MIT terms for Stanislav Budzinskiy. The MARIA-Fortran submodule and BLAS/LAPACK dependencies remain separate from this scoped root finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sbudzinskiy/LRAP/blob/dc0c54ea975370bd7f54b259d931ef54bc03a9f8/LICENSE",
+              "sha256": "1fb13db9e13a881466d44ffce155285c4a301d791679ca5028ca50ea5be5c0d1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23179,12 +23606,138 @@
             ],
             "notes": "The README identifies vector fitting, source/build files and a gnuplot-based test script. Model order, pole constraints and stability preservation require more detailed documentation/source review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K1a1a3",
+            "level": "source-reviewed",
+            "revision": "cc0bd91499bb65d98bc45830a66fdc0e80b6e271",
+            "reviewed_on": "2026-11-05",
+            "notes": "calculate_residues builds fixed-pole rational basis columns 1/(s-a), adds optional constant/linear terms, stacks real/imaginary sample equations and solves for real coefficients, coupling complex-conjugate poles so residues form conjugate pairs. K1a1a3 records this unconstrained linear least-squares fit in specified nonpolynomial basis functions with poles held fixed. It is not a mapping of the separate iterative pole-relocation optimization. The default morse_penrose_solve explicitly forms A-transpose*A and inverts it; the alternative pads the matrix and dispatches EISPACK SVD. Neither returns solver status to the caller. Adjacent complex conjugate poles are required and invalid pairing STOPs; sampling at poles is unguarded. NEW_A and C_HAT dummy arrays are not assigned by this routine, despite appearing in its signature. Require 2*NF>=number of real unknowns and adequate rank; normal equations worsen conditioning. No fit, conditioning or SVD/back-end accuracy was checked by execution.",
+            "evidence": [
+              {
+                "path": "SRC/calculate_residues.F90",
+                "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/calculate_residues.F90",
+                "sha256": "ec6314a2edf54ede34c2daaae2dc28083525fdd1e4e337a46efcc157b29b0286"
+              },
+              {
+                "path": "SRC/dmatrix.F90",
+                "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/dmatrix.F90",
+                "sha256": "22d5fc7e5cb17c09b0ee6aa2e7aa9cdc059d26769902cfa2b4b189d18b09f5b7"
+              },
+              {
+                "path": "SRC/Vfit.F90",
+                "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/Vfit.F90",
+                "sha256": "606467ac404caee67065bd8620c35f84d068fc58237a9a5e698f47c2a8c8bea3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/README.md",
+                "sha256": "8bc2379abfb96ca160e28556c1abcdaed1596f90f6ffa6a3809f54aa89e76a0e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calculate_residues",
+                "role": "public-entry-point",
+                "summary": "External fixed-pole residue fit using nonstandard COMPLEX*16/REAL*8 declarations and default INTEGER/LOGICAL controls. C receives residues; D/H receive real optional polynomial terms or zero. NEW_A/C_HAT are unused, not returned pole updates. There is no INFO output.",
+                "signature": "CALL calculate_residues(order, a, new_a, c, c_hat, d, h, nf, f, s, &\n include_const_term, include_s_term, use_SVD_invert, verbose)",
+                "declarations": [
+                  {
+                    "path": "SRC/calculate_residues.F90",
+                    "line_start": 33,
+                    "line_end": 54
+                  }
+                ],
+                "path": "SRC/calculate_residues.F90",
+                "line_start": 33,
+                "line_end": 335,
+                "usage": "integer,parameter :: order=1,nf=3\ncomplex*16 :: a(order),unused_a(order),c(order),unused_c(order),f(nf),s(nf)\nreal*8 :: d,h\na(1)=(-1d0,0d0)\ns=[(0d0,1d0),(0d0,2d0),(0d0,3d0)]\nf=2d0/(s-a(1))\ncall calculate_residues(order,a,unused_a,c,unused_c,d,h,nf,f,s,.false.,.false.,.false.,.false.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile/link the external matrix helpers and required dependencies. This sketch chooses a single fixed real pole and the normal-equation path; it does not endorse that path for ill-conditioned fitting. Never read the unused NEW_A/C_HAT arrays as results. Check fitted responses and residuals independently because no returned solver status or uncertainty estimate is provided. Full Vfit pole iteration and passivity/stability guarantees are outside this mapping."
+              },
+              {
+                "procedure": "morse_penrose_solve",
+                "role": "implementation-helper",
+                "path": "SRC/dmatrix.F90",
+                "line_start": 154,
+                "line_end": 195
+              },
+              {
+                "procedure": "svd_solve",
+                "role": "implementation-helper",
+                "path": "SRC/dmatrix.F90",
+                "line_start": 200,
+                "line_end": 247
+              }
+            ]
+          },
+          {
+            "code": "K6a1",
+            "level": "source-reviewed",
+            "revision": "cc0bd91499bb65d98bc45830a66fdc0e80b6e271",
+            "reviewed_on": "2026-11-05",
+            "notes": "calculate_fit_function initializes each response as d+s*h and adds c(i)/(s-a(i)) for every supplied pole/residue. K6a1 records evaluation of an existing rational fit; it does not estimate coefficients, relocate poles, enforce passivity or validate stability. The external routine accepts explicit-size COMPLEX*16 vectors, REAL*8 d/h and no status. Caller must supply finite compatible arrays and avoid s=a denominators; no cancellation/overflow or singular-evaluation guard is present. No response values or checked driver were executed.",
+            "evidence": [
+              {
+                "path": "SRC/calculate_fit_function.F90",
+                "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/calculate_fit_function.F90",
+                "sha256": "a5afa0ad89c300bb27cd7990d9f5b48774e16f91399220183ab805754ca3f016"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calculate_fit_function",
+                "role": "public-entry-point",
+                "summary": "External scalar-response rational evaluator over NF sample points. A/C have ORDER poles/residues, S/F_FIT have NF complex entries. Output F_FIT is fully assigned; there are no module/global-state dependencies in this selected body.",
+                "signature": "CALL calculate_fit_function(order, a, c, d, h, nf, f_fit, s)",
+                "declarations": [
+                  {
+                    "path": "SRC/calculate_fit_function.F90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "SRC/calculate_fit_function.F90",
+                "line_start": 33,
+                "line_end": 65,
+                "usage": "integer,parameter :: order=1,nf=2\ncomplex*16 :: a(order),c(order),s(nf),response(nf)\nreal*8 :: d,h\na(1)=(-1d0,0d0); c(1)=(2d0,0d0); d=0d0; h=0d0\ns=[(0d0,1d0),(0d0,2d0)]\ncall calculate_fit_function(order,a,c,d,h,nf,response,s)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This call needs only the selected evaluator body, but its legacy COMPLEX*16/REAL*8 declarations require compatible compiler support. Avoid sample/pole coincidences and verify values/residuals against the intended model. No fitted-pole quality, physical realization or extrapolation accuracy is certified."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later selected code; EISPACK separately labeled LGPL",
+          "spdx_expression": null,
+          "revision": "cc0bd91499bb65d98bc45830a66fdc0e80b6e271",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected routines explicitly allow GPL v3 or later. The root notice separately assigns LGPL terms to EISPACK and supplies LGPL v3 text. Preserve that component distinction; the full bundled EISPACK provenance/version scope is not audited here.",
+          "evidence": [
+            {
+              "path": "license.txt",
+              "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/license.txt",
+              "sha256": "b5e53c9ed0209ff434d1b531f95c33db5a13118ed5540ff96fadc70c0481c780"
+            },
+            {
+              "path": "SRC/calculate_residues.F90",
+              "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/calculate_residues.F90",
+              "sha256": "ec6314a2edf54ede34c2daaae2dc28083525fdd1e4e337a46efcc157b29b0286"
+            },
+            {
+              "path": "SRC/calculate_fit_function.F90",
+              "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/SRC/calculate_fit_function.F90",
+              "sha256": "a5afa0ad89c300bb27cd7990d9f5b48774e16f91399220183ab805754ca3f016"
+            },
+            {
+              "path": "COPYING.LESSER.txt",
+              "url": "https://github.com/chrissmartt/vector_fit/blob/cc0bd91499bb65d98bc45830a66fdc0e80b6e271/COPYING.LESSER.txt",
+              "sha256": "cb8bb87c30d8a944f086b7aa3221ba168e30fcb231490f54781da1c450d9ddbe"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24445,12 +24998,143 @@
             ],
             "notes": "The README documents changes to NITSOL, including Gram-Schmidt choices, finite-difference precision and removal of COMMON blocks. BLAS/LAPACK must be supplied externally; detailed solver behavior and convergence remain unchecked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "9d3c60658235f5489f7167a915f6eb18e195d4ef",
+            "reviewed_on": "2026-11-05",
+            "notes": "NITSOL validates integer controls, initializes real algorithm parameters and slices caller workspace before dispatching NITDRV. The inspected driver evaluates the residual, chooses GMRES/BiCGSTAB/TFQMR/classical-GMRES, backtracks and updates the nonlinear iterate and forcing term. F2 records a nonlinear-system inexact Newton-Krylov interface, not verification of every Krylov/finite-difference kernel. Analytic Jacobian-vector and right-preconditioner callbacks are optional; finite differences are the default. INPUT(12), RINPT(9), INFO(6) and solver-specific RWORK sizes belong to this fork, not the original shorter interface. ITERM=0 can mean a small step rather than a small residual, so inspect RWORK(1:N) independently. NITDFLTS explicitly fills RINPT; do not assume an all-zero real vector selects all documented defaults. Illegal integer controls can branch to cleanup before IPUNIT is assigned, an uninitialized-variable finding on that error path. No nonlinear solve or failure case was executed.",
+            "evidence": [
+              {
+                "path": "src/nitsol.f",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitsol.f",
+                "sha256": "034345721d6e4caff94f6d854c59d6d541b2010a5e452c9450b53fc2026cb5d2"
+              },
+              {
+                "path": "src/nitdrv.f",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitdrv.f",
+                "sha256": "227d93a20e8f15675a8e70411868170327c2f1302e45e5e7ac6ba664e3b00ffe"
+              },
+              {
+                "path": "src/nitdflts.f",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitdflts.f",
+                "sha256": "8a54d740f24c512536416422e22a9a65304dc3b0a324d4ffb7d3be03521f7d06"
+              },
+              {
+                "path": "src/nitdflts.h",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitdflts.h",
+                "sha256": "5a97ea273ff60d0cb59fea2e82eebaf5f4753f45b7188bf530abfa78046bec69"
+              },
+              {
+                "path": "src/nitjv.f",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitjv.f",
+                "sha256": "afed51a5ab7306fbb0187296cd0f645004cb715f942876256b54314d932f0908"
+              },
+              {
+                "path": "examples/linear/t1.f90",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/examples/linear/t1.f90",
+                "sha256": "383973942eac8dbdc942219a47467b9d72dbbc4fc12315a7404ef93aefc07018"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/README.md",
+                "sha256": "c3a0c5c4ea8ca162bca694faa4f938a6954050f77cbeaa830e7b0602c328feaf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "nitsol",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION nonlinear solver, overwriting X. F and JACV are external subroutines with this fork callback signatures; DINPR/DNORM are DOUBLE PRECISION functions with DDOT/DNRM2 signatures. RWORK has no explicit length argument: allocate the documented solver-dependent capacity.",
+                "signature": "CALL nitsol(n, x, f, jacv, ftol, stptol, input, rinpt, info, &\n            rwork, rpar, ipar, iterm, dinpr, dnorm)",
+                "declarations": [
+                  {
+                    "path": "src/nitsol.f",
+                    "line_start": 1,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "src/nitsol.f",
+                    "line_start": 42,
+                    "line_end": 83
+                  },
+                  {
+                    "path": "src/nitsol.f",
+                    "line_start": 98,
+                    "line_end": 115
+                  },
+                  {
+                    "path": "src/nitsol.f",
+                    "line_start": 136,
+                    "line_end": 162
+                  }
+                ],
+                "path": "src/nitsol.f",
+                "line_start": 1,
+                "line_end": 648,
+                "usage": "integer, parameter :: n=2,kdmax=20\ninteger :: input(12),info(6),ipar(1),iterm\ndouble precision :: x(n),rinpt(9),rpar(1),rwork(n*(kdmax+5)+kdmax*(kdmax+3))\ndouble precision, external :: ddot,dnrm2\nexternal :: f,jacv\ninput=0; input(4)=kdmax; ipar=0; rpar=0d0; x=0d0\ncall nitdflts(rinpt)\n! Supply F and a matching dummy JACV for finite-difference, unpreconditioned mode.\ncall nitsol(n,x,f,jacv,1d-10,1d-12,input,rinpt,info,rwork,rpar,ipar,iterm,ddot,dnrm2)\nif(iterm/=0) error stop \"NITSOL did not terminate normally\"\n! Also inspect the residual in rwork(1:n).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Driver fragment until F/JACV are supplied; link this fork with compatible BLAS/LAPACK. Use the NITSOL2 callback interface with IINF/RIINF rather than older common-block examples. The workspace shown is for default simpler GMRES with kdmax=20. Protect callers from invalid controls before the recorded early-cleanup path, and validate a small residual even on ITERM=0."
+              },
+              {
+                "procedure": "nitdflts",
+                "role": "public-entry-point",
+                "summary": "External helper filling the nine real controls from nitdflts.h constants.",
+                "signature": "CALL nitdflts(rinpt)",
+                "declarations": [
+                  {
+                    "path": "src/nitdflts.f",
+                    "line_start": 1,
+                    "line_end": 5
+                  },
+                  {
+                    "path": "src/nitdflts.f",
+                    "line_start": 21,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/nitdflts.f",
+                "line_start": 1,
+                "line_end": 33
+              },
+              {
+                "procedure": "nitdrv",
+                "role": "implementation-helper",
+                "path": "src/nitdrv.f",
+                "line_start": 1,
+                "line_end": 710
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "9d3c60658235f5489f7167a915f6eb18e195d4ef",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README, original distribution notes and defining source identify the NITSOL provenance but no explicit project reuse grant. The pinned tree has no separately named LICENSE/COPYING. This scoped absence finding does not assign terms from BLAS/LAPACK to the solver.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/README.md",
+              "sha256": "c3a0c5c4ea8ca162bca694faa4f938a6954050f77cbeaa830e7b0602c328feaf"
+            },
+            {
+              "path": "olddoc/ReadMe",
+              "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/olddoc/ReadMe",
+              "sha256": "ef63a67c2b97197e096650f685e0dabfd984a3a46c9ee7db5392c923b560f4ef"
+            },
+            {
+              "path": "src/nitsol.f",
+              "url": "https://github.com/vadim-z/NITSOL2/blob/9d3c60658235f5489f7167a915f6eb18e195d4ef/src/nitsol.f",
+              "sha256": "034345721d6e4caff94f6d854c59d6d541b2010a5e452c9450b53fc2026cb5d2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29662,12 +30346,106 @@
             ],
             "notes": "The README enumerates standard, generalized and coupled equations, triangular substitution variants and iterative refinement. Hardware-dependent block tuning and perturbed Schur decompositions affect use; no accuracy or performance results were reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D8",
+            "level": "source-reviewed",
+            "revision": "979db9ac7f3045e0aa3531335abd0de5cdda0fd2",
+            "reviewed_on": "2026-11-05",
+            "notes": "DLA_GELYAP reduces a real coefficient matrix to Schur form when needed, transforms a symmetric right-hand side, dispatches a triangular Lyapunov solver and transforms the solution back. DLA_GESYLV performs the two-matrix Schur/transformation analogue for op(A)*X +/- X*op(B)=SCALE*Y. D8 is the GAMS matrix-equation leaf, covering these standard Lyapunov/Sylvester drivers, not generalized/Stein/refinement variants. FACT selectors distinguish general, Hessenberg and already-factored matrices; Schur factors overwrite A/B. Workspace query uses LDWORK=-1 and returns the required integer length in LDWORK itself, not WORK(1). Initialize INFO before calling because it is read on entry. Preserve and interpret SCALE and inspect INFO before treating X as a solution; internal failure can return before the back transformation. Library-global solver/blocksize options are consulted; lower-level kernels and all solver modes are not fully audited. No matrix equation or residual was run.",
+            "evidence": [
+              {
+                "path": "src/double/frontend/dla_gelyap.f90",
+                "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/src/double/frontend/dla_gelyap.f90",
+                "sha256": "eb2958b0ef43d90fe41be81321716f153d738383bc4d77a6669e958cb5d6949b"
+              },
+              {
+                "path": "src/double/frontend/dla_gesylv.f90",
+                "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/src/double/frontend/dla_gesylv.f90",
+                "sha256": "625fc16c139504f98dcadbcc2ed2bec1f5fd30595302866de11e30cf6a0d43a7"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/README.md",
+                "sha256": "a4183e93dab04416471b54f384447f93960439e4eeeeb1b642c6b27465f2fb36"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DLA_GELYAP",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION standard Lyapunov driver. FACT/TRANS are one-character selectors, X contains symmetric RHS on input and solution on successful output, A/Q store the Schur form/vectors. Query/reuse LDWORK as an INTEGER INOUT length.",
+                "signature": "CALL DLA_GELYAP(FACT, TRANS, M, A, LDA, Q, LDQ, X, LDX, &\n                SCALE, WORK, LDWORK, INFO)",
+                "declarations": [
+                  {
+                    "path": "src/double/frontend/dla_gelyap.f90",
+                    "line_start": 175,
+                    "line_end": 186
+                  },
+                  {
+                    "path": "src/double/frontend/dla_gelyap.f90",
+                    "line_start": 126,
+                    "line_end": 146
+                  }
+                ],
+                "path": "src/double/frontend/dla_gelyap.f90",
+                "line_start": 175,
+                "line_end": 351,
+                "usage": "integer, parameter :: n=2\ninteger :: ldwork,info\ndouble precision :: a(n,n),q(n,n),x(n,n),scale,query(1)\ndouble precision,allocatable :: work(:)\na=0d0; a(1,1)=-1d0; a(2,2)=-2d0\nq=0d0; q(1,1)=1d0; q(2,2)=1d0\nx=0d0; x(1,1)=1d0; x(2,2)=1d0\ninfo=0; ldwork=-1\ncall dla_gelyap(\"F\",\"N\",n,a,n,q,n,x,n,scale,query,ldwork,info)\nif(info/=0) error stop \"workspace query failed\"\nallocate(work(ldwork)); info=0\ncall dla_gelyap(\"F\",\"N\",n,a,n,q,n,x,n,scale,work,ldwork,info)\nif(info/=0) error stop \"Lyapunov solve failed\"\n! Check A0*X + X*transpose(A0) - SCALE*Y0 independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a configured/initialized complete MEPACK build with compatible BLAS/LAPACK and its options modules. The sketch supplies an already-diagonal Schur form and identity Q (FACT=F); arbitrary A requires FACT=N or correctly computed factors. Check SCALE and residuals against preserved original coefficients/RHS. INFO=0 alone does not provide a forward-error or conditioning estimate."
+              },
+              {
+                "procedure": "DLA_GESYLV",
+                "role": "public-entry-point",
+                "summary": "External standard Sylvester driver for M-by-N X. SGN is DOUBLE PRECISION +1 or -1, not an INTEGER sign flag. A/B and QA/QB follow FACTA/FACTB; X overwrites Y. LDWORK query and SCALE conventions match the selected Lyapunov interface.",
+                "signature": "CALL DLA_GESYLV(FACTA, FACTB, TRANSA, TRANSB, SGN, M, N, &\n A, LDA, B, LDB, QA, LDQA, QB, LDQB, X, LDX, SCALE, WORK, LDWORK, INFO)",
+                "declarations": [
+                  {
+                    "path": "src/double/frontend/dla_gesylv.f90",
+                    "line_start": 250,
+                    "line_end": 262
+                  },
+                  {
+                    "path": "src/double/frontend/dla_gesylv.f90",
+                    "line_start": 34,
+                    "line_end": 46
+                  }
+                ],
+                "path": "src/double/frontend/dla_gesylv.f90",
+                "line_start": 250,
+                "line_end": 555
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "979db9ac7f3045e0aa3531335abd0de5cdda0fd2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed defining files explicitly allow GPL version 3 or any later version. External BLAS/LAPACK and other dependencies have separate notices; this is not a full dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/LICENSE",
+              "sha256": "14d0f9538e9902cd30402cab8dcf0d24e6c64e2778ad6a27acbdd7a22825c1a5"
+            },
+            {
+              "path": "src/double/frontend/dla_gelyap.f90",
+              "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/src/double/frontend/dla_gelyap.f90",
+              "sha256": "eb2958b0ef43d90fe41be81321716f153d738383bc4d77a6669e958cb5d6949b"
+            },
+            {
+              "path": "src/double/frontend/dla_gesylv.f90",
+              "url": "https://github.com/mpimd-csc/mepack/blob/979db9ac7f3045e0aa3531335abd0de5cdda0fd2/src/double/frontend/dla_gesylv.f90",
+              "sha256": "625fc16c139504f98dcadbcc2ed2bec1f5fd30595302866de11e30cf6a0d43a7"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35663,12 +36441,162 @@
             ],
             "notes": "The README lists contractions, dyadic products, index permutations and tensor square roots in real(kind=8). These support a broad linear-algebra mapping; suitability for a material model does not establish the correctness of that model or a complete FEM solver.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "767e55c0402771ed260746ce00c38fc0ffdc56f9",
+            "reviewed_on": "2026-11-05",
+            "notes": "Tensor::inv for full Tensor2 uses explicit 3-by-3 cofactors divided by the determinant, assigning all nine inverse entries. D2a1 is scoped to fixed-size general real 3-by-3 inversion, not a pivoted factorization, a generic dimension solver or a rank-four tensor inverse. The selected Tensor2 is REAL(kind=8) storage AB(3,3); the symmetric compact overload exists but is not the selected sketch. There is no singularity, conditioning or overflow guard and no status result. det_2 performs the explicit cubic determinant formula. A zero/nearly-zero determinant can therefore yield invalid or inaccurate inverse entries. No inversion, identity residual or material-model example was run.",
+            "evidence": [
+              {
+                "path": "ttb/ttb_library.f",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/ttb/ttb_library.f",
+                "sha256": "945d159d464982bf48bed4bd4552c626bd697e551798f54242920bac5bb2bb91"
+              },
+              {
+                "path": "ttb/libinv.f",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/ttb/libinv.f",
+                "sha256": "ed08b6addf31dbcd7529b90179f13117a59213069bec82845f5fdf2921ea730f"
+              },
+              {
+                "path": "ttb/libdet.f",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/ttb/libdet.f",
+                "sha256": "bf139d3b9999251bbf851339472a87ebc9faeccbae0d9fc686a1403968a506a1"
+              },
+              {
+                "path": "docs/api/functions/inverse.md",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/docs/api/functions/inverse.md",
+                "sha256": "ded27df632f113bc391fd0e6a4a768e39fe4d12d32aa76551d50d1aaafb54ff0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "inv",
+                "role": "public-entry-point",
+                "summary": "Public Tensor module generic, shown for full Tensor2 input/result. Fixed REAL(kind=8) AB(3,3) storage; no workspace or status argument. The one-argument full Tensor2 path is reviewed.",
+                "signature": "tinverse = inv(t)",
+                "declarations": [
+                  {
+                    "path": "ttb/ttb_library.f",
+                    "line_start": 2,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "ttb/ttb_library.f",
+                    "line_start": 28,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "ttb/ttb_library.f",
+                    "line_start": 256,
+                    "line_end": 261
+                  },
+                  {
+                    "path": "ttb/libinv.f",
+                    "line_start": 1,
+                    "line_end": 8
+                  }
+                ],
+                "path": "ttb/libinv.f",
+                "line_start": 1,
+                "line_end": 20,
+                "module": "Tensor",
+                "usage": "use Tensor, only: Tensor2,inv\ntype(Tensor2) :: a,ainv\na%ab=0d0; a%ab(1,1)=2d0; a%ab(2,2)=3d0; a%ab(3,3)=4d0\nainv=inv(a)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile/include ttb_library.f with its fixed-form include tree available. Match the compiler meaning of kind 8. Provide a nonsingular well-scaled full 3-by-3 matrix and independently verify A*AINV. Compact symmetric representations and supplied-determinant overloads are outside this sketch."
+              },
+              {
+                "procedure": "det_2",
+                "role": "implementation-helper",
+                "path": "ttb/libdet.f",
+                "line_start": 1,
+                "line_end": 11,
+                "module": "Tensor"
+              }
+            ]
+          },
+          {
+            "code": "D1a4",
+            "level": "source-reviewed",
+            "revision": "767e55c0402771ed260746ce00c38fc0ffdc56f9",
+            "reviewed_on": "2026-11-05",
+            "notes": "Tensor::operator(.ddot.) for two full Tensor2 objects initializes a scalar to zero and sums the nine pairwise products AB(i,j)*AB(i,j). D1a4 records this real Frobenius inner product, viewed as a dot product on nine stored entries; it is not matrix multiplication or an arbitrary-rank complex contraction. The separately inspected Tensor2s pair weights off-diagonal compact entries by two. Only these scalar second-order contractions are covered, not every higher-order .ddot. overload. All values use fixed REAL(kind=8), direct unscaled accumulation and no overflow/cancellation status. No contractions or representation equivalence were run.",
+            "evidence": [
+              {
+                "path": "ttb/ttb_library.f",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/ttb/ttb_library.f",
+                "sha256": "945d159d464982bf48bed4bd4552c626bd697e551798f54242920bac5bb2bb91"
+              },
+              {
+                "path": "ttb/libddot.f",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/ttb/libddot.f",
+                "sha256": "febdab58847cea6013b65f7b9f9e951811715c631cc5e6c06ba5063830d81420"
+              },
+              {
+                "path": "docs/api/operators.md",
+                "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/docs/api/operators.md",
+                "sha256": "cdf0fd4cdf640cc125ada8ce7d74b69d8648f2ad16d4a80e336b7f641c5a5a8f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "operator(.ddot.)",
+                "role": "public-entry-point",
+                "summary": "Public Tensor module defined binary operator, shown for two full Tensor2 operands and a scalar REAL(kind=8) result. AB(3,3) carries all nine entries; no conjugation is relevant for this real type.",
+                "signature": "inner = a .ddot. b",
+                "declarations": [
+                  {
+                    "path": "ttb/ttb_library.f",
+                    "line_start": 28,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "ttb/ttb_library.f",
+                    "line_start": 149,
+                    "line_end": 159
+                  },
+                  {
+                    "path": "ttb/libddot.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "ttb/libddot.f",
+                "line_start": 1,
+                "line_end": 16,
+                "module": "Tensor",
+                "usage": "use Tensor, only: Tensor2,operator(.ddot.)\ntype(Tensor2) :: a,b\nreal(kind=8) :: inner\na%ab=1d0; b%ab=2d0\ninner=a .ddot. b",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the fixed-form Tensor module and retain the defined operator in an ONLY import. Compact Tensor2s storage uses doubled off-diagonal contributions; do not treat its six entries as an unweighted Euclidean dot product. Higher-order contractions and physical stress/strain conventions are not verified."
+              },
+              {
+                "procedure": "ddot_2s2s",
+                "role": "implementation-helper",
+                "path": "ttb/libddot.f",
+                "line_start": 18,
+                "line_end": 34,
+                "module": "Tensor"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "767e55c0402771ed260746ce00c38fc0ffdc56f9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root provides MIT terms for Andreas Dutzler. This review covers selected mathematical services rather than third-party finite-element solver interfaces or a complete tensor-API audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/adtzlr/ttb/blob/767e55c0402771ed260746ce00c38fc0ffdc56f9/LICENSE",
+              "sha256": "e0acf91862abf598033d2480499d125f27a409994797ed0023b0046d3e6b6640"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37354,12 +38282,124 @@
             ],
             "notes": "The README identifies the GCVSPL Fortran core and separate wrapper/core licensing terms. Smoothing is classified as approximation rather than assumed exact interpolation; supported smoothing choices and numerical derivatives need deeper review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K5",
+            "level": "source-reviewed",
+            "revision": "00e57d093252d10a98d71513060b5625d52efe89",
+            "reviewed_on": "2026-11-05",
+            "notes": "GCVSPL constructs B-spline design/penalty bands, then calls SPLC to obtain coefficients for a fixed smoothing parameter or searches the selected GCV/MSE/degrees-of-freedom criterion by bracketing and golden-section steps. K5 records smoothing by natural splines of degree 2*M-1, not proof of a global GCV optimum or a validated noise model. X must increase strictly; weights are positive; N>=2*M, K>=1 and leading dimensions/capacities must match. Positive MD initializes saved setup, while negative MD reuses saved scalar state and WK and must not be interleaved with another fit. IER=0 reports normal exit, not a numerical accuracy certificate; not every shape/capacity is checked. The selected sketch uses a fixed smoothing parameter (MD=1), avoiding claims about an unrun automatic parameter choice. No smoothing or noise/statistical validation was performed.",
+            "evidence": [
+              {
+                "path": "gcvspline/gcvspl.f",
+                "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/gcvspline/gcvspl.f",
+                "sha256": "2c565dcc3d5eae03dfd923d1dfa3f528d32fbaba9111c37cd0d0a5ea03e30e1d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/README.md",
+                "sha256": "3071f5d5015eaf1d4596ea082b22ac4449e46f3549d5566cf99beace5e2a9d45"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GCVSPL",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION natural-spline smoothing routine. Y(NY,K) supplies samples; C(NC,K) receives coefficients; WK needs at least N+6*(N*M+1) doubles. MD selects fixed/GCV/MSE/DOF mode; first call must use positive MD.",
+                "signature": "CALL GCVSPL(X, Y, NY, WX, WY, M, N, K, MD, VAL, C, NC, WK, IER)",
+                "declarations": [
+                  {
+                    "path": "gcvspline/gcvspl.f",
+                    "line_start": 51,
+                    "line_end": 83
+                  },
+                  {
+                    "path": "gcvspline/gcvspl.f",
+                    "line_start": 102,
+                    "line_end": 125
+                  },
+                  {
+                    "path": "gcvspline/gcvspl.f",
+                    "line_start": 266,
+                    "line_end": 284
+                  }
+                ],
+                "path": "gcvspline/gcvspl.f",
+                "line_start": 266,
+                "line_end": 424,
+                "usage": "integer,parameter :: m=2,n=6,k=1\ninteger :: ier\ndouble precision :: x(n),y(n,k),wx(n),wy(k),c(n,k),wk(n+6*(n*m+1))\nx=[0d0,1d0,2d0,3d0,4d0,5d0]\ny(:,1)=[0d0,1.2d0,1.8d0,3.1d0,4d0,5.2d0]\nwx=1d0; wy=1d0\ncall gcvspl(x,y,n,wx,wy,m,n,k,1,0.01d0,c,n,wk,ier)\nif(ier/=0) error stop \"spline smoothing failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the fixed-form Fortran kernel with its bundled support routines. M=2 means cubic (degree three), not a quadratic spline. This sketch supplies a fixed penalty rather than trusting a GCV optimum from six points. Evaluate the returned coefficients using SPLDER, not as fitted sample values. For negative-MD reuse, retain the corresponding WK/setup and avoid interleaving different fits."
+              }
+            ]
+          },
+          {
+            "code": "K6a2",
+            "level": "source-reviewed",
+            "revision": "00e57d093252d10a98d71513060b5625d52efe89",
+            "reviewed_on": "2026-11-05",
+            "notes": "SPLDER locates an interval in the supplied knot sequence, differences B-spline coefficients for positive IDER, evaluates the reduced-order tableau and applies the derivative factorial scale. K6a2 is derivative evaluation of an already fitted function, not fresh numerical differentiation of arbitrary raw data or an ODE solver. Require coefficients from compatible GCVSPL settings, N>=2*M, in-range T, nonnegative IDER, mutable interval L and Q(2*M) scratch. IDER>=2*M returns zero, matching the degree limit; there is no error/status output or negative-order guard. Accuracy as an estimate of an underlying signal derivative depends on the smoothing/model and is not established by the algebraic spline derivative. No derivative or comparison was run.",
+            "evidence": [
+              {
+                "path": "gcvspline/gcvspl.f",
+                "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/gcvspline/gcvspl.f",
+                "sha256": "2c565dcc3d5eae03dfd923d1dfa3f528d32fbaba9111c37cd0d0a5ea03e30e1d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SPLDER",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION function. Pass one column of C(NC,K) as an N-entry coefficient vector, original knots, half-order M, derivative IDER, in/out interval hint L and DOUBLE PRECISION Q(2*M) scratch. It also evaluates the function for IDER=0, but this mapping is scoped to derivatives.",
+                "signature": "derivative = SPLDER(IDER, M, N, T, X, C, L, Q)",
+                "declarations": [
+                  {
+                    "path": "gcvspline/gcvspl.f",
+                    "line_start": 1236,
+                    "line_end": 1261
+                  },
+                  {
+                    "path": "gcvspline/gcvspl.f",
+                    "line_start": 1278,
+                    "line_end": 1287
+                  }
+                ],
+                "path": "gcvspline/gcvspl.f",
+                "line_start": 1278,
+                "line_end": 1415,
+                "usage": "double precision,external :: splder\ndouble precision :: derivative,q(2*m)\ninteger :: l\n! Continue after successful GCVSPL using the same M,N,X,C.\nl=1\nderivative=splder(1,m,n,2.5d0,x,c(:,1),l,q)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment depends on a successful preceding fit with the corresponding knots/coefficients. Keep T within [X(1),X(N)] and 0<=IDER<2*M for a potentially nonzero derivative. Use a separate interval hint/scratch for each independent stream; no numerical derivative accuracy or boundary behavior was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Woltring restricted-use kernel; GPL v3 wrapper text",
+          "spdx_expression": null,
+          "revision": "00e57d093252d10a98d71513060b5625d52efe89",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE explicitly separates the Fortran Woltring kernel notice (academic/research use wording and permission required for commercial exploitation) from GPL v3 Python wrappers. Preserve that distinction rather than labeling the Fortran kernel GPL or assigning a single aggregate SPDX license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/LICENSE",
+              "sha256": "614ed16442f9dd5afd126d38a75848d25cb581067404a10f0840b4a87beb307f"
+            },
+            {
+              "path": "gcvspline/gcvspl.f",
+              "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/gcvspline/gcvspl.f",
+              "sha256": "2c565dcc3d5eae03dfd923d1dfa3f528d32fbaba9111c37cd0d0a5ea03e30e1d"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/charlesll/gcvspline/blob/00e57d093252d10a98d71513060b5625d52efe89/README.md",
+              "sha256": "3071f5d5015eaf1d4596ea082b22ac4449e46f3549d5566cf99beace5e2a9d45"
+            }
+          ]
         }
       },
       "imports": {}

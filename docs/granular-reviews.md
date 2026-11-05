@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 180 repositories now have 219 source-reviewed
+Reviewed on 2026-11-05. 188 repositories now have 232 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-173 repository cards now identify public routines and link their usage lines
+181 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 180 independently source-reviewed repositories now have an
+separately. All 188 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -204,6 +204,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | EISCOR | External `d_symtrid_qr` | MIT |
 | Fazang | `fz_var::grad`, `::reset_adj`; `fz_env::reboot_chain` via `fazang` | BSD-3-Clause |
 | BLZPACK | External `DBLZDRV` in standard/generalized symmetric modes | BSD-style notice with additional enhancement grant |
+| NITSOL2 | External `nitsol`, `nitdflts`; fork-specific residual/Jv callback contracts | No license grant identified in reviewed material |
+| LRAP | `nonnegative_matrix_mod::nn_lrma_svd` | MIT; MARIA dependency separate |
+| FortranMatrix | `matrix_mod_array::inverse` (real and complex rank-two overloads) | GPL-3.0-only; external libraries separate |
+| Tensor Toolbox (ttb) | `Tensor::inv`, `Tensor::operator(.ddot.)` for selected second-order types | MIT |
+| MEPACK | External `DLA_GELYAP`, `DLA_GESYLV` | GPL-3.0-or-later |
+| curvefit | `linear_interp%interpolate`; scalar `linear_least_squares` | GNU GPL v3 text; version choice unresolved |
+| gcvspline | External `GCVSPL`, `SPLDER` | Woltring restricted-use kernel; GPL v3 wrapper text |
+| vector_fit | External `calculate_residues`, `calculate_fit_function` | Selected code GPL-3.0-or-later; EISPACK separately labeled LGPL |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -403,6 +411,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [EISCOR](https://github.com/eiscor/eiscor) | D4a5 | Symmetric tridiagonal Cayley/core reduction and unitary QR dispatch | Short driver WORK section requires repair/checking; factor N=1 edge case. Complex vectors, scaling and INFO inspection required. |
 | [Fazang](https://github.com/yizhang-yiz/fazang) | H1 | Reverse-mode tape, primitive chain rules and adjoint extraction | Reset adjoints before repeat sweeps; tape reboot invalidates handles. Convenience jac uses uninitialized n; Hessian path unreviewed. |
 | [BLZPACK](https://github.com/oamarques/BLZPACK) | D4a1; D4b1 | Standard/generalized symmetric block-Lanczos reverse communication and step orchestration | Caller supplies products, shifted solves and inertia. Match storage-prefix formulas and definiteness assumptions; cited generalized example uses B=I and external MA47. |
+| [NITSOL2](https://github.com/vadim-z/NITSOL2) | F2 | Inexact Newton/Krylov driver, backtracking and forcing-term control | Fork callback/control signatures, solver-specific workspaces and explicit real defaults. Small-step success need not imply a small residual; early invalid-control cleanup can use uninitialized IPUNIT. |
+| [LRAP](https://github.com/sbudzinskiy/LRAP) | K | Entrywise nonnegativity transformation followed by truncated SVD | One step, not an internally converged fit or best-approximation certificate. Dual workspace queries; SVD status can be overwritten before return. |
+| [FortranMatrix](https://github.com/knanagnostop/FortranMatrix) | D2a1; D2c1 | Real/complex LU dispatch and explicit inversion with workspace queries | Input copied; errors print and STOP. Nonempty square matrices, compatible ABI and containing module's PFAPACK dependency required. |
+| [Tensor Toolbox](https://github.com/adtzlr/ttb) | D2a1; D1a4 | Fixed 3-by-3 cofactor inverse and scalar Frobenius contractions | Inverse has no singularity/conditioning guard. Compact symmetric double contractions weight off-diagonal entries twice. |
+| [MEPACK](https://github.com/mpimd-csc/mepack) | D8 | Standard Lyapunov/Sylvester Schur-transform/solve/back-transform drivers | Integer LDWORK carries query result; initialize INFO, retain SCALE and inspect status before using X. Inner solver modes not fully audited. |
+| [curvefit](https://github.com/jchristopherson/curvefit) | E1a; K1a1a2 | Piecewise-linear interpolation and through-origin degree-one least-squares dispatch | Initialize interpolation successfully before lookup; wrapper does not guard every error path. Scalar regression has no intercept and delegates polynomial solve to nonlin. |
+| [gcvspline](https://github.com/charlesll/gcvspline) | K5; K6a2 | Natural B-spline smoothing and fitted-spline derivative evaluation | Half-order M gives degree 2*M-1. Preserve setup/work for negative-MD reuse; derivative quality depends on smoothing, and no new samples were checked. |
+| [vector_fit](https://github.com/chrissmartt/vector_fit) | K1a1a3; K6a1 | Fixed-pole residue least squares and rational-response evaluation | Pole relocation excluded. Normal equations/default solve lack returned status; NEW_A/C_HAT unassigned. Avoid sample/pole coincidences. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -755,3 +771,30 @@ mode; its author example also needs a separately supplied MA47 solver. EISCOR's
 symmetric tridiagonal card records the driver/factor workspace-section mismatch
 and small-dimension edge case. These calling sketches were not compiled or run;
 recording an implemented method and its limitations is not a correctness claim.
+
+## Projection steps, fitted functions and solver contracts
+
+LRAP's selected routine performs one nonnegativity transformation and rank
+truncation. It remains classified at K: source inspection does not establish a
+converged least-squares optimizer against a fixed original target. In contrast,
+vector_fit's fixed-pole residue solve is linear in its fitted coefficients and
+supports K1a1a3; the separate rational evaluator supports K6a1. Pole relocation,
+passivity and stability guarantees remain outside these selected mappings.
+
+The spline cards separate constructing a smoothing fit (K5) from differentiating
+the fitted spline (K6a2). GCVSPL's negative modes reuse saved setup/work state;
+SPLDER consumes one compatible coefficient column. curvefit's scalar regression
+fits through the origin, while its linear interpolator requires successful data
+initialization before lookup. Its external polynomial fitting kernel was not
+newly audited. The cards retain these distinctions and the separate Woltring
+kernel/Python-wrapper license notices.
+
+FortranMatrix's real/complex inverses dispatch LU and explicit inversion but stop
+the process on errors; the containing module also imports PFAPACK. Tensor
+Toolbox's selected inverse is a fixed 3-by-3 cofactor formula without conditioning
+or singularity guards. MEPACK's selected matrix-equation drivers instead expose
+INFO and SCALE, and return workspace queries through integer LDWORK. NITSOL2
+requires its fork-specific controls/callbacks, explicit real defaults and an
+independent residual check even after small-step termination. These reviews
+identify implemented paths and calling contracts; none of the new sketches or
+upstream numerical programs was compiled or run.

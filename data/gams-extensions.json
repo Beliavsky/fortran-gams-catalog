@@ -240,6 +240,30 @@
       "parent": "D4b",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "K1a1a3": {
+      "label": "Other functions (e.g., trigonometric, user-specified)",
+      "parent": "K1a1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K6a": {
+      "label": "Evaluation of fitted functions, including quadrature",
+      "parent": "K6",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K6a1": {
+      "label": "Function evaluation",
+      "parent": "K6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K6a2": {
+      "label": "Derivative evaluation",
+      "parent": "K6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
