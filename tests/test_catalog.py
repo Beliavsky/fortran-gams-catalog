@@ -276,7 +276,10 @@ class CatalogTests(unittest.TestCase):
         records = {p['id']: p['local'] for p in self.local['projects']}
         # These distinctions matter to somebody looking for a runnable algorithm.
         self.assertEqual([c['code'] for c in records['github:ralna/cutest']['classifications']], ['S'])
-        self.assertEqual([c['code'] for c in records['github:imurray/chol-rev']['classifications']], ['H1'])
+        # Documentation and source reviews may independently support the same
+        # class; neither should turn a derivative primitive into a factorizer.
+        chol = records['github:imurray/chol-rev']['classifications']
+        self.assertEqual({c['code'] for c in chol}, {'H1'})
         gamma = records['github:ckormanyos/gamma_f77']
         self.assertIn('real Gamma', gamma['classifications'][0]['notes'])
         self.assertIn('complex-argument', gamma['classifications'][0]['notes'])

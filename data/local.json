@@ -1217,12 +1217,100 @@
             ],
             "notes": "The README documents the adjoint primitive that propagates factor sensitivities to the original positive-definite matrix. This is not classified as a general-purpose Cholesky solver or a complete automatic-differentiation system.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "d85b1e3c00650a11d79b9305c75682646e83cac1",
+            "reviewed_on": "2026-11-04",
+            "notes": "DPO2FT walks the lower Cholesky factor backward, propagating supplied factor adjoints through diagonal division, BLAS matrix/vector updates and diagonal halving. DPOFRT performs the corresponding blocked updates and delegates diagonal blocks to DPO2FT. This is a reverse first-derivative primitive for a scalar objective depending on an already-computed positive-definite Cholesky factor, not a factorization, solve or complete automatic-differentiation system. Only UPLO=L is implemented in the nonempty paths; the upper branches call XERBLA without reliably setting the advertised INFO=-8. Input checks omit LDC, so the caller must enforce it. The blocked path may overwrite entries above the selected triangle. Preserve the author triangular-adjoint convention when passing sensitivities onward. BLAS/LAPACK support routines and matching integer ABI are required. No adjoint identity or finite-difference comparison was run.",
+            "evidence": [
+              {
+                "path": "dpo2ft.f",
+                "url": "https://github.com/imurray/chol-rev/blob/d85b1e3c00650a11d79b9305c75682646e83cac1/dpo2ft.f",
+                "sha256": "f164d2eadd978690a864992a114e4f9b6906a4cd246996ac3407ea21a0524ff7"
+              },
+              {
+                "path": "dpofrt.f",
+                "url": "https://github.com/imurray/chol-rev/blob/d85b1e3c00650a11d79b9305c75682646e83cac1/dpofrt.f",
+                "sha256": "2d21cdf4b3a31e599566461696e3baf86763b20ddae9fb9d5fc199ae95a83f2c"
+              },
+              {
+                "path": "python/chol_diff.py",
+                "url": "https://github.com/imurray/chol-rev/blob/d85b1e3c00650a11d79b9305c75682646e83cac1/python/chol_diff.py",
+                "sha256": "8d3363a140bc7cd162077a6b6e162f71b80c44381094725ce3ec1ac506e20f98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DPO2FT",
+                "role": "public-entry-point",
+                "summary": "External unblocked double-precision reverse primitive. A holds a valid lower Cholesky factor; C holds the lower factor sensitivities on entry and is overwritten with input-matrix sensitivities in the author triangular convention. Supply UPLO=L, N >= 0 and both leading dimensions >= MAX(1,N); check INFO. A and C must be separate valid arrays.",
+                "signature": "CALL DPO2FT(UPLO, N, A, LDA, C, LDC, INFO)",
+                "declarations": [
+                  {
+                    "path": "dpo2ft.f",
+                    "line_start": 9,
+                    "line_end": 15
+                  }
+                ],
+                "path": "dpo2ft.f",
+                "line_start": 1,
+                "line_end": 164,
+                "examples": [
+                  {
+                    "path": "python/chol_diff.py",
+                    "line_start": 153,
+                    "line_end": 166
+                  }
+                ]
+              },
+              {
+                "procedure": "DPOFRT",
+                "role": "public-entry-point",
+                "summary": "External blocked variant with the same double-precision input/output convention, lower-factor restriction and required leading dimensions. Calls DPO2FT for small problems and diagonal blocks. C is modified in place, including some upper entries; retain only the meaningful triangle. INFO is not an accuracy estimate.",
+                "signature": "CALL DPOFRT(UPLO, N, A, LDA, C, LDC, INFO)",
+                "declarations": [
+                  {
+                    "path": "dpofrt.f",
+                    "line_start": 9,
+                    "line_end": 15
+                  }
+                ],
+                "path": "dpofrt.f",
+                "line_start": 1,
+                "line_end": 219,
+                "examples": [
+                  {
+                    "path": "python/chol_diff.py",
+                    "line_start": 261,
+                    "line_end": 274
+                  }
+                ],
+                "usage": "external :: dpofrt\ndouble precision :: factor(2,2), adjoint(2,2)\ninteger :: info\nfactor = reshape([2.0d0,1.0d0,0.0d0,3.0d0],[2,2])\nadjoint = 0.0d0\nadjoint(1,1) = 1.0d0\nadjoint(2,2) = 1.0d0\ncall dpofrt(\"L\",2,factor,2,adjoint,2,info)\nif (info /= 0) error stop \"reverse Cholesky failed\"",
+                "usage_notes": "Uncompiled calling sketch. The supplied lower factor defines X=factor*transpose(factor); adjoint initially seeds the sum of the factor diagonal. Link these reverse routines with ABI-compatible BLAS and LAPACK support; this is not a standalone single-file program. The output uses the author triangular sensitivity representation, so do not automatically symmetrize or double off-diagonals without matching the subsequent contraction convention. No numerical check was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT plus BSD-3-Clause-Open-MPI derived Fortran routines",
+          "spdx_expression": "MIT AND BSD-3-Clause-Open-MPI",
+          "revision": "d85b1e3c00650a11d79b9305c75682646e83cac1",
+          "reviewed_on": "2026-11-04",
+          "notes": "LICENSE explicitly places the four derived Fortran reverse routines under the reproduced LAPACK terms, including the third-party intellectual-property disclaimer, while other repository files use MIT. The combined expression describes those recorded components; linked BLAS/LAPACK and other third-party dependencies retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/imurray/chol-rev/blob/d85b1e3c00650a11d79b9305c75682646e83cac1/LICENSE",
+              "sha256": "d73fdd5663672185d489775cfdda74cb12e15e931051b2f5db0a7857769cda77"
+            }
+          ]
         }
       },
       "imports": {}
@@ -2773,12 +2861,161 @@
             ],
             "notes": "The README distinguishes srfpak, sphpak, qshep2d and qshep3d and their geometries. Gradient estimation is documented; the suite is not assigned a single univariate interpolation class.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2b",
+            "level": "source-reviewed",
+            "revision": "3beca3e84a5407cfcc35360bfe9538f151ddb3e0",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected quadratic_shepard_2d wrapper creates local quadratic models for scattered planar points through alg660::qshep2. The reviewed core builds weighted least-squares systems, applies Givens rotations and solves for nodal quadratic coefficients. qs2val blends those local polynomials with compact-support modified Shepard weights, returning the stored value exactly at a node; qs2grd differentiates that weighted quotient. E2b is scattered multivariate interpolation, not gridded tensor-product interpolation. Only this 2D path is reviewed: the spherical, triangulation and 3D variants are not certified here. The wrapper fixes neighbor counts, uses default REAL and requires at least six equal-length samples. Duplicate/collinear configurations and unsupported query locations have status paths. Query methods assume successful construction and do not guard against unallocated data. No interpolation or gradient check was run.",
+            "evidence": [
+              {
+                "path": "src/qshep2d.f90",
+                "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/src/qshep2d.f90",
+                "sha256": "85bd405f72633afd2fcb9c9942f45c1bd20dd5324ec51bac594f04df37355424"
+              },
+              {
+                "path": "src/alg660.f90",
+                "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/src/alg660.f90",
+                "sha256": "224876079e9592a458a54a36d0e884e8add71f6a90a6c189549d12775a43f585"
+              },
+              {
+                "path": "src/interpolate_frame.f90",
+                "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/src/interpolate_frame.f90",
+                "sha256": "a8e3f4891e4cb672dfb06c0fdd9ab75f1668b3d4b3e43c00fe51cc919c5e7540"
+              },
+              {
+                "path": "test/test_qshep2d.f90",
+                "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/test/test_qshep2d.f90",
+                "sha256": "d2d253fcc22d64dbb30b98a7393f6b02e910dfed4bd9f7091cd9b6533e28fd72"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "create_mesh",
+                "role": "public-entry-point",
+                "summary": "Type-bound constructor for type(qshep_2d), using default REAL x(:), y(:), f(:), each of equal length >= 6. Values are incorporated into the stored fit. Check inherited error_status after construction before querying. The actual type is qshep_2d, despite qshep2d in some documentation sketches.",
+                "signature": "CALL mesh%create_mesh(x, y, f)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 64,
+                    "line_end": 68
+                  },
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 12,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 64,
+                "line_end": 130,
+                "module": "quadratic_shepard_2d",
+                "derived_type": "qshep_2d",
+                "examples": [
+                  {
+                    "path": "test/test_qshep2d.f90",
+                    "line_start": 20,
+                    "line_end": 35
+                  }
+                ]
+              },
+              {
+                "procedure": "interpolate_point",
+                "role": "public-entry-point",
+                "summary": "Type-bound default REAL value query at a planar point (px,py). Construct successfully first and check error_status after each query. If no nodal support covers the query, the core returns a NaN and the wrapper records code_outside_spanned; this is not a general extrapolator.",
+                "signature": "value = mesh%interpolate_point(px, py)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 140,
+                    "line_end": 143
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 140,
+                "line_end": 175,
+                "module": "quadratic_shepard_2d",
+                "derived_type": "qshep_2d",
+                "usage": "use quadratic_shepard_2d, only: qshep_2d\ntype(qshep_2d) :: mesh\nreal :: x(9), y(9), f(9), value\ninteger :: status\nx = [0.,1.,2.,0.,1.,2.,0.,1.,2.]\ny = [0.,0.,0.,1.,1.,1.,2.,2.,2.]\nf = x+y\ncall mesh%create_mesh(x,y,f)\ncall mesh%error_status(status)\nif (status /= 0) error stop \"mesh creation failed\"\nvalue = mesh%interpolate_point(0.5,0.5)\ncall mesh%error_status(status)\nif (status /= 0) error stop \"query failed\"",
+                "usage_notes": "Uncompiled calling sketch using the pinned type and bindings. Compile interpolate_frame and alg660 before quadratic_shepard_2d. The affine expected value is 1, but neither this sketch nor the author randomized example was run. Error status is mutable per query; inspect it before another operation overwrites it."
+              },
+              {
+                "procedure": "gradient_point",
+                "role": "public-entry-point",
+                "summary": "Returns a two-element default REAL vector of derivatives of the fitted interpolant with respect to px and py. It does not supply derivatives of an unknown sampled function. Check error_status; the unsupported-location branch returns zero components with a nonzero status.",
+                "signature": "gradient = mesh%gradient_point(px, py)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 185,
+                    "line_end": 189
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 185,
+                "line_end": 227,
+                "module": "quadratic_shepard_2d",
+                "derived_type": "qshep_2d",
+                "examples": [
+                  {
+                    "path": "test/test_qshep2d.f90",
+                    "line_start": 30,
+                    "line_end": 42
+                  }
+                ]
+              },
+              {
+                "procedure": "qshep2",
+                "module": "alg660",
+                "role": "implementation-evidence",
+                "path": "src/alg660.f90",
+                "line_start": 234,
+                "line_end": 475
+              },
+              {
+                "procedure": "qs2val",
+                "module": "alg660",
+                "role": "implementation-evidence",
+                "path": "src/alg660.f90",
+                "line_start": 576,
+                "line_end": 668
+              },
+              {
+                "procedure": "qs2grd",
+                "module": "alg660",
+                "role": "implementation-evidence",
+                "path": "src/alg660.f90",
+                "line_start": 813,
+                "line_end": 906
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT wrappers; ACM Software License Agreement for numerical cores",
+          "spdx_expression": null,
+          "revision": "3beca3e84a5407cfcc35360bfe9538f151ddb3e0",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE is MIT, but README licensing lines 69-75 explicitly restrict that choice to the object-oriented interfaces and state that the underlying numerical algorithms use the ACM Software License Agreement. A single MIT expression would misrepresent this combination; the ACM agreement text/version was not independently audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/LICENSE",
+              "sha256": "bbd9d505e2e9500b52c7556c80f05f58aab83edc7461766a17f489a3b44c9d5a"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/arjenmarkus/interpolation2d3d/blob/3beca3e84a5407cfcc35360bfe9538f151ddb3e0/README.md",
+              "sha256": "6ee15e29d77cc6789e55df4ba452fa2addcd4ec5780ba73f1267a12776745258"
+            }
+          ]
         }
       },
       "imports": {}
@@ -9532,12 +9769,110 @@
             ],
             "notes": "The source interface includes differentiation of a supplied Jacobian and explicitly selects real128. Interface inspection does not establish supported platforms, stencil accuracy or successful compilation; real128 availability is compiler-dependent.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "8cd97a1605a87022553a7343f40b397f8508fb8d",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected findiff and findiff_multiscale paths perturb each coordinate and combine symmetric 3-, 5-, 7- or 9-point stencils to approximate a square vector-function Jacobian. findiffhes instead differences a supplied square Jacobian callback and returns a rank-three derivative tensor; it does not directly compute a scalar Hessian from scalar function values. The order argument selects stencil point count, not derivative order or a certified accuracy order. All reviewed interfaces use iso_fortran_env real128, require nonzero suitable perturbations and provide no automatic step selection, error estimate or status. The generic stencil fallback is three-point with a printed warning. The author test files select real64 while the module selects real128 and need consistent kinds/imports before they can serve as drivers. The matrix-in-time and multiscale-tensor paths are not included in this review. No stencil error or compilation failure was reproduced.",
+            "evidence": [
+              {
+                "path": "findiffmod.f90",
+                "url": "https://github.com/PunchesMalone/findiff/blob/8cd97a1605a87022553a7343f40b397f8508fb8d/findiffmod.f90",
+                "sha256": "fbf138fca4448b7354d74b3d6a99a18a7ed225d92aa2ae98738d433aff715623"
+              },
+              {
+                "path": "test/test.f90",
+                "url": "https://github.com/PunchesMalone/findiff/blob/8cd97a1605a87022553a7343f40b397f8508fb8d/test/test.f90",
+                "sha256": "0eb9dcce84237cb8fdb7125f5e6072e3c1ba1f89679b7bb9b02569e2792009d4"
+              },
+              {
+                "path": "test/test_rosenbrock.f90",
+                "url": "https://github.com/PunchesMalone/findiff/blob/8cd97a1605a87022553a7343f40b397f8508fb8d/test/test_rosenbrock.f90",
+                "sha256": "307f3e2b0aeedb09802fe49617cbb01e2cd9d182ac7a2656df89b740a19df480"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "findiff",
+                "role": "public-entry-point",
+                "summary": "Module function approximating J(i,j)=d f_i/d x_j for a callback mapping an n-element real128 vector to an n-element real128 vector. xstar and scalar eps must have that kind. order is one of 3,5,7,9. Returned matrix is (n,n); eps is an absolute coordinate perturbation.",
+                "signature": "jacobian = findiff(f, xstar, eps, order)",
+                "declarations": [
+                  {
+                    "path": "findiffmod.f90",
+                    "line_start": 109,
+                    "line_end": 124
+                  }
+                ],
+                "path": "findiffmod.f90",
+                "line_start": 107,
+                "line_end": 201,
+                "module": "findiffmod",
+                "usage": "use findiffmod, only: wp, findiff\nreal(wp) :: x(2), jacobian(2,2)\nx = [1.0_wp,2.0_wp]\njacobian = findiff(my_vector_function,x,1.0e-4_wp,5)",
+                "usage_notes": "Calling fragment only, not a checked driver. Supply an explicit-interface my_vector_function(x) returning real(wp) f(size(x)), with assumed-shape real(wp) input. Import wp from this pinned module, or consistently select real128; do not mix the real64 kinds used by the bundled tests. Choose and validate the step for the actual function and scale. real128 availability depends on the compiler."
+              },
+              {
+                "procedure": "findiff_multiscale",
+                "role": "public-entry-point",
+                "summary": "Square real128 Jacobian function with a separate absolute step epsvec(j) for each coordinate. Every step must be nonzero and chosen for the function scale; output column j uses that coordinate step. No adaptive error control is implemented.",
+                "signature": "jacobian = findiff_multiscale(f, xstar, epsvec, order)",
+                "declarations": [
+                  {
+                    "path": "findiffmod.f90",
+                    "line_start": 282,
+                    "line_end": 297
+                  }
+                ],
+                "path": "findiffmod.f90",
+                "line_start": 280,
+                "line_end": 385,
+                "module": "findiffmod"
+              },
+              {
+                "procedure": "findiffhes",
+                "role": "public-entry-point",
+                "summary": "Differentiate a user-provided real128 square Jacobian j(x). Returns tensor res(i,j,k)=d J(i,j)/d x_k using the selected centered stencil. Caller must supply the Jacobian callback; the name does not imply a direct scalar-Hessian interface.",
+                "signature": "tensor = findiffhes(j, xstar, eps, order)",
+                "declarations": [
+                  {
+                    "path": "findiffmod.f90",
+                    "line_start": 7,
+                    "line_end": 18
+                  }
+                ],
+                "path": "findiffmod.f90",
+                "line_start": 5,
+                "line_end": 106,
+                "module": "findiffmod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "8cd97a1605a87022553a7343f40b397f8508fb8d",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license/copying file was present in the pinned root tree, and no license grant was identified in the inspected module or author test. This scoped absence finding does not establish redistribution rights or cover all historical versions. The old repository URL redirects to DavidACunningham/findiff; the saved catalog identity and commit pin are retained.",
+          "evidence": [
+            {
+              "path": "findiffmod.f90",
+              "url": "https://github.com/PunchesMalone/findiff/blob/8cd97a1605a87022553a7343f40b397f8508fb8d/findiffmod.f90",
+              "sha256": "fbf138fca4448b7354d74b3d6a99a18a7ed225d92aa2ae98738d433aff715623"
+            },
+            {
+              "path": "test/test.f90",
+              "url": "https://github.com/PunchesMalone/findiff/blob/8cd97a1605a87022553a7343f40b397f8508fb8d/test/test.f90",
+              "sha256": "0eb9dcce84237cb8fdb7125f5e6072e3c1ba1f89679b7bb9b02569e2792009d4"
+            }
+          ]
         }
       },
       "imports": {}

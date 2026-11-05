@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Twenty-seven repositories now have forty source-reviewed
+Reviewed on 2026-11-04. Thirty repositories now have forty-three source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Twenty-six repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A twenty-seventh, DDFSA, identifies the supplied
+Twenty-nine repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A thirtieth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All twenty-seven independently source-reviewed repositories now have an
+separately. All thirty independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -50,6 +50,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Akima with Derivatives | External `setup`, `SETUP_DV`, `interp` | Apache-2.0 |
 | adjac | `adjac::adjac_reset`, `::adjac_set_independent`, `::adjac_get_dense_jacobian`, `::adjac_free` | BSD-3-Clause core; separate FFTPACK notice |
 | generic_rk | `runge_kutta::rk_wrapper` | BSD-2-Clause |
+| Interpolation in 2D and 3D | `quadratic_shepard_2d::qshep_2d%create_mesh`, `%interpolate_point`, `%gradient_point` | MIT wrappers; ACM numerical-core notice |
+| chol-rev | External `DPO2FT`, `DPOFRT` (lower-factor reverse differentiation) | MIT and BSD-3-Clause-Open-MPI component notices |
+| findiff | `findiffmod::findiff`, `::findiff_multiscale`, `::findiffhes` | No license identified in reviewed material |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -96,6 +99,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Akima with Derivatives](https://github.com/andrewning/akima) | E1a; H1 | Smoothed Akima cubic construction, tangent coefficient propagation and analytic query/data derivatives | Ordered distinct nodes and n >= 3 required. End-polynomial extrapolation is not generally reliable. Sensitivities differentiate the interpolant, not an unknown sampled function. |
 | [adjac](https://github.com/pv/adjac) | H1 | Real overloaded product rule, derivative tape and dense Jacobian extraction | Shared tape/mode lifecycle needs coordination. Only the real dense path is source reviewed; complex, COO, FFT and tapeless variants are not certified. |
 | [generic_rk](https://github.com/cbcoutinho/generic_rk) | I1a1a | Active Dormand-Prince tableau selection and adaptive explicit stage path | Stage state accumulates across stages instead of resetting. Initial endpoint clipping needs attention. Hard-coded tolerances, unit-22 output and STOP on exhaustion; no stiff mapping. |
+| [Interpolation in 2D and 3D](https://github.com/arjenmarkus/interpolation2d3d) | E2b | Planar modified quadratic Shepard fit, weighted local evaluation and interpolant gradients | Only the 2D path reviewed. Default REAL, at least six samples, construction/status checks required; unsupported queries are not general extrapolation. |
+| [chol-rev](https://github.com/imurray/chol-rev) | H1 | Lower-factor reverse sensitivity propagation, unblocked and blocked BLAS updates | Upper path unimplemented, LDC not checked, blocked routine overwrites upper entries. Preserve triangular adjoint convention and match BLAS integer ABI. |
+| [findiff](https://github.com/PunchesMalone/findiff) | H1 | Symmetric finite-difference square Jacobians and derivatives of a supplied Jacobian | Requires real128 and user-selected nonzero steps. order counts stencil points. Bundled real64 tests need consistent kinds; no automatic error estimate. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -186,3 +192,16 @@ real overloads. Its real dense calling sketch explicitly resets tape mode.
 The generic_rk mapping records the active explicit path and its stage-state
 finding; its method name alone does not establish numerical order or stiff
 capability. No upstream source was compiled or run for these reviews.
+
+## Scattered interpolation and derivative primitives
+
+E2b (scattered multivariate data) is recorded from the NIST classification
+report, printed page 17 / PDF page 19. It has no more specific children in that
+scheme. The reviewed Shepard bindings use `qshep_2d`, correcting the type name
+shown in some author documentation, and link status checks and author examples.
+The wrapper MIT notice does not replace the separate ACM notice for its core.
+
+The chol-rev entries describe differentiation through an existing lower factor,
+not ordinary Cholesky factorization or another review of the LAPACK repository.
+The findiff tensor entry requires a Jacobian callback; it is not advertised as
+a scalar-Hessian-from-values routine. No upstream program was compiled or run.

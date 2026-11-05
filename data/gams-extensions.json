@@ -30,6 +30,12 @@
       "parent": "G2h3b",
       "source": "https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2h3b2",
       "reviewed_on": "2026-11-04"
+    },
+    "E2b": {
+      "label": "Scattered",
+      "parent": "E2",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=19",
+      "reviewed_on": "2026-11-04"
     }
   }
 }
