@@ -1493,12 +1493,158 @@
             ],
             "notes": "The README distinguishes quadratic, cubic, linear, robust and RIPPLE variants and their dimensional restrictions. No single dimensional leaf is assigned to the entire suite.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2b",
+            "level": "source-reviewed",
+            "revision": "1aead0f26ca367514a658c6c509aa5bd33c0dfc6",
+            "reviewed_on": "2026-11-05",
+            "notes": "QSHEP2 selects neighboring planar data, sets compact radii, forms local quadratic weighted least-squares models with Givens QR, enlarges neighborhoods/damps quadratic terms for conditioning, and returns cell-search/model data. QS2VAL blends those nodal polynomials by compact Shepard weights and returns exact nodal F on coincidence. E2b records bivariate scattered interpolation, not gridded-only or arbitrary-dimensional interpolation. N>=6, 5<=NQ<=MIN(40,N-1), 1<=NW<=MIN(40,N-1) and NR>=1 are required. Setup IER diagnoses ranges, duplicate nodes and degeneracy. QS2VAL returns zero both for some invalid input and for points outside all supports; use QS2GRD for a status-bearing evaluation. This review covers setup/evaluation control, not a complete audit of neighbor/rotation kernels or robustness in all geometries. No interpolant or author test was executed.",
+            "evidence": [
+              {
+                "path": "src/qshep2d.f90",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/qshep2d.f90",
+                "sha256": "76175d21abe897c9bf120fe9b161feb0db320e0ba42f7bcb483989758d6371e6"
+              },
+              {
+                "path": "src/real_precision.f90",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/real_precision.f90",
+                "sha256": "688e28a9e2f039a3a4304f36129a682a7e57e5cf2230964c6fc1bd241d092613"
+              },
+              {
+                "path": "src/qshep2d_test.f90",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/qshep2d_test.f90",
+                "sha256": "eacb72fe577fca6049fe3ef4cd0d6f117cd5696d12e626a9b1a3dff3e18f36df"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/Makefile",
+                "sha256": "a7787c72b8d1b77c6e14f24c70a20b9fca16a1a17a1d18c047eeec97ab03eef2"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/README.md",
+                "sha256": "f870419c5d06b981ff899d9b34df5664a11d1c35f043ddb5ac26c82fa7b320c4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "QSHEP2",
+                "role": "public-entry-point",
+                "summary": "Public module setup routine. REAL(R8) coordinate/value vectors have length N; output coefficients A(5,N), RSQ(N), LCELL(NR,NR), LNEXT(N) and geometry scalars must be retained together. Check IER before evaluation.",
+                "signature": "CALL QSHEP2(N, X, Y, F, NQ, NW, NR, LCELL, LNEXT, &\n            XMIN, YMIN, DX, DY, RMAX, RSQ, A, IER)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 1,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 214,
+                    "line_end": 232
+                  },
+                  {
+                    "path": "src/real_precision.f90",
+                    "line_start": 1,
+                    "line_end": 3
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 5,
+                "line_end": 515,
+                "module": "QSHEP2D_MOD",
+                "usage": "use REAL_PRECISION, only: R8\nuse QSHEP2D_MOD, only: QSHEP2, QS2VAL\ninteger, parameter :: n=16, nr=2\ninteger :: i,j,k,ier,lcell(nr,nr),lnext(n)\nreal(R8) :: x(n),y(n),f(n),rsq(n),a(5,n),xmin,ymin,dx,dy,rmax,value\nk=0\ndo j=0,3\n  do i=0,3\n    k=k+1; x(k)=real(i,R8); y(k)=real(j,R8); f(k)=x(k)**2+y(k)**2\n  end do\nend do\ncall QSHEP2(n,x,y,f,8,8,nr,lcell,lnext,xmin,ymin,dx,dy,rmax,rsq,a,ier)\nif (ier /= 0) error stop \"Shepard setup failed\"\nvalue=QS2VAL(1.5_R8,1.5_R8,n,x,y,f,nr,lcell,lnext,xmin,ymin,dx,dy,rmax,rsq,a)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the supplied blas_shep helper routines along with the precision and QSHEP2D modules. The grid-shaped sample is passed through the scattered-data API; no accuracy or polynomial-reproduction test was run. A zero QS2VAL return does not identify a successful zero value versus no support. Keep every setup array/scalar consistent with the original nodes."
+              },
+              {
+                "procedure": "QS2VAL",
+                "role": "public-entry-point",
+                "summary": "Public scalar evaluation function for a previously constructed interpolant. Zero is also returned on invalid geometry or outside all support radii; no status dummy.",
+                "signature": "value = QS2VAL(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, &\n               XMIN, YMIN, DX, DY, RMAX, RSQ, A)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 519,
+                    "line_end": 520
+                  },
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 582,
+                    "line_end": 592
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 519,
+                "line_end": 681,
+                "module": "QSHEP2D_MOD"
+              }
+            ]
+          },
+          {
+            "code": "E3a2",
+            "level": "source-reviewed",
+            "revision": "1aead0f26ca367514a658c6c509aa5bd33c0dfc6",
+            "reviewed_on": "2026-11-05",
+            "notes": "QS2GRD differentiates the compact Shepard quotient using nodal quadratic derivatives and derivatives of the weights. At a supplied node it returns F and the local linear coefficients A(4:5). E3a2 records derivatives of the fitted bivariate interpolant, not derivatives of an arbitrary callback or an automatic-differentiation service. Requires successful QSHEP2 data. IER=0 denotes supported evaluation, 1 invalid geometry and 2 no supporting node; the no-support path sets Q/QX/QY to zero while invalid-geometry early returns leave them unassigned. This is a source review of the derivative evaluator and status semantics, not a finite-difference/accuracy verification.",
+            "evidence": [
+              {
+                "path": "src/qshep2d.f90",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/qshep2d.f90",
+                "sha256": "76175d21abe897c9bf120fe9b161feb0db320e0ba42f7bcb483989758d6371e6"
+              },
+              {
+                "path": "src/real_precision.f90",
+                "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/src/real_precision.f90",
+                "sha256": "688e28a9e2f039a3a4304f36129a682a7e57e5cf2230964c6fc1bd241d092613"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "QS2GRD",
+                "role": "public-entry-point",
+                "summary": "Public interpolant value/gradient evaluator. Inputs are the retained QSHEP2 state and REAL(R8) query; outputs Q/QX/QY and IER must be interpreted together. Check IER before reading outputs.",
+                "signature": "CALL QS2GRD(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, &\n            XMIN, YMIN, DX, DY, RMAX, RSQ, A, Q, QX, QY, IER)",
+                "declarations": [
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 685,
+                    "line_end": 686
+                  },
+                  {
+                    "path": "src/qshep2d.f90",
+                    "line_start": 757,
+                    "line_end": 768
+                  }
+                ],
+                "path": "src/qshep2d.f90",
+                "line_start": 685,
+                "line_end": 900,
+                "module": "QSHEP2D_MOD",
+                "usage": "use QSHEP2D_MOD, only: QS2GRD\n! First build and retain the QSHEP2 state, using matching REAL(R8) arrays.\ncall QS2GRD(px,py,n,x,y,f,nr,lcell,lnext, &\n            xmin,ymin,dx,dy,rmax,rsq,a,q,qx,qy,ier)\nif (ier /= 0) error stop \"Shepard query invalid or unsupported\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. State-reuse fragment, not a complete driver. Do not use Q/QX/QY after IER=1; the early return does not assign them. IER=2 means no compact support, not an extrapolation with verified derivative accuracy. No numerical differentiation comparison was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "ACM Software License Agreement",
+          "spdx_expression": null,
+          "revision": "1aead0f26ca367514a658c6c509aa5bd33c0dfc6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned ACM agreement permits academic/research and similar noncommercial uses under its stated conditions and separately addresses commercial use. It is not recorded as an unrestricted BSD/MIT grant.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/vtopt/sheppack/blob/1aead0f26ca367514a658c6c509aa5bd33c0dfc6/LICENSE",
+              "sha256": "60af1c9af174ca5c539dfc48bd283c1c10ad5788632e9240ecd1aac54657dbc2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -1816,12 +1962,115 @@
             ],
             "notes": "The README identifies the ID low-rank matrix approximation library and points to detailed documentation. It notes a transfer to GitLab; this entry describes the pinned GitHub snapshot, not the latest version elsewhere.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "4de32e3d455b9e5c11bdb65aa37dc85e640f57d0",
+            "reviewed_on": "2026-11-05",
+            "notes": "iddr_qrpiv selects columns by trailing norms, builds Householder transformations and updates/recomputes pivot norms for a fixed-rank real QR. iddr_id then composes the pivot swaps into selected-column indices and backsolves R11*proj=R12, packing interpolation coefficients into the start of overwritten A. D5 records the QR-based decomposition path; ID is not an SVD, and selected original columns must be retained from a copy. Require 1<=krank<=MIN(m,n): the QR helper clips loop count but the ID wrapper subsequently accesses the requested rank. rnorms receives signed diagonal entries despite absolute-value wording in its header. Large interpolation coefficients are zeroed at a fixed 2**20 comparison, not reported as a numerical-error status. No matrix approximation, reference QR or error bound was checked by execution.",
+            "evidence": [
+              {
+                "path": "src/idd_id.f",
+                "url": "https://github.com/fastalgorithms/libid/blob/4de32e3d455b9e5c11bdb65aa37dc85e640f57d0/src/idd_id.f",
+                "sha256": "cb1fd68fd5b5fc2f490a3325fee0f7c2a9fa1de8289b5c425ff506377ddb9f07"
+              },
+              {
+                "path": "src/idd_qrpiv.f",
+                "url": "https://github.com/fastalgorithms/libid/blob/4de32e3d455b9e5c11bdb65aa37dc85e640f57d0/src/idd_qrpiv.f",
+                "sha256": "cf16fbf46afbbf15add6e456af9d2cb519a0dca670b74da5024fd73fb2bed887"
+              },
+              {
+                "path": "test/idd_id_test.f",
+                "url": "https://github.com/fastalgorithms/libid/blob/4de32e3d455b9e5c11bdb65aa37dc85e640f57d0/test/idd_id_test.f",
+                "sha256": "c69710085e3aa577e157efc1e836fbfc1d7ffa0e7f9c80e19b01cdecf06228ad"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/fastalgorithms/libid/blob/4de32e3d455b9e5c11bdb65aa37dc85e640f57d0/README.md",
+                "sha256": "25add13bb54998d241a61581ca817a6dc24c90410db14c8045c9b995325e77a4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "iddr_id",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 fixed-rank interpolative decomposition. a(m,n) is destroyed; list(n) identifies the selected-column permutation and the leading krank*(n-krank) contiguous values of a hold proj with leading dimension krank. rnorms(n) is work/diagonal output, not an error certificate.",
+                "signature": "CALL iddr_id(m, n, a, krank, list, rnorms)",
+                "declarations": [
+                  {
+                    "path": "src/idd_id.f",
+                    "line_start": 142,
+                    "line_end": 142
+                  },
+                  {
+                    "path": "src/idd_id.f",
+                    "line_start": 164,
+                    "line_end": 194
+                  }
+                ],
+                "path": "src/idd_id.f",
+                "line_start": 142,
+                "line_end": 260,
+                "usage": "external :: iddr_id\ninteger, parameter :: m=4,n=3,rank=2\ninteger :: selected(n)\ndouble precision :: a(m,n),original(m,n),diagonals(n)\na(:,1)=[1.0d0,0.0d0,1.0d0,2.0d0]\na(:,2)=[0.0d0,1.0d0,1.0d0,1.0d0]\na(:,3)=a(:,1)+a(:,2); original=a\ncall iddr_id(m,n,a,rank,selected,diagonals)\n! Recover selected original columns and packed coefficients before reconstruction.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the supplied fixed-form QR/Householder helpers. The packed projection is not simply a(1:rank,rank+1:n) after this call; its contiguous storage has leading dimension rank. Preserve original data and reconstruct/check the approximation independently. The routine has no success flag or verified error guarantee."
+              },
+              {
+                "procedure": "iddr_qrpiv",
+                "role": "public-entry-point",
+                "summary": "External fixed-rank column-pivoted QR. Upper trapezoid and Householder vectors share overwritten a; ind stores pivot swaps, unlike the composed selected-column list returned by iddr_id.",
+                "signature": "CALL iddr_qrpiv(m, n, a, krank, ind, ss)",
+                "declarations": [
+                  {
+                    "path": "src/idd_qrpiv.f",
+                    "line_start": 646,
+                    "line_end": 646
+                  },
+                  {
+                    "path": "src/idd_qrpiv.f",
+                    "line_start": 724,
+                    "line_end": 727
+                  }
+                ],
+                "path": "src/idd_qrpiv.f",
+                "line_start": 646,
+                "line_end": 893
+              },
+              {
+                "procedure": "idd_lssolve",
+                "role": "implementation-helper",
+                "path": "src/idd_id.f",
+                "line_start": 327,
+                "line_end": 386
+              },
+              {
+                "procedure": "idd_reconid",
+                "role": "implementation-helper",
+                "path": "src/idd_id.f",
+                "line_start": 265,
+                "line_end": 322
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "4de32e3d455b9e5c11bdb65aa37dc85e640f57d0",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root gives the three redistribution/endorsement clauses and disclaimer for Martinsson, Rokhlin, Shkolnisky and Tygert. This selected deterministic path does not audit every bundled dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/fastalgorithms/libid/blob/4de32e3d455b9e5c11bdb65aa37dc85e640f57d0/LICENSE",
+              "sha256": "2b2abd8901bf0e7c037c4e88b12015ec0d837802c6046728f6a081a3810bd07b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19572,12 +19821,98 @@
             ],
             "notes": "The README documents several approximation methods but explicitly says Fortran development will not continue and a Julia port is planned. This entry preserves the Fortran snapshot without implying active Fortran maintenance.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "29568e3acb8a93d24fc308c5d570c82c2e3534fb",
+            "reviewed_on": "2026-11-05",
+            "notes": "dgersvd1 orthogonalizes a caller-provided column sketch, optionally alternates matrix/transpose products and QR/LQ power steps, forms Q-transpose*A through a callback, computes its small SVD, and lifts left singular vectors by GEMM. D6 records approximate real SVD with kc sketch columns, not automatic rank selection or exact full SVD. The caller generates csk=A*Omega; the routine does not sample Omega internally. Arrays are contiguous rank-one buffers with explicit leading dimensions. Query both workspaces before execution. The checks bound kc by n but the QR path also needs kc<=m; require kc<=MIN(m,n). Several callback/LAPACK statuses can be overwritten by subsequent calls without an immediate return. No randomized approximation, singular values, error or author test was run.",
+            "evidence": [
+              {
+                "path": "src/lr/lr_tsvd/sub/lr_tsvd_sub.f90",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/src/lr/lr_tsvd/sub/lr_tsvd_sub.f90",
+                "sha256": "b6dd12f902c3eb4ec1ff5cb7931cffae6dcd899456301e5d6cf5eeb9a42939d2"
+              },
+              {
+                "path": "src/lr/lr_tsvd/lr_tsvd_mod.f90",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/src/lr/lr_tsvd/lr_tsvd_mod.f90",
+                "sha256": "c45751fac3e2564be7b42bbd8bbeff298d052ff23384ddb07ee549e2f711f422"
+              },
+              {
+                "path": "src/la/la_core/la_core_mod.f90",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/src/la/la_core/la_core_mod.f90",
+                "sha256": "71d8d3b0ade2729c2ec27d7eae2f6689235c970aef3759acaef147a40d9f1447"
+              },
+              {
+                "path": "src/common/kinds/kinds_mod.f90",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/src/common/kinds/kinds_mod.f90",
+                "sha256": "097a49c456a8ecd7934120fd8035aeb4ac69e4549dfddee9a48e736dc735a174"
+              },
+              {
+                "path": "test/lr/lr_tsvd/dgersvd1_test.f90",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/test/lr/lr_tsvd/dgersvd1_test.f90",
+                "sha256": "785de59042bf038ed73e5d7df9644e43cd2303732d9b1e771ee8eedc640787c0"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/README.md",
+                "sha256": "b203c7cc59c0dbdb132f6708e42ee46ef4ebebb282ea54a90556abc4cc846a53"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dgersvd1",
+                "role": "public-entry-point",
+                "summary": "Public module approximate SVD subroutine with procedure-pointer B2AB/B2BA products. csk is the precomputed m-by-kc column sketch stored in a 1D buffer and is overwritten. Returns kc singular values, U(m,kc), VT(kc,n) in flat buffers, plus INFO and real/integer workspace queries.",
+                "signature": "CALL dgersvd1(m, n, B2AB, B2BA, kc, csk, ldcsk, niter_power, &\n              S, U, ldu, VT, ldvt, work, lwork, iwork, liwork, info)",
+                "declarations": [
+                  {
+                    "path": "src/lr/lr_tsvd/lr_tsvd_mod.f90",
+                    "line_start": 144,
+                    "line_end": 173
+                  },
+                  {
+                    "path": "src/la/la_core/la_core_mod.f90",
+                    "line_start": 123,
+                    "line_end": 139
+                  }
+                ],
+                "path": "src/lr/lr_tsvd/sub/lr_tsvd_sub.f90",
+                "line_start": 517,
+                "line_end": 699,
+                "module": "maria_lr_tsvd_mod",
+                "examples": [
+                  {
+                    "path": "test/lr/lr_tsvd/dgersvd1_test.f90",
+                    "line_start": 150,
+                    "line_end": 183
+                  }
+                ],
+                "usage": "use maria_lr_tsvd_mod, only: dgersvd1\n! Provide associated B2AB/B2BA procedure pointers with the linked dmatmul interface.\n! Set 1<=kc<=min(m,n); allocate flat output/sketch buffers and form csk=A*Omega.\n! First query with lwork=-1/liwork=-1 and one-element work/iwork buffers.\n! Allocate both workspaces to their reported lengths, then:\ncall dgersvd1(m,n,B2AB,B2BA,kc,csk,ldcsk,niter_power, &\n              singular_values,u,ldu,vt,ldvt,work,lwork,iwork,liwork,info)\nif (info /= 0) error stop \"MARIA approximate SVD failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback/workspace fragment, not a complete randomized-SVD driver. Use the author test for flattened column-major indexing and product callback semantics; pointers represent multiplication with A on the left/right, with transB affecting the supplied operand. Retain/provide sketch data, pick oversampling/power steps yourself and check residuals independently. INFO is not a statistical approximation certificate, and overwritten intermediate errors need attention. Link configured BLAS/LAPACK through the supplied build."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "29568e3acb8a93d24fc308c5d570c82c2e3534fb",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned MIT root notice covers MARIA. Separately configured BLAS/LAPACK, optional MKL RNG and other backend terms are not audited by this scoped review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sbudzinskiy/MARIA-Fortran/blob/29568e3acb8a93d24fc308c5d570c82c2e3534fb/LICENSE",
+              "sha256": "1fb13db9e13a881466d44ffce155285c4a301d791679ca5028ca50ea5be5c0d1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24838,12 +25173,138 @@
             ],
             "notes": "The README explicitly prioritizes pedagogy over efficiency and lists implemented decompositions and iterative eigenvalue methods. SVD, Lanczos and Davidson appear under Next step and are not counted as completed capabilities.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "98622775c476eccf3c1027c4cec60fa69182347b",
+            "reviewed_on": "2026-11-05",
+            "notes": "CHOLESKY forms a real lower-triangular Cholesky factor by diagonal square roots and column updates, supporting the positive-definite real-symmetric decomposition part of D2b1b. This routine does not solve for a right-hand side. Only the lower triangle of output L is assigned; the upper triangle remains undefined and the optional internal CHECK path nevertheless reads the full array through multiplication. The sketch sets CHECK=false and zeroes the upper triangle after return. Pivots <=1e-15 trigger file output and STOP, which can reject a small but positive-definite scaled problem; dimensions/symmetry are not validated. It reads upper-triangle input entries as lower-factor data and assumes symmetry. No factorization or residual was executed.",
+            "evidence": [
+              {
+                "path": "Cholesky/Cholesky.f90",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/Cholesky/Cholesky.f90",
+                "sha256": "77718affec14d47cd6fc00107679cbc7e31243e6832ab2054cd535978b7eebe2"
+              },
+              {
+                "path": "operation_mat.f90",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/operation_mat.f90",
+                "sha256": "6be79bc891a1cddd98d08f25c3748d59aa1353a7e1c90f9ae0adea11452057b5"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/README.md",
+                "sha256": "3e82524fa14804225dba155db2331ae500489219c4029e53677f273305c11ddc"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CHOLESKY",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 square Cholesky-factor routine. MATRIX is input, L output, CHECK input logical; no INFO/status. Use DIM>=1 and a symmetric positive-definite matrix. The useful factor is its assigned lower triangle.",
+                "signature": "CALL CHOLESKY(DIM, MATRIX, L, CHECK)",
+                "declarations": [
+                  {
+                    "path": "Cholesky/Cholesky.f90",
+                    "line_start": 1,
+                    "line_end": 14
+                  }
+                ],
+                "path": "Cholesky/Cholesky.f90",
+                "line_start": 1,
+                "line_end": 82,
+                "usage": "external :: cholesky\ndouble precision :: a(2,2),l(2,2)\ninteger :: i\na=reshape([4.0d0,2.0d0,2.0d0,3.0d0],[2,2])\ncall cholesky(2,a,l,.false.)\ndo i=1,2\n  l(i,i+1:2)=0.0d0\nend do\n! Independently check MATMUL(l,TRANSPOSE(l)) against a.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the external helpers in operation_mat even with CHECK disabled. Caller-side initialization before the call does not define unassigned INTENT(OUT) entries; zero the upper triangle after return instead. The internal file named error may be deleted/recreated. No positive-definiteness, relative factorization error or scale robustness was tested."
+              }
+            ]
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "98622775c476eccf3c1027c4cec60fa69182347b",
+            "reviewed_on": "2026-11-05",
+            "notes": "GS normalizes the first column, subtracts projections of each original input column onto previous normalized columns, and normalizes the remainder. D5 records classical Gram-Schmidt orthogonalization, not modified Gram-Schmidt, pivoted QR or least-squares solving. NORMVECMAT divides by the Euclidean norm without zero/rank-deficiency protection. An internal CHECK compares Q*Q-transpose with an identity and prints file diagnostics using an absolute tolerance, but provides no returned rank/error status. The sketch uses independent columns and leaves numerical verification to the caller; no orthogonality or conditioning experiment was run.",
+            "evidence": [
+              {
+                "path": "Gram_Schmidt/GS.f90",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/Gram_Schmidt/GS.f90",
+                "sha256": "14f2a5591f74bfe48cc9d3a91ce2139640163305199586f551957a26ab7c4b9e"
+              },
+              {
+                "path": "operation_mat.f90",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/operation_mat.f90",
+                "sha256": "6be79bc891a1cddd98d08f25c3748d59aa1353a7e1c90f9ae0adea11452057b5"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/README.md",
+                "sha256": "3e82524fa14804225dba155db2331ae500489219c4029e53677f273305c11ddc"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GS",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 routine orthonormalizing DIM columns of a DIM-by-DIM matrix. Returns only Q, not triangular R or rank/status. Supply linearly independent finite columns; CHECK prints diagnostics rather than returning status.",
+                "signature": "CALL GS(DIM, MATRIX, ORTHOMATRIX, CHECK)",
+                "declarations": [
+                  {
+                    "path": "Gram_Schmidt/GS.f90",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "Gram_Schmidt/GS.f90",
+                "line_start": 1,
+                "line_end": 68,
+                "usage": "external :: gs\ndouble precision :: a(2,2),q(2,2)\na=reshape([1.0d0,1.0d0,1.0d0,-1.0d0],[2,2])\ncall gs(2,a,q,.false.)\n! Independently check TRANSPOSE(q)*q and the spanned subspace.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link operation_mat helpers and avoid confusing its external TRANSPOSE subroutine with the intrinsic function when writing new code. Classical Gram-Schmidt can lose orthogonality on ill-conditioned inputs; the source has no reorthogonalization or rank flag. The optional built-in checker uses a fixed absolute tolerance and was not run."
+              },
+              {
+                "procedure": "NORMVECMAT",
+                "role": "implementation-helper",
+                "path": "operation_mat.f90",
+                "line_start": 138,
+                "line_end": 155
+              },
+              {
+                "procedure": "PRODVEC",
+                "role": "implementation-helper",
+                "path": "operation_mat.f90",
+                "line_start": 158,
+                "line_end": 173
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "All rights reserved statement; no reuse grant identified",
+          "spdx_expression": null,
+          "revision": "98622775c476eccf3c1027c4cec60fa69182347b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned README explicitly reserves all rights to Quentin Marecat; no separate reuse/redistribution grant was identified. Source contact information and educational intent do not establish such permission.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/README.md",
+              "sha256": "3e82524fa14804225dba155db2331ae500489219c4029e53677f273305c11ddc"
+            },
+            {
+              "path": "Cholesky/Cholesky.f90",
+              "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/Cholesky/Cholesky.f90",
+              "sha256": "77718affec14d47cd6fc00107679cbc7e31243e6832ab2054cd535978b7eebe2"
+            },
+            {
+              "path": "Gram_Schmidt/GS.f90",
+              "url": "https://github.com/Quentin-Marecat/Lin_Alg/blob/98622775c476eccf3c1027c4cec60fa69182347b/Gram_Schmidt/GS.f90",
+              "sha256": "14f2a5591f74bfe48cc9d3a91ce2139640163305199586f551957a26ab7c4b9e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -27568,12 +28029,124 @@
             ],
             "notes": "The README documents object-based matrix/preconditioner interfaces, CRS and matrix-free examples, libsparse and MKL dependencies. Historical compiler tests are upstream reports; current coarray runtime compatibility and numerical convergence were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "36408df93ae5d6515d3bf7d27008aca16780e77e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The cg binding computes a real conjugate-gradient recurrence with distributed row products, global dot-product reductions and gathered search directions for an assumed symmetric positive-definite operator. D2b1b records that ordinary CG system-solve scope; no nonsymmetric or indefinite support is inferred. Matrix input can be a compatible crssparse object or gen_coeff extension. x is a replicated global-length coarray; only owned rows are updated and the full solution is assembled on image 1 at the end. Initial x is required zero, but the source tests SUM(x)==0 rather than every entry. RHS is read from a binary stream file with integer header. Stopping adds image-local Euclidean norms, not the square root of globally summed squares; zero RHS and curvature breakdown are unguarded. getlargeeigenvalue receives MINVAL, and last-image scratch is O(maxit**2). No coarray solve, speed or convergence check was run.",
+            "evidence": [
+              {
+                "path": "src/lib/modcoarraysolver.f90",
+                "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/src/lib/modcoarraysolver.f90",
+                "sha256": "5ca244e9ea7e14a09d0fbe5cdf5fd91c1f2c190e8d4f8a6f266fb48a92018678"
+              },
+              {
+                "path": "src/lib/modcoeff.f90",
+                "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/src/lib/modcoeff.f90",
+                "sha256": "8ef4d00a48609d3f933cae448eab61b37c61cf5eb1bb341921ea50f32c1ac652"
+              },
+              {
+                "path": "src/lib/modcoarrayop.f90",
+                "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/src/lib/modcoarrayop.f90",
+                "sha256": "69036600b8f5397a0762ea3d2292a24289ca000dfbaa1e9b985fc40601717612"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/README.md",
+                "sha256": "4a9f3a59501e2505ed06c3a03607d7cf3f62a1787bf17e7e53f87f333b522c11"
+              },
+              {
+                "path": "src/example_gen_gen/pcgrowcoarray_mvlr.f90",
+                "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/src/example_gen_gen/pcgrowcoarray_mvlr.f90",
+                "sha256": "02e7ce36dda8012b7c9684c0045a006f7cdfccdf1732d36649c4547e08ba2043"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public type-bound CG solve. Constructor cg(neq) takes global INT32 equation count. startrow/endrow are scalar INT32 coarrays; x is REAL64(:)[*]; crhs is a filename. gen_coeff%multbyv supplies the row-restricted product for a user-defined matrix operator.",
+                "signature": "CALL solver%solve(matrix, x, rhs_filename, startrow, endrow)",
+                "declarations": [
+                  {
+                    "path": "src/lib/modcoarraysolver.f90",
+                    "line_start": 57,
+                    "line_end": 67
+                  },
+                  {
+                    "path": "src/lib/modcoarraysolver.f90",
+                    "line_start": 376,
+                    "line_end": 390
+                  },
+                  {
+                    "path": "src/lib/modcoeff.f90",
+                    "line_start": 9,
+                    "line_end": 22
+                  }
+                ],
+                "path": "src/lib/modcoarraysolver.f90",
+                "line_start": 385,
+                "line_end": 576,
+                "module": "modcoarraysolver",
+                "derived_type": "cg",
+                "usage": "use iso_fortran_env, only: int32,real64\nuse modcoarraysolver, only: cg\ntype(cg) :: solver\n! Define matrix as a compatible CSR object or gen_coeff extension.\n! Allocate x(neq)[*], and partition scalar startrow[*]/endrow[*] on all images.\nsolver=cg(neq)\ncall solver%setmaxiterations(100_int32)\ncall solver%setthreshold(1.0e-8_real64)\nx=0.0_real64\ncall solver%solve(matrix,x,rhs_filename,startrow,endrow)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Distributed interface fragment, not a full coarray driver. Build with matching libsparse precision/API, coarray runtime and LAPACK dependency; the dependency version is not pinned by this review. Every image must participate with disjoint complete row ranges and matching coarray shapes. Prepare the binary RHS format, use nonzero RHS, and compute an independent global residual on image 1. No public success flag certifies convergence or an SPD operator."
+              },
+              {
+                "procedure": "multbyv",
+                "role": "implementation-helper",
+                "path": "src/lib/modcoarraysolver.f90",
+                "line_start": 1030,
+                "line_end": 1048,
+                "module": "modcoarraysolver"
+              },
+              {
+                "procedure": "norm",
+                "role": "implementation-helper",
+                "path": "src/lib/modcoarraysolver.f90",
+                "line_start": 1166,
+                "line_end": 1179,
+                "module": "modcoarraysolver"
+              },
+              {
+                "procedure": "readrhs",
+                "role": "implementation-helper",
+                "path": "src/lib/modcoarraysolver.f90",
+                "line_start": 1182,
+                "line_end": 1214,
+                "module": "modcoarraysolver"
+              },
+              {
+                "procedure": "co_sum_scal_real64",
+                "role": "implementation-helper",
+                "path": "src/lib/modcoarrayop.f90",
+                "line_start": 37,
+                "line_end": 58,
+                "module": "modcoarrayop"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "36408df93ae5d6515d3bf7d27008aca16780e77e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies MIT terms. Separately required libsparse, LAPACK and coarray/OpenMP runtimes are outside this scoped project-license review.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/jvdp1/pcgcoarray/blob/36408df93ae5d6515d3bf7d27008aca16780e77e/LICENSE.md",
+              "sha256": "96d240009147ede866013278f1104f3216ae2032464ebaf72a3b1cb2a35e0004"
+            }
+          ]
         }
       },
       "imports": {}
@@ -28354,12 +28927,160 @@
             ],
             "notes": "The README describes optional LAPACK, pFUnit and Doxygen features, disabled by default, and Unix-like platform support. A general tensor-calculus description does not establish coverage of every tensor decomposition, contraction or derivative algorithm.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1a4",
+            "level": "source-reviewed",
+            "revision": "a91a4db5f81e0026f055be1202d9127cbaec4273",
+            "reviewed_on": "2026-11-05",
+            "notes": "The rank-two/rank-two doubleContract overload initializes a scalar and sums a(i,j)*b(i,j) over fixed 3x3 arrays: the Frobenius inner product, equivalent to a dot product of their nine components. D1a4 is scoped to this scalar inner-product path, not ordinary matrix multiplication. Public .ddot. and doubleContract share the same specific routine. The rank-two/rank-four and reverse overloads accumulate into uninitialized result matrices; those paths are recorded as source findings and excluded from the sketch. No contraction or range/cancellation test was executed.",
+            "evidence": [
+              {
+                "path": "src/libtt_products.f90",
+                "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/src/libtt_products.f90",
+                "sha256": "a706c0ce234645aa4de953c217bab82f8bccb0d59272869184623d78b9d2742f"
+              },
+              {
+                "path": "src/libtt_precision.f90",
+                "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/src/libtt_precision.f90",
+                "sha256": "ecaf7f5e98815e864d5663408979fe2f5337f1800cde280760a804ea9ef99a0f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/README.md",
+                "sha256": "b9684e0c0d165aeeb98ac923ab6bf4bcc4f74f7e0f5ab351cc6cf4551ab13811"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "doubleContract",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for two REAL(dp) 3x3 arrays returning a scalar. dp is SELECTED_REAL_KIND(15,307). Higher-rank overloads have distinct contracts and recorded initialization findings.",
+                "signature": "value = doubleContract(a, b)",
+                "declarations": [
+                  {
+                    "path": "src/libtt_products.f90",
+                    "line_start": 9,
+                    "line_end": 28
+                  },
+                  {
+                    "path": "src/libtt_products.f90",
+                    "line_start": 56,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "src/libtt_precision.f90",
+                    "line_start": 7,
+                    "line_end": 9
+                  }
+                ],
+                "path": "src/libtt_products.f90",
+                "line_start": 56,
+                "line_end": 68,
+                "module": "libtt_products",
+                "usage": "use libtt_precision, only: dp\nuse libtt_products, only: doubleContract\nreal(dp) :: a(3,3),b(3,3),value\na=1.0_dp; b=2.0_dp\nvalue=doubleContract(a,b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build libtt_precision before libtt_products. This scalar overload initializes its reduction; it does not validate the uninitialized rank-four contraction overloads or imply arbitrary dimensions. Ordinary summation has no compensated/overflow-scaled accuracy guarantee."
+              },
+              {
+                "procedure": "double_contract_ranks24",
+                "role": "implementation-helper",
+                "path": "src/libtt_products.f90",
+                "line_start": 74,
+                "line_end": 90,
+                "module": "libtt_products"
+              },
+              {
+                "procedure": "double_contract_ranks42",
+                "role": "implementation-helper",
+                "path": "src/libtt_products.f90",
+                "line_start": 96,
+                "line_end": 112,
+                "module": "libtt_products"
+              }
+            ]
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "a91a4db5f81e0026f055be1202d9127cbaec4273",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected dyad vector/vector overload initializes result(3,3) and assigns outer-product entries a(i)*b(j); the matrix/matrix overload produces a rank-four outer product. D1b6 records these product operations with no contracted index, not an ordinary MATMUL replacement. Dimensions are fixed to three Cartesian components, and generic/private-specific boundaries are preserved on the card. This scope does not inherit claims about double contractions, elastic tensors or solver modules. No outer product was executed.",
+            "evidence": [
+              {
+                "path": "src/libtt_products.f90",
+                "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/src/libtt_products.f90",
+                "sha256": "a706c0ce234645aa4de953c217bab82f8bccb0d59272869184623d78b9d2742f"
+              },
+              {
+                "path": "src/libtt_precision.f90",
+                "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/src/libtt_precision.f90",
+                "sha256": "ecaf7f5e98815e864d5663408979fe2f5337f1800cde280760a804ea9ef99a0f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dyad",
+                "role": "public-entry-point",
+                "summary": "Public generic outer product. This signature selects two REAL(dp) vectors of length three and returns a 3x3 matrix; the operator .dyad. is an alternative public spelling.",
+                "signature": "outer = dyad(a, b)",
+                "declarations": [
+                  {
+                    "path": "src/libtt_products.f90",
+                    "line_start": 30,
+                    "line_end": 48
+                  },
+                  {
+                    "path": "src/libtt_products.f90",
+                    "line_start": 118,
+                    "line_end": 123
+                  },
+                  {
+                    "path": "src/libtt_precision.f90",
+                    "line_start": 7,
+                    "line_end": 9
+                  }
+                ],
+                "path": "src/libtt_products.f90",
+                "line_start": 118,
+                "line_end": 133,
+                "module": "libtt_products",
+                "usage": "use libtt_precision, only: dp\nuse libtt_products, only: dyad\nreal(dp) :: a(3),b(3),outer(3,3)\na=[1.0_dp,2.0_dp,3.0_dp]; b=[4.0_dp,5.0_dp,6.0_dp]\nouter=dyad(a,b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The outer product contains no summed index. Fixed 3D array sizes and REAL(dp) must match. Other tensor overloads, geometry conventions and physical-model correctness were not numerically tested."
+              },
+              {
+                "procedure": "dyadic_ranks22",
+                "role": "implementation-helper",
+                "path": "src/libtt_products.f90",
+                "line_start": 198,
+                "line_end": 219,
+                "module": "libtt_products"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL version 2.1 text; version choice unresolved",
+          "spdx_expression": null,
+          "revision": "a91a4db5f81e0026f055be1202d9127cbaec4273",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies LGPL version 2.1 text and the README names LGPL, without settling version-only versus or-later choice in the inspected module. Optional numerical backends are outside this scoped notice review.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/LICENSE.md",
+              "sha256": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/llamm-de/tensor_tools/blob/a91a4db5f81e0026f055be1202d9127cbaec4273/README.md",
+              "sha256": "b9684e0c0d165aeeb98ac923ab6bf4bcc4f74f7e0f5ab351cc6cf4551ab13811"
+            }
+          ]
         }
       },
       "imports": {}
@@ -32249,12 +32970,126 @@
             ],
             "notes": "The build-focused README is supplemented by interpolation and integration module interfaces, exposing linear/PCHIP/FITPACK and basic/QUADPACK components. Interface presence supports broad scope, not a procedure-level accuracy or backend-equivalence claim.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "539258d111e51f14263f96f803e9d5258a06dd00",
+            "reviewed_on": "2026-11-05",
+            "notes": "The REAL64 root_brentq path evaluates two endpoints, accepts an endpoint zero, then alternates secant/inverse interpolation with bisection safeguards and a combined absolute/relative interval stopping rule. F1b records a derivative-free scalar root, not polynomial-specific roots or optimization. The callback is a subroutine f(x,fx), not a scalar function. Optional res carries status and counts; on a same-sign interval the early return leaves x0 undefined, so inspect res before using it. Sign checks multiply endpoint values and can overflow/underflow; finiteness, positive tolerances and valid iteration limits are not comprehensively checked. No root, failure or author example was run.",
+            "evidence": [
+              {
+                "path": "src/numfort/optimize/include/root_brent_impl.F90",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/src/numfort/optimize/include/root_brent_impl.F90",
+                "sha256": "f38efdc08941a60108d96e96cfaec8d14b198cdd7d5673b63577e8a48b41ec4e"
+              },
+              {
+                "path": "src/numfort/optimize/root_brent_real64.F90",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/src/numfort/optimize/root_brent_real64.F90",
+                "sha256": "ed23d97d3671e63f648573483b0dad7ad0db7d6053cab722c13c8d35549cc2c2"
+              },
+              {
+                "path": "src/numfort/optimize/include/interfaces_spec.F90",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/src/numfort/optimize/include/interfaces_spec.F90",
+                "sha256": "fe8f90e1d3bc3ce550488cd44ac6e2e09e217d70f868436d59cef84b080541db"
+              },
+              {
+                "path": "src/numfort/optimize/interfaces_real64.F90",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/src/numfort/optimize/interfaces_real64.F90",
+                "sha256": "164fb162ed77de64c0ec5a1c75eb7854b80f7e948dfe67108946d0ed7a44b8df"
+              },
+              {
+                "path": "examples/optimize/root_brent.f90",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/examples/optimize/root_brent.f90",
+                "sha256": "81ae13e6ac715752bc9a44b033507d0d64430ac673bc4048f20742cb87755688"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/README.md",
+                "sha256": "21c00bbb11885ffbed1f14d8f0483f982c85e6a93cde952741ea9c1678fd2014"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "root_brentq",
+                "role": "public-entry-point",
+                "summary": "Public REAL64 module root finder, implemented through a preprocessed include. x0 is required output; xtol/rtol/maxiter/res are optional. Use the documented optim_result_real64 type to check success before consuming a root.",
+                "signature": "CALL root_brentq(f, a, b [, xtol, rtol, maxiter], x0=x0 [, res=res])",
+                "declarations": [
+                  {
+                    "path": "src/numfort/optimize/root_brent_real64.F90",
+                    "line_start": 3,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/numfort/optimize/include/root_brent_impl.F90",
+                    "line_start": 2,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "src/numfort/optimize/include/interfaces_spec.F90",
+                    "line_start": 12,
+                    "line_end": 17
+                  }
+                ],
+                "path": "src/numfort/optimize/include/root_brent_impl.F90",
+                "line_start": 2,
+                "line_end": 35,
+                "module": "numfort_optimize_brent_real64",
+                "examples": [
+                  {
+                    "path": "examples/optimize/root_brent.f90",
+                    "line_start": 15,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "examples/optimize/root_brent.f90",
+                    "line_start": 46,
+                    "line_end": 53
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse numfort_optimize, only: root_brentq, optim_result => optim_result_real64\ntype(optim_result) :: result\nreal(real64) :: root\n! Supply residual(x,fx), both REAL64; e.g. fx=x*x-2.\ncall root_brentq(residual,0.0_real64,2.0_real64, &\n                 xtol=1.0e-12_real64,rtol=1.0e-12_real64,maxiter=100, &\n                 x0=root,res=result)\nif (.not. result%success) error stop \"Brent root failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment; build the numfort modules/includes using their supplied configuration. Continuous finite residuals with a genuine sign-changing bracket are caller assumptions. Preserve/check the result status even though x0 is a required output. Endpoint sign-product arithmetic is not overflow-safe, and no residual/interval error was independently checked."
+              },
+              {
+                "procedure": "root_brentq_impl",
+                "role": "implementation-helper",
+                "path": "src/numfort/optimize/include/root_brent_impl.F90",
+                "line_start": 39,
+                "line_end": 168,
+                "module": "numfort_optimize_brent_real64"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL version 3 root text; bundled component terms separate",
+          "spdx_expression": null,
+          "revision": "539258d111e51f14263f96f803e9d5258a06dd00",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies LGPL version 3 text and a separate ledger lists multiple bundled-component licenses. The inspected root routine attributes its port to SciPy but does not independently settle every adapted-source notice or version-only/or-later scope. Do not treat all bundled software as solely LGPL.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/LICENSE.txt",
+              "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+            },
+            {
+              "path": "LICENSES_bundled.txt",
+              "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/LICENSES_bundled.txt",
+              "sha256": "dfd5f44ae6f6e59e8a90353d7b123456eb202c6f822c1cc2db52dd8e61a1b77d"
+            },
+            {
+              "path": "src/numfort/optimize/include/root_brent_impl.F90",
+              "url": "https://github.com/richardfoltyn/numfort/blob/539258d111e51f14263f96f803e9d5258a06dd00/src/numfort/optimize/include/root_brent_impl.F90",
+              "sha256": "f38efdc08941a60108d96e96cfaec8d14b198cdd7d5673b63577e8a48b41ec4e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37922,12 +38757,128 @@
             ],
             "notes": "The README describes reconstruction and rank-dependent representation size; combining it with k-means is an overarching goal. It does not establish a completed clustering pipeline or a guarantee of globally optimal/nonunique factor recovery.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K1b2a",
+            "level": "source-reviewed",
+            "revision": "2a9c8ee7c0be355ed630d9168788608731d2b37f",
+            "reviewed_on": "2026-11-05",
+            "notes": "factoring initializes W/H and alternates multiplicative updates involving W-transpose*A and A*H-transpose, with additive 1e-10 denominator offsets. K1b2a records its intended nonnegative bilinear least-squares matrix approximation: factor entries have linear nonnegativity constraints, unlike an SVD. Implementation findings limit use: w_update loops over H dimensions rather than W dimensions, causing incomplete/out-of-bounds updates for common reduced ranks; init_start_h declares width SIZE(A,1) but fills SIZE(A,2). The reported Error squares the sum of signed residuals, not the Frobenius residual norm. factoring runs a fixed iteration count and only prints reconstruction, returning a printing-helper integer rather than W/H or an optimizer status. No low-rank fit or convergence was verified.",
+            "evidence": [
+              {
+                "path": "mu_method.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/mu_method.f90",
+                "sha256": "911a3800f36d5624176210a0acc5f46ba79a143866a095f284a452dba28e8da8"
+              },
+              {
+                "path": "update_h.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/update_h.f90",
+                "sha256": "6de2177b2bbc9ad7639543d96c7f269e63b3065de50fcd15d28a09234cc51ac0"
+              },
+              {
+                "path": "update_w.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/update_w.f90",
+                "sha256": "5b587edf09a315aedcbc041b0656ea4957dd8478aac32ae25aa3a78d09538a5e"
+              },
+              {
+                "path": "random_init.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/random_init.f90",
+                "sha256": "d7877c569e2c664115d71e658e8f2bec65a03de754250da19130382142fc82ae"
+              },
+              {
+                "path": "init.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/init.f90",
+                "sha256": "a547769f1c1866c51cc9ab7dc3643695a8dfbfc99f59697057d95df2493446f6"
+              },
+              {
+                "path": "distance.f90",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/distance.f90",
+                "sha256": "293f086504e73399707ff0f84fc4645310c245c6c7ab2697f392fd938761a6ef"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/README.md",
+                "sha256": "bbcc4ff8967ac340e382bcfc6753bbbbbcb9a300fe60fad67cce65b338c9059b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "factoring",
+                "role": "public-entry-point",
+                "summary": "Public default-REAL function executing and printing an NMF experiment. Inputs A, rank and max_iter; return is an integer helper result, not factors or error status. The sketch uses square/full-rank dimensions solely to avoid the recorded rectangular/rank-loop mismatch.",
+                "signature": "printing_result = factoring(A, rank, max_iter)",
+                "declarations": [
+                  {
+                    "path": "mu_method.f90",
+                    "line_start": 18,
+                    "line_end": 36
+                  }
+                ],
+                "path": "mu_method.f90",
+                "line_start": 28,
+                "line_end": 55,
+                "module": "mu_method",
+                "usage": "use mu_method, only: factoring\nreal :: a(2,2)\ninteger :: printing_result\na=reshape([1.0,2.0,3.0,4.0],[2,2])\n! Interface-only square/full-rank case; reduced-rank paths need the recorded repairs.\nprinting_result=factoring(a,2,5)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a source-inspected experiment, not a checked dimensionality-reduction example. Fix w_update loop extents, init_start_h shape and the residual diagnostic before relying on general NMF use. Initialization calls nonstandard RAND and does not expose a local RNG state. Validate nonnegative finite input, rank and independent Frobenius residual yourself; no factor-quality assertion was run."
+              },
+              {
+                "procedure": "h_update",
+                "role": "implementation-helper",
+                "path": "update_h.f90",
+                "line_start": 25,
+                "line_end": 48,
+                "module": "update_h"
+              },
+              {
+                "procedure": "w_update",
+                "role": "implementation-helper",
+                "path": "update_w.f90",
+                "line_start": 25,
+                "line_end": 47,
+                "module": "update_w"
+              },
+              {
+                "procedure": "init_start_h",
+                "role": "implementation-helper",
+                "path": "random_init.f90",
+                "line_start": 26,
+                "line_end": 33,
+                "module": "random_init"
+              },
+              {
+                "procedure": "error",
+                "role": "implementation-helper",
+                "path": "distance.f90",
+                "line_start": 18,
+                "line_end": 35,
+                "module": "distance"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "2a9c8ee7c0be355ed630d9168788608731d2b37f",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit license grant was identified in the reviewed material and no separately named LICENSE/COPYING appears in the pinned tree. Public source access is not treated as permission to redistribute.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/README.md",
+              "sha256": "bbcc4ff8967ac340e382bcfc6753bbbbbcb9a300fe60fad67cce65b338c9059b"
+            },
+            {
+              "path": "mu_method.f90",
+              "url": "https://github.com/PetchMa/non-neg_matrix_factorization/blob/2a9c8ee7c0be355ed630d9168788608731d2b37f/mu_method.f90",
+              "sha256": "911a3800f36d5624176210a0acc5f46ba79a143866a095f284a452dba28e8da8"
+            }
+          ]
         }
       },
       "imports": {}

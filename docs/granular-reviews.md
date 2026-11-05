@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 156 repositories now have 187 source-reviewed
+Reviewed on 2026-11-05. 164 repositories now have 198 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-150 repository cards now identify public routines and link their usage lines
+158 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Six further cards (DDFSA, CWT, polyfit, StatTools, GridSearch and
 PSOclassicG) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 156 independently source-reviewed repositories now have an
+separately. All 164 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -180,6 +180,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | l-bfgs-b_wrapper_f90 | `LBFGSB_module::lbfgsb` (objective/gradient/observer callbacks) | BSD core notice; wrapper grant unresolved |
 | osqp-fortran | `OSQP::OSQP_settings`, `::OSQP_solve`, `::OSQP_cleanup` | No wrapper license grant identified |
 | quadprog | `quad_prog::quadprog` (Fortran generic) | GPL v3 root; GPL-2.0-or-later core notices |
+| SHEPPACK | `QSHEP2D_MOD::QSHEP2`, `::QS2VAL`, `::QS2GRD` | ACM Software License Agreement |
+| numfort (richardfoltyn) | `numfort_optimize_brent_real64::root_brentq` | LGPL v3 root; bundled notices separate |
+| tensor_tools | `libtt_products::doubleContract` (3x3 scalar), `::dyad` | LGPL v2.1 text; version choice unresolved |
+| Non-Neg_Matrix_Factorization | `mu_method::factoring` (printing experiment) | No license grant identified |
+| lin_alg | External `CHOLESKY`, `GS` (educational routines) | All rights reserved; no reuse grant identified |
+| pcgcoarray | `modcoarraysolver::cg%solve` | MIT; dependencies separate |
+| libid | External `iddr_qrpiv`, `iddr_id` | BSD-3-Clause |
+| maria-fortran | `maria_lr_tsvd_mod::dgersvd1` | MIT; backends separate |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -355,6 +363,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [l-bfgs-b_wrapper_f90](https://github.com/snljty/l-bfgs-b_wrapper_f90) | G1b1b; G2h1a2 | Unbounded/box-constrained SETULB reverse-communication callback dispatch | func_tol is FACTR, max_cyc counts FG requests. Objective declaration mismatch and observer access before first evaluation recorded. Core not fully audited. |
 | [osqp-fortran](https://github.com/osqp/osqp-fortran) | G2e1 | Positive-definite convex-QP subset through one-based CSC Fortran/C setup and solve bridge | Match backend kinds/configuration; bridge temporarily mutates INTENT(IN) indices. Setup-failure and process-exit paths require repair; inspect solver info as well as status. |
 | [quadprog](https://github.com/pedro-ricardo/quadprog) | G2e1 | Row-constraint/sign conversion, bound appending and Cholesky QP setup/dispatch | Near-zero Hessian diagonals are changed, not validated. Equality-check logic can miss violations; res is criterion output, not constraint residual. |
+| [SHEPPACK](https://github.com/vtopt/sheppack) | E2b; E3a2 | Scattered quadratic Shepard setup, compact weighted evaluation and fitted-function gradient | Retain consistent setup state; setup IER and query IER differ. Scalar evaluator returns zero outside support without a status. |
+| [numfort](https://github.com/richardfoltyn/numfort) | F1b | REAL64 safeguarded secant/inverse interpolation and bisection | Residual callback is a subroutine. Invalid bracket can leave x0 undefined; inspect optional result status. Sign-product overflow/underflow not guarded. |
+| [tensor_tools](https://github.com/llamm-de/tensor_tools) | D1a4; D1b6 | Fixed-3D Frobenius inner product and vector/matrix dyadic outer products | Scalar contraction initializes output; two rank-four contraction overloads do not and are excluded from the sketch. |
+| [Non-Neg_Matrix_Factorization](https://github.com/petchma/non-neg_matrix_factorization) | K1b2a | Alternating nonnegative multiplicative least-squares approximation | W-loop and H-initializer dimensions need repair; printed Error is squared signed-residual sum. No returned factors/status or checked reduced-rank example. |
+| [lin_alg](https://github.com/Quentin-Marecat/lin_alg) | D2b1b; D5 | Lower Cholesky factor and classical Gram-Schmidt columns | Factor upper triangle undefined; disable internal full-factor check and zero after return. Normalization lacks rank guard; no solution/error status. |
+| [pcgcoarray](https://github.com/jvdp1/pcgcoarray) | D2b1b | Coarray CG recurrence, row products and synchronized reductions | Zero initial guess, binary RHS and collective participation required. Sum of local L2 norms, image-1 solution assembly, quadratic iteration scratch and eigenvalue getter finding recorded. |
+| [libid](https://github.com/fastalgorithms/libid) | D5 | Fixed-rank pivoted Householder QR and interpolative-decomposition backsolve | A overwritten with packed coefficients; preserve original selected columns. Pivot swaps differ from composed column list; validate rank and approximation independently. |
+| [maria-fortran](https://github.com/sbudzinskiy/maria-fortran) | D6 | Caller-sketched randomized SVD with QR/LQ power steps and projected SVD dispatch | Caller forms A*Omega and supplies multiplication pointers. Flat buffers, both workspace queries, kc<=min(m,n) and intermediate error handling matter. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -639,3 +655,27 @@ optimality, and criterion/objective values from independently computed feasibili
 residuals. Detailed cards retain initialization, argument-intent, optional-argument
 and reporting findings. No upstream routine, optimizer or calling sketch in this
 batch was compiled or run.
+
+## Factorization storage, approximation inputs and fitted derivatives
+
+A Cholesky factor, orthogonal basis, interpolative decomposition and approximate
+SVD expose different objects. The lin_alg card marks the assigned triangle;
+libid records packed coefficient storage and selected original columns. MARIA
+requires the caller to prepare its initial randomized sketch and its product
+callbacks. No full LAPACK/kernel audit or numerical-error certificate is inferred
+from inspecting their setup and dispatch paths.
+
+Nonnegative matrix factorization is a bilinear least-squares approximation with
+linear nonnegativity constraints, not an SVD. Its K1b2a mapping follows the
+[Netlib GAMS taxonomy](https://netlib.org/bib/gams.html), and retains the actual
+shape/update/reporting findings rather than suggesting a checked fit. The scalar
+3x3 tensor contraction and outer products have scoped mappings; problematic
+higher-rank accumulations do not inherit the scalar sketch.
+
+SHEPPACK's gradient is a derivative of an already fitted interpolant. A zero
+scalar evaluation does not distinguish no support from a successful zero;
+QS2GRD provides status-bearing evaluation. The root-finder card likewise requires
+checking status before using a potentially unassigned result. The coarray card
+states its norm/ownership/file conventions and collective requirements.
+No upstream routine, fit, root, coarray solve or calling sketch in this batch
+was compiled or run.
