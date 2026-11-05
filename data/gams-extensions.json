@@ -162,6 +162,18 @@
       "parent": "D9a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "H2a3a2": {
+      "label": "Nonautomatic",
+      "parent": "H2a3a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L6a14": {
+      "label": "Negative binomial, normal, normal order statistics",
+      "parent": "L6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 140 repositories now have 165 source-reviewed
+Reviewed on 2026-11-05. 148 repositories now have 176 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-136 repository cards now identify public routines and link their usage lines
+144 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Four further cards (DDFSA, CWT, polyfit and
 StatTools) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 140 independently source-reviewed repositories now have an
+separately. All 148 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -164,6 +164,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fortran_lsp | External legacy `NNLS` | No license grant identified in reviewed material |
 | vanhuffel | External `DTLS` | No license grant identified in reviewed material |
 | lanczos_iterator | External `rs_lanczos` (real symmetric, matrix-free) | MIT; backends separate |
+| Fortran_RNG | `xoshiro256::xoshiro256star2%random_number`, `%set_state` | MIT |
+| xoshiro-fortran | `pkg_xoshiro::typ_xoshiro256star2%random_number`, `%set_state` | No license grant identified |
+| fortran-splitmix64 | `pkg_splitmix64::splitmix64_next` (seed unchanged) | No license grant identified |
+| fortran-xorshift-64-star | `random::RandomNumberGenerator%random_uniform`, `%random_normal` | GPL v3 text; version choice unresolved |
+| ogata | External `fbt` (Fortran orders 0/1) | MIT documentation notice |
+| fftlog | External `fhti`, `fht`, `fftl` (logarithmic grids) | CC0 additions; numerical-component notices separate |
+| FortranCWT | `A19CWT::rA19CWT_zerobc` | GPL v3 text; version choice unresolved |
+| wavepack | `wavepack::wavelet` (Morlet path) | MIT root; older restrictive source notices retained |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -323,6 +331,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fortran_lsp](https://github.com/ivan-pi/fortran_lsp) | D9b1 | NNLS active/passive sets, Householder/Givens updates and triangular solve | A/b overwritten; mode=1 succeeds. Workspace/ABI checks required; simplified wrapper source includes a test main. |
 | [vanhuffel](https://github.com/ivan-pi/vanhuffel) | D9a4 | Augmented-data QR/SVD dispatch, rank adjustment and TLS solution recovery | Perturbs both A and B; not ordinary fixed-A residual minimization. Inspect IERR/IWARN and scaling; backend kernels not fully audited. |
 | [lanczos_iterator](https://github.com/lanczos-iterator/lanczos_iterator) | D4a1 | Matrix-free real-symmetric wrapper, recurrence and Ritz/residual dispatch | ADD callback semantics; variance output is a residual norm. Saved state, polishing work and absent success flag require care. |
+| [Fortran_RNG](https://github.com/vinceneede/Fortran_RNG) | L6a21 | Four-word xoshiro256 star-star output, recurrence and 52-bit real conversion | Explicit four-word seed; allocation alone does not initialize state. IEEE layout and wrapping integer arithmetic assumed. |
+| [xoshiro-fortran](https://github.com/DSCF-1224/xoshiro-fortran) | L6a21 | Scalar star-star and REAL64 submodule dispatch | Real draws advance twice, integer draws once. Seed setter silently copies only the common prefix; require four words. |
+| [fortran-splitmix64](https://github.com/DSCF-1224/fortran-splitmix64) | L6a21 | Stateless SplitMix mixing step | INTENT(IN) seed is unchanged; repeated seed repeats output. Assigning harvest to seed is not ordinary SplitMix progression. |
+| [fortran-xorshift-64-star](https://github.com/jonas-finkler/fortran-xorshift-64-star) | L6a21; L6a14 | Limb-multiplied xorshift uniform output and cached Box-Muller normals | Nonzero seed; real conversion may round to 1. Normal cache is per procedure/thread, not per object; LOG endpoint unguarded. |
+| [ogata](https://github.com/UCLA-TMD/ogata) | J; H2a3a2 | Mesh-spacing search and tabulated Bessel-zero quadrature | Fortran nu=0/1 and 1<=n<=98 only; node access precedes limit checks. No error estimate/Newton convergence flag. |
+| [fftlog](https://github.com/emsig/fftlog) | J; J1a3 | Gamma-ratio multipliers, periodic logarithmic Hankel and half-order sine/cosine transforms | In-place data; initialize workspace and retain adjusted kr. Logarithmic-grid assumptions and singular/Nyquist handling matter. |
+| [FortranCWT](https://github.com/wangyun1995/FortranCWT) | J | Real zero-boundary CBSW transform via spline coefficients and cumulative sums | Allocatable outputs use scale-first zero-based indexing; no status. Only selected A19 path reviewed. |
+| [wavepack](https://github.com/zoziha/wavepack) | J | Mean removal, FFT/daughter/inverse Morlet transform and cone of influence | Time-first output; enforce 65535 scratch bound. Mutable default controls, dependency branch and source notices recorded. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -563,3 +579,25 @@ callback semantics; its variance-named output is a residual norm. The seed
 path was followed through its downstream normalization, so the wrapper's seed
 packing is not presented as an uncorrected random-seed defect.
 No upstream routine or calling sketch in this batch was compiled or run.
+
+## Explicit random state and transform conventions
+
+A state setter is not necessarily a seeding algorithm: two xoshiro interfaces
+need all four words supplied explicitly. The SplitMix function does not modify
+its seed, and its returned mixed value is not the next additive counter state.
+The reviewed xorshift normal cache belongs to the procedure/thread rather than
+the object. These details affect reproducibility even before distributional
+quality is considered. Intended unsigned arithmetic is not assumed portable
+merely because a translation uses signed INT64 storage.
+
+Hankel and wavelet services remain under J where the taxonomy has no matching
+child; implementation names and scopes supply additional specificity. FFTLog's
+sine/cosine service does match J1a3. Ogata also matches H2a3a2 because it uses a
+callback on a semi-infinite domain with user-chosen node count, not a requested
+accuracy. The added quadrature and normal-sampling leaves follow the
+[Netlib GAMS taxonomy](https://netlib.org/bib/gams.html).
+
+Transform grids, normalization and index order must be read before comparing
+results: logarithmic periodic samples, finite uniform samples with zero-boundary
+extension, and time-first versus scale-first coefficients are different contracts.
+No generator, transform or calling sketch in this batch was compiled or run.
