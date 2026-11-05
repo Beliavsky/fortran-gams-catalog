@@ -4154,12 +4154,120 @@
             ],
             "notes": "The README documents Make and fpm builds. Classification covers the FFT library; it does not classify every bundled Forlab utility.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected complex-double FFT/IFFT bindings pad/truncate rank-one inputs, allocate work buffers, initialize CFFT1I and dispatch CFFT1F/CFFT1B. The forward wrapper multiplies the backend result by N and inverse divides by N; inspected backend documentation and radix scaling establish the normalization convention. This is a one-dimensional complex Fourier-transform mapping, not a review of convolution/filter/Hilbert or higher-dimensional methods. Backend REAL work arrays are supplied from COMPLEX buffers through implicit external interfaces, requiring ABI/build care. Positive transform lengths are required before LOG/workspace allocation. Errors are stored in IERR but not inspected or exposed. Planning/workspaces are rebuilt per call; no performance or numerical round trip was measured.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+                "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+              },
+              {
+                "path": "src/fftpack5.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+                "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+              },
+              {
+                "path": "doc/README_FFTPACK5.1",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/doc/README_FFTPACK5.1",
+                "sha256": "d02e98214e82f038be437ad443ed8dce2ce87d5ef4e07c470cea24d176862014"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fft",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected COMPLEX(KIND=8) rank-one binding returns an allocatable complex vector. Optional INTEGER(KIND=4) N pads with zeros or truncates input. Require positive lengths. Each call allocates and initializes FFTPACK workspaces; backend IERR is not propagated or checked by the wrapper.",
+                "signature": "Y = fft(X, N)",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 363,
+                    "line_end": 368
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 66,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 111,
+                    "line_end": 118
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 363,
+                "line_end": 399,
+                "module": "fftpack",
+                "usage": "use fftpack, only: fft, ifft\ncomplex(kind=8) :: x(4)\ncomplex(kind=8), allocatable :: spectrum(:), reconstructed(:)\nx = [(1d0,0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0)]\nspectrum = fft(x)\nreconstructed = ifft(spectrum)\n! Independently check maxval(abs(reconstructed-x)).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The wrapper multiplies normalized CFFT1F output by N and divides CFFT1B output by N, giving an unnormalized forward DFT and inverse scaled by 1/N. KIND=8 is the source ABI, not a portable guarantee of real64 across compilers. Scalar type-punning to REAL backend workspaces may require compatibility build options. No round trip or full radix-kernel audit was run."
+              },
+              {
+                "procedure": "ifft",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected COMPLEX(KIND=8) rank-one binding returns an allocatable complex vector. Optional INTEGER(KIND=4) N pads with zeros or truncates input. Require positive lengths. Each call allocates and initializes FFTPACK workspaces; backend IERR is not propagated or checked by the wrapper.",
+                "signature": "Y = ifft(X, N)",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 822,
+                    "line_end": 827
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 66,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 111,
+                    "line_end": 118
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 822,
+                "line_end": 858,
+                "module": "fftpack",
+                "usage": "use fftpack, only: fft, ifft\ncomplex(kind=8) :: x(4)\ncomplex(kind=8), allocatable :: spectrum(:), reconstructed(:)\nx = [(1d0,0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0)]\nspectrum = fft(x)\nreconstructed = ifft(spectrum)\n! Independently check maxval(abs(reconstructed-x)).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The wrapper multiplies normalized CFFT1F output by N and divides CFFT1B output by N, giving an unnormalized forward DFT and inverse scaled by 1/N. KIND=8 is the source ABI, not a portable guarantee of real64 across compilers. Scalar type-punning to REAL backend workspaces may require compatibility build options. No round trip or full radix-kernel audit was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Bundled FFTPACK GPL notice; wrapper terms unresolved",
+          "spdx_expression": null,
+          "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+          "reviewed_on": "2026-11-05",
+          "notes": "Bundled FFTPACK routines explicitly say GNU GPL without a version choice. The wrapper has attribution but no inspected grant, and no root license file is present in the pinned tree. Do not infer the historical upstream FFTPACK license or a single SPDX expression for this distribution.",
+          "evidence": [
+            {
+              "path": "src/fftpack5.f90",
+              "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+              "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+            },
+            {
+              "path": "src/fftpack.f90",
+              "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+              "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+            },
+            {
+              "path": "doc/README_FFTPACK5.1",
+              "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/doc/README_FFTPACK5.1",
+              "sha256": "d02e98214e82f038be437ad443ed8dce2ce87d5ef4e07c470cea24d176862014"
+            }
+          ]
         }
       },
       "imports": {}
@@ -9911,12 +10019,92 @@
             ],
             "notes": "The README identifies a translation of Garrappa MATLAB code and reference-data cases generated with the FM package. The author test corpus is not a catalog-verified driver or an independently reproduced accuracy result.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C19",
+            "level": "source-reviewed",
+            "revision": "54195cb599c9f5018a9fc912dc3fb31f5dfb2800",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MLF_GARRAPPA generic maps scalar/rank-1/rank-2/rank-3 inputs to private bindings. The inspected scalar two-parameter binding sets gamma=1 and dispatches SUB_GENMLF_MULTISHOT: alpha=beta=1 returns EXP, tiny z uses reciprocal Gamma(beta), and other cases dispatch inverse-Laplace evaluation with contour-parameter selection and residue contributions. The source review covers scalar entry/dispatch and contour evaluation structure, not every parameter-optimization, Gamma or sorting helper. Alpha must be positive. Invalid parameters print diagnostics and return without reliably defined outputs or a status code. The saved epsilon and RNG initialization are shared side effects. This is not a review of the separate derivative generic or all generalized three-parameter domains.",
+            "evidence": [
+              {
+                "path": "mod_mlf_garrappa.f90",
+                "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative/blob/54195cb599c9f5018a9fc912dc3fb31f5dfb2800/mod_mlf_garrappa.f90",
+                "sha256": "8934b4865eae2de8f98c5a44c036911a573af4ac42eebaab3e4cb49383aea733"
+              },
+              {
+                "path": "README.txt",
+                "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative/blob/54195cb599c9f5018a9fc912dc3fb31f5dfb2800/README.txt",
+                "sha256": "2694bbfa081cee3a3f869047f58136bf8f804da494b64a050e86b986f9483fbc"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mlf_garrappa",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected scalar binding uses real(kind(1d0)) ALPHA/BETA and complex(kind(1d0)) Z/result. The module keeps its RK constant private, so callers should declare a matching kind themselves. No status argument is provided.",
+                "signature": "VALUE = mlf_garrappa(ALPHA, BETA, Z)",
+                "declarations": [
+                  {
+                    "path": "mod_mlf_garrappa.f90",
+                    "line_start": 68,
+                    "line_end": 76
+                  },
+                  {
+                    "path": "mod_mlf_garrappa.f90",
+                    "line_start": 128,
+                    "line_end": 165
+                  }
+                ],
+                "path": "mod_mlf_garrappa.f90",
+                "line_start": 128,
+                "line_end": 183,
+                "module": "mod_mlf_garrappa",
+                "usage": "use mod_mlf_garrappa, only: mlf_garrappa\ninteger, parameter :: dp=kind(1.0d0)\ncomplex(dp) :: value\nvalue = mlf_garrappa(0.5_dp,1.0_dp,cmplx(-1.0_dp,0.0_dp,dp))\n! For alpha=1/2, beta=1: compare independently with exp(1)*erfc(1).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The analytic comparison is a suggested independent check, not a reported result. Validate alpha>0 before calling. MLF_SET_EPSILON changes saved module state; its requested tolerance is not a proven error bound. Three-parameter GENMLF has additional restrictions and was not exposed as a reviewed entry here."
+              },
+              {
+                "procedure": "sub_genmlf_multishot",
+                "module": "mod_mlf_garrappa",
+                "role": "implementation-helper",
+                "path": "mod_mlf_garrappa.f90",
+                "line_start": 535,
+                "line_end": 681
+              },
+              {
+                "procedure": "worksub_ltinv_multishot",
+                "module": "mod_mlf_garrappa",
+                "role": "implementation-helper",
+                "path": "mod_mlf_garrappa.f90",
+                "line_start": 685,
+                "line_end": 1008
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Author public-domain statement and citation request",
+          "spdx_expression": null,
+          "revision": "54195cb599c9f5018a9fc912dc3fb31f5dfb2800",
+          "reviewed_on": "2026-11-05",
+          "notes": "README.txt says the module is released in the public domain with permission from the MATLAB author; the source permits use/modification and asks for citations. No standardized dedication or complete inherited Gamma/component license audit was found, so no SPDX expression is asserted.",
+          "evidence": [
+            {
+              "path": "README.txt",
+              "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative/blob/54195cb599c9f5018a9fc912dc3fb31f5dfb2800/README.txt",
+              "sha256": "2694bbfa081cee3a3f869047f58136bf8f804da494b64a050e86b986f9483fbc"
+            },
+            {
+              "path": "mod_mlf_garrappa.f90",
+              "url": "https://github.com/tranqv/Mittag-Leffler-function-and-its-derivative/blob/54195cb599c9f5018a9fc912dc3fb31f5dfb2800/mod_mlf_garrappa.f90",
+              "sha256": "8934b4865eae2de8f98c5a44c036911a573af4ac42eebaab3e4cb49383aea733"
+            }
+          ]
         }
       },
       "imports": {}
@@ -11165,12 +11353,115 @@
             ],
             "notes": "Pinned module manuals document linear equations/LU and integration/first-order ODE initial-value problems. Only these documented areas are mapped; the rest of the broader library awaits review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1a1",
+            "level": "source-reviewed",
+            "revision": "f5617d7b40109a79e70a7bfa2161b701f5b541a2",
+            "reviewed_on": "2026-11-05",
+            "notes": "Public TRAPECIO/SIMPSON generics dispatch to private precision-specific functions. The reviewed DP paths sort finite bounds, repeatedly halve trapezoid spacing (SIMPSON extrapolates (4*Tnew-Told)/3), stop on absolute change below EPS and restore reversed-bound signs. This is automatic finite-interval function quadrature, not a grid-only routine or general singular/infinite-interval guarantee. EPS defaults to 1e-2 and is an absolute successive-estimate test, not a rigorous error bound. MAXITER=26 is fixed; nonconvergence prints and STOPs the host process. Equal-zero estimates can cause early acceptance; no oscillatory-integrand or floating-point edge tests were run. Other Integration module algorithms and imported Linear routines remain outside this source review.",
+            "evidence": [
+              {
+                "path": "src/int.f90",
+                "url": "https://github.com/ramos/afnl/blob/f5617d7b40109a79e70a7bfa2161b701f5b541a2/src/int.f90",
+                "sha256": "911f83b92b14b0cdec29790d66705635ba97af935547124229fed98fabe08abf"
+              },
+              {
+                "path": "src/numtypes.f90",
+                "url": "https://github.com/ramos/afnl/blob/f5617d7b40109a79e70a7bfa2161b701f5b541a2/src/numtypes.f90",
+                "sha256": "adbe293d2bc48071dc5fe8f0ad7ffff9df6e215a6fdb249e81200c02354a49fe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Trapecio",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected NumTypes::DP binding takes finite endpoints, a scalar REAL(DP) FUNC(X) callback and optional real EPS. It returns a scalar integral without status/error estimate. Negative/reversed intervals are normalized then signed on success; failure terminates with STOP.",
+                "signature": "VALUE = Trapecio(A, B, FUNC, EPS)",
+                "declarations": [
+                  {
+                    "path": "src/int.f90",
+                    "line_start": 51,
+                    "line_end": 57
+                  },
+                  {
+                    "path": "src/int.f90",
+                    "line_start": 205,
+                    "line_end": 218
+                  },
+                  {
+                    "path": "src/numtypes.f90",
+                    "line_start": 36,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/int.f90",
+                "line_start": 194,
+                "line_end": 249,
+                "module": "Integration",
+                "usage": "use NumTypes, only: dp\nuse Integration, only: Trapecio\nreal(dp) :: value\n! Supply a matching REAL(dp) callback FUNC(x), e.g. exp(x).\nvalue = Trapecio(0.0_dp,1.0_dp,func,1.0e-8_dp)\n! For exp(x), compare independently with exp(1)-1.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use positive tolerance and a well-behaved finite-interval integrand. Endpoints are evaluated; this is not the separate open/singularity-transformed API. An absolute successive-estimate change does not certify true error. Build NumTypes/Linear dependencies and the Integration module; the private *_DP specific names are not user entry points."
+              },
+              {
+                "procedure": "Simpson",
+                "role": "public-entry-point",
+                "summary": "Public generic; inspected NumTypes::DP binding takes finite endpoints, a scalar REAL(DP) FUNC(X) callback and optional real EPS. It returns a scalar integral without status/error estimate. Negative/reversed intervals are normalized then signed on success; failure terminates with STOP.",
+                "signature": "VALUE = Simpson(A, B, FUNC, EPS)",
+                "declarations": [
+                  {
+                    "path": "src/int.f90",
+                    "line_start": 51,
+                    "line_end": 57
+                  },
+                  {
+                    "path": "src/int.f90",
+                    "line_start": 264,
+                    "line_end": 277
+                  },
+                  {
+                    "path": "src/numtypes.f90",
+                    "line_start": 36,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/int.f90",
+                "line_start": 253,
+                "line_end": 313,
+                "module": "Integration",
+                "usage": "use NumTypes, only: dp\nuse Integration, only: Simpson\nreal(dp) :: value\n! Supply a matching REAL(dp) callback FUNC(x), e.g. exp(x).\nvalue = Simpson(0.0_dp,1.0_dp,func,1.0e-8_dp)\n! For exp(x), compare independently with exp(1)-1.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use positive tolerance and a well-behaved finite-interval integrand. Endpoints are evaluated; this is not the separate open/singularity-transformed API. An absolute successive-estimate change does not certify true error. Build NumTypes/Linear dependencies and the Integration module; the private *_DP specific names are not user entry points."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "f5617d7b40109a79e70a7bfa2161b701f5b541a2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The inspected modules explicitly grant GNU GPL version 2 or later, matching the supplied GPL text. Documentation and unreviewed linked components may have their own terms; this is not a full dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ramos/afnl/blob/f5617d7b40109a79e70a7bfa2161b701f5b541a2/LICENSE",
+              "sha256": "dcc100d4161cc0b7177545ab6e47216f84857cda3843847c792a25289852dcaa"
+            },
+            {
+              "path": "src/int.f90",
+              "url": "https://github.com/ramos/afnl/blob/f5617d7b40109a79e70a7bfa2161b701f5b541a2/src/int.f90",
+              "sha256": "911f83b92b14b0cdec29790d66705635ba97af935547124229fed98fabe08abf"
+            },
+            {
+              "path": "src/numtypes.f90",
+              "url": "https://github.com/ramos/afnl/blob/f5617d7b40109a79e70a7bfa2161b701f5b541a2/src/numtypes.f90",
+              "sha256": "adbe293d2bc48071dc5fe8f0ad7ffff9df6e215a6fdb249e81200c02354a49fe"
+            }
+          ]
         }
       },
       "imports": {}
@@ -12253,12 +12544,92 @@
             ],
             "notes": "The README explicitly uses a z convention with period one for theta3, unlike the NIST convention with period pi. Future comparisons must convert arguments consistently; no convention-independent identity is asserted.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C13",
+            "level": "source-reviewed",
+            "revision": "ea49a80f47de5fde413d426521a2e970f8c682c1",
+            "reviewed_on": "2026-11-05",
+            "notes": "THETA3 dispatches to a logarithmic implementation that shifts/inverts tau, reduces z, sums paired exponential terms and finally exponentiates the result. Source uses exp(i*pi*n*(tau*n+2*z)), so z has real period one, unlike conventions with period pi. Require Im(tau)>0. Invalid tau, excessive transformation/shift recursion and detected NaNs call EXIT(-1), terminating the process rather than returning status. MAXITER limits transformations/shifts, not the final series loop, whose stopping test uses floating-point stagnation. Only THETA3 and the inspected shared helper path are mapped here; the other advertised theta/log/generalized interfaces are not independently certified.",
+            "evidence": [
+              {
+                "path": "jacobitheta.f90",
+                "url": "https://github.com/fremling/jacobi-theta-function-fortran/blob/ea49a80f47de5fde413d426521a2e970f8c682c1/jacobitheta.f90",
+                "sha256": "bcad753a6fad9b777f009d2770c21c911c1dd2ae1ee13aeb3d0240c4ad504845"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/fremling/jacobi-theta-function-fortran/blob/ea49a80f47de5fde413d426521a2e970f8c682c1/README.md",
+                "sha256": "580d64e4e1737a4faea39f2c583b194c90b5e56bd4789179b1f53349d780b801"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "theta3",
+                "role": "public-entry-point",
+                "summary": "Public scalar complex function. Z, TAU and result have kind KIND((1D0,1D0)); optional integer MAXITER controls recursion limits. Use the module interface so the optional argument is passed correctly. The private logarithmic helper is not a public entry.",
+                "signature": "VALUE = theta3(Z, TAU, MAXITER)",
+                "declarations": [
+                  {
+                    "path": "jacobitheta.f90",
+                    "line_start": 12,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "jacobitheta.f90",
+                    "line_start": 62,
+                    "line_end": 68
+                  }
+                ],
+                "path": "jacobitheta.f90",
+                "line_start": 62,
+                "line_end": 68,
+                "module": "jacobitheta",
+                "usage": "use jacobitheta, only: theta3\ninteger, parameter :: dp=kind(1.0d0)\ncomplex(dp) :: value\nvalue = theta3(cmplx(0.0_dp,0.0_dp,dp), &\n               cmplx(0.0_dp,1.0_dp,dp),maxiter=1000)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite inputs and positive imaginary TAU. Validate against the period-one defining series or an independent implementation with the argument conversion handled explicitly. The routine can terminate its host process; MAXITER does not bound the inner series. C interoperability of the separate BIND(C) log entries was not reviewed."
+              },
+              {
+                "procedure": "dologtheta3",
+                "module": "jacobitheta",
+                "role": "implementation-helper",
+                "path": "jacobitheta.f90",
+                "line_start": 197,
+                "line_end": 270
+              },
+              {
+                "procedure": "calctheta3",
+                "module": "jacobitheta",
+                "role": "implementation-helper",
+                "path": "jacobitheta.f90",
+                "line_start": 328,
+                "line_end": 360
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "ea49a80f47de5fde413d426521a2e970f8c682c1",
+          "reviewed_on": "2026-11-05",
+          "notes": "No license grant was identified in the defining module/README, and the pinned tree has no separate LICENSE/COPYING file. Public availability does not itself grant redistribution rights.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/fremling/jacobi-theta-function-fortran/blob/ea49a80f47de5fde413d426521a2e970f8c682c1/README.md",
+              "sha256": "580d64e4e1737a4faea39f2c583b194c90b5e56bd4789179b1f53349d780b801"
+            },
+            {
+              "path": "jacobitheta.f90",
+              "url": "https://github.com/fremling/jacobi-theta-function-fortran/blob/ea49a80f47de5fde413d426521a2e970f8c682c1/jacobitheta.f90",
+              "sha256": "bcad753a6fad9b777f009d2770c21c911c1dd2ae1ee13aeb3d0240c4ad504845"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13246,12 +13617,81 @@
             ],
             "notes": "The README lists sums/dot products and trigonometric/logarithmic/error-function approximations. Performance and accuracy depend on routine, arguments and compiler flags; no uniform improvement over intrinsics is claimed here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C8",
+            "level": "source-reviewed",
+            "revision": "a4f93517a2c09c57b6ae74585404ae4457d16716",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public FERF generic selects elemental real32/real64 approximations to erf. Both inspected bindings compute SIGN(1-(1+0.278393*abs(x)+0.230389*x**2+0.000972*abs(x)*x**2+0.078108*x**4)**(-4),x). This is a fixed-coefficient approximation, not a high-accuracy replacement for intrinsic ERF, ERFC or scaled tails. Extra precision in the DP interface does not add coefficient accuracy. Squaring/polynomial powers can overflow for large inputs, and no exceptional-value handling, error estimate or status is provided. Only FERF, not the library reductions/logarithm/trigonometric approximations, is source reviewed; neither speed nor numerical error was measured.",
+            "evidence": [
+              {
+                "path": "src/fast_erf.f90",
+                "url": "https://github.com/jalvesz/fast_math/blob/a4f93517a2c09c57b6ae74585404ae4457d16716/src/fast_erf.f90",
+                "sha256": "d7b0e72040b69f947bc44011c00bbe3fa53feb8b9cdd1474f163393fece286f5"
+              },
+              {
+                "path": "src/fast_math.f90",
+                "url": "https://github.com/jalvesz/fast_math/blob/a4f93517a2c09c57b6ae74585404ae4457d16716/src/fast_math.f90",
+                "sha256": "4e3696a0937d02053226e0a808253f05e94ac58e264b0c669ac34a65e26d6a4e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ferf",
+                "role": "public-entry-point",
+                "summary": "Public elemental generic with real32/real64 scalar bindings, usable elementwise on conformable arrays. Import directly from fast_erf or through the fast_math facade. The specific FERF_SP/FERF_DP procedures are private.",
+                "signature": "VALUE = ferf(X)",
+                "declarations": [
+                  {
+                    "path": "src/fast_erf.f90",
+                    "line_start": 8,
+                    "line_end": 17
+                  },
+                  {
+                    "path": "src/fast_erf.f90",
+                    "line_start": 21,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "src/fast_erf.f90",
+                    "line_start": 34,
+                    "line_end": 37
+                  }
+                ],
+                "path": "src/fast_erf.f90",
+                "line_start": 12,
+                "line_end": 45,
+                "module": "fast_erf",
+                "usage": "use iso_fortran_env, only: real64\nuse fast_erf, only: ferf\nreal(real64) :: x(3), approximate(3), error(3)\nx = [-1.0_real64,0.0_real64,1.0_real64]\napproximate = ferf(x)\nerror = approximate-erf(x)\n! Inspect ERROR against application tolerances; no bound is asserted.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The intrinsic comparison is a proposed validation step, not executed evidence. Use representative finite inputs; do not assume safe behavior for extreme magnitudes or IEEE exceptions. The public interface offers precision variants of the same low-degree formula, not separately optimized machine-precision algorithms."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "a4f93517a2c09c57b6ae74585404ae4457d16716",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root MIT notice and the defining module SPDX-License-Identifier: MIT agree. This review does not audit every included vendor-specific helper or dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/jalvesz/fast_math/blob/a4f93517a2c09c57b6ae74585404ae4457d16716/LICENSE.md",
+              "sha256": "2a501d28b26403a73bb098c276039c1cda1c5a803d2999620d2627f339b982b1"
+            },
+            {
+              "path": "src/fast_erf.f90",
+              "url": "https://github.com/jalvesz/fast_math/blob/a4f93517a2c09c57b6ae74585404ae4457d16716/src/fast_erf.f90",
+              "sha256": "d7b0e72040b69f947bc44011c00bbe3fa53feb8b9cdd1474f163393fece286f5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -16401,12 +16841,83 @@
             ],
             "notes": "The README identifies a translation of the Weinert smoothing algorithm. Smoothing is not exact interpolation, and claimed speed improvement is not independently benchmarked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K5",
+            "level": "source-reviewed",
+            "revision": "9878445007a84cdb69b79d3c1cdc5c5e00c23f05",
+            "reviewed_on": "2026-11-05",
+            "notes": "CSPLINE forms second differences of equally spaced observations, factors a structured smoothing system using an untruncated or truncated recurrence, reconstructs the fitted values, evaluates a GCV-style score and fills intermediate/end samples. K5 records smoothing rather than exact interpolation through the supplied data. The user supplies LAM; returning SCORE does not mean the routine automatically minimizes GCV or chooses LAM. T enters through LAM*T**3, R selects subdivision/output layout and JJ controls recurrence truncation. There are no argument checks or status output. Small N and truncated recurrence sizes can cause invalid indexing; divisions/logarithms and score trace need valid nondegenerate inputs. The source review does not establish a general admissible parameter region or numerical stability.",
+            "evidence": [
+              {
+                "path": "cspline.f90",
+                "url": "https://github.com/jamesorr/fastspline/blob/9878445007a84cdb69b79d3c1cdc5c5e00c23f05/cspline.f90",
+                "sha256": "869ed6e2807c8fd520ac2773a91ac6f506ab65ca8f55edc594ffb589e3e1b7ea"
+              },
+              {
+                "path": "testspline.f90",
+                "url": "https://github.com/jamesorr/fastspline/blob/9878445007a84cdb69b79d3c1cdc5c5e00c23f05/testspline.f90",
+                "sha256": "05e79bfcee5549c43042b5a0bd9f3bc3b0fcedb5b64263d4a49454ac5caf1438"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jamesorr/fastspline/blob/9878445007a84cdb69b79d3c1cdc5c5e00c23f05/README.md",
+                "sha256": "ec0045337d70d15fe8fe9f6b5cef52d031bf34fcc974c5a641c85df2dc426de8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cspline",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine using REAL*8. Y(N) is input, X(R*N+R-1), XONY(N) and SCORE are outputs. Fitted original-node values occupy X(R:R*N:R); other entries are intermediate samples and end extensions. This is a regular-grid routine, not an arbitrary-abscissa spline API.",
+                "signature": "CALL cspline(X, XONY, SCORE, Y, N, R, T, JJ, LAM)",
+                "declarations": [
+                  {
+                    "path": "cspline.f90",
+                    "line_start": 4,
+                    "line_end": 20
+                  }
+                ],
+                "path": "cspline.f90",
+                "line_start": 4,
+                "line_end": 301,
+                "module": "mcspline",
+                "usage": "use mcspline, only: cspline\ninteger, parameter :: n=12, r=2\nreal(kind(1d0)) :: y(n), x(r*n+r-1), fitted(n), score\ninteger :: j\ny = [(real(j,kind(1d0)),j=1,n)]\ncall cspline(x,fitted,score,y,n,r,0.1d0,6,5.8d0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch follows the author test sizes/controls and does not establish their accuracy or safety generally. REAL*8 is a compiler extension; confirm its kind matches the compiled module. Do not infer that LAM=0 is safe or that any positive N/R is accepted. Supply application-level validation and inspect finite outputs. No smoothing-parameter search was performed.",
+                "examples": [
+                  {
+                    "path": "testspline.f90",
+                    "line_start": 6,
+                    "line_end": 29
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT-form grant; copyright placeholders unresolved",
+          "spdx_expression": null,
+          "revision": "9878445007a84cdb69b79d3c1cdc5c5e00c23f05",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE.md contains the MIT permission/disclaimer text but leaves year/fullname template placeholders. The MATLAB-to-Fortran origin is documented in README; no claim is made that this notice resolves every inherited source right.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/jamesorr/fastspline/blob/9878445007a84cdb69b79d3c1cdc5c5e00c23f05/LICENSE.md",
+              "sha256": "1edd619189271dcc4bf1732b46ccd66d5d173f7e1654d0060ba66c81a684bc86"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/jamesorr/fastspline/blob/9878445007a84cdb69b79d3c1cdc5c5e00c23f05/README.md",
+              "sha256": "ec0045337d70d15fe8fe9f6b5cef52d031bf34fcc974c5a641c85df2dc426de8"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25500,12 +26011,81 @@
             ],
             "notes": "The README lists named procedures and identifies Ralph Carmichael translations of Forsythe-Malcolm-Moler code, alongside the original fixed-form source. The list supports broad divisions; local compiler claims and individual procedure behavior have not been checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "b850d06d29e348a803feaba58c0b68a8fdd5c5f1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public BRENTZERO generic selects single/double bindings. The reviewed double binding tests endpoint roots/signs, maintains a bracket, attempts secant or inverse-quadratic interpolation and falls back to bisection when acceptance conditions fail. It returns an interval-scale convergence test or exact computed zero, evaluation count and explicit error code. The routine is for one continuous scalar equation with a sign-changing bracket, not guaranteed root enumeration, polynomial complex roots or discontinuous functions. The initial FA*FB sign test can overflow/underflow, and finite values/positive tolerances/iteration limits are not validated. No accuracy or pathological-bracket behavior was checked by execution.",
+            "evidence": [
+              {
+                "path": "fmm.f90",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/fmm.f90",
+                "sha256": "f2c3d0c63b0e126cd093df644f9720e16e50b8eb56e5219a418a5b9e4c634a10"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BrentZero",
+                "role": "public-entry-point",
+                "summary": "Public module generic; reviewed double binding uses SELECTED_REAL_KIND(10,50). Callback F(X) has a scalar real input with INTENT(IN) and scalar real result. ERRCode=0 normal, 1 iteration budget, 2 endpoints have the same sign; NEVAL counts endpoint and iteration evaluations.",
+                "signature": "CALL BrentZero(AX, BX, F, TOL, MAXITER, NEVAL, ERRCODE, XZERO, FZERO)",
+                "declarations": [
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 83,
+                    "line_end": 85
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 103,
+                    "line_end": 104
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3076,
+                    "line_end": 3095
+                  }
+                ],
+                "path": "fmm.f90",
+                "line_start": 3076,
+                "line_end": 3223,
+                "module": "ForsytheMalcolmMoler",
+                "usage": "use ForsytheMalcolmMoler, only: BrentZero\ninteger, parameter :: dp=selected_real_kind(10,50)\nreal(dp) :: root, residual\ninteger :: neval, status\n! Provide F(x)=x*x-2 with a matching REAL(dp) scalar interface.\ncall BrentZero(1.0_dp,2.0_dp,f,1.0e-10_dp,100,neval,status,root,residual)\nif (status /= 0) error stop \"BrentZero failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide the callback, finite endpoint values, a continuous bracketed problem and positive controls. Compare ROOT with sqrt(2) and independently evaluate the residual. Convergence in bracket width is not a universal residual guarantee; ERRCODE=2 returns HUGE sentinels. No other textbook solver is promoted to source-reviewed by this mapping."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; inherited numerical-source provenance recorded",
+          "spdx_expression": null,
+          "revision": "b850d06d29e348a803feaba58c0b68a8fdd5c5f1",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root MIT notice names Beliavsky (2024); the module also attributes the 1977 collection and Ralph Carmichael modernization. This scoped review does not establish that the root notice settles every original third-party routine right, so no project-wide SPDX assertion is made.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/LICENSE",
+              "sha256": "b93639315b748939fb0297bc8b476b9d5b2f860d311df0e9fe6a1122f412be7c"
+            },
+            {
+              "path": "fmm.f90",
+              "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/fmm.f90",
+              "sha256": "f2c3d0c63b0e126cd093df644f9720e16e50b8eb56e5219a418a5b9e4c634a10"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/README.md",
+              "sha256": "9c075ca9db3582d6871c897940ae656c9ac7d4a6c860889cc91f08ad464fdd76"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38835,12 +39415,83 @@
             ],
             "notes": "The README describes circular loops and straight current segments; the pinned mod_cel interface documents a complete elliptic integral and excludes zero complementary parameter. Polygon/filament approximations are not exact arbitrary finite-width conductors. Floating-point error and asymptotic-accuracy claims were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C14",
+            "level": "source-reviewed",
+            "revision": "bab71767cb166ef878002b806c8360fe21307765",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public CEL function evaluates Bulirsch complete elliptic integral cel(kc,p,a,b) using a duplication iteration, transforming the p<=0 branch before iteration. The integral definition is explicitly given in source. This mapping covers the reusable special-function routine, not the domain-specific magnetic-field APIs or a claim of all elliptic-integral forms. Source finding: the kc=0 branch tests local B before assigning B_IN, so that branch reads undefined state; the declaration already requires nonzero kc. The loop has no explicit iteration limit/status output. Positive p and nonzero kc avoid the inspected singular-branch issue; the negative-p branch is not presented as an ordinary nonsingular integral.",
+            "evidence": [
+              {
+                "path": "abscab/mod_cel.f90",
+                "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/abscab/mod_cel.f90",
+                "sha256": "3c14d5c4e63b892bd67479ca0b3fc8545bbc40c938b7d53dbfa1ac0c01ef84fb"
+              },
+              {
+                "path": "abscab/mod_kinds.f90",
+                "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/abscab/mod_kinds.f90",
+                "sha256": "a8c1277766cdf4fcc63d993d8e7d70dec9f5798b5381093caf59884f3e834724"
+              },
+              {
+                "path": "test/test_cel.f90",
+                "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/test/test_cel.f90",
+                "sha256": "e2b188850b2c9cb7cc328f3eafc87ef07c21b902d18d78cedc552086ba057440"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cel",
+                "role": "public-entry-point",
+                "summary": "Public module function returning REAL64 via wp=>mod_kinds::dp. Arguments KC_IN, P_IN, A_IN, B_IN are real(wp) scalars; no status or error bound is returned. The complementary modulus KC is not the usual elliptic parameter m.",
+                "signature": "VALUE = cel(K_C_IN, P_IN, A_IN, B_IN)",
+                "declarations": [
+                  {
+                    "path": "abscab/mod_cel.f90",
+                    "line_start": 17,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "abscab/mod_kinds.f90",
+                    "line_start": 2,
+                    "line_end": 7
+                  }
+                ],
+                "path": "abscab/mod_cel.f90",
+                "line_start": 17,
+                "line_end": 98,
+                "module": "mod_cel",
+                "usage": "use mod_kinds, only: dp\nuse mod_cel, only: cel\nreal(dp) :: value\nvalue = cel(1.0_dp,1.0_dp,1.0_dp,1.0_dp)\n! For these inputs the defining integral is pi/2.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Keep KC nonzero and use positive P for the ordinary nonsingular integral illustrated here. No result or negative-P principal-value behavior was verified. The pinned author test supplies two independent reference constants but was not run.",
+                "examples": [
+                  {
+                    "path": "test/test_cel.f90",
+                    "line_start": 5,
+                    "line_end": 33
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "bab71767cb166ef878002b806c8360fe21307765",
+          "reviewed_on": "2026-11-05",
+          "notes": "Pinned root Apache 2.0 license inspected. The scope is the repository notice; transitive/domain-specific components were not exhaustively audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jonathanschilling/abscab-fortran/blob/bab71767cb166ef878002b806c8360fe21307765/LICENSE",
+              "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+            }
+          ]
         }
       },
       "imports": {}

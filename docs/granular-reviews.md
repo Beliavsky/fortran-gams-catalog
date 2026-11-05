@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Seventy-six repositories now have ninety-five source-reviewed
+Reviewed on 2026-11-05. Eighty-four repositories now have 103 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Seventy-five repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A seventy-sixth, DDFSA, identifies the supplied
+Eighty-three repository cards now identify public routines and link their usage lines
+to pinned argument declarations. An eighty-fourth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All seventy-six independently source-reviewed repositories now have an
+separately. All eighty-four independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -99,6 +99,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | minimize | External `steepest_descent` (scalar objective/vector gradient) | MIT |
 | grid_interpolation | `interpolation::bilinear` | No license identified in reviewed material |
 | finite_difference | `dq_coeff_mod::calc_dq_coeff` (root variable-precision binding) | GPL-3.0-or-later |
+| ABSCAB Fortran | `mod_cel::cel` | Apache-2.0 |
+| Mittag-Leffler function and derivative | `mod_mlf_garrappa::mlf_garrappa` (scalar binding) | Author public-domain statement and citation request; inherited terms not fully audited |
+| Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
+| fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
+| FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings) | Bundled GPL notice without version; wrapper terms unresolved |
+| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero` | MIT root; inherited source provenance recorded separately |
+| AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
+| fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -194,6 +202,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [minimize](https://github.com/ryokbys/minimize) | G1b1b | Steepest-descent direction and line-search dispatch | Zero-gradient/zero-cost divisions and saved-array dimension reuse need attention. Other solver methods remain unreviewed. |
 | [grid_interpolation](https://github.com/ChristianSteger/grid_interpolation) | E2a | Four-weight bilinear evaluation on a uniform rectangular grid | Data layout is (NY,NX). Boundary branches fall through because CONTINUE does not skip an iteration; outside and upper-endpoint queries are unsafe. |
 | [finite_difference](https://github.com/jlr581/finite_difference) | H1 | Gaussian RBF differentiation-weight construction, LDL dispatch and adaptive precision | Root variable-precision API only. Check STAT; reject duplicate nodes/unknown tags; validate stencil accuracy. No full arithmetic/linear-kernel audit. |
+| [ABSCAB Fortran](https://github.com/jonathanschilling/abscab-fortran) | C14 | Bulirsch complete elliptic integral duplication iteration | Require nonzero complementary modulus. The zero-modulus branch tests uninitialized B. Positive P illustrated; no principal-value or domain-API certification. |
+| [Mittag-Leffler function and derivative](https://github.com/tranqv/mittag-leffler-function-and-its-derivative) | C19 | Scalar two-parameter entry, Gamma/EXP special cases and inverse-Laplace dispatch | Alpha>0; invalid input may leave output undefined. Saved tolerance/RNG side effects. Derivative and generalized-parameter APIs remain outside this review. |
+| [Jacobi theta functions](https://github.com/fremling/Jacobi-Theta-function-Fortran) | C13 | THETA3 modular transforms, argument reduction and exponential-series summation | Period-one Z convention; Im(tau)>0. EXIT terminates the process on failures; MAXITER does not bound the inner series. |
+| [fastspline](https://github.com/jamesorr/fastspline) | K5 | Structured cubic smoothing solve, trace score and output reconstruction | Regular samples; user chooses LAM. No automatic GCV minimization or input/status validation. Truncation and small-N indexing require care. |
+| [FFTPack](https://github.com/keurfonluu/FFTPack) | J1a2 | Complex-double vector wrapper planning, transform dispatch and normalization | Forward unnormalized, inverse scaled by 1/N. Positive lengths, numeric-kind/ABI compatibility required; IERR ignored and workspaces rebuilt per call. |
+| [Computer Methods for Mathematical Computations](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | F1b | Bracketed Brent root search with secant/inverse-quadratic steps and bisection | Continuous scalar problem, finite values, positive controls. Check error code; endpoint sign-product can overflow/underflow. Other textbook solvers not reviewed. |
+| [AFNL](https://github.com/ramos/afnl) | H2a1a1 | Repeated trapezoid refinement and Simpson extrapolation | Absolute successive-estimate test, default 1e-2, fixed 26 refinements. Endpoint evaluations; nonconvergence STOPs the process. Not a rigorous error bound. |
+| [fast_math](https://github.com/jalvesz/fast_math) | C8 | Fixed-coefficient elemental erf approximation | DP uses the same approximate coefficients as SP. No machine-precision/error-bound claim; extreme inputs can overflow. Other fast functions not reviewed. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
