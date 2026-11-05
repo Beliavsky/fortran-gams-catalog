@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Ninety-two repositories now have 111 source-reviewed
+Reviewed on 2026-11-05. One hundred repositories now have 119 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Ninety repository cards now identify public routines and link their usage lines
+Ninety-eight repository cards now identify public routines and link their usage lines
 to pinned argument declarations. DDFSA and CWT identify supplied program entry
 points and keep their internal/benchmark routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All ninety-two independently source-reviewed repositories now have an
+separately. All one hundred independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -115,6 +115,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | CWT | `cwt` program; contained wavelet/quadrature helpers | GPL v3 text; version choice unresolved |
 | Pade_approximants | `padem::acPade` (matrix/double-precision solve path) | MIT root; numerical dependency terms separate |
 | libcoul90 | `libcoul90::coul90` (real Coulomb path) | MIT root; inherited numerical rights not fully resolved |
+| Fortran_Davidson | `davidson_dense::generalized_eigensolver_dense` (ordinary DPR path) | Apache-2.0 |
+| qrupdate-ng | External `DQR1UP` (real rank-one QR update) | GPL-3.0-or-later |
+| PROPACK | External `DLANSVD` (nonrestarted real truncated SVD) | No grant identified in reviewed material |
+| minila | `linsys::linsol` (vector binding) | GPL v3 text; version choice unresolved |
+| Bolander linear algebra library | External `cholesky_factor` | No license identified in reviewed material |
+| fortsparse | `fortsparse_csr::csr_matvec` (real64 service) | MIT core; backend licenses separate |
+| Fortran_CSR | `csrmodule::CSRcomplex%matmul` (native fallback) | MIT |
+| Linear System Solvers | `mod_lis_linear_solver::lis_linear_solver_t%Keep_lsys_ops_and_solve` | No adapter license identified |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -226,6 +234,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [CWT](https://github.com/khaors/cwt) | J | Direct Morlet/Mexican-hat kernel sums and scalogram file output | Standalone program, not module API. Quadrature omits sample spacing; translations use indices, Morlet uses default COMPLEX, output loses phase. |
 | [Pade_approximants](https://github.com/JohanSchott/Pade_approximants) | K4 | Even-coefficient rational fit, least-squares dispatch and evaluation | Inspected solver=0, precision=64, mtr=0 only. KIND=16/build dependencies still required; diagnostics unit 90, no returned convergence status. Thiele is unimplemented. |
 | [libcoul90](https://github.com/banana-bred/libcoul90) | C12 | Real Coulomb continued fractions, order recurrences and normalization | X>1e-7, base-order-dependent zero-based output extent, IFAIL checks. Shared diagnostic modules; no Bessel/wrapper or JWKB accuracy audit. |
+| [Fortran_Davidson](https://github.com/NLeSC-JCER/Fortran_Davidson) | D4a1 | Real-symmetric projection, Ritz residuals, DPR correction and basis expansion/restart | Ordinary dense path only. Sticky convergence flags require independent final residual checks; near-zero correction denominators and basis dimensions need safeguards. |
+| [qrupdate-ng](https://github.com/mpimd-csc/qrupdate-ng) | D7 | Rank-one real QR update through rotations and retriangularization | Existing full/economy factors required; destructive U/V and workspace rules. No returned status; invalid dimensions invoke error handler. Other update variants not reviewed. |
+| [PROPACK](https://github.com/poulson/PROPACK) | D6 | Nonrestarted Lanczos bidiagonalization, projected SVD and Ritz-vector dispatch | Both A and A-transpose callbacks; substantial mode-specific workspace. K is overwritten; check INFO and residuals. COMMON statistics and dependencies remain relevant. |
+| [minila](https://github.com/ghbrown/minila) | D2a1 | Partial-pivot LU, RHS permutation and triangular substitutions | Default REAL; exact-zero singular checks. Error returns can leave the allocatable solution undefined/unallocated. Inverse and SOR not reviewed. |
+| [Bolander linear algebra library](https://github.com/bolanderc/bolander-linear-algebra-library) | D2b1b | Lower Cholesky factorization with trailing rank-one updates | ERROR output is never assigned; no positive-pivot/size/symmetry checks. Upper triangle remains original input. Factorization only, not a solve. |
+| [fortsparse](https://github.com/lazy-fortran/fortsparse) | D1b4 | Canonical real CSR validator and sparse matrix-vector sum | One-based storage, sorted distinct columns, externally checked X/Y shapes. Solver/AMG/backend claims remain documentation reviewed. |
+| [Fortran_CSR](https://github.com/cometscome/Fortran_CSR) | D1b4 | Public complex type-bound product and native CSR row loop | Preprocessing selects MKL or fallback; native fallback reviewed. Y capacity unchecked; dimension failure STOPs. NONZERO returns terminal pointer, not NNZ. |
+| [Linear System Solvers](https://github.com/M-Badri/linear_system_solvers) | D2a4 | CSR/LIS object setup and solve/result-copy dispatch | Adapter review, not a numerical-kernel audit. LIS index/ABI conventions and lifecycle required; IERR mostly ignored, RHS length not asserted. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
