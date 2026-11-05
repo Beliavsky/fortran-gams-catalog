@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Thirty-three repositories now have forty-seven source-reviewed
+Reviewed on 2026-11-04. Thirty-six repositories now have fifty source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Thirty-two repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A thirty-third, DDFSA, identifies the supplied
+Thirty-five repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A thirty-sixth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All thirty-three independently source-reviewed repositories now have an
+separately. All thirty-six independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -56,6 +56,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | libdierckx FITPACK | External `splder`, `splint` | No license identified in reviewed material |
 | ORTHPOL | External `dgauss` (rule generation from recurrence coefficients) | No license identified in reviewed material |
 | triasymq | External `triasymq` (triangle nodes and weights) | BSD-3-Clause core; modified BSD notice for some helpers |
+| NITSOL | External `nitsol` (square residual system; reviewed GMRES path) | No license identified in reviewed material |
+| JFNK-Hookstep | External `newtonhook`; state in module `newton` | GNU GPL version 3; version scope unresolved |
+| easydop853 | `easydop853_module::easydop853` | BSD-3-Clause and BSD-2-Clause component notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -108,6 +111,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [libdierckx FITPACK](https://github.com/DaanVanVugt/libdierckx) | E3a2; E3a3 | B-spline derivative coefficients/evaluation and basis-integral contraction | Caller supplies valid representation; default REAL and degree at most five. Spline calculus is not arbitrary-function differentiation/integration. |
 | [ORTHPOL](https://github.com/ivan-pi/orthpol) | H2c | Jacobi-matrix Gaussian nodes and weights from supplied recurrence coefficients | Caller supplies a valid measure and forms the weighted sum. deps controls node iteration, not integration accuracy. Other rule families not reviewed. |
 | [triasymq](https://github.com/zgimbutas/triasymq) | H2c | Tabulated D3 triangle-rule expansion and affine area scaling | Prevalidate degree 1..50 and nondegenerate vertices. Initialize node-count capacity; no public status. Tables not numerically reverified. |
+| [NITSOL](https://github.com/cmacmackin/nitsol) | F2 | Inexact Newton driver, GMRES products/corrections and residual backtracking | Small-step termination need not satisfy residual tolerance. Caller workspace, callbacks, common blocks and linked block-data defaults require care; other Krylov implementations not reviewed. |
+| [JFNK-Hookstep](https://github.com/apwillis1/JFNK-Hookstep) | F2 | Newton trust-radius trials, GMRES and SVD-regularized hookstep | Caller supplies Jacobian action and shared-state initialization. GMRES flag overwritten in Newton wrapper; zero-norm normalization guards need checking. Some failures STOP. |
+| [easydop853](https://github.com/GasinAn/easydop853) | I1a1a | Fixed-configuration wrapper and explicit adaptive DOP853 stage path | Fixed tolerances/step limit, endpoint-only output and ERROR STOP on failure. Stiffness detection does not establish stiff integration. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -222,3 +228,15 @@ FITPACK's reviewed derivative and integral routines act on an existing spline,
 so E3a2 and E3a3 describe them more precisely than general differentiation or
 integration classes. Its fitting/smoothing paths remain documentation reviewed.
 None of the upstream routines or sketches in this batch was compiled or run.
+
+## Nonlinear systems and simplified ODE integration
+
+NITSOL and JFNK-Hookstep remain in F2, which is already a leaf in this taxonomy.
+Their internal linear solves and residual minimization do not establish separate
+general least-squares/optimization APIs. The NITSOL review covers its GMRES path;
+other Krylov methods remain outside the implementation review. The hookstep
+core requires an operator callback, with finite differences supplied in the
+author template rather than automatically constructed by the core.
+The easydop853 entry records its fixed tolerances and callback object argument,
+and distinguishes stiffness detection from stiff-system capability.
+These are source reviews and uncompiled calling fragments, not checked drivers.

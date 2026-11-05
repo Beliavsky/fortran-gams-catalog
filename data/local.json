@@ -1538,12 +1538,143 @@
             ],
             "notes": "The nitsol.f interface documentation describes backtracking, GMRES/BiCGSTAB/TFQMR and analytic or finite-difference Jacobian-vector products. Only interface documentation is reviewed, not convergence behavior.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "32b2432bb3c9180fa3ac5f9183033c2778963569",
+            "reviewed_on": "2026-11-04",
+            "notes": "The reviewed NITSOL path solves a square residual system with inexact Newton steps and residual-norm backtracking. The public driver validates option selections, partitions caller workspace and dispatches to nitdrv. The inspected GMRES path uses Jacobian-vector products, modified Gram-Schmidt and Krylov corrections; nitjv chooses supplied analytic products or directional finite differences and optional right preconditioning. nitbt evaluates trial residuals and reduces the step until its decrease condition holds. F2 is the system-of-equations leaf; the internal linear solves and residual norms do not make this a general nonlinear least-squares or optimization API. BiCGSTAB/TFQMR dispatch is present, but those implementations were not reviewed. Normal termination also permits a small-step criterion without the residual reaching ftol, so independently check the returned residual. Common blocks, saved initialization and the block-data defaults require coordinated builds and do not establish thread safety. No nonlinear solve or convergence test was run.",
+            "evidence": [
+              {
+                "path": "Nitsol/nitsol.f",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitsol.f",
+                "sha256": "fde0a9333cb2bf132544c55e3d0c78991290b3626740a8f7ad1fd29437644bbc"
+              },
+              {
+                "path": "Nitsol/nitdrv.f",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitdrv.f",
+                "sha256": "0544e934c439b56c06cd59647271e151e2a5344e4b87b3fce8b48f29739fc88e"
+              },
+              {
+                "path": "Nitsol/nitjv.f",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitjv.f",
+                "sha256": "a7d15d5c34f315267f68c7d915bb840bc01ad4b261e7a6f51dc94487332c904a"
+              },
+              {
+                "path": "Nitsol/nitgm.f",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitgm.f",
+                "sha256": "927cdd2fcf7cf88bb9b7520f76c06e27bd5f139dd37e69071ac5111af5df54de"
+              },
+              {
+                "path": "Nitsol/nitbt.f",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitbt.f",
+                "sha256": "e13882ad269aa80c3ee44f17c29a09785db4e0572cb688cbf46617a39e1e778c"
+              },
+              {
+                "path": "Nitsol/nitparam.h",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitparam.h",
+                "sha256": "bf5ac8aaca3d42d264cecc6d04f0900355b20d33d64b84f90151a21f348639ff"
+              },
+              {
+                "path": "Nitsol/nitinfo.h",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitinfo.h",
+                "sha256": "337c413a281926bf20b5edb6c89168cf975909186a683e40516a13c30a53fa9e"
+              },
+              {
+                "path": "Nitsol/nitdflts.h",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitdflts.h",
+                "sha256": "0f6b82fdc63232ab8890361eecd22a95c6e5505596c22736015645bd53f73688"
+              },
+              {
+                "path": "Nitsol/nitprint.h",
+                "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitprint.h",
+                "sha256": "c5b67abc1bc5d107bbe08b105687eb990a173b5051e20098795a830ab4ff34dd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "nitsol",
+                "role": "public-entry-point",
+                "summary": "External double-precision square-system solver. x(n) is the initial guess and returned iterate; f(n,xcur,fcur,rpar,ipar,itrmf) supplies the residual. jacv supplies selected J*v or right-preconditioner actions, or may be a dummy when both are disabled. Initialize the ten-element input array, provide info(6), parameter arrays and method-sized rwork, plus BLAS-compatible dot/norm callbacks. iterm=0 may mean small step rather than small residual; rwork(1:n) holds the final residual on the normal driver path.",
+                "signature": "CALL nitsol(n, x, f, jacv, ftol, stptol, input, info, rwork, rpar, ipar, iterm, dinpr, dnorm)",
+                "declarations": [
+                  {
+                    "path": "Nitsol/nitsol.f",
+                    "line_start": 4,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "Nitsol/nitsol.f",
+                    "line_start": 42,
+                    "line_end": 80
+                  },
+                  {
+                    "path": "Nitsol/nitsol.f",
+                    "line_start": 92,
+                    "line_end": 106
+                  }
+                ],
+                "path": "Nitsol/nitsol.f",
+                "line_start": 1,
+                "line_end": 604,
+                "usage": "external :: nitsol, residual, jacobian_action\ndouble precision, external :: ddot, dnrm2\ninteger, parameter :: n=2, kd=2\ninteger :: options(10), info(6), ipar(1), iterm\ndouble precision :: x(n), work(n*(kd+5)+kd*(kd+3)), rpar(1)\noptions = 0\noptions(4) = kd\nx = [1.0d0,1.0d0]\nrpar = 0.0d0\nipar = 0\ncall nitsol(n,x,residual,jacobian_action,1.0d-8,1.0d-10, &\n            options,info,work,rpar,ipar,iterm,ddot,dnrm2)\n! Check iterm and independently inspect work(1:n).",
+                "usage_notes": "Uncompiled calling fragment for finite-difference, unpreconditioned GMRES. Supply an explicit residual implementation matching the documented callback and a linkable dummy jacobian_action (unused in these options). Link the complete NITSOL package including nitbd block data, required BLAS/LAPACK support and matching integer/double-precision ABI. GMRES workspace is n*(kd+5)+kd*(kd+3); different methods require different storage. No solution, residual or performance comparison was computed."
+              },
+              {
+                "procedure": "nitdrv",
+                "role": "implementation-helper",
+                "path": "Nitsol/nitdrv.f",
+                "line_start": 487,
+                "line_end": 644
+              },
+              {
+                "procedure": "nitjv",
+                "role": "implementation-helper",
+                "path": "Nitsol/nitjv.f",
+                "line_start": 161,
+                "line_end": 211
+              },
+              {
+                "procedure": "nitgm",
+                "role": "implementation-helper",
+                "path": "Nitsol/nitgm.f",
+                "line_start": 286,
+                "line_end": 437
+              },
+              {
+                "procedure": "nitbt",
+                "role": "implementation-helper",
+                "path": "Nitsol/nitbt.f",
+                "line_start": 123,
+                "line_end": 204
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "32b2432bb3c9180fa3ac5f9183033c2778963569",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license/copying file was identified in the pinned tree and no explicit grant was identified in the inspected ReadMe or NITSOL interface source. This is a scoped absence finding; bundled BLAS/LAPACK and example application materials have not received a complete component-license audit.",
+          "evidence": [
+            {
+              "path": "ReadMe",
+              "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/ReadMe",
+              "sha256": "ef63a67c2b97197e096650f685e0dabfd984a3a46c9ee7db5392c923b560f4ef"
+            },
+            {
+              "path": "Nitsol/nitsol.f",
+              "url": "https://github.com/cmacmackin/nitsol/blob/32b2432bb3c9180fa3ac5f9183033c2778963569/Nitsol/nitsol.f",
+              "sha256": "fde0a9333cb2bf132544c55e3d0c78991290b3626740a8f7ad1fd29437644bbc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -1583,12 +1714,123 @@
             ],
             "notes": "The README explicitly solves F(x)=0 using GMRES and a hookstep trust region. Its Lorenz example does not turn this mapping into general ODE time integration.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "8ae8c0d76e08dbbfa37258c45dd4a71406e0a896",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected external newtonhook routine solves a square residual system using a matrix-vector callback, right-preconditioned GMRES and SVD-regularized hooksteps. It compares actual residual-norm reduction with the predicted reduction and retries trust-region radii. The author example approximates J*v by directional residual differences around module state new_x/new_fx; the core itself accepts a supplied operator and does not automatically differentiate an arbitrary callback. This is F2 root finding, not a general constrained optimizer or ODE integrator. Source limitations remain: newtonhook overwrites the GMRES return flag ginfo with the input print flag info immediately after the solve, so the advertised GMRES-failure propagation is not established; GMRES normalizes residual/Arnoldi vectors without explicit zero-norm guards. Some linear-algebra failures STOP. Reusing the saved Krylov state and module-wide solution arrays requires coordinated calls. No failure, periodic orbit or nonlinear accuracy result was reproduced.",
+            "evidence": [
+              {
+                "path": "Fortran90/NewtonHook.f90",
+                "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/Fortran90/NewtonHook.f90",
+                "sha256": "463b9caceeb123e00e3d87a7640afb6f2d208ce0460dbddd47d7f18a03a93aa0"
+              },
+              {
+                "path": "Fortran90/GMRESm.f90",
+                "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/Fortran90/GMRESm.f90",
+                "sha256": "a576fe41462370f54dd64366232f910f72e8ff4f886a506602849bb2cef7212c"
+              },
+              {
+                "path": "Fortran90/newton_Lorenz.f90",
+                "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/Fortran90/newton_Lorenz.f90",
+                "sha256": "1e1c7646968ed2a4e21c35f9ecbcd823686c6664b6697710c203c966989c9e80"
+              },
+              {
+                "path": "NewtonHook.md",
+                "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/NewtonHook.md",
+                "sha256": "8d010109bc59958ff0d9cd83e4e6216a3de65a207cc18518e580afc1a128fa31"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "newtonhook",
+                "role": "public-entry-point",
+                "summary": "External routine using the separate module newton for saved state. Allocate new_x(n), new_fx(n), set new_x to the initial guess, then provide f(n,x,y), df(n,v,jv), in-place preconditioner dfp(n,v), parameterless monitor sub(), and double-precision dp(n,a,b). df must apply the Jacobian at the current shared iterate. info is both print-control input and termination output. Tolerances and trust-radius parameters are double precision; del=0 disables hooksteps.",
+                "signature": "CALL newtonhook(f, df, dfp, sub, dp, m, n, gtol, tol, del, mndl, mxdl, nits, info)",
+                "declarations": [
+                  {
+                    "path": "Fortran90/NewtonHook.f90",
+                    "line_start": 60,
+                    "line_end": 65
+                  },
+                  {
+                    "path": "Fortran90/NewtonHook.f90",
+                    "line_start": 47,
+                    "line_end": 53
+                  },
+                  {
+                    "path": "Fortran90/NewtonHook.f90",
+                    "line_start": 24,
+                    "line_end": 44
+                  }
+                ],
+                "path": "Fortran90/NewtonHook.f90",
+                "line_start": 56,
+                "line_end": 190,
+                "examples": [
+                  {
+                    "path": "Fortran90/newton_Lorenz.f90",
+                    "line_start": 57,
+                    "line_end": 87
+                  }
+                ],
+                "usage": "use newton, only: new_x, new_fx\nexternal :: newtonhook, residual, jacobian_action, precondition, monitor\ndouble precision, external :: inner_product\ninteger :: info\nallocate(new_x(2),new_fx(2))\nnew_x = [1.0d0,1.0d0]\ninfo = 0\ncall newtonhook(residual,jacobian_action,precondition,monitor,inner_product, &\n                2,2,1.0d-3,1.0d-8,1.0d0,1.0d-12,10.0d0,50,info)\n! Check info and the independently evaluated residual at new_x.",
+                "usage_notes": "Calling fragment only. Implement all callbacks; jacobian_action may use analytic products or the documented directional-difference template, precondition may be the identity and monitor may do nothing. Compile the source defining module newton before the caller and link GMRESm plus compatible LAPACK/BLAS. Choose m large enough for the Krylov solve; the author warns that restarting affects hookstep correctness. Module storage is shared. No system or claimed termination behavior was run."
+              },
+              {
+                "procedure": "gmresm",
+                "role": "implementation-evidence",
+                "path": "Fortran90/GMRESm.f90",
+                "line_start": 35,
+                "line_end": 123
+              },
+              {
+                "procedure": "hookstep",
+                "role": "implementation-evidence",
+                "path": "Fortran90/GMRESm.f90",
+                "line_start": 130,
+                "line_end": 161
+              },
+              {
+                "procedure": "multJ",
+                "role": "implementation-evidence",
+                "path": "Fortran90/newton_Lorenz.f90",
+                "line_start": 146,
+                "line_end": 174
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "8ae8c0d76e08dbbfa37258c45dd4a71406e0a896",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE contains GNU GPL version 3. No inspected project-specific notice resolves GPL-3.0-only versus GPL-3.0-or-later, so an SPDX expression is not asserted. Source headers also request citation; the numerical dependencies retain their own license terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "Fortran90/NewtonHook.f90",
+              "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/Fortran90/NewtonHook.f90",
+              "sha256": "463b9caceeb123e00e3d87a7640afb6f2d208ce0460dbddd47d7f18a03a93aa0"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/apwillis1/JFNK-Hookstep/blob/8ae8c0d76e08dbbfa37258c45dd4a71406e0a896/README.md",
+              "sha256": "5bfbbe74443636d30e5645e4902220a7a694f3eb76e6e89ac8ccd0470f43f228"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8037,12 +8279,119 @@
             ],
             "notes": "The README describes a simplification of Jacob Williams DOP853 interfaces. Users cannot set tolerances and other parameters through this simplified interface; complete configurability of the original is not claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "3749d517cddd998e5338f49208b6b10f7d12b289",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected easydop853 wrapper initializes a DOP853 object and integrates a callback-defined initial-value system. The reviewed core evaluates explicit Runge-Kutta stages, scales embedded error estimates by absolute/relative tolerances, accepts or rejects steps and clips the last step to the requested endpoint. This is a one-step nonstiff method; stiffness detection is not a stiff solver. The wrapper fixes rtol=1e-12, atol=1e-24, nmax=2250000 and nstiff=1 and requests no output callback or dense output. It converts initialization and negative integration statuses into ERROR STOP rather than exposing a recoverable flag. It returns only the final x and y and exposes none of the configurable lower-level tolerance/statistics interface through its argument list. Local error control does not certify global accuracy. Other dense-output and event modes are outside this review. No orbit, decay test or error estimate was checked by execution.",
+            "evidence": [
+              {
+                "path": "easydop853_module.f90",
+                "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/easydop853_module.f90",
+                "sha256": "311246097018ed07ad21e2e826c8a21e5beb6655b08eef7b4f94ba0b186cd8b4"
+              },
+              {
+                "path": "dop853_module.f90",
+                "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/dop853_module.f90",
+                "sha256": "419f6dcdd21bd6deee0b90221f8156489314e5d35b779788c56398b58bd5a55d"
+              },
+              {
+                "path": "dop853_constants.f90",
+                "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/dop853_constants.f90",
+                "sha256": "7693cc2a7e4d5dd2dd0e2a867463f1f5e0368181e2689ce06d4a38ebec501ae6"
+              },
+              {
+                "path": "easydop853_test.f90",
+                "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/easydop853_test.f90",
+                "sha256": "924ebd98aa44accc6d320777aec51a38c8313d1d88ed7119b492d97413ecd130"
+              },
+              {
+                "path": "fcn.f90",
+                "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/fcn.f90",
+                "sha256": "22b1ee81da0568573731caffab9c4316af5ea6aa10aff2dd497248dccc83dd2c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "easydop853",
+                "role": "public-entry-point",
+                "summary": "Module subroutine with real64 x as initial/final independent variable, real64 xend as requested endpoint, and an INOUT real64 state vector y(:). Callback fcn(me,x,y,f) must include class(dop853_class) me and assumed-shape state/derivative vectors, even if it does not use the object. Fixed tolerances cannot be changed through this interface. Failure ERROR STOPs; no idid is returned.",
+                "signature": "CALL easydop853(fcn, x, xend, y)",
+                "declarations": [
+                  {
+                    "path": "easydop853_module.f90",
+                    "line_start": 53,
+                    "line_end": 59
+                  },
+                  {
+                    "path": "dop853_module.f90",
+                    "line_start": 160,
+                    "line_end": 168
+                  }
+                ],
+                "path": "easydop853_module.f90",
+                "line_start": 49,
+                "line_end": 84,
+                "module": "easydop853_module",
+                "examples": [
+                  {
+                    "path": "easydop853_test.f90",
+                    "line_start": 9,
+                    "line_end": 22
+                  },
+                  {
+                    "path": "fcn.f90",
+                    "line_start": 1,
+                    "line_end": 20
+                  }
+                ],
+                "usage": "use easydop853_module, only: easydop853, deriv_func, wp\nprocedure(deriv_func) :: decay\nreal(wp) :: x, y(1)\nx = 0.0_wp\ny = 1.0_wp\ncall easydop853(decay,x,1.0_wp,y)",
+                "usage_notes": "Uncompiled calling fragment. Supply decay(me,x,y,f) matching deriv_func, with f=-y for the test equation; its analytic endpoint is exp(-1), but no comparison was run. Compile dop853_constants, dop853_module and easydop853_module in that order before the caller/callback. The wrapper returns only endpoint values; use the lower-level object interface if configurable tolerances, dense output, statistics or recoverable error handling are needed."
+              },
+              {
+                "procedure": "dp86co",
+                "module": "dop853_module",
+                "role": "implementation-helper",
+                "path": "dop853_module.f90",
+                "line_start": 608,
+                "line_end": 709
+              },
+              {
+                "procedure": "deriv_func",
+                "module": "dop853_module",
+                "role": "callback",
+                "path": "dop853_module.f90",
+                "line_start": 160,
+                "line_end": 168
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause wrapper/modernization and BSD-2-Clause original",
+          "spdx_expression": "BSD-3-Clause AND BSD-2-Clause",
+          "revision": "3749d517cddd998e5338f49208b6b10f7d12b289",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned LICENSE reproduces three-clause BSD notices for Jiachen An and Jacob Williams and the two-clause BSD notice for Ernst Hairer. These component notices are retained rather than presenting only the wrapper copyright. The source also reproduces the wrapper notice.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/LICENSE",
+              "sha256": "918b9a6af63c29af81ffd7694ed045026ef17b00505fbe9df6017dbbcb41feb4"
+            },
+            {
+              "path": "easydop853_module.f90",
+              "url": "https://github.com/GasinAn/easydop853/blob/3749d517cddd998e5338f49208b6b10f7d12b289/easydop853_module.f90",
+              "sha256": "311246097018ed07ad21e2e826c8a21e5beb6655b08eef7b4f94ba0b186cd8b4"
+            }
+          ]
         }
       },
       "imports": {}
