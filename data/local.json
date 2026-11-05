@@ -19445,12 +19445,85 @@
             ],
             "notes": "The README explicitly disclaims guaranteed global optimization. It documents parallel box-bounded local searches and returning the best solution found, rather than a proof of global optimality.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "c8460193927f74e93703e0c270e2533a08de8dbc",
+            "reviewed_on": "2026-11-05",
+            "notes": "HYPERBOB launches one bound-constrained BOBYQA local search per MPI rank from a common-seed random Latin hypercube, collects objective values, and broadcasts the best computed point. This is heuristic multistart global minimization, not certified coverage or a proof of global optimality. MPI_INIT and collective HYPERBOB_INITIALIZE precede use; HYPERBOB_CLEANUP releases module arrays. Every rank must use matching dimensions, seed and bounds. RHOBMIN/RHOEMAX and SEED are mutable. MAXTIME is explicitly not implemented; ERR only checks allocated row capacity and is not BOBYQA convergence or an MPI success report. The MPI_GATHER receive section can be noncontiguous when NROWS>NX; use NROWS=NX in the sketch pending validation of compiler packing and MPI-buffer behavior. Review covers wrapper selection/communication and callback contracts, not every BOBYQA or Latin-sampling kernel.",
+            "evidence": [
+              {
+                "path": "src/hyperBOB_V1.4.f90",
+                "url": "https://github.com/maxEntropyProd/hyperBOB/blob/c8460193927f74e93703e0c270e2533a08de8dbc/src/hyperBOB_V1.4.f90",
+                "sha256": "2d9153448d2ab25bd6220149126be9a0352397158b3ebb4131ca3078e0f2ee75"
+              },
+              {
+                "path": "src/README.md",
+                "url": "https://github.com/maxEntropyProd/hyperBOB/blob/c8460193927f74e93703e0c270e2533a08de8dbc/src/README.md",
+                "sha256": "dcf92eba9804b4fc681762d26c0e009573968387cd64ee939ed7f23d882648de"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hyperBOB",
+                "role": "public-entry-point",
+                "summary": "Public collective module multistart wrapper; callback X is assumed-shape, not explicit X(N).",
+                "signature": "CALL hyperBOB(NX,NPT,X,XL,XU,RHOBMIN,RHOEMAX,IPRINT,MAXFUN,MAXTIME,CALFUN,SEED,FMIN,ERR)",
+                "declarations": [
+                  {
+                    "path": "src/hyperBOB_V1.4.f90",
+                    "line_start": 26,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/hyperBOB_V1.4.f90",
+                    "line_start": 60,
+                    "line_end": 76
+                  }
+                ],
+                "path": "src/hyperBOB_V1.4.f90",
+                "line_start": 60,
+                "line_end": 140,
+                "module": "hyperBOB_module",
+                "usage": "use mpi\nuse hyperBOB_module\ninteger :: ierr,seed,err\nreal(wp) :: x(2),lo(2),hi(2),rhob,rhoe,fmin\ncall MPI_Init(ierr)\ncall hyperBOB_initialize(2)\nlo=-2.0_wp; hi=2.0_wp; seed=12345\nrhob=0.5_wp; rhoe=1.e-6_wp\n! Supply CALFUN(N,X(:),F), with X assumed-shape and REAL(wp) throughout.\ncall hyperBOB(2,5,x,lo,hi,rhob,rhoe,0,1000,0.0_wp,calfun,seed,fmin,err)\ncall hyperBOB_cleanUp()\ncall MPI_Finalize(ierr)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback body omitted. Use matching MPI_DOUBLE_PRECISION/wp ABI and collective execution on MPI_COMM_WORLD. MAXTIME does not enforce a limit; independently check returned objective and local termination. No global search, communication or padded-storage case was run."
+              },
+              {
+                "procedure": "hyperBOB_initialize",
+                "role": "implementation-helper",
+                "path": "src/hyperBOB_V1.4.f90",
+                "line_start": 38,
+                "line_end": 49
+              },
+              {
+                "procedure": "hyperBOB_cleanUp",
+                "role": "implementation-helper",
+                "path": "src/hyperBOB_V1.4.f90",
+                "line_start": 51,
+                "line_end": 58
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; numerical dependencies separate",
+          "spdx_expression": "MIT",
+          "revision": "c8460193927f74e93703e0c270e2533a08de8dbc",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms for the wrapper project. The copied BOBYQA and Latin-sampling source and MPI build dependencies need their component notices; this does not audit every included numerical routine.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/maxEntropyProd/hyperBOB/blob/c8460193927f74e93703e0c270e2533a08de8dbc/LICENSE",
+              "sha256": "8beadd8635fd4b1d8c0e3ba2a06c50cd2bfb948ecd36415d7e7db0cc0d0ef282"
+            }
+          ]
         }
       },
       "imports": {}
@@ -20655,12 +20728,132 @@
             ],
             "notes": "The README documents forward/backward expansion and OpenMP stack settings and notes platform limitations for large transforms on macOS. Scaling and transform accuracy remain unverified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C9",
+            "level": "source-reviewed",
+            "revision": "270c400cee0a215b6040a1e1890ed9bf41b5fd5f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external C-binding POLYNOMIAL routine evaluates normalized real Legendre polynomials at colatitudes Y using a three-term recurrence. Its zeroth polynomial is 1/sqrt(2), so this is not the unnormalized P_l(cos(theta)) convention. UP advances degree with normalization factors; L_TARGET must be nonnegative and JX positive. The function accepts an array of angles, not arbitrary complex arguments or an associated order. The separate associated-function source supplies normalized recurrences for transform work but is not substituted for this public evaluation interface. Review covers the polynomial recurrence and output initialization, not high-degree stability, orthogonality or a quadrature error guarantee.",
+            "evidence": [
+              {
+                "path": "sht/legendre_polynomial.f90",
+                "url": "https://github.com/hottahd/sht_py/blob/270c400cee0a215b6040a1e1890ed9bf41b5fd5f/sht/legendre_polynomial.f90",
+                "sha256": "9bec162b8f7b214357719c2a81d7daf1e6fe9edb139a543435e5ef110c7c17b7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "polynomial",
+                "role": "public-entry-point",
+                "summary": "External BIND(C) polynomial evaluator; import an explicit matching interface for a Fortran call.",
+                "signature": "CALL polynomial(Y,JX,L_TARGET,PM)",
+                "declarations": [
+                  {
+                    "path": "sht/legendre_polynomial.f90",
+                    "line_start": 24,
+                    "line_end": 34
+                  }
+                ],
+                "path": "sht/legendre_polynomial.f90",
+                "line_start": 24,
+                "line_end": 57,
+                "usage": "use iso_c_binding, only: c_int,c_double\ninterface\n subroutine polynomial(y,jx,l_target,pm) bind(C)\n  import c_int,c_double\n  integer(c_int),intent(in) :: jx,l_target\n  real(c_double),intent(in) :: y(0:jx-1)\n  real(c_double),intent(out) :: pm(0:jx-1)\n end subroutine\nend interface\nreal(c_double) :: y(0:2),p(0:2)\ny=[0._c_double,acos(-1._c_double)/2,acos(-1._c_double)]\ncall polynomial(y,3_c_int,2_c_int,p)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The source uses default INTEGER/DOUBLE PRECISION rather than ISO_C_BINDING named kinds; confirm they match C_INT/C_DOUBLE in the chosen build. Compile the polynomial source and its UP helper. No normalized values, recurrence stability or angle-domain case was checked."
+              },
+              {
+                "procedure": "up",
+                "role": "implementation-helper",
+                "path": "sht/legendre_polynomial.f90",
+                "line_start": 1,
+                "line_end": 21
+              }
+            ]
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "270c400cee0a215b6040a1e1890ed9bf41b5fd5f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The associated-function FORWARD/BACKWARD C-binding entries perform discrete associated-Legendre analysis/synthesis of longitude-Fourier coefficient columns. FORWARD applies sin(theta)*delta-theta weights on uniformly spaced colatitudes and accumulates normalized recurrence products; BACKWARD reconstructs from triangular degree/order coefficients. This is the Legendre integral-transform stage, not the Python FFT longitude stage or an exact Gauss-Legendre quadrature. N selects the order spacing via MOD(m,N); require N>=1, even positive KX and enough latitude points per OpenMP partition. INIT_GEOMETRY reads local Y(1), so fewer than two points in a thread partition is unsafe. Both this file and legendre_polynomial.f90 define C symbols FORWARD/BACKWARD, so link/load them separately as in the project rather than combining both implementations into one library. Review covers transform interfaces, recurrences and accumulation, not inversion accuracy or parallel scaling.",
+            "evidence": [
+              {
+                "path": "sht/legendre_associated_function.f90",
+                "url": "https://github.com/hottahd/sht_py/blob/270c400cee0a215b6040a1e1890ed9bf41b5fd5f/sht/legendre_associated_function.f90",
+                "sha256": "6c5de9b7357cf1457401e27264abb52664e80c5344f5f781db72a28d0bebefc2"
+              },
+              {
+                "path": "sht/sht_py.py",
+                "url": "https://github.com/hottahd/sht_py/blob/270c400cee0a215b6040a1e1890ed9bf41b5fd5f/sht/sht_py.py",
+                "sha256": "6672c18025f3346e0d6486e9393e31328aa78c7f18521bb2b8b4ed7a191d7926"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "forward",
+                "role": "public-entry-point",
+                "summary": "External C-binding complex coefficient analysis; the source requires a matching explicit interface and OpenMP runtime.",
+                "signature": "CALL forward(N,QQG,YG,JXG,KX,FQQ)",
+                "declarations": [
+                  {
+                    "path": "sht/legendre_associated_function.f90",
+                    "line_start": 96,
+                    "line_end": 109
+                  }
+                ],
+                "path": "sht/legendre_associated_function.f90",
+                "line_start": 96,
+                "line_end": 109,
+                "usage": "use iso_c_binding, only: c_int,c_double,c_double_complex\ninterface\n subroutine forward(n,q,y,jx,kx,f) bind(C)\n  import c_int,c_double,c_double_complex\n  integer(c_int),intent(in) :: n,jx,kx\n  real(c_double),intent(in) :: y(0:jx-1)\n  complex(c_double_complex),intent(in) :: q(0:jx-1,0:kx/2)\n  complex(c_double_complex),intent(out) :: f(0:n*kx/2,0:kx/2)\n end subroutine\nend interface\n! Prepare uniformly spaced colatitudes Y and longitude-Fourier coefficients Q.\n! Set OpenMP threads so every local latitude block has at least two points.\ncall forward(1_c_int,q,y,jx,kx,f)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation transform fragment. Match default INTEGER/DOUBLE COMPLEX to C kinds for the chosen compiler and link only the associated-function FORWARD implementation. Numerical quadrature/normalization and repeated forward/backward accuracy need independent checks; no transform or thread layout was executed."
+              },
+              {
+                "procedure": "init_geometry",
+                "role": "implementation-helper",
+                "path": "sht/legendre_associated_function.f90",
+                "line_start": 32,
+                "line_end": 50
+              },
+              {
+                "procedure": "m_up",
+                "role": "implementation-helper",
+                "path": "sht/legendre_associated_function.f90",
+                "line_start": 53,
+                "line_end": 74
+              },
+              {
+                "procedure": "l_up",
+                "role": "implementation-helper",
+                "path": "sht/legendre_associated_function.f90",
+                "line_start": 78,
+                "line_end": 92
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license text",
+          "spdx_expression": null,
+          "revision": "270c400cee0a215b6040a1e1890ed9bf41b5fd5f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root contains GPL version 3 text. This scoped finding does not infer an or-later clause or clear separately linked OpenMP/FFT dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/hottahd/sht_py/blob/270c400cee0a215b6040a1e1890ed9bf41b5fd5f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/hottahd/sht_py/blob/270c400cee0a215b6040a1e1890ed9bf41b5fd5f/README.md",
+              "sha256": "d5cbd747ed2287bb84d5f15972c303b284fc671ce41d1fd9b6547320774cd4ad"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24256,12 +24449,120 @@
             ],
             "notes": "The README architecture diagrams separate user equations/boundaries, semidiscretization and DASSL integration. The entry does not imply that arbitrary PDEs are solved without user callbacks or an appropriate time integrator.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2a1a",
+            "level": "source-reviewed",
+            "revision": "732a4ad1880efce2c3f541e10ce73e6608a25c33",
+            "reviewed_on": "2026-11-05",
+            "notes": "PDECHEB semidiscretizes mixed one-space-dimensional parabolic PDE/ODE systems by C0 Chebyshev generalized collocation. INICHB initializes element/grid/workspace COMMON state and initial values through CSET/UVINIT. PDECHB builds the implicit ODE residual by element differentiation, flux/boundary assembly through CRES/DRES and optional coupling through SODEFN. Time integration is delegated to DASSL; PDECHB alone does not advance time. User routines SPDEFN, SBNDR, UVINIT and compatible optional coupled-ODE definitions are required. NPTS=NEL*NPOLY+1 and NEQN=NPDE*NPTS+NV; workspace lengths depend on polynomial degree/elements/coupling. ITIME=-1 signals setup failure and IRES communicates residual rejection/termination to DASSL. Shared saved COMMON blocks preclude assuming independent concurrent contexts. Review covers initialization, residual assembly and an author call sequence, not spatial convergence, temporal integration or every supported coordinate/coupling variant.",
+            "evidence": [
+              {
+                "path": "pdecheb/pdechb.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/pdecheb/pdechb.f",
+                "sha256": "847b0d095aa2942ad053b42fb00987a21345e996a6c8c870897012ea401daee3"
+              },
+              {
+                "path": "pdecheb/inichb.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/pdecheb/inichb.f",
+                "sha256": "6ec3470157f2f226d421d87ca7d8624a34e3991abb066e0968fb65c3454e6d9f"
+              },
+              {
+                "path": "pdecheb/cres.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/pdecheb/cres.f",
+                "sha256": "3fb9749d80b2721994ecf2ef90843d4b56d2a209d03a3baa5b70df66f9a68849"
+              },
+              {
+                "path": "pdecheb/dres.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/pdecheb/dres.f",
+                "sha256": "1ea0463f2f427d092889729657a0fb2ad86e5636e790fb4f9f67b89e37b1ca20"
+              },
+              {
+                "path": "pdecheb/cset.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/pdecheb/cset.f",
+                "sha256": "1426187769c83c5b4610652b730df598ad1c846085b53deed450108251d0517b"
+              },
+              {
+                "path": "examples/example1.f",
+                "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/examples/example1.f",
+                "sha256": "725c0e2d94145d696f215facbbe4469befedd3ff23a8f1fe982111c292b5a929"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "INICHB",
+                "role": "public-entry-point",
+                "summary": "External collocation setup driver; IWK here is the scalar real-workspace length.",
+                "signature": "CALL INICHB(NEQN,NPDE,NPTS,X,U,WK,IWK,M,TS,IBAND,ITIME,XBK,IBK,NEL,NPOLY,NV,NXI,XI,IDEV)",
+                "declarations": [
+                  {
+                    "path": "pdecheb/inichb.f",
+                    "line_start": 143,
+                    "line_end": 148
+                  }
+                ],
+                "path": "pdecheb/inichb.f",
+                "line_start": 1,
+                "line_end": 2,
+                "usage": "external :: INICHB,PDECHB\n! Supply user PDE/boundary/initial-condition callbacks and sized arrays.\n! XBK(IBK), IBK=NEL+1; NPTS=NEL*NPOLY+1; U has NPDE*NPTS+NV entries.\nitime=1\ncall INICHB(neqn,npde,npts,x,u,wk,lwk,m,t,iband,itime,xbk,ibk,nel,npoly,nv,nxi,xi,6)\nif(itime==-1) error stop \"PDECHEB setup failed\"\n! A compatible DASSL call uses PDECHB as its residual callback.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation setup fragment. Follow the author example for problem-specific workspace formulas, consistent initial derivatives and DASSL controls; this does not include a time integrator or PDE callback bodies. No mesh, residual or trajectory was tested."
+              },
+              {
+                "procedure": "PDECHB",
+                "role": "public-entry-point",
+                "summary": "External DASSL-compatible implicit residual callback using initialized saved COMMON/workspace state.",
+                "signature": "CALL PDECHB(T,U,UDOT,RESD,IRES,WK,IWK)",
+                "declarations": [
+                  {
+                    "path": "pdecheb/pdechb.f",
+                    "line_start": 24,
+                    "line_end": 29
+                  }
+                ],
+                "path": "pdecheb/pdechb.f",
+                "line_start": 1,
+                "line_end": 29,
+                "usage": "! After successful INICHB and preparation of a consistent U/UDOT pair:\ncall PDECHB(t,u,udot,residual,ires,wk,iwork)\n! IWORK here is an integer array, unlike INICHB scalar IWK length.\n! Pass residual acceptance/failure state back through the DASSL protocol.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Residual-evaluation fragment only. It does not integrate the PDE or establish consistency; preserve the initialization work and compatible shared context. No residual norm or time step was checked."
+              },
+              {
+                "procedure": "CRES",
+                "role": "implementation-helper",
+                "path": "pdecheb/cres.f",
+                "line_start": 1,
+                "line_end": 148
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Original author rights retained; no standalone grant identified",
+          "spdx_expression": null,
+          "revision": "732a4ad1880efce2c3f541e10ce73e6608a25c33",
+          "reviewed_on": "2026-11-05",
+          "notes": "The archived algorithm header credits Martin Berzins and states ALL RIGHTS RETAINED. No standalone LICENSE/COPYING appears in the pinned tree and no redistribution grant was identified in the reviewed README files. Algorithm/public-source availability alone is not a permissive license finding.",
+          "evidence": [
+            {
+              "path": "acm-toms-690.f",
+              "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/acm-toms-690.f",
+              "sha256": "18965b14493e56956ce00d2c87d1bc0c493dbe98753d182f64ddaef1e799c878"
+            },
+            {
+              "path": "readme.txt",
+              "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/readme.txt",
+              "sha256": "53cff6cfabbb7228640ac35c78f1ebacfcbfe0947ab2f99b4fad766e5c2934a1"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ivan-pi/pdecheb/blob/732a4ad1880efce2c3f541e10ce73e6608a25c33/README.md",
+              "sha256": "c0e5d820260150bc0f0ab7c2c7eee7bf7d02b56861508cc68061d97f4916251e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30054,12 +30355,104 @@
             ],
             "notes": "DESCRIPTION documents applied econometric tests. Critical-value approximations, test assumptions and behavior under particular data-generating processes remain unchecked here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "93e7fb6bea1673925b34f0aba1a654011acff74a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external DDNOR routine evaluates the standard normal cumulative distribution via Cody-style piecewise rational error/complementary-error approximations. It uses symmetry and separate small/intermediate/large transformed-argument branches. The input is clipped internally to [-16,16], and positive-tail probabilities can round to one; this is not a survival-function API preserving arbitrary extreme-tail relative accuracy. No input argument is overwritten and no error/status output is supplied. Accuracy claims in inherited comments were not adopted as verified results. This selected distribution-function mapping does not imply every urca test or response-surface coefficient table was source reviewed.",
+            "evidence": [
+              {
+                "path": "src/UnitRootMacKinnon.f",
+                "url": "https://github.com/cran/urca/blob/93e7fb6bea1673925b34f0aba1a654011acff74a/src/UnitRootMacKinnon.f",
+                "sha256": "a1852e05753e4f18757b250e924bdc25049d266806fcef204cdaf4e053675f44"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ddnor",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) standard-normal CDF subroutine with one scalar output.",
+                "signature": "CALL ddnor(YSTAR,GAUSS)",
+                "declarations": [
+                  {
+                    "path": "src/UnitRootMacKinnon.f",
+                    "line_start": 547,
+                    "line_end": 560
+                  }
+                ],
+                "path": "src/UnitRootMacKinnon.f",
+                "line_start": 547,
+                "line_end": 669,
+                "usage": "external :: ddnor\nreal(8) :: x,p\nx=1.0d0\ncall ddnor(x,p)\n! P approximates Pr(Z<=X) for standard normal Z; no separate upper-tail result.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile/link the containing source with its required R print/exit support or provide a properly scoped standalone extraction consistent with licensing. Match REAL(8) to the expected double kind. No CDF values, tails or accuracy claim were tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a2n",
+            "level": "source-reviewed",
+            "revision": "93e7fb6bea1673925b34f0aba1a654011acff74a",
+            "reviewed_on": "2026-11-05",
+            "notes": "INNORZ estimates a standard normal quantile using an Abramowitz-Stegun-style initial approximation, a second approximation-based correction, then a CDF/density Newton correction through DDNOR. Use strictly interior probabilities: the input check rejects values outside [0,1] but permits endpoints whose later 1/PR**2 and logarithms are singular. Extreme interior probabilities can still overflow or lose accuracy through complementary-CDF cancellation and density division. Invalid input uses R REALPR/REXIT rather than a recoverable Fortran status. The result is a scalar quantile, not a random draw or normal order-statistic sample. Review covers approximation/correction flow and domain hazards, not validated tail accuracy.",
+            "evidence": [
+              {
+                "path": "src/UnitRootMacKinnon.f",
+                "url": "https://github.com/cran/urca/blob/93e7fb6bea1673925b34f0aba1a654011acff74a/src/UnitRootMacKinnon.f",
+                "sha256": "a1852e05753e4f18757b250e924bdc25049d266806fcef204cdaf4e053675f44"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "innorz",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) normal inverse-CDF subroutine with R error-path dependencies.",
+                "signature": "CALL innorz(PROB,ANORM)",
+                "declarations": [
+                  {
+                    "path": "src/UnitRootMacKinnon.f",
+                    "line_start": 675,
+                    "line_end": 696
+                  }
+                ],
+                "path": "src/UnitRootMacKinnon.f",
+                "line_start": 675,
+                "line_end": 716,
+                "usage": "external :: innorz\nreal(8) :: p,z\np=0.975d0\nif(p<=0d0.or.p>=1d0) error stop \"probability must be strictly interior\"\ncall innorz(p,z)\n! Compare Z and its independently evaluated normal CDF with the requested P.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use moderate interior probabilities and resolve R error-support linkage. Endpoints are unsafe despite passing the routine range check, and no INFO output reports numerical failure. No quantile, round trip or extreme-tail behavior was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later package; MacKinnon permission record",
+          "spdx_expression": null,
+          "revision": "93e7fb6bea1673925b34f0aba1a654011acff74a",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>=2). The legacy source retains older noncommercial/incorporation restrictions, while the included 2008 permission correspondence agrees to use in the GPL R package subject to working code and appropriate citations. Preserve both provenance and the specific package permission; do not treat the older header alone as the current complete package license or infer unrestricted reuse of an unrelated original distribution.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/urca/blob/93e7fb6bea1673925b34f0aba1a654011acff74a/DESCRIPTION",
+              "sha256": "a171b7bdbc598723903a171b60ddd24e8fe3439846707a73dd7d7b3744d62f2b"
+            },
+            {
+              "path": "inst/Licenses/MacKinnonLicense.txt",
+              "url": "https://github.com/cran/urca/blob/93e7fb6bea1673925b34f0aba1a654011acff74a/inst/Licenses/MacKinnonLicense.txt",
+              "sha256": "d564442837c340bda0785d9b25e7db91c55b744241dd14aa6567da96da56c1c9"
+            },
+            {
+              "path": "src/UnitRootMacKinnon.f",
+              "url": "https://github.com/cran/urca/blob/93e7fb6bea1673925b34f0aba1a654011acff74a/src/UnitRootMacKinnon.f",
+              "sha256": "a1852e05753e4f18757b250e924bdc25049d266806fcef204cdaf4e053675f44"
+            }
+          ]
         }
       },
       "imports": {}
@@ -33180,12 +33573,138 @@
             ],
             "notes": "The README is only a title. Evidence is supplemented by the LinAlgLib public interface, including real/complex vector and matrix operations, symmetric/Hermitian eigensolver objects and SVD; interface review is not numerical implementation validation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public DSINGULARVALUEDECOMPOSITION type wraps real DGESVD after copying the input DMat into a temporary. INIT allocates thin U(M,MIN(M,N)), Sigma(MIN(M,N)) and V(MIN(M,N),N); despite its name V stores LAPACK V-transpose, as confirmed by the author reconstruction U*Sigma*V. Both query and compute calls use JOBU=JOBVT=S. LAPACK INFO is local and never returned or acted on, so a completed method call is not a convergence certificate. Match type bookkeeping N_ROW/N_COL to allocated M storage and initialize before use. This mapping covers the wrapper and author call pattern, not additional review of LAPACK kernels or validated singular values.",
+            "evidence": [
+              {
+                "path": "src/LinAlgLib.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/src/LinAlgLib.f90",
+                "sha256": "cc8430a6303df1928842e34bf978f30650197c24e2828894881468e71df971a1"
+              },
+              {
+                "path": "src/MatrixDouble.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/src/MatrixDouble.f90",
+                "sha256": "51a8311cb0ddf61b8d5671254fdc56ba377a6e045c6986ea20e3e182e318b074"
+              },
+              {
+                "path": "test/test_DSVD.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/test/test_DSVD.f90",
+                "sha256": "5d777d601a59d6494166f8a419ad205f4f62903f510dfbb59ff609b6a58b3c66"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SVD",
+                "role": "public-entry-point",
+                "summary": "Public type-bound thin real SVD wrapper; no user-visible INFO.",
+                "signature": "CALL factors%init(A)\nCALL factors%SVD(A)\nCALL factors%fin()",
+                "declarations": [
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 226,
+                    "line_end": 233
+                  },
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 593,
+                    "line_end": 600
+                  },
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 609,
+                    "line_end": 614
+                  }
+                ],
+                "path": "src/LinAlgLib.f90",
+                "line_start": 609,
+                "line_end": 628,
+                "module": "LinAlgLib",
+                "derived_type": "DSingularValueDecomposition",
+                "usage": "use MatrixDouble, only: DMat\nuse LinAlgLib, only: DSingularValueDecomposition\ntype(DMat) :: a\ntype(DSingularValueDecomposition) :: factors\ncall a%ini(3,2)\na%m=reshape([1d0,0d0,1d0,0d0,2d0,1d0],[3,2])\ncall factors%init(a)\ncall factors%SVD(a)\n! Independently check U*diag(Sigma)*V against A; V already means V-transpose.\ncall factors%fin()\ncall a%fin()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link a compatible real64/default-integer BLAS/LAPACK ABI and preserve the wrapper storage bookkeeping. Investigate local INFO on query/compute failures before using this as a robust solver. No reconstruction, singular value or cleanup was tested."
+              }
+            ]
+          },
+          {
+            "code": "D4b1",
+            "level": "source-reviewed",
+            "revision": "b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8",
+            "reviewed_on": "2026-11-05",
+            "notes": "GENEIGENSOLSYMD wraps DSYGVD for real symmetric generalized eigenproblems with positive-definite B. ITYPE selects A*z=lambda*B*z (1), A*B*z=lambda*z (2), or B*A*z=lambda*z (3). The method reads the upper triangles, queries workspace and copies final vectors to THIS%VEC. Although A/B are declared INTENT(IN), their allocatable matrix components are passed to the destructive external LAPACK routine; preserve inputs and resolve that contract before use. Both query/compute INFO values are ignored and not exposed, including non-positive-definite-B failures. Review covers wrapper setup and dispatch, not an assertion that arbitrary B is definite or that all type/ABI configurations compile correctly.",
+            "evidence": [
+              {
+                "path": "src/LinAlgLib.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/src/LinAlgLib.f90",
+                "sha256": "cc8430a6303df1928842e34bf978f30650197c24e2828894881468e71df971a1"
+              },
+              {
+                "path": "src/MatrixDouble.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/src/MatrixDouble.f90",
+                "sha256": "51a8311cb0ddf61b8d5671254fdc56ba377a6e045c6986ea20e3e182e318b074"
+              },
+              {
+                "path": "test/test_GenEigenSolSymD.f90",
+                "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/test/test_GenEigenSolSymD.f90",
+                "sha256": "8b3cb10593c5db4478019697b3d30ad12673a3d7e7c45bbf7f4569358e924b55"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DiagSym",
+                "role": "public-entry-point",
+                "summary": "Public generalized symmetric type-bound eigensolver wrapper with hidden LAPACK status and destructive input-component behavior.",
+                "signature": "CALL solver%init(A,B,ITYPE)\nCALL solver%DiagSym(A,B)\nCALL solver%fin()",
+                "declarations": [
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 206,
+                    "line_end": 214
+                  },
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 383,
+                    "line_end": 394
+                  },
+                  {
+                    "path": "src/LinAlgLib.f90",
+                    "line_start": 402,
+                    "line_end": 407
+                  }
+                ],
+                "path": "src/LinAlgLib.f90",
+                "line_start": 402,
+                "line_end": 423,
+                "module": "LinAlgLib",
+                "derived_type": "GenEigenSolSymD",
+                "usage": "use MatrixDouble, only: DMat\nuse LinAlgLib, only: GenEigenSolSymD\ntype(DMat) :: a,b\ntype(GenEigenSolSymD) :: solver\n! Initialize equal-sized real symmetric A and positive-definite B.\n! Preserve matrix copies and resolve the documented input-mutation/status contracts.\ncall solver%init(a,b,itype=1)\ncall solver%DiagSym(a,b)\n! Check original-A*z-lambda*original-B*z independently.\ncall solver%fin()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-assembly interface fragment, not a checked generalized-eigenproblem example. Match linked LAPACK kinds, inspect internal INFO and do not rely on INTENT(IN) as an input-preservation guarantee. No definiteness, eigenpair or mutation behavior was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains the standard BSD three-condition license and credits Takayuki Miyagi. BLAS/LAPACK dependencies retain their own notices and ABI requirements.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Takayuki-Miyagi/LinAlgf90/blob/b5b6ef1eab80e1062b3bedf9be5ce55d8456dfb8/LICENSE",
+              "sha256": "a85ad29278bc0e59e58ba69157f85ce3ba8122ead2542aae538aaada7cc21d07"
+            }
+          ]
         }
       },
       "imports": {}
@@ -65930,12 +66449,99 @@
             ],
             "notes": "The current Japanese README identifies K-means with k-means++ initialization, labels stable distribution not yet released and describes Linux-focused test packaging. Older discovery claims about many additional learning algorithms are not carried forward. Cluster quality, persistence and non-Linux source builds were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L14a1b",
+            "level": "source-reviewed",
+            "revision": "83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public KMEANS object fits dense nonhierarchical Euclidean clusters through repeated nearest-centroid assignments and centroid updates, with random/kmeans++ initialization, optional explicit initial centers, restarts and empty-cluster relocation. X has observation rows and feature columns; PREDICT returns one-based labels in an (N,1) allocatable INT64 matrix. SCORE returns a nonnegative-style sum of squared distances, not sklearn negative inertia. The selected sketch uses N_INIT=1 and default unchunked storage: the demo passes real-valued N_INIT/CHUNK_SIZE although the inspected constructor requires INT64, and the multi-restart chunked path passes the unallocated whole-distance matrix. The iteration helper also marks persistent input state INTENT(OUT) while reading it, and convergence checks can touch initially unset previous centroids. Those state contracts require repair/validation before relying on fits. OpenBLAS thread control and RNG state are global side effects. Review is source-based, not a validated clustering implementation.",
+            "evidence": [
+              {
+                "path": "fortlearner/kmeans/mod_kmeans.f90",
+                "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/fortlearner/kmeans/mod_kmeans.f90",
+                "sha256": "c69cd41ba6eb517a5fb09ada0e3ab4c8d07b6c658d3a7afedcecb7a108a8b2ae"
+              },
+              {
+                "path": "fortlearner/kmeans/mod_kmeans_fit_single_iter_dense.f90",
+                "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/fortlearner/kmeans/mod_kmeans_fit_single_iter_dense.f90",
+                "sha256": "63abcc64e47eb2c7e1b18f41ec1c4cc48c72288a71ef5ebe63693e006d775df0"
+              },
+              {
+                "path": "fortlearner/kmeans/mod_base_kmeans.f90",
+                "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/fortlearner/kmeans/mod_base_kmeans.f90",
+                "sha256": "3a9e124238db5a12402df4d9e6e4c5f5757932246af03b792831ee11e88a7fb7"
+              },
+              {
+                "path": "demos/fortran/samples/demo_kmeans.f90",
+                "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/demos/fortran/samples/demo_kmeans.f90",
+                "sha256": "6d2466ac68fde1a6969cbddb1dcc4deb3d2dab3e1a9eff8dda85f2112f4aa0bb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fit",
+                "role": "public-entry-point",
+                "summary": "Public type-bound dense K-means training method; optional initial centers have shape (clusters,features).",
+                "signature": "MODEL = new_kmeans(N_CLUSTERS,MAX_ITER,INIT,N_INIT,TOL,RANDOM_STATE,NUM_THREADS,PRINT_LOG,CHUNK_SIZE,FATAL)\nCALL model%fit(X,INIT_C)\nLABELS = model%predict(X)",
+                "declarations": [
+                  {
+                    "path": "fortlearner/kmeans/mod_kmeans.f90",
+                    "line_start": 17,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "fortlearner/kmeans/mod_kmeans.f90",
+                    "line_start": 121,
+                    "line_end": 125
+                  },
+                  {
+                    "path": "fortlearner/kmeans/mod_kmeans.f90",
+                    "line_start": 257,
+                    "line_end": 261
+                  }
+                ],
+                "path": "fortlearner/kmeans/mod_kmeans.f90",
+                "line_start": 121,
+                "line_end": 254,
+                "module": "mod_kmeans",
+                "derived_type": "kmeans",
+                "usage": "use mod_kinds, only: i64,r64\nuse mod_kmeans, only: kmeans,new_kmeans\ntype(kmeans) :: model\nreal(r64) :: x(4,2)\ninteger(i64),allocatable :: labels(:,:)\nx(:,1)=[0._r64,0.1_r64,4._r64,4.1_r64]\nx(:,2)=[0._r64,0.2_r64,4._r64,4.2_r64]\nmodel=new_kmeans(n_clusters=2_i64,n_init=1_i64,random_state=1_i64,num_threads=1_i64)\n! Resolve the documented iteration-state INTENT/initialization issues first.\ncall model%fit(x)\nlabels=model%predict(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Illustrates constructor integer kinds and data orientation; it is not a checked cluster example. Build with preprocessing, the required module graph, OpenMP and OpenBLAS. Investigate state initialization/INTENT and avoid the multi-restart chunked branch pending repair. No labels, objective, stopping state or thread restoration was tested."
+              },
+              {
+                "procedure": "fit_single_iter_whole_dense",
+                "role": "implementation-helper",
+                "path": "fortlearner/kmeans/mod_kmeans_fit_single_iter_dense.f90",
+                "line_start": 15,
+                "line_end": 168
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT with third-party notices",
+          "spdx_expression": "MIT",
+          "revision": "83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms for FortLearner. THIRD_PARTY_NOTICES separately records the scikit-learn-inspired empty-cluster relocation policy and its BSD-style attribution; linked OpenBLAS has its own notices.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/LICENSE",
+              "sha256": "70a4911aca5c7b66a0209ae26308d68f45b4d50711a014e9b2284d0dd2c32c4a"
+            },
+            {
+              "path": "THIRD_PARTY_NOTICES.md",
+              "url": "https://github.com/NaoMatch/FortLearner/blob/83a7c1ed7e1b3ed89a6d78c43eba24dafa4f6411/THIRD_PARTY_NOTICES.md",
+              "sha256": "07846011a3f92eabeb6955e0c6a1891dd65f09b6b47dcd894a478a6a16c15bcc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -65978,12 +66584,100 @@
             ],
             "notes": "The README documents training/prediction programs, map parameters and topology-preserving clustering. Only documented options are included; generic distance/topology extensibility does not imply every combination works. This repository is distinct from the later F08 implementation; clustering results were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L14a1b",
+            "level": "source-reviewed",
+            "revision": "9a65990011c215d1dc8eeefb3ae1ba39e91555fa",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public EXTERNAL_TRAIN_MAP entry constructs a normal self-organizing map, trains through repeated best-matching-unit searches and neighborhood-weighted prototype updates, and returns nonhierarchical prototype assignments and map diagnostics. This is non-nested prototype clustering, not supervised classification or a dendrogram. The C-binding arrays use observations by variables; the wrapper fixes the random seed to 12345 and Euclidean distance even though DISTANCE_TYPE is accepted. GRID_TYPE=0/1 selects rectangular/hexagonal layout and NEIGH_TYPE=0/1 bubble/Gaussian neighborhoods. Invalid selectors are not comprehensively rejected. The training best-match search initializes its distance threshold to 100000, so scale inputs and investigate large-distance cases before trusting indices. Allocation/status and distortion diagnostics do not provide a convergence certificate. Review covers the normal-SOM wrapper, training update and prediction dispatch, not robust/ViSOM variants or cluster validity.",
+            "evidence": [
+              {
+                "path": "self_organized_map_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/self_organized_map_utilities.f90",
+                "sha256": "86eb263ca96b8f16345228e32a171568e9d25cdd2b817c11f19abf93245c8dae"
+              },
+              {
+                "path": "kohonen_layer_parameters_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/kohonen_layer_parameters_utilities.f90",
+                "sha256": "4ea1693b5fbcde5620d8d2c8122242af99289c688487898f07e97af25d0c0c32"
+              },
+              {
+                "path": "kohonen_pattern_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/kohonen_pattern_utilities.f90",
+                "sha256": "e3c419252681371d367a0b9103770c4e787cb07a70ca0946e5f5b03e55e8d2c9"
+              },
+              {
+                "path": "euclidean_distance_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/euclidean_distance_utilities.f90",
+                "sha256": "4a77dd016aafa25ccbc926ad7cd70cbceb72f724ff01a436165d0674d4bc01dd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "external_train_map",
+                "role": "public-entry-point",
+                "summary": "Public module BIND(C,name=\"train_som_\") wrapper; scalar arguments are passed by reference.",
+                "signature": "CALL external_train_map(X,NVAR,NPAT,NX,NY,NEPOCH,ALPHA,GRID_TYPE, &\n     DISTANCE_TYPE,NEIGH_TYPE,TOROIDAL,PROT,DISTORTION,U_MATRIX,COORDS,NUMBER_PATTERNS,NODE_INDEX)",
+                "declarations": [
+                  {
+                    "path": "self_organized_map_utilities.f90",
+                    "line_start": 1408,
+                    "line_end": 1421
+                  },
+                  {
+                    "path": "self_organized_map_utilities.f90",
+                    "line_start": 61,
+                    "line_end": 87
+                  }
+                ],
+                "path": "self_organized_map_utilities.f90",
+                "line_start": 1408,
+                "line_end": 1522,
+                "module": "self_organized_map_utilities",
+                "usage": "use iso_c_binding, only: c_int,c_double\nuse self_organized_map_utilities, only: external_train_map\n! X(NPAT,NVAR), PROT(NX*NY,NVAR), DISTORTION(NEPOCH), COORDS(NX*NY,3).\n! U_MATRIX(2*NX-1,2*NY-1), COUNTS(NX,NY), NODE_INDEX(NPAT,3).\n! Prepare scaled finite C_DOUBLE data and C_INT sizes/selectors.\ncall external_train_map(x,nvar,npat,nx,ny,nepoch,0.1_c_double,0_c_int, &\n     0_c_int,1_c_int,0_c_int,prot,distortion,u_matrix,coords,counts,node_index)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation normal-SOM fragment; import the module interface rather than inventing a C argument order. Use positive grid/data/epoch sizes and compatible kind=8/c_double implementation. The wrapper ignores DISTANCE_TYPE and seeds internal global randomness. No cluster assignments, topology, large-distance behavior or diagnostics were tested."
+              },
+              {
+                "procedure": "train_som_data",
+                "role": "implementation-helper",
+                "path": "self_organized_map_utilities.f90",
+                "line_start": 233,
+                "line_end": 402
+              },
+              {
+                "procedure": "update_weights",
+                "role": "implementation-helper",
+                "path": "self_organized_map_utilities.f90",
+                "line_start": 875,
+                "line_end": 969
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license text",
+          "spdx_expression": null,
+          "revision": "9a65990011c215d1dc8eeefb3ae1ba39e91555fa",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GPL version 3 text. This scoped finding does not infer an or-later option absent from the reviewed grant or establish the license of every separately bundled utility.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/khaors/KohonenF03/blob/9a65990011c215d1dc8eeefb3ae1ba39e91555fa/README.md",
+              "sha256": "0b276bff93cf3aa3b2ab80d97897bf7da4421bf4505f54efff3afb2002528718"
+            }
+          ]
         }
       },
       "imports": {}
@@ -66196,12 +66890,117 @@
             ],
             "notes": "The README explicitly excludes batch training, dropout, convolution and distributed parallelism and says alternative optimizers are not wired into network training. Proposed L-BFGS/classification/recurrent features are not counted. BLAS/LAPACK dependencies and supplied QR-versus-network comparisons were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "1f2b8991900dda36b40d997da77d287c25541bac",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public NEURALNET%BACKPROP method differentiates the scalar network loss with respect to packed weights and optional biases by reverse propagation through activation derivatives and BLAS products. This is analytic chain-rule/backpropagation differentiation, not finite differences or a general source-transforming AD tool. WEIGHTS/BIAS are inout buffers: their entry values become model parameters and their returned contents become gradients. DATA uses predictor rows plus one target row and observation columns. The LOSS callback supplies derivative with respect to prediction, despite its name; the supplied MSE returns 2*(prediction-actual), with averaging performed inside BACKPROP. Activation callbacks distinguish forward value from derivative with FW. The method mutates network intermediate state and reports selected dimension failures via IERR. EVALUATE declares IERR INTENT(OUT) but does not set it on success; BACKPROP immediately tests that undefined value and likewise lacks an explicit final success assignment. Repair the success-status contract before relying on returned gradients. Review covers the scalar-output gradient path and interface, not arbitrary tensor AD, every activation at nondifferentiable points or verified gradient accuracy.",
+            "evidence": [
+              {
+                "path": "src/neuralnet.f90",
+                "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/src/neuralnet.f90",
+                "sha256": "2f4a6364565cd9419d16d21b44e876bcd2c9abd741a376c1fb9658179c4cc720"
+              },
+              {
+                "path": "test/test_reg_ls.f90",
+                "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/test/test_reg_ls.f90",
+                "sha256": "824871573ac206d29ab99f39d0b9a3e1a980688381813f14a6e0a5565069c9ad"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BACKPROP",
+                "role": "public-entry-point",
+                "summary": "Public type-bound scalar-network loss-gradient method with packed mutable parameter/gradient buffers.",
+                "signature": "CALL net%BACKPROP(WEIGHTS,BIAS,DATA,LOSS,IERR)",
+                "declarations": [
+                  {
+                    "path": "src/neuralnet.f90",
+                    "line_start": 21,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "src/neuralnet.f90",
+                    "line_start": 255,
+                    "line_end": 272
+                  },
+                  {
+                    "path": "src/neuralnet.f90",
+                    "line_start": 504,
+                    "line_end": 513
+                  }
+                ],
+                "path": "src/neuralnet.f90",
+                "line_start": 255,
+                "line_end": 358,
+                "module": "NEURALNET_MOD",
+                "derived_type": "NEURALNET",
+                "usage": "use NEURALNET_MOD, only: neuralnet,MSE\n! Build NET with matching input dimension and one output node.\n! DATA(D+1,N) holds predictors then target; copy parameter values first.\n! W and BIAS have exactly the network packed weight/bias lengths.\n! First repair EVALUATE/BACKPROP success-status assignments.\ncall net%BACKPROP(w,bias,data,MSE,ierr)\nif(ierr/=0) error stop \"network gradient failed\"\n! W/BIAS now contain averaged loss gradients, not original parameters.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-construction fragment with compatible REAL_PRECISION R8 and BLAS doubles. Handle networks without biases carefully: the training path passes an unallocated bias buffer in that branch, whose safety needs investigation; this sketch assumes allocated biased layers. Compare against independent finite differences before use. No derivative, allocation or activation test was run. The success-path IERR defect must be resolved before the displayed status check is meaningful."
+              }
+            ]
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "1f2b8991900dda36b40d997da77d287c25541bac",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public OPT_MOD::ADAM module subroutine updates an unconstrained vector using a supplied gradient callback, exponential first/second moments and bias-corrected adaptive steps. The selected class describes smooth multivariate minimization with user-provided first derivatives; the method neither evaluates an objective nor supplies bounds/Hessians. IBUDGET limits gradient calls; an exactly zero gradient causes early return, but no norm-based convergence/error status is returned. Caller must choose valid decay/step/epsilon values and a suitable gradient. The SGD sibling uses geometric step decay; ADAGRAD is not promoted here because its inspected initial zero accumulator is tested for zero before the first accumulation, causing immediate return. Review covers the ADAM recurrence and callable contract, not optimizer convergence or network-training correctness.",
+            "evidence": [
+              {
+                "path": "src/optimizers.f90",
+                "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/src/optimizers.f90",
+                "sha256": "bcabf62606a21a5186ba06ff8760557b165103af7b9ad8928d99c3a5b6db9c9b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ADAM",
+                "role": "public-entry-point",
+                "summary": "Public module gradient-only unconstrained optimizer with optional budget and moment controls.",
+                "signature": "CALL ADAM(D,GRAD,X,IBUDGET,ALPHA,BETA1,BETA2,EPS)",
+                "declarations": [
+                  {
+                    "path": "src/optimizers.f90",
+                    "line_start": 65,
+                    "line_end": 88
+                  },
+                  {
+                    "path": "src/optimizers.f90",
+                    "line_start": 4,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/optimizers.f90",
+                "line_start": 65,
+                "line_end": 133,
+                "module": "OPT_MOD",
+                "usage": "use REAL_PRECISION, only: R8\nuse OPT_MOD, only: ADAM\nreal(R8) :: x(2)\nx=[2.0_R8,-1.0_R8]\n! Supply GRAD(D,X,G), for example G=2*X for the smooth sum-of-squares objective.\ncall ADAM(2,gradient,x,ibudget=1000,alpha=0.01_R8)\n! Independently evaluate the objective and gradient norm at returned X.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback body omitted; import the module for optional arguments and match R8 kinds. ADAM has no objective-decrease check or convergence flag. This is not a tested minimization result, and it does not imply the ADAGRAD sibling is functional."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "1f2b8991900dda36b40d997da77d287c25541bac",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms and credits Tyler H. Chang. Linked BLAS and any separately supplied callbacks retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/LICENSE",
+              "sha256": "4b8e54f90cec5bba3dd84e561ad9d63fc90aaa7556a8d503ece5ee076b8302e6"
+            }
+          ]
         }
       },
       "imports": {}

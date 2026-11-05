@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 324 repositories now have 428 source-reviewed
+Reviewed on 2026-11-05. 332 repositories now have 440 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-313 repository cards now identify public routines and link their usage lines
+321 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Eleven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV and TiktakGlobalSearch) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 324 independently source-reviewed repositories now have an
+separately. All 332 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -348,6 +348,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | TikTak | `TiktakGlobalSearch` | MIT root; bundled numerical provenance requires review |
 | SLATEC Modern | `special_functions::DDAWS`, `special_functions::DBETA`, `special_functions::DGAMI`, `special_functions::DBETAI` | Apache-2.0 root and original SLATEC disclaimer |
 | BiCGSTAB and GMRES solver examples | `SOLVERS_base` | MIT |
+| hyperBOB | `hyperBOB_module::hyperBOB` | MIT root; numerical dependencies separate |
+| sht_py | `polynomial`, `forward` | GPL-3.0 license text |
+| PDECHEB | `INICHB`, `PDECHB` | Original author rights retained; no standalone grant identified |
+| urca | `ddnor`, `innorz` | GPL-2.0-or-later package; MacKinnon permission record |
+| LinAlgf90 | `LinAlgLib::DSingularValueDecomposition%SVD`, `LinAlgLib::GenEigenSolSymD%DiagSym` | BSD-3-Clause |
+| FortLearner | `mod_kmeans::kmeans%fit` | MIT with third-party notices |
+| KohonenF03 | `self_organized_map_utilities::external_train_map` | GPL-3.0 license text |
+| NN_MOD regressors | `NEURALNET_MOD::NEURALNET%BACKPROP`, `OPT_MOD::ADAM` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -691,6 +699,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [TikTak](https://github.com/serdarozkan/tiktak) | G2i | Configuration-driven heuristic multistart global search | Program interface; objective/configuration adaptation and isolated filesystem state required. |
 | [SLATEC Modern](https://github.com/zaneham/slatec) | C8c; C7b; C7e; C7f | Dawson, complete beta and incomplete gamma/beta functions | Modern module includes; normalized versus unnormalized definitions, domain termination and intermediate overflow matter. |
 | [BiCGSTAB and GMRES solver examples](https://github.com/jnsresearcher/solvers_bcgstab_gmres) | D2a4 | CSR BiCGSTAB and unrestarted GMRES | Breakdown guards and exhausted-iteration slices need correction; ITER is not a success certificate. |
+| [hyperBOB](https://github.com/maxentropyprod/hyperbob) | G2i | MPI Latin-hypercube multistart BOBYQA | Collective initialization and callback shape; MAXTIME is not implemented and ERR is not convergence. |
+| [sht_py](https://github.com/hottahd/sht_py) | C9; J | Normalized Legendre polynomial evaluation and associated transforms | Explicit C interfaces; separate duplicate binding names and sufficient local latitude points. |
+| [PDECHEB](https://github.com/ivan-pi/pdecheb) | I2a1a | One-dimensional parabolic PDE Chebyshev semidiscretization | Problem callbacks, workspace and saved COMMON required; time integration is delegated to DASSL. |
+| [urca](https://github.com/cran/urca) | L5a1n; L5a2n | Normal CDF and inverse-CDF approximation routines | Tail clipping/cancellation, unsafe quantile endpoints and R error-support linkage. |
+| [LinAlgf90](https://github.com/takayuki-miyagi/linalgf90) | D6; D4b1 | Thin real SVD and generalized symmetric eigensolver wrappers | V stores V-transpose; LAPACK INFO is hidden and generalized input preservation needs repair. |
+| [FortLearner](https://github.com/naomatch/fortlearner) | L14a1b | Dense nonhierarchical K-means clustering | Integer constructor kinds, mutable global threading/RNG and iteration-state contracts need attention. |
+| [KohonenF03](https://github.com/khaors/kohonenf03) | L14a1b | Nonhierarchical self-organizing-map clustering | Fixed seed/Euclidean wrapper; scaled data, grid selectors and array dimensions matter. |
+| [NN_MOD regressors](https://github.com/thchang/nn_mod) | H1; G1b1b | Scalar-network backpropagation and gradient-supplied Adam minimization | Loss callback returns a derivative; gradient buffers overwrite parameters and success-status assignments need repair. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1276,3 +1292,11 @@ operations and smoothed penalized quantile regression where narrower leaves
 would overstate the inspected algorithms. The review distinguishes program
 entry points from routines, documents prototype solver breakdown/status/rank
 limitations, and keeps component license notices separate from root declarations.
+
+hyperBOB, PDECHEB, linalgf90, KohonenF03, nn_mod, FortLearner, sht_py and
+urca now have pinned source interfaces and calling sketches. These sketches
+were not compiled or run. Review distinguishes spatial semidiscretization
+from time integration, gradients from loss values, normalized Legendre values
+from classical unnormalized polynomials, and wrapper status from convergence.
+Collective/workspace/kind requirements, prototype state-contract limitations
+and component-specific licensing remain explicit.
