@@ -2368,12 +2368,215 @@
             ],
             "notes": "The README provides the build procedure; release notes discuss eigenmode algorithms and experimental Hermitian solver support. Kept at D4 rather than asserting every matrix-type specialization is verified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "9e775f3406359fb122bc9612d54655c4cdc5f7ad",
+            "reviewed_on": "2026-11-05",
+            "notes": "EIGEN_S is the public module dispatcher for real symmetric distributed dense eigenproblems. It selects the configured EIGEN_S0 or EIGEN_FS implementation; inspected paths scale the matrix, reduce to real tridiagonal form, solve by divide-and-conquer/bisection and back-transform eigenvectors. MPI and EigenExa initialization precede the call, and EIGEN_GET_MATDIMS supplies required local storage for the configured two-dimensional cyclic distribution and work padding. A is overwritten, including implementation performance fields, so preserve the mathematical input for residuals. NVEC controls requested vectors and MODE selects values/vectors/refinement variants; the sketch selects A and all vectors. There is no public INFO dummy, and silent early returns/implementation error state must not be mistaken for a verified solution. Source review covers module dispatch and selected reduction/solve/backtransform calls, not all distributed kernels or every build configuration.",
+            "evidence": [
+              {
+                "path": "src/eigen_libs.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_libs.F",
+                "sha256": "5788c8c2e964372a16760fae32f9866d32aa33669cf9de907dc30f4d4110c941"
+              },
+              {
+                "path": "src/eigen_s.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_s.F",
+                "sha256": "434ef316de87035ff7bf72099576035ea933042fcd35681cd1711817c585ed67"
+              },
+              {
+                "path": "src/eigen_FS.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_FS.F",
+                "sha256": "83b2824721a5436de82366a3283e42fc58d352cc70bcfa1a146cefe4a04f631d"
+              },
+              {
+                "path": "src/eigen_trd.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_trd.F",
+                "sha256": "331c0fb8cea8bd31bb8bb5fe296ddc5ebcc43ca97c35c5f75ab4a410ba2162b0"
+              },
+              {
+                "path": "src/eigen_devel.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_devel.F",
+                "sha256": "015412e4a533fe7fa1ad327d7acdad6248938d05d8b8a092081a244062e54a30"
+              },
+              {
+                "path": "benchmark_h/bench_eigen.f",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/benchmark_h/bench_eigen.f",
+                "sha256": "f0abc8c36d208fa6e955373ff417ec92f48e292e84bb83d1512e64e9e6a4cf45"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eigen_s",
+                "role": "public-entry-point",
+                "summary": "Public module symmetric eigensolver; arrays contain distributed local storage, not replicated global matrices.",
+                "signature": "CALL eigen_s(N,NVEC,A,LDA,W,Z,LDZ,M_FORWARD,M_BACKWARD,MODE)",
+                "declarations": [
+                  {
+                    "path": "src/eigen_libs.F",
+                    "line_start": 150,
+                    "line_end": 166
+                  }
+                ],
+                "path": "src/eigen_libs.F",
+                "line_start": 150,
+                "line_end": 202,
+                "module": "eigen_libs_mod",
+                "usage": "use mpi\nuse eigen_libs_mod, only: eigen_init,eigen_get_matdims,eigen_s,eigen_free\ninteger :: ierr,n,nx,ny\nreal(8),allocatable :: a(:,:),z(:,:),w(:)\ncall MPI_Init(ierr)\ncall eigen_init()\nn=4\ncall eigen_get_matdims(n,nx,ny)\nallocate(a(nx,ny),z(nx,ny),w(n))\n! Fill A using EigenExa local/global cyclic indices; retain an input copy.\ncall eigen_s(n,n,a,nx,w,z,nx,mode=\"A\")\n! Check implementation error state and distributed eigenpair residuals.\ncall eigen_free()\ncall MPI_Finalize(ierr)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a storage/lifecycle fragment with no matrix population. Use compatible MPI/BLACS/ScaLAPACK/BLAS configuration and collective calls on participating ranks. No eigenvalues, residuals, orthogonality, rank layout or allocation dimensions were tested."
+              },
+              {
+                "procedure": "eigen_s0",
+                "role": "implementation-helper",
+                "path": "src/eigen_s.F",
+                "line_start": 30,
+                "line_end": 307
+              },
+              {
+                "procedure": "eigen_FS",
+                "role": "implementation-helper",
+                "path": "src/eigen_FS.F",
+                "line_start": 29,
+                "line_end": 300
+              }
+            ]
+          },
+          {
+            "code": "D4a3",
+            "level": "source-reviewed",
+            "revision": "9e775f3406359fb122bc9612d54655c4cdc5f7ad",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external EIGEN_H interface computes ordinary complex Hermitian distributed eigenproblems through Hermitian reduction to a real tridiagonal problem, real divide-and-conquer/bisection eigenvectors, real-to-complex conversion and complex back-transformation. REAL(8) eigenvalues and COMPLEX(8) matrix/vector storage must match the build. The EIGEN_LIBS_MOD interface is required for optional arguments even though the implementation is external. Use initialized MPI/EigenExa state and queried local storage. The selected vector-producing MODE=A path is distinguished from MODE=N: the latter jumps over BETA allocation but reaches an unconditional DEALLOCATE(BETA), so eigenvalues-only behavior needs correction/reproduction. Input A is destroyed and can receive performance data. No general non-Hermitian or generalized-complex claim is inferred. This records selected driver dispatch and interface, not a Hermitian residual or parallel numerical validation.",
+            "evidence": [
+              {
+                "path": "src/eigen_libs.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_libs.F",
+                "sha256": "5788c8c2e964372a16760fae32f9866d32aa33669cf9de907dc30f4d4110c941"
+              },
+              {
+                "path": "src/eigen_h.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_h.F",
+                "sha256": "336cf3bcd3ce2f4ab38c346e1f634b836a7c5422cac73edb6bd3b1d7bf6eb16f"
+              },
+              {
+                "path": "src/eigen_devel.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_devel.F",
+                "sha256": "015412e4a533fe7fa1ad327d7acdad6248938d05d8b8a092081a244062e54a30"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eigen_h",
+                "role": "public-entry-point",
+                "summary": "External Hermitian eigensolver imported with its explicit optional-argument interface through EIGEN_LIBS_MOD.",
+                "signature": "CALL eigen_h(N,NVEC,A,LDA,W,Z,LDZ,M_FORWARD,M_BACKWARD,MODE)",
+                "declarations": [
+                  {
+                    "path": "src/eigen_libs.F",
+                    "line_start": 44,
+                    "line_end": 56
+                  },
+                  {
+                    "path": "src/eigen_h.F",
+                    "line_start": 45,
+                    "line_end": 50
+                  }
+                ],
+                "path": "src/eigen_h.F",
+                "line_start": 30,
+                "line_end": 321,
+                "usage": "use eigen_libs_mod, only: eigen_h\n! MPI/EigenExa initialized; N,NX and correctly distributed COMPLEX(8) A/Z prepared.\n! W is REAL(8); preserve A elsewhere before this collective call.\ncall eigen_h(n,n,a,nx,w,z,nx,mode=\"A\")",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The storage/lifecycle follows EIGEN_GET_MATDIMS and EIGEN_INIT as in the real interface. The sketch omits initialization and data population. Do not substitute MODE=N without investigating the unallocated-BETA cleanup path. No complex eigenpair, layout or cleanup case was executed."
+              }
+            ]
+          },
+          {
+            "code": "D4b1",
+            "level": "source-reviewed",
+            "revision": "9e775f3406359fb122bc9612d54655c4cdc5f7ad",
+            "reviewed_on": "2026-11-05",
+            "notes": "KMATH_EIGEN_GEV solves a distributed real symmetric generalized eigenproblem with positive-definite B by eigendecomposing B, forming its inverse-square-root transformation, solving the transformed symmetric problem and back-transforming vectors. Square and rectangular process grids dispatch to separate helpers with redistributions/PDGEMM. A is destroyed and B is overwritten by the transformation; this is not an indefinite-metric problem or an unmodified Cholesky driver. The external interface exposes no INFO output. In the square-grid helper, a nonpositive eigenvalue test returns on only one selected rank, so invalid B can produce inconsistent collective control flow; callers must not rely on graceful invalid-metric handling. Review covers the helper transformation/solve dispatch and data contracts, not all redistribution kernels or a positive-definiteness/conditioning certification.",
+            "evidence": [
+              {
+                "path": "src/KMATH_EIGEN_GEV.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/KMATH_EIGEN_GEV.F",
+                "sha256": "c1b7e093c4a33fac50832ca03f08efaaf1888ef37a7a9eaeb281333f82ef886c"
+              },
+              {
+                "path": "src/KMATH_EIGEN_GEV_1.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/KMATH_EIGEN_GEV_1.F",
+                "sha256": "5e3f3c261fe17ece17f61fbff158b08267dd0c38a726223fc41359abe2c9ece7"
+              },
+              {
+                "path": "src/KMATH_EIGEN_GEV_2.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/KMATH_EIGEN_GEV_2.F",
+                "sha256": "ef09193388d441a172fd3ad1109a1395db695433e4aed0f0a152e1d6cc76f9bd"
+              },
+              {
+                "path": "src/KMATH_EIGEN_GEV_misc.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/KMATH_EIGEN_GEV_misc.F",
+                "sha256": "441d33d06917338a6aecedbe69aba97d4111ae281933e7303ce16e77651a7ecd"
+              },
+              {
+                "path": "src/eigen_libs.F",
+                "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/src/eigen_libs.F",
+                "sha256": "5788c8c2e964372a16760fae32f9866d32aa33669cf9de907dc30f4d4110c941"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "KMATH_EIGEN_GEV",
+                "role": "public-entry-point",
+                "summary": "External generalized symmetric solver with mutable flat distributed real storage and initialized EigenExa/BLACS context.",
+                "signature": "CALL KMATH_EIGEN_GEV(N,A,LDA,B,LDB,W,Z,LDZ)",
+                "declarations": [
+                  {
+                    "path": "src/KMATH_EIGEN_GEV.F",
+                    "line_start": 2,
+                    "line_end": 22
+                  },
+                  {
+                    "path": "src/KMATH_EIGEN_GEV.F",
+                    "line_start": 31,
+                    "line_end": 33
+                  }
+                ],
+                "path": "src/KMATH_EIGEN_GEV.F",
+                "line_start": 2,
+                "line_end": 62,
+                "usage": "external :: KMATH_EIGEN_GEV\n! MPI/EigenExa/BLACS initialized, mutable N/LDA/LDB/LDZ set.\n! A/B/Z have the required distributed/padded real(8) storage; B is SPD.\n! Preserve both mathematical matrices before this collective call.\ncall KMATH_EIGEN_GEV(n,a,lda,b,ldb,w,z,ldz)\n! Independently check A_original*z-lambda*B_original*z and B-orthogonality.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment does not assemble or validate distributed matrices. Do not treat return of arrays as an INFO=0 status: none is provided. Invalid-B collective behavior and very ill-conditioned B require investigation. No generalized eigenproblem or grid branch was run."
+              },
+              {
+                "procedure": "KMATH_EIGEN_GEV_1",
+                "role": "implementation-helper",
+                "path": "src/KMATH_EIGEN_GEV_1.F",
+                "line_start": 1,
+                "line_end": 158
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause core; LAPACK/ScaLAPACK notices separate",
+          "spdx_expression": null,
+          "revision": "9e775f3406359fb122bc9612d54655c4cdc5f7ad",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root begins with the two-condition RIKEN/Imamura/JAEA grant and then reproduces distinct LAPACK/ScaLAPACK component notices. This preserves that scoped mixed provenance without assigning every dependency the core BSD-2-Clause expression.",
+          "evidence": [
+            {
+              "path": "LICENCE.txt",
+              "url": "https://github.com/RIKEN-RCCS/EigenExa/blob/9e775f3406359fb122bc9612d54655c4cdc5f7ad/LICENCE.txt",
+              "sha256": "3ff2c6303a40f32cbd0d17ff3efa8056d01211dbd5ad7c0d9ebe94fbf55f20f4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4696,12 +4899,112 @@
             ],
             "notes": "CUTEst supplies optimization test infrastructure and decoded problem interfaces. It is placed under software tools, not labeled as an optimization algorithm. Problem-specific SIF decoding may be required.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "R",
+            "level": "source-reviewed",
+            "revision": "acff7e033e4723fc40bc379033ca1e808355c963",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external CUTEST_UOFG routine evaluates the objective and optionally its gradient for a previously decoded/setup unconstrained SIF problem. It dispatches through global CUTEST data/work state to element/group evaluation and derivative accumulation, updates work/counters and reports failures in STATUS. It does not minimize the objective, choose search directions or establish optimizer convergence, so the source mapping is a numerical problem-evaluation service rather than an optimization-solver leaf. GRAD=false leaves G unsuitable as a computed gradient. The default public names and kinds are selected by preprocessing: CUTEST_UOFG_R becomes CUTEST_UOFG, and the provided interface module becomes CUTEST_INTERFACE_DOUBLE in the normal double/32-bit build. A matching SIF-decoded OUTSDIF.d plus compiled ELFUN/GROUP/RANGE routines and a successful USETUP are prerequisites; the global wrapper is distinct from per-workspace threaded variants. No objective or derivative was numerically checked.",
+            "evidence": [
+              {
+                "path": "src/tools/uofg.F90",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/src/tools/uofg.F90",
+                "sha256": "73da8a598cc890e77ab31e7fa73414fb5b14b2ce97c31faa413d04759eb39f45"
+              },
+              {
+                "path": "src/tools/interface.F90",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/src/tools/interface.F90",
+                "sha256": "0a5717b36bea3ec24c73553e543aa879bf63b648141f685d82e6ccb434af0f35"
+              },
+              {
+                "path": "src/tools/usetup.F90",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/src/tools/usetup.F90",
+                "sha256": "8ca794dbe80a4cd6e6298442bba078b548d69eecc4dc7488e260cf6fa360a7e1"
+              },
+              {
+                "path": "src/tools/udimen.F90",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/src/tools/udimen.F90",
+                "sha256": "4b106ae687250a5fad14ca388ddbc2143f1b408fd3c82d8694bf061be671ced9"
+              },
+              {
+                "path": "src/tools/kinds.F90",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/src/tools/kinds.F90",
+                "sha256": "ff9ae900846711c875bdccf6d916180a81c55af77e6d1a0c697d85f822e572e5"
+              },
+              {
+                "path": "include/cutest_modules.h",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/include/cutest_modules.h",
+                "sha256": "e438cc003225d506269cda11faa675c1769252b3612c6281abf6c389707f0f48"
+              },
+              {
+                "path": "include/cutest_routines.h",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/include/cutest_routines.h",
+                "sha256": "040b6f83c55d4eb1024b1638bd8db652186c01b697954c05a92a332a68e6cfc9"
+              },
+              {
+                "path": "include/cutest_routines_double.h",
+                "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/include/cutest_routines_double.h",
+                "sha256": "417342c0c7893bf5b2ab2ebbb3396fce237c47f170b15937d74ce497ded019d5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CUTEST_uofg",
+                "role": "public-entry-point",
+                "summary": "External default-double objective/gradient evaluator; use the generated CUTEST_INTERFACE_DOUBLE explicit interface.",
+                "signature": "CALL CUTEST_uofg(STATUS,N,X,F,G,GRAD)",
+                "declarations": [
+                  {
+                    "path": "src/tools/uofg.F90",
+                    "line_start": 56,
+                    "line_end": 67
+                  },
+                  {
+                    "path": "src/tools/interface.F90",
+                    "line_start": 101,
+                    "line_end": 109
+                  },
+                  {
+                    "path": "include/cutest_routines_double.h",
+                    "line_start": 270,
+                    "line_end": 270
+                  }
+                ],
+                "path": "src/tools/uofg.F90",
+                "line_start": 56,
+                "line_end": 85,
+                "usage": "use CUTEST_INTERFACE_double, only: CUTEST_uofg\n! Default double/32-bit CUTEst build; match its kinds in X/F/G/N/STATUS.\n! Decode/link a SIF problem and call CUTEST_usetup successfully first.\ncall CUTEST_uofg(status,n,x,f,g,.true.)\nif(status/=0) error stop \"CUTEst evaluation failed\"\n! Use F/G in an external optimizer; this call performs no optimization.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. A post-setup calling fragment, not a standalone SIF decoder or solver. Link generated problem routines against the same CUTEst real/integer variant, manage setup/termination once per problem, and avoid sharing global work across concurrent evaluations. No function value, gradient check or thread case was run."
+              },
+              {
+                "procedure": "CUTEST_uofg_threadsafe_r",
+                "role": "implementation-helper",
+                "path": "src/tools/uofg.F90",
+                "line_start": 146,
+                "line_end": 316
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "acff7e033e4723fc40bc379033ca1e808355c963",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root lists the standard three redistribution/endorsement conditions and credits Gould, Orban and Toint. Individual SIF problems and linked generated routines may carry their own terms; this is the testing-environment notice, not a blanket license on every external benchmark problem.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ralna/CUTEst/blob/acff7e033e4723fc40bc379033ca1e808355c963/LICENSE",
+              "sha256": "4d63ae7ccb5e148ac8fde299c1fb6475017dc993454865d74fadc4b1d4b709f3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5043,12 +5346,104 @@
             ],
             "notes": "The source banner explicitly identifies Latin-hypercube and random sampling, while the README documents Make builds. Distribution coverage and dependence/correlation options have not been checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6b5",
+            "level": "source-reviewed",
+            "revision": "029378b798a1012e6faed6205b95649775a97612",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied LHSDRV program initializes shared modules, reads an LHS keyword file, dispatches marginal sampling and pairs ranks through MIX to produce Latin-hypercube or random-sample designs. In the inspected uniform marginal, IRS=0 selects one random point per equal-probability stratum; IRS!=0 removes that stratum offset. The driver reads command-line filename or prompts, writes named sample/report files, and leaves LHS.ERR on its flagged failure path. It is not an isolated subroutine taking a user array: LHS/UNIFRM/MIX consume shared state and Fortran units. Rank-correlation matching and stratification do not certify a requested Pearson correlation, independence or quality for every marginal. Source review covers the supplied program, uniform stratification and pairing dispatch, not every inverse-CDF distribution or a generated design.",
+            "evidence": [
+              {
+                "path": "src/Lhsdrv.for",
+                "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/src/Lhsdrv.for",
+                "sha256": "a298e926f649faf733c2829c2aa68bfd8984f169a494b440a23714d5c604813f"
+              },
+              {
+                "path": "src/Lhs.for",
+                "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/src/Lhs.for",
+                "sha256": "db8842324bb9505279d234d7d652d123e69f696838cf4fde2628b667f4e4f6f2"
+              },
+              {
+                "path": "src/UNIFRM.FOR",
+                "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/src/UNIFRM.FOR",
+                "sha256": "13012fbea4bb2c1c7570b39bc466ec354a3271564934f614f6aff47909cafe60"
+              },
+              {
+                "path": "src/MIX.FOR",
+                "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/src/MIX.FOR",
+                "sha256": "065947f65da60ceab6ed4982a72b55a9136703d07bca78d8df1d412be0294f94"
+              },
+              {
+                "path": "exe/EXAMPLE.LHI",
+                "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/exe/EXAMPLE.LHI",
+                "sha256": "f778d49b9736984d5057a7f65fb8f4848060f4f102fc61771464f64362976eb3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LHSDRV",
+                "role": "program-entry-point",
+                "summary": "Supplied command-line sampling program; its argument names an LHS keyword/data file, not a Fortran module callback.",
+                "signature": "lhs EXAMPLE.LHI",
+                "declarations": [
+                  {
+                    "path": "src/Lhsdrv.for",
+                    "line_start": 2,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "src/Lhsdrv.for",
+                    "line_start": 102,
+                    "line_end": 107
+                  }
+                ],
+                "path": "src/Lhsdrv.for",
+                "line_start": 2,
+                "line_end": 175,
+                "usage": "! After building the standalone LHSDRV executable (named lhs here):\n! Run in a separate working directory containing the needed input/support files.\n! Shell command:\n!   lhs EXAMPLE.LHI\n! Inspect the output files named by LHSOUT/LHSMSG and any retained LHS.ERR.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the supplied example keyword file as a format reference and compile all initialized modules/dependencies. The source uses legacy fixed form, GETARG and shared units/state; output filenames can collide in concurrent runs. No sample, stratum coverage, rank correlation or failure indicator was checked."
+              },
+              {
+                "procedure": "LHS",
+                "role": "implementation-helper",
+                "path": "src/Lhs.for",
+                "line_start": 24,
+                "line_end": 352
+              },
+              {
+                "procedure": "UNIFRM",
+                "role": "implementation-helper",
+                "path": "src/UNIFRM.FOR",
+                "line_start": 5,
+                "line_end": 50
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-2.1 root text; Sandia provenance retained",
+          "spdx_expression": null,
+          "revision": "029378b798a1012e6faed6205b95649775a97612",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GNU LGPL version 2.1 text and the numerical driver retains Sandia/US-government sponsorship and disclaimer statements. This finding records those reviewed notices without asserting a complete grant/version reconciliation for every legacy auxiliary routine.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/LICENSE",
+              "sha256": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331"
+            },
+            {
+              "path": "src/Lhs.for",
+              "url": "https://github.com/NREL/lhs/blob/029378b798a1012e6faed6205b95649775a97612/src/Lhs.for",
+              "sha256": "db8842324bb9505279d234d7d652d123e69f696838cf4fde2628b667f4e4f6f2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -10213,12 +10608,104 @@
             ],
             "notes": "The README distinguishes the original noncompiling historical version from later compatibility edits and a driver. The pinned repository is described without claiming a successful build or current support.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2a2",
+            "level": "source-reviewed",
+            "revision": "cbcda1a89cc12d8541dd001dbe0a06753a612b1c",
+            "reviewed_on": "2026-11-05",
+            "notes": "EMS_SSLV is the public sparse LP solve dispatcher for an already loaded bounded model min c^T*x with row and variable bounds. It initializes/resets revised-simplex state, calls EMS_RSMI and finalizes model solution state. The inspected core maintains sparse basis/dual pricing and feasibility/iteration exit handling. RT_COD reports message severity; the LP problem status (optimal, infeasible, unbounded, iteration stop) is separate shared/control state, not inferred from RT_COD=0 alone. IS(0:*) is the initialized integer view of EMSOL equivalenced real/integer workspace, not an ordinary independent scratch vector: the code deliberately passes that storage to differently typed kernels. COMMON/include configuration, memory-manager setup and model import are required. The supplied driver reads only EMS-format ml.ems; the MPS-named import routine does not establish general MPS support for this distribution. Review covers solve dispatch, selected revised-simplex control and driver setup, not every factorization/update kernel, certificate or modern-compiler portability issue.",
+            "evidence": [
+              {
+                "path": "ssx1.f",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/ssx1.f",
+                "sha256": "8dde1d4bd2947acf3d716f022f3b996bec04ad6d36804a7ddc6b72f578f7d393"
+              },
+              {
+                "path": "rsmi.f",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/rsmi.f",
+                "sha256": "35280921a228fb1878330bc2ae7413ffad3bf0f8f945152e5f0e707842317c95"
+              },
+              {
+                "path": "ts_sslv.f",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/ts_sslv.f",
+                "sha256": "df01460b42ef9662521f5c0941db0ce5e536dfa6e5e7cc881c6f0d84a9fafb85"
+              },
+              {
+                "path": "dts_emsol.f",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/dts_emsol.f",
+                "sha256": "d47c47a054734978dfbca7c0821a7d04d4f7a9daf40846d16202b9baa128cc29"
+              },
+              {
+                "path": "DS.h",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/DS.h",
+                "sha256": "da7fe71e54ee5be910e9145a2c1d19fb9f1cd0ccf30e7a2f9cf50c1bf7a5a67d"
+              },
+              {
+                "path": "EMSRTCOD.INC",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/EMSRTCOD.INC",
+                "sha256": "c7a7f6be9b3e1d1742076c4c8cca5efcb52af75cbde0cde6ca06a4fef5a1c783"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/README.md",
+                "sha256": "25ff8becaddf8bcfa8adb4c793bc59f5026f896035916bfff1d474f1f0425fd0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ems_sslv",
+                "role": "public-entry-point",
+                "summary": "External legacy sparse LP solve routine with zero-based initialized workspace and mutable return severity.",
+                "signature": "CALL ems_sslv(RT_COD,IS,LP_ALG_MODE,USR_LP_IZ_MODE)",
+                "declarations": [
+                  {
+                    "path": "ssx1.f",
+                    "line_start": 2608,
+                    "line_end": 2627
+                  }
+                ],
+                "path": "ssx1.f",
+                "line_start": 2608,
+                "line_end": 2862,
+                "usage": "external :: ems_sslv\ninteger :: return_code,algorithm,initialization\n! In the surrounding driver, WORKSPACE(0:*) is EMSOL's initialized INTEGER view.\n! Build its equivalenced real/integer backing store and load a model first.\nalgorithm=1; initialization=1\ncall ems_sslv(return_code,workspace,algorithm,initialization)\n! Inspect return severity and the separate EMSOL LP/problem-status controls.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. A workspace/model setup fragment, not a standalone allocation example. Follow TS_EMS_SSLV/DS.h for legacy storage ownership and model loading; supplying unrelated integer/real arrays changes the contract. Compiler support for historical argument aliasing and bit constants needs review. No LP objective, feasibility, optimality or compiler build was verified."
+              },
+              {
+                "procedure": "ems_rsmi",
+                "role": "implementation-helper",
+                "path": "rsmi.f",
+                "line_start": 18,
+                "line_end": 1088
+              },
+              {
+                "procedure": "ts_ems_sslv",
+                "role": "implementation-helper",
+                "path": "ts_sslv.f",
+                "line_start": 3,
+                "line_end": 331
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "cbcda1a89cc12d8541dd001dbe0a06753a612b1c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies the MIT grant. Legacy include/configuration and numerical-source provenance are recorded by the source evidence; no external solver runtime is relabeled by this finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ERGO-Code/EMSOL/blob/cbcda1a89cc12d8541dd001dbe0a06753a612b1c/LICENSE",
+              "sha256": "34bf2b626369a2b3e872d6007f8a3a142b6ddef7b2591a00f1928ac8b67a70fb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -11529,12 +12016,84 @@
             ],
             "notes": "The README and DESCRIPTION document Gaussian/non-Gaussian state-space inference, filtering and smoothing. This is an R package with compiled numerical components, not a ready-made standalone Fortran API.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2e",
+            "level": "source-reviewed",
+            "revision": "02a9c3c94360fd6a4e1c274d9485b7d5975d5734",
+            "reviewed_on": "2026-11-05",
+            "notes": "KFILTER performs sequential-observation Kalman filtering for a linear Gaussian state-space model, including optional exact diffuse initialization via P1INF/RANKP. The inspected ordinary branch updates innovations, gain, mean/covariance and log likelihood, then propagates the state with T and R*Q*R^T. TIMEVAR has five 0/1 selectors controlling third-dimension lengths of Z,H,T,R,Q. YMISS=0 means observed; positive missing flags skip measurement updates. The scalar-observation sketch avoids the requirement to transform correlated multivariate measurement errors before sequential filtering: the core uses diagonal H entries. AT(:,t) and PT(:,:,t) are prediction states before observation t; the optional THETA output uses those predictions and is not a smoothed estimate. Likelihood accumulation and tolerance-based zero-innovation handling do not certify covariance positivity or model fit. Review covers driver and ordinary/diffuse one-step recurrences, not every R-facing data transformation or non-Gaussian smoother.",
+            "evidence": [
+              {
+                "path": "src/kfilter.f90",
+                "url": "https://github.com/helske/KFAS/blob/02a9c3c94360fd6a4e1c274d9485b7d5975d5734/src/kfilter.f90",
+                "sha256": "26617baa4c8f87cc626b1550cfe91bfa38c3837b3e299ed6c783cf5175035d17"
+              },
+              {
+                "path": "src/filter1step.f90",
+                "url": "https://github.com/helske/KFAS/blob/02a9c3c94360fd6a4e1c274d9485b7d5975d5734/src/filter1step.f90",
+                "sha256": "29a170efac5c6b146b41789230997943ca30019b4ed6b2cfa6b264d9f61cbc7d"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/helske/KFAS/blob/02a9c3c94360fd6a4e1c274d9485b7d5975d5734/DESCRIPTION",
+                "sha256": "cd82e557d54bf12469242e78527cfb9dbc9e1feb841e1655d8720e2eb20de529"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "kfilter",
+                "role": "public-entry-point",
+                "summary": "External double-precision filtering driver with explicit-shape arrays and mutable diffuse-rank state.",
+                "signature": "CALL kfilter(YT,YMISS,TIMEVAR,ZT,HT,TT,RT,QT,A1,P1,P1INF,P,N,M,R, &\n     D,J,AT,PT,VT,FT,KT,PINF,FINF,KINF,LIK,TOL,RANKP,THETA,THETAVAR,FILTERSIGNAL)",
+                "declarations": [
+                  {
+                    "path": "src/kfilter.f90",
+                    "line_start": 3,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/kfilter.f90",
+                "line_start": 3,
+                "line_end": 90,
+                "usage": "integer,parameter :: p=1,n=3,m=1,r=1\ninteger :: missing(n,p),tv(5),d,j,rankp\ndouble precision :: y(n,p),z(p,m,1),h(p,p,1),trans(m,m,1)\ndouble precision :: noise(m,r,1),q(r,r,1),a1(m),p1(m,m),p1inf(m,m)\ndouble precision :: a(m,n+1),v(p,n),f(p,n),gain(m,p,n),lik\ndouble precision :: cov(m,m,n+1),diffuse(m,m,n+1),finf(p,n),kinf(m,p,n)\ndouble precision :: signal(n,p),signalvar(p,p,n)\ny(:,1)=[1d0,1.5d0,1.2d0]; missing=0; tv=0\nz=1d0; h=0.25d0; trans=1d0; noise=1d0; q=0.1d0\na1=0d0; p1=1d0; p1inf=0d0; rankp=0; d=0; j=0\na=0d0; cov=0d0; diffuse=0d0; v=0d0; f=0d0; gain=0d0\nfinf=0d0; kinf=0d0; signal=0d0; signalvar=0d0; lik=0d0\ncall kfilter(y,missing,tv,z,h,trans,noise,q,a1,p1,p1inf,p,n,m,r, &\n     d,j,a,cov,v,f,gain,diffuse,finf,kinf,lik,1d-10,rankp,signal,signalvar,1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the defining filter and one-step routines with compatible BLAS. This is a scalar local-level model with finite initial variance and no diffuse phase. Inspect innovations and independently check recurrences; do not interpret unobserved/unused output entries as computed estimates. No likelihood, prediction or diffuse transition was verified."
+              },
+              {
+                "procedure": "filter1step",
+                "role": "implementation-helper",
+                "path": "src/filter1step.f90",
+                "line_start": 87,
+                "line_end": 145
+              },
+              {
+                "procedure": "dfilter1step",
+                "role": "implementation-helper",
+                "path": "src/filter1step.f90",
+                "line_start": 3,
+                "line_end": 84
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "02a9c3c94360fd6a4e1c274d9485b7d5975d5734",
+          "reviewed_on": "2026-11-05",
+          "notes": "The R package DESCRIPTION declares GPL (>= 2). This scoped finding records that package declaration for the included filtering source, not the terms of linked BLAS or the R runtime.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/helske/KFAS/blob/02a9c3c94360fd6a4e1c274d9485b7d5975d5734/DESCRIPTION",
+              "sha256": "cd82e557d54bf12469242e78527cfb9dbc9e1feb841e1655d8720e2eb20de529"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14660,12 +15219,87 @@
             ],
             "notes": "The README distinguishes Python implementations and Fortran wrappers. DASKR and DASPK wrappers are marked not implemented yet; they are not advertised as existing functionality.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a2",
+            "level": "source-reviewed",
+            "revision": "aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The vendored DDASKR driver solves implicit differential/algebraic systems G(t,y,yprime)=0 with variable-order BDF integration, direct dense/band or preconditioned Krylov linear solves, and optional root-event detection. Its own category header identifies I1A2. The selected sketch uses direct dense finite-difference Jacobians, consistent supplied initial Y/YPRIME, scalar tolerances and no events. RES(T,Y,YPRIME,CJ,DELTA,IRES,RPAR,IPAR) has a CJ argument that older DASSL residual interfaces lack. INFO has 20 entries and selects solver/initialization modes; work lengths depend on those choices and on NEQ/NRT. Positive IDID distinguishes intermediate, endpoint, root and initialization returns; negative values require the documented recovery protocol, not blind resubmission. Continuation preserves workspace/state and changes INFO(1) as documented. This review covers driver controls, DDSTP BDF step dispatch/acceptance and residual contract, not every Newton/Krylov/preconditioner kernel, DAE index or consistent-initialization mode.",
+            "evidence": [
+              {
+                "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                "url": "https://github.com/JonasBreuling/dae4py/blob/aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b/dae4py/fortran/daskr/solver/ddaskr.f",
+                "sha256": "ec35cf263c50fa87c5a2b97805f1700af58fc32eb7005bc97f8c9282a12b96ca"
+              },
+              {
+                "path": "dae4py/fortran/daskr/solver/daux.f",
+                "url": "https://github.com/JonasBreuling/dae4py/blob/aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b/dae4py/fortran/daskr/solver/daux.f",
+                "sha256": "05d160ddb08e20d24a2dde4fd1939edcf8a1b42bb80e6bc76ed2bb9a9e845bbb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DDASKR",
+                "role": "public-entry-point",
+                "summary": "External double-precision implicit integrator; unused callback actuals still require compatible declared procedures.",
+                "signature": "CALL DDASKR(RES,NEQ,T,Y,YPRIME,TOUT,INFO,RTOL,ATOL,IDID, &\n     RWORK,LRW,IWORK,LIW,RPAR,IPAR,JAC,PSOL,RT,NRT,JROOT)",
+                "declarations": [
+                  {
+                    "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                    "line_start": 198,
+                    "line_end": 227
+                  },
+                  {
+                    "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                    "line_start": 1402,
+                    "line_end": 1410
+                  }
+                ],
+                "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                "line_start": 1,
+                "line_end": 2493,
+                "usage": "external :: residual,jacobian,preconditioner,event_functions\ninteger :: info(20),idid,iwork(100),ipar(1),jroot(1)\ndouble precision :: t,y(1),yp(1),rtol(1),atol(1),rwork(100),rpar(1)\nt=0d0; y=1d0; yp=-1d0\nrtol=1d-6; atol=1d-8; info=0; iwork=0; rwork=0d0; rpar=0d0; ipar=0\n! Supply RESIDUAL(T,Y,YP,CJ,DELTA,IRES,RPAR,IPAR): DELTA(1)=YP(1)+Y(1).\n! Supply compatible dummy procedures for unused JAC/PSOL/RT arguments too.\ncall ddaskr(residual,1,t,y,yp,1d0,info,rtol,atol,idid, &\n     rwork,100,iwork,100,rpar,ipar,jacobian,preconditioner,event_functions,0,jroot)\n! Inspect IDID and reached T before interpreting Y.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback bodies are omitted. These workspace sizes target only the stated one-equation direct/no-event/default-order case; do not reuse them for larger systems or Krylov options. Link the required DASKR support, linear algebra and error routines. No trajectory, event, residual or continuation was run."
+              },
+              {
+                "procedure": "DDSTP",
+                "role": "implementation-helper",
+                "path": "dae4py/fortran/daskr/solver/ddaskr.f",
+                "line_start": 3132,
+                "line_end": 3592
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-style wrapper and UC/LLNL DASKR notices",
+          "spdx_expression": null,
+          "revision": "aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The Python project root has a BSD-style notice. Vendored DASKR retains a separate UC/LLNL three-condition grant plus government/disclaimer provisions. Those files and provenance are retained as distinct findings, without reducing every vendored solver to the root notice.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/JonasBreuling/dae4py/blob/aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b/LICENSE.txt",
+              "sha256": "11b86cac156eb14d92bac85b00dca2abfee6f0777b9a9e337ac966f83f0142c8"
+            },
+            {
+              "path": "dae4py/fortran/daskr/LICENSE",
+              "url": "https://github.com/JonasBreuling/dae4py/blob/aa2b4ef4a90d82267ecc78abcfab5d1e5714d12b/dae4py/fortran/daskr/LICENSE",
+              "sha256": "25d6d87e1e8cf6248924a23087e2bc680c885a13c56d5497bf78bfe389efc03c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21905,12 +22539,143 @@
             ],
             "notes": "The README describes parsing and error reporting rather than numerical equation solving. Performance and security wording in the original description is not treated as a benchmark or security assessment.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "A6b",
+            "level": "source-reviewed",
+            "revision": "3514b7463ef2c6f8673527a5b3b4184845d0955e",
+            "reviewed_on": "2026-11-05",
+            "notes": "DECTOINT32 converts a signed decimal character representation to the selected integer kind using character tests, shifts/additions and explicit magnitude/range logic. INT32TOBINARYASU formats the stored integer bit pattern as a 32-character binary string: negative inputs use the unsigned bit representation rather than a leading minus, and positive outputs are right-justified with blanks. The implementation hard-codes ASCII digit/sign/space codes and 32-bit limits, while K_INT32=SELECTED_INT_KIND(9) only guarantees a minimum decimal range; verify actual bit size on the target compiler. Only ordinary spaces are trimmed, not all whitespace. Optional substring positions are clipped/normalized in some cases rather than uniformly rejected as the prose implies. ERROR must be inspected; OUTPUT can hold a partial accumulation on failure. This mapping records selected base/representation conversion, not arbitrary precision or a verified boundary/encoding implementation.",
+            "evidence": [
+              {
+                "path": "src/fnDecimalUtil.f90",
+                "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnDecimalUtil.f90",
+                "sha256": "775f0f2990555e3413bf35d6b245cad6163003dfd7278157175a2e57cf67246b"
+              },
+              {
+                "path": "src/fnInt32Util.f90",
+                "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnInt32Util.f90",
+                "sha256": "36f9c6ddd856df568ac45b6313edd33caf4a28050fb7d717029ce7b66ef52731"
+              },
+              {
+                "path": "src/fnConsts.f90",
+                "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnConsts.f90",
+                "sha256": "5702fae21f39c55458afd20cb9be1c5034ac0d525bbe9c7351c8aa24c5f86018"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "decToInt32",
+                "role": "public-entry-point",
+                "summary": "Public module decimal parser with logical error output; optional inclusive positions have kind K_INT32.",
+                "signature": "CALL decToInt32(INPUT,OUTPUT,ERROR,STARTPOS,ENDPOS)",
+                "declarations": [
+                  {
+                    "path": "src/fnDecimalUtil.f90",
+                    "line_start": 61,
+                    "line_end": 68
+                  },
+                  {
+                    "path": "src/fnConsts.f90",
+                    "line_start": 31,
+                    "line_end": 43
+                  }
+                ],
+                "path": "src/fnDecimalUtil.f90",
+                "line_start": 61,
+                "line_end": 173,
+                "module": "fnDecimalUtil",
+                "usage": "use fnConsts, only: k_int32\nuse fnDecimalUtil, only: decToInt32\nuse fnInt32Util, only: int32ToBinaryAsU\ninteger(k_int32) :: value\nlogical :: failed\ncharacter(32) :: bits\ncall decToInt32(\" 12345 \",value,failed)\nif(failed) error stop \"invalid or out-of-range decimal\"\nbits=int32ToBinaryAsU(value)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use ASCII-compatible encoding and confirm a 32-bit selected integer kind before relying on the fixed limits/bit layout. Do not use partial OUTPUT after ERROR. This sketch deliberately uses an in-range positive decimal without substring options. No round-trip, negative minimum, overflow or malformed-character case was tested."
+              },
+              {
+                "procedure": "int32ToBinaryAsU",
+                "role": "public-entry-point",
+                "summary": "Public function formatting a stored integer as unsigned binary bits in a blank-padded CHARACTER(32) result.",
+                "signature": "TEXT = int32ToBinaryAsU(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/fnInt32Util.f90",
+                    "line_start": 54,
+                    "line_end": 58
+                  }
+                ],
+                "path": "src/fnInt32Util.f90",
+                "line_start": 54,
+                "line_end": 99,
+                "module": "fnInt32Util"
+              }
+            ]
+          },
+          {
+            "code": "R2",
+            "level": "source-reviewed",
+            "revision": "3514b7463ef2c6f8673527a5b3b4184845d0955e",
+            "reviewed_on": "2026-11-05",
+            "notes": "ISINTEGER checks a signed decimal string's syntax after trimming leading/trailing ordinary spaces and an optional sign, requiring at least one ASCII digit. It does not convert the string or test whether its magnitude fits any integer kind: arbitrarily long digit strings can satisfy this syntax test. The bit/character comparisons depend on the hard-coded ASCII constants shared with the parsers. R2 is the input-validation service scope, not number-theoretic primality or a range certificate. Other binary/octal/hex/unsigned predicates exist but their complete behavior is not covered by this selected procedure review.",
+            "evidence": [
+              {
+                "path": "src/fnNumberStringUtil.f90",
+                "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnNumberStringUtil.f90",
+                "sha256": "3a35cae465a6764a20b4731984e2018730d0b044984c3e43235e8d6694907304"
+              },
+              {
+                "path": "src/fnConsts.f90",
+                "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnConsts.f90",
+                "sha256": "5702fae21f39c55458afd20cb9be1c5034ac0d525bbe9c7351c8aa24c5f86018"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "isInteger",
+                "role": "public-entry-point",
+                "summary": "Public pure logical module function checking signed-decimal syntax, not representable range.",
+                "signature": "VALID = isInteger(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/fnNumberStringUtil.f90",
+                    "line_start": 60,
+                    "line_end": 64
+                  }
+                ],
+                "path": "src/fnNumberStringUtil.f90",
+                "line_start": 60,
+                "line_end": 90,
+                "module": "fnNumberStringUtil",
+                "usage": "use fnNumberStringUtil, only: isInteger\nlogical :: valid\nvalid=isInteger(\" -12345 \")\n! A true result still requires a range-checked conversion before integer use.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Only ASCII-style decimal syntax and space trimming are selected. Do not infer that a syntactically valid long number fits INT32/INT64. No whitespace, encoding, empty-sign or long-input test was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "3514b7463ef2c6f8673527a5b3b4184845d0955e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and inspected utility source headers contain the MIT grant and Khang Hoang Nguyen copyright. Compiler intrinsic behavior and platform encoding remain outside that notice review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/LICENSE",
+              "sha256": "85e3d08bdfe6f9b1da2dc5b4c175cde8e1cf2997f38939128d1899000a62bac4"
+            },
+            {
+              "path": "src/fnDecimalUtil.f90",
+              "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnDecimalUtil.f90",
+              "sha256": "775f0f2990555e3413bf35d6b245cad6163003dfd7278157175a2e57cf67246b"
+            },
+            {
+              "path": "src/fnNumberStringUtil.f90",
+              "url": "https://github.com/kevinhng86/faiNumber-Fortran/blob/3514b7463ef2c6f8673527a5b3b4184845d0955e/src/fnNumberStringUtil.f90",
+              "sha256": "3a35cae465a6764a20b4731984e2018730d0b044984c3e43235e8d6694907304"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26149,12 +26914,152 @@
             ],
             "notes": "The README describes a copy of G. W. Stewart Matran and distinguishes storage types and precision choices. This is a matrix-wrapper library, not new independent implementations of every backend routine.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "3467ac0b6c62ab914e4a85dfd871e6b28e571b32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public SVD generic wraps precision-selected LAPACK GESVD for real RMAT values, offering full/economy left/right vectors and returning a decomposition with D,U,V (the wrapper transposes LAPACK's V^T). The source copies A into TEMP(NROW,NCOL) but uses LDA=A%NAROW, so padded row storage can give an invalid leading dimension; TEMP=A%A can also encounter nonmatching backing extents. Require exact unpadded storage or repair that path. Optional INFO is assigned only on failure, not zeroed on success, and an early query failure reaches cleanup before USEMYWORK is initialized. Request both vector sides explicitly to avoid passing unassociated unused pointer components in the legacy interface. This is a source-inspected wrapper, not an audit or new implementation of LAPACK itself. No singular values, reconstruction or memory-safety case was checked.",
+            "evidence": [
+              {
+                "path": "src/RmatSVD.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/RmatSVD.f90",
+                "sha256": "2ba0029ad60bd4a565b0f8f7e533eab6988d9997914f0727a44a0d44fcd7615f"
+              },
+              {
+                "path": "src/Rmat.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/Rmat.f90",
+                "sha256": "60b053e7b0ad7171b603fb4da1a063c6dd27f7297f38599d8f758ff1d9eb1110"
+              },
+              {
+                "path": "src/MatranUtil.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/MatranUtil.f90",
+                "sha256": "bf6f34e459462f02fa6a484f788bef6f322a8c2e1514abaaa616dc6e4f187941"
+              },
+              {
+                "path": "src/RmatSVDDebug.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/RmatSVDDebug.f90",
+                "sha256": "e4c0e9958a128aa7445397eb26abfa704c65ec16beaeef3ef603a6cb2bbd8e3c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SVD",
+                "role": "public-entry-point",
+                "summary": "Public RMATSVD_M generic; returns a pointer-backed RMATSVD decomposition.",
+                "signature": "CALL SVD(SVDC,A,WANTU,WANTV,FULL,INFO,MYWORK)",
+                "declarations": [
+                  {
+                    "path": "src/RmatSVD.f90",
+                    "line_start": 56,
+                    "line_end": 62
+                  },
+                  {
+                    "path": "src/RmatSVD.f90",
+                    "line_start": 70,
+                    "line_end": 95
+                  }
+                ],
+                "path": "src/RmatSVD.f90",
+                "line_start": 64,
+                "line_end": 66,
+                "module": "RmatSVD_m",
+                "usage": "use MatranUtil_m, only: wp\nuse Rmat_m\nuse RmatSVD_m, only: RmatSVD,SVD\ntype(Rmat) :: a\ntype(RmatSVD) :: factors\na=reshape([1.0_wp,0.0_wp,0.0_wp,2.0_wp,1.0_wp,1.0_wp],[3,2])\n! Require exact backing shape: NAROW=NROW and NACOL=NCOL.\ncall SVD(factors,a,wantu=.true.,wantv=.true.,full=.false.)\n! Validate factors and release all pointer-owned storage with Matran conventions.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This illustrates the unpadded, both-vector branch and omits the unreliable success INFO output. Compile consistently with the dbl/sngl preprocessing configuration and linked BLAS/LAPACK ABI. Review/fix the recorded padding/query-cleanup issues before production use. No factorization, residual or cleanup was executed."
+              },
+              {
+                "procedure": "RmSVD",
+                "role": "implementation-helper",
+                "path": "src/RmatSVD.f90",
+                "line_start": 70,
+                "line_end": 255,
+                "module": "RmatSVD_m"
+              }
+            ]
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "3467ac0b6c62ab914e4a85dfd871e6b28e571b32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public QR generic wraps LAPACK GEQRF and explicitly constructs real Q/R through stored Householder vectors and BLAS products. FULLQ chooses full or thin Q; no column pivoting is performed in this generic. A is logically input, with copies used for the actual factorization; Matran temporary/pointer lifecycle still applies. The sliced GEMV/GER actual arrays are paired with adjusted leading dimensions, whose compiler temporary/contiguity behavior needs validation; the wrapper does not provide an INFO output or consistently act on LAPACK INFO. R is tagged upper triangular, so unused backing entries should not be interpreted as dense zeros. This source mapping is QR decomposition, not rank revelation or a least-squares solve. Review covers shape branches and Householder reconstruction dispatch, not a new LAPACK kernel audit or an orthogonality guarantee.",
+            "evidence": [
+              {
+                "path": "src/RmatQR.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/RmatQR.f90",
+                "sha256": "67ba84f7ab160d484630781abf654cb838674e898d39029137cb05fb732441cc"
+              },
+              {
+                "path": "src/Rmat.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/Rmat.f90",
+                "sha256": "60b053e7b0ad7171b603fb4da1a063c6dd27f7297f38599d8f758ff1d9eb1110"
+              },
+              {
+                "path": "src/MatranUtil.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/MatranUtil.f90",
+                "sha256": "bf6f34e459462f02fa6a484f788bef6f322a8c2e1514abaaa616dc6e4f187941"
+              },
+              {
+                "path": "src/RmatQRDebug.f90",
+                "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/src/RmatQRDebug.f90",
+                "sha256": "75c9d4c0638c686244200c38b2d6f17337bac49abd69e8e2950c76c46ecb4af1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "QR",
+                "role": "public-entry-point",
+                "summary": "Public module generic producing RMATQR with Q and triangular-tagged R; optional FULLQ and pointer workspace.",
+                "signature": "CALL QR(FACTORS,A,FULLQ,MYWORK)",
+                "declarations": [
+                  {
+                    "path": "src/RmatQR.f90",
+                    "line_start": 41,
+                    "line_end": 46
+                  },
+                  {
+                    "path": "src/RmatQR.f90",
+                    "line_start": 71,
+                    "line_end": 90
+                  }
+                ],
+                "path": "src/RmatQR.f90",
+                "line_start": 48,
+                "line_end": 50,
+                "module": "RmatQR_m",
+                "usage": "use MatranUtil_m, only: wp\nuse Rmat_m\nuse RmatQR_m, only: RmatQR,QR\ntype(Rmat) :: a\ntype(RmatQR) :: factors\na=reshape([1.0_wp,0.0_wp,1.0_wp,0.0_wp,1.0_wp,1.0_wp],[3,2])\ncall QR(factors,a,fullq=.false.)\n! Check reconstruction/orthogonality and use triangular semantics for FACTORS%R.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the configured real kind and linked BLAS/LAPACK precision. The example is a tall matrix, not the full-Q/wide branches. Pointer components need explicit cleanup; inspect the sliced-array BLAS leading dimensions before relying on results. No QR residual, orthogonality or compiler-array-temporary behavior was checked."
+              },
+              {
+                "procedure": "RmQR",
+                "role": "implementation-helper",
+                "path": "src/RmatQR.f90",
+                "line_start": 71,
+                "line_end": 323,
+                "module": "RmatQR_m"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom Stewart license; unmodified distribution restriction",
+          "spdx_expression": null,
+          "revision": "3467ac0b6c62ab914e4a85dfd871e6b28e571b32",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README grants use/copy subject to retaining copyright/license/availability notices, restricts distribution to the current unmodified Matran version while permitting appended extension modules, and requires \"Used by permission.\" This is not an MIT/BSD permission to redistribute arbitrary modifications. Linked BLAS/LAPACK has separate terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/Beliavsky/Matran/blob/3467ac0b6c62ab914e4a85dfd871e6b28e571b32/README.md",
+              "sha256": "a2e707757d7f097e1e7757495b4a6aa0bfcf17228aecb375a0a2b9c3e6d552fa"
+            }
+          ]
         }
       },
       "imports": {}

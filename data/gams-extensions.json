@@ -564,6 +564,24 @@
       "parent": "L6a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L6b5": {
+      "label": "Experimental designs",
+      "parent": "L6b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2a2": {
+      "label": "Sparse matrix of constraints",
+      "parent": "G2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "A6b": {
+      "label": "Base conversion",
+      "parent": "A6",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

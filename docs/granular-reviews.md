@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 308 repositories now have 404 source-reviewed
+Reviewed on 2026-11-05. 316 repositories now have 416 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-299 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Nine further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT, TREAT and main_Gaussian) identify supplied program entry points and keep their internal/benchmark
+306 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Ten further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT, main_Gaussian and LHSDRV) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 308 independently source-reviewed repositories now have an
+separately. All 316 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -332,6 +332,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | L-BFGS-B-NS | `setulb` | BSD-3-Clause declaration; referenced license file absent |
 | copa | `copa__sampler::run_sampler` | GPL-3.0-only root text; manifest placeholder |
 | MSOLV | `solver::solve_syst` | LGPL-3.0-only root; backend terms separate |
+| EigenExa | `eigen_libs_mod::eigen_s`, `eigen_h`, `KMATH_EIGEN_GEV` | BSD-2-Clause core; LAPACK/ScaLAPACK notices separate |
+| CUTEst | `CUTEST_uofg` | BSD-3-Clause |
+| LHS | `LHSDRV` | LGPL-2.1 root text; Sandia provenance retained |
+| EMSOL | `ems_sslv` | MIT |
+| KFAS | `kfilter` | GPL-2.0-or-later |
+| dae4py | `DDASKR` | BSD-style wrapper and UC/LLNL DASKR notices |
+| faiNumber Fortran | `fnDecimalUtil::decToInt32`, `fnInt32Util::int32ToBinaryAsU`, `fnNumberStringUtil::isInteger` | MIT |
+| Matran | `RmatSVD_m::SVD`, `RmatQR_m::QR` | Custom Stewart license; unmodified distribution restriction |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -659,6 +667,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [L-BFGS-B-NS](https://github.com/wilmerhenao/l-bfgs-b-ns) | G2h1a2 | Reverse-communication bounded limited-memory quasi-Newton optimization | Fork-specific work/state sizes; standard PGTOL/FACTR exits disabled; caller stopping logic required. |
 | [copa](https://github.com/thomasbiekoetter/copa) | L6b | Serial ensemble stretch-move sampling | At least two walkers and ten steps; validate ranges shape, prior support and external RNG setup. |
 | [MSOLV](https://github.com/tribo-pprime/msolv) | D2a4 | Real sparse direct-solver lifecycle dispatch | Backend formats/ownership and external libraries required; STOP errors, MPI ownership and cleanup allocations need review. |
+| [EigenExa](https://github.com/riken-rccs/eigenexa) | D4a1; D4a3; D4b1 | Distributed real/complex Hermitian ordinary and real symmetric generalized eigenproblems | MPI/local storage setup; no public INFO; values-only cleanup and invalid-metric collective paths require review. |
+| [CUTEst](https://github.com/ralna/cutest) | R | SIF problem objective/gradient evaluation service | Decode/setup and compiled problem routines required; evaluation is not optimization. |
+| [LHS](https://github.com/nrel/lhs) | L6b5 | Supplied Latin-hypercube sampling design program | Program/configuration-file interface; shared modules and outputs; rank matching is not correlation certification. |
+| [EMSOL](https://github.com/ergo-code/emsol) | G2a2 | Sparse bounded LP revised-simplex dispatch | Legacy equivalenced workspace/setup and separate LP status; supplied import supports EMS format. |
+| [KFAS](https://github.com/helske/kfas) | L10a2e | Sequential Gaussian state-space Kalman filtering | Scalar sketch; predicted versus smoothed states, correlated observation transformations and diffuse rank matter. |
+| [dae4py](https://github.com/jonasbreuling/dae4py) | I1a2 | Vendored implicit DASKR BDF integration | Residual includes CJ; consistent initial conditions, option-specific workspaces and IDID recovery are required. |
+| [faiNumber Fortran](https://github.com/kevinhng86/fainumber-fortran) | A6b; R2 | Decimal parsing, binary formatting and numeric-string syntax validation | ASCII/32-bit assumptions; syntax validity does not imply representable range; inspect conversion error flags. |
+| [Matran](https://github.com/beliavsky/matran) | D6; D5 | Real matrix-type SVD and QR interfaces | SVD padding/success-INFO/query-cleanup findings; QR sliced-array BLAS contracts and pointer lifecycle need validation. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1228,3 +1244,11 @@ disabled standard stopping tests in L-BFGS-B-NS, the uninitialized reference mea
 in EnSDAM covariance, CoPA control/shape guards and separate continuation path
 statuses. Those limitations remain explicit rather than implying checked numerical
 results or complete algorithm/API audits.
+
+KFAS, dae4py/DASKR, EigenExa, LHS, EMSOL, faiNumber, CUTEst and Matran
+now have pinned procedure or program interfaces and calling sketches. The sketches
+were not compiled or run. This review distinguishes LHS configuration-driven
+program use, CUTEst evaluation services and sparse/distributed solver setup.
+Matran padding/status/cleanup limitations, EigenExa mode-specific cleanup and
+invalid-metric collective behavior, and legacy workspace/kind/encoding assumptions
+remain explicit; no numerical results or complete API audit are implied.

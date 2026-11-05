@@ -275,7 +275,9 @@ class CatalogTests(unittest.TestCase):
     def test_classification_scope_does_not_turn_support_tools_into_solvers(self):
         records = {p['id']: p['local'] for p in self.local['projects']}
         # These distinctions matter to somebody looking for a runnable algorithm.
-        self.assertEqual([c['code'] for c in records['github:ralna/cutest']['classifications']], ['S'])
+        # Source review also identifies numerical problem-evaluation services;
+        # these evaluate a supplied problem and do not perform optimization.
+        self.assertEqual({c['code'] for c in records['github:ralna/cutest']['classifications']}, {'S', 'R'})
         # Documentation and source reviews may independently support the same
         # class; neither should turn a derivative primitive into a factorizer.
         chol = records['github:imurray/chol-rev']['classifications']
