@@ -192,6 +192,8 @@ def build(destination, root=ROOT):
         crumbs = ' / '.join(link('../../classes/'+c+'/', c) for c in reversed(lineage(tree, code)[1:]))
         intro = '<nav aria-label="Breadcrumb">'+link('../../','All classes')+' / '+crumbs+'</nav>'
         intro += '<h1>'+e(code+' — '+info['label'])+'</h1><p>Includes explicitly mapped descendants. Driver links below match this class or a narrower problem.</p>'
+        intro += '<p>'+link('https://gams.nist.gov/cgi-bin/serve.cgi/Class/'+quote(code, safe=''),
+                           'Original GAMS classification at NIST')+'</p>'
         page('classes/'+code, code+' — '+info['label'], intro+class_links(code, '../../')+
              (listing(subset, '../../', code) if subset else '<p>No repository is mapped here yet.</p>'))
     for p in projects:
