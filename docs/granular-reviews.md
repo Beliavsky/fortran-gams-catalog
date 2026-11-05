@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Eighty-four repositories now have 103 source-reviewed
+Reviewed on 2026-11-05. Ninety-two repositories now have 111 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Eighty-three repository cards now identify public routines and link their usage lines
-to pinned argument declarations. An eighty-fourth, DDFSA, identifies the supplied
-program entry point and keeps its benchmark harness among implementation helpers.
+Ninety repository cards now identify public routines and link their usage lines
+to pinned argument declarations. DDFSA and CWT identify supplied program entry
+points and keep their internal/benchmark routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All eighty-four independently source-reviewed repositories now have an
+separately. All ninety-two independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -107,6 +107,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
+| PyIntegral | External `GaussLegendreQuadrature` (tabulated-data integration) | Custom noncommercial terms; redistribution requires permission |
+| Alexander Mead library | `calculus::derivative` (1D binding) | No license identified in reviewed material |
+| modforutils | `binomial_coefficients::binomialCoef`, `::binomialCoefsArray` | Custom six-condition license |
+| numfor | `csplines::csplrep`, `csplines::csplev` | No grant identified for the reviewed spline module |
+| PyFluxconserving | External `LINinterpol` (not the flux-conservation dispatcher) | Custom noncommercial terms; redistribution requires permission |
+| CWT | `cwt` program; contained wavelet/quadrature helpers | GPL v3 text; version choice unresolved |
+| Pade_approximants | `padem::acPade` (matrix/double-precision solve path) | MIT root; numerical dependency terms separate |
+| libcoul90 | `libcoul90::coul90` (real Coulomb path) | MIT root; inherited numerical rights not fully resolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -210,6 +218,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Computer Methods for Mathematical Computations](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | F1b | Bracketed Brent root search with secant/inverse-quadratic steps and bisection | Continuous scalar problem, finite values, positive controls. Check error code; endpoint sign-product can overflow/underflow. Other textbook solvers not reviewed. |
 | [AFNL](https://github.com/ramos/afnl) | H2a1a1 | Repeated trapezoid refinement and Simpson extrapolation | Absolute successive-estimate test, default 1e-2, fixed 26 refinements. Endpoint evaluations; nonconvergence STOPs the process. Not a rigorous error bound. |
 | [fast_math](https://github.com/jalvesz/fast_math) | C8 | Fixed-coefficient elemental erf approximation | DP uses the same approximate coefficients as SP. No machine-precision/error-bound claim; extreme inputs can overflow. Other fast functions not reviewed. |
+| [PyIntegral](https://github.com/neutrinomuon/pyintegral) | H2a1b2 | Gauss-Legendre rule generation, tabulated linear interpolation and weighted sums | Explicit positive N_INT required despite OPTIONAL declaration; no tolerance/error estimate. Interpolation indexing/status and finite Newton iteration limits need attention. |
+| [Alexander Mead library](https://github.com/alexander-mead/library) | H1 | Centered differences with repeatedly halved width | Default REAL. Relative successive-derivative test divides by the old estimate; no status, fixed iteration budget and STOP on failure. |
+| [modforutils](https://github.com/rweed/modforutils) | C1 | Binomial lookup table and Pascal-row recurrence | REAL64 output is not arbitrary-size exact-integer arithmetic. Require nonnegative N; large coefficients can round or overflow. Other utilities not reviewed. |
+| [numfor](https://github.com/numericfor/numfor) | E1a | Endpoint-curvature cubic fit and scalar local-polynomial evaluation | N>=4, strictly ascending grid. Allocation condition relies on short-circuiting; outside/upper-end lookup can exceed coefficient columns. Other spline operations not reviewed. |
+| [PyFluxconserving](https://github.com/neutrinomuon/PyFluxconserving) | E1a | Cached-interval search and affine interpolation | Saved state and search indexing are unsafe, including in-range cases. Header zero-outside behavior is not implemented. No flux-conservation claim. |
+| [CWT](https://github.com/khaors/cwt) | J | Direct Morlet/Mexican-hat kernel sums and scalogram file output | Standalone program, not module API. Quadrature omits sample spacing; translations use indices, Morlet uses default COMPLEX, output loses phase. |
+| [Pade_approximants](https://github.com/JohanSchott/Pade_approximants) | K4 | Even-coefficient rational fit, least-squares dispatch and evaluation | Inspected solver=0, precision=64, mtr=0 only. KIND=16/build dependencies still required; diagnostics unit 90, no returned convergence status. Thiele is unimplemented. |
+| [libcoul90](https://github.com/banana-bred/libcoul90) | C12 | Real Coulomb continued fractions, order recurrences and normalization | X>1e-7, base-order-dependent zero-based output extent, IFAIL checks. Shared diagnostic modules; no Bessel/wrapper or JWKB accuracy audit. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
