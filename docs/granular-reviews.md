@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 108 repositories now have 127 source-reviewed
+Reviewed on 2026-11-05. 116 repositories now have 136 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-106 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. DDFSA and CWT identify supplied program entry
-points and keep their internal/benchmark routines among implementation helpers.
+112 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Four further cards?DDFSA, CWT, polyfit and
+StatTools?identify supplied program entry points and keep their internal/benchmark
+routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 108 independently source-reviewed repositories now have an
+separately. All 116 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -131,6 +132,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | TRDF | External `TRDF` (linked objective/constraints and ALGENCAN path) | No license identified in reviewed material |
 | DFO mirror | External `dfo` (legacy linked-problem driver) | CPL-1.0 |
 | LMBM | External `LMBMU` (linked objective/subgradient) | No redistribution grant identified in reviewed files |
+| polyfit | Program `polyfit`; independent fitting helpers remain internal | GPL v3 text; version scope unresolved |
+| samplestat | `SampleStatistics::ArithMean`, `::Variance`, `::StdDev` | GNU GPL notice; version/module scope unresolved |
+| StatTools | Program `statistics`, installed as `st_statistics` | GPL v3 root; support source GPL-3.0-or-later |
+| Fortran-Metrics | `metrics_mo::metrics_ty%calc` (vector overload) | MIT |
+| normal-deviates | `pmnrg::MultiNormalGenerator%get` and constructor | MIT |
+| mtprng | `mtprng::mtprng_init`, `::mtprng_rand_real2` | Original custom notices and GPL-3.0-or-later modifications |
+| sobseq | `mod_sobseq::sobol_state%initialize`, `%next`, `%skip_ahead` | MIT |
+| pcg-fortran | `pcg_fortran::pcg_state_oneseq_64_type%random_number_xsh_rr` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -259,6 +268,15 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [DFO mirror](https://github.com/jacobwilliams/dfo) | G2h3b | Input/scaling/interpolation setup and constrained trust-region solver dispatch | Legacy flat arrays, CHARACTER*256 and linked FUN; saved COMMON and default 50-dimensional model limits. Backend configuration/rights and INFO checks required. |
 | [LMBM](https://github.com/WilmerHenao/lmbm) | G1b2 | Workspace initialization, bundle/update dispatch and termination tests | Linked objective/subgradient; no callback argument. Default-REAL time buffers mixed with double work. Distinguish stationarity from progress/budget exits in IOUT(3). |
 
+| [polyfit](https://github.com/plopezrios/polyfit) | K1a1a2 | Independent polynomial fits via weighted normal equations and LAPACK symmetric inversion | Standalone program; internal helpers are not library APIs. Rank/scaling issues and skipped undersized data sets; other fitting branches unreviewed. |
+| [samplestat](https://github.com/haniibrahim/samplestat) | L1a1a; L1a1b | Direct arithmetic mean, N-1 sample variance and square-root standard deviation | Separate N must fit the vector. Raw-moment cancellation and absent validation/status; confidence routines unreviewed. |
+| [StatTools](https://github.com/AstroFloyd/StatTools) | L1a1 | Command-argument data summaries and dispatch to libSUFR median/stdev | Program, not a library. External statistical kernels unreviewed; zero-denominator and geometric-mean domain issues. |
+| [Fortran-Metrics](https://github.com/tkdhss111/Fortran-Metrics) | L1 | Missing-pair filtering and prediction-error summaries | Default REAL and -999 sentinel. Vector MAPE uses signed observations; zero denominators unguarded. |
+| [normal-deviates](https://github.com/patti-favaron/normal-deviates) | L6b14 | Ziggurat proposals, covariance Cholesky and row-wise affine transform | Global intrinsic RNG; nonuniform strip-index selection, unguarded log endpoints and absolute covariance thresholds. No distribution validation. |
+| [mtprng](https://github.com/pdebuyl/mtprng) | L6a21 | Explicit single-seed MT19937 and 32-bit-to-real scaling | Explicit initialization essential: default-state lazy seeding is unreachable. INT64 storage does not mean 64 random bits. |
+| [sobseq](https://github.com/daanvanvugt/sobseq) | L6a21 | Scalar Sobol coordinate, direction recurrence and Gray-code next/skip-ahead | Deterministic low-discrepancy sequence, not independent random draws. User direction parameters, default REAL rounding and unchecked exhaustion. |
+| [pcg-fortran](https://github.com/dscf-1224/pcg-fortran) | L6a21 | Fixed initialization and oneseq 64-state/32-output XSH-RR update | Raw signed bit words; modular overflow/narrowing depends on compiler behavior. Other variants and author C comparisons unverified. |
+
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
 index does not make it an arbitrary integer-order cylindrical `J_n` evaluator.
@@ -281,6 +299,7 @@ Likewise, a block-tridiagonal solver with wider scalar bandwidth and special
 boundary couplings remains under D2a2 rather than scalar-tridiagonal D2a2a.
 H1 and P are already leaves: specific procedures provide useful detail even
 where the official taxonomy has no further subdivisions.
+
 
 ## Source findings to follow up
 
@@ -414,3 +433,22 @@ The polynomial_interpolation mappings distinguish a single degree-n polynomial
 B-spline on a Cartesian-product grid (E2a). Flattening, query shifting, basis
 order and result layouts are recorded with calling fragments. No upstream
 program or numerical reference comparison was compiled or run in this batch.
+
+## Polynomial fitting, summaries and sampling interfaces
+
+The polynomial-fit and multivariate-normal branches use the detailed
+K1a1a2 and L6b14 paths in the [Netlib GAMS taxonomy](https://netlib.org/bib/gams.html).
+These additions preserve the imported taxonomy and record their source in
+`data/gams-extensions.json`. The polyfit mapping is restricted to the ordinary
+polynomial independent-coefficient path; it does not turn its internal normal
+equations into a public least-squares API.
+
+The sampling cards distinguish pseudorandom bit words, scaled uniform values,
+a deterministic Sobol coordinate and intended multivariate normal samples.
+Source findings qualify these classifications: mtprng needs explicit seeding;
+normal-deviates has strip-index and logarithm-endpoint concerns; pcg-fortran
+relies on compiler arithmetic behavior. The cards record the implementation
+intent and calling contract, without certifying distribution quality.
+StatTools delegates its median and standard-deviation kernels to libSUFR;
+that dependency was not audited in this batch. No upstream code or calling
+sketch in this batch was compiled or run.

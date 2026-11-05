@@ -3312,12 +3312,111 @@
             ],
             "notes": "The README identifies the generator family and Fortran interface/build instructions. This does not establish statistical quality, stream independence or suitability for cryptography.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "1c0402a5de2e4c6bfeec20330121a9cc96bf4e75",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected stateful MT19937 path seeds 624 words, twists and tempers 32-bit outputs carried in INT64 storage, and scales them by 2^-32 in mtprng_rand_real2 for intended [0,1) uniform output. It is not a 64-bit-payload generator despite the rand64 function name. Explicit mtprng_init is essential: default mti=-1 bypasses the outer mti>=624 block that encloses the proposed lazy-seed test, then indexes mt(-1). The default-state path is therefore unsafe. This review covers explicit positive single-seed initialization and real2 dispatch, not array seeding, range conversion, normal sampling or statistical/bitwise validation. No generator was run.",
+            "evidence": [
+              {
+                "path": "mtprng.f90",
+                "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/mtprng.f90",
+                "sha256": "7cc6fb2aa680a10f7c7505eb44a3f1fe2adbc76a4d7d03ac8aa726a66ec22bee"
+              },
+              {
+                "path": "stdtypes.f90",
+                "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/stdtypes.f90",
+                "sha256": "72594eb0765c5fb0836d033d20a0bf17fcada961447a13a5c98ca549cd8d9d49"
+              },
+              {
+                "path": "example_prog.f90",
+                "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/example_prog.f90",
+                "sha256": "005f040b1178578d3324f7de698dd1ffa3b97d0e783e75bbe3169b361c971c6e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mtprng_init",
+                "role": "public-entry-point",
+                "summary": "Public single-seed initializer. Pass an INT32 seed and a state object; the initializer sets the word array and mti. Always initialize explicitly before drawing numbers.",
+                "signature": "CALL mtprng_init(seed, state)",
+                "declarations": [
+                  {
+                    "path": "mtprng.f90",
+                    "line_start": 105,
+                    "line_end": 121
+                  },
+                  {
+                    "path": "mtprng.f90",
+                    "line_start": 152,
+                    "line_end": 156
+                  }
+                ],
+                "path": "mtprng.f90",
+                "line_start": 152,
+                "line_end": 173,
+                "module": "mtprng",
+                "usage": "use stdtypes, only: INT32, IEEE64\nuse mtprng, only: mtprng_state, mtprng_init, mtprng_rand_real2\ntype(mtprng_state) :: state\nreal(IEEE64) :: u\ncall mtprng_init(123_INT32, state)\nu = mtprng_rand_real2(state)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile stdtypes before mtprng. The sketch uses an explicit positive seed and does not rely on the broken lazy-initialization branch. The source uses a long free-form line in seed initialization, so compiler line-length settings may be needed. Reproducibility, period and distribution quality have not been tested here; not for cryptography."
+              },
+              {
+                "procedure": "mtprng_rand_real2",
+                "role": "public-entry-point",
+                "summary": "Public REAL(IEEE64) uniform function, intended interval [0,1), advancing a previously initialized state. It scales the 32-bit integer-output path, not a full 53-bit real sampler.",
+                "signature": "u = mtprng_rand_real2(state)",
+                "declarations": [
+                  {
+                    "path": "mtprng.f90",
+                    "line_start": 347,
+                    "line_end": 355
+                  }
+                ],
+                "path": "mtprng.f90",
+                "line_start": 347,
+                "line_end": 361,
+                "module": "mtprng"
+              },
+              {
+                "procedure": "mtprng_rand64",
+                "role": "implementation-helper",
+                "path": "mtprng.f90",
+                "line_start": 227,
+                "line_end": 282,
+                "module": "mtprng"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom original-source notices and GPL-3.0-or-later modifications",
+          "spdx_expression": null,
+          "revision": "1c0402a5de2e4c6bfeec20330121a9cc96bf4e75",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENSE explicitly distinguishes original in-code licenses from GPL >= v3 modifications. The defining files carry Scott Robert Ladd permission notices requiring origin/alteration marking and notice preservation. Preserve these scoped notices rather than assigning the complete project a single simplified SPDX license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/LICENSE",
+              "sha256": "1985d3070c0ca5ea82ef513f25ab20759edf4426e84e0834b99a6650f037e5dc"
+            },
+            {
+              "path": "mtprng.f90",
+              "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/mtprng.f90",
+              "sha256": "7cc6fb2aa680a10f7c7505eb44a3f1fe2adbc76a4d7d03ac8aa726a66ec22bee"
+            },
+            {
+              "path": "stdtypes.f90",
+              "url": "https://github.com/pdebuyl/mtprng/blob/1c0402a5de2e4c6bfeec20330121a9cc96bf4e75/stdtypes.f90",
+              "sha256": "72594eb0765c5fb0836d033d20a0bf17fcada961447a13a5c98ca549cd8d9d49"
+            }
+          ]
         }
       },
       "imports": {}
@@ -7202,12 +7301,109 @@
             ],
             "notes": "The README documents the MultiNormalGenerator interface and rejects nonsymmetric or non-positive-definite covariance matrices. No behavior for singular covariance is claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6b14",
+            "level": "source-reviewed",
+            "revision": "9b5746d11e2991ca12868dddc196580e1ddabdfb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MultiNormalGenerator constructor builds 128 Ziggurat strips; get checks shapes/symmetry, factors the covariance in a private Cholesky helper, fills independent scalar normal proposals and applies mean + L*z to each sample row. This supports the multivariate normal generation intent (L6b14). Important implementation qualifications: strip indices use IAND(NINT(U*10000),127), which is not exactly uniform over 128 strips; the tail logs unguarded RANDOM_NUMBER results, which can be zero. Symmetry uses absolute tolerance 1e-6 and Cholesky rejects updated diagonal values below 1e-6, including some small positive-definite covariances. The intrinsic RNG is global rather than owned by each object. This source mapping does not certify exact distribution, randomness quality or empirical covariance; no samples were run.",
+            "evidence": [
+              {
+                "path": "src/pmnrg.f90",
+                "url": "https://github.com/patti-favaron/normal-deviates/blob/9b5746d11e2991ca12868dddc196580e1ddabdfb/src/pmnrg.f90",
+                "sha256": "db13e00bca7ab5cbacc147fbae30a103d7df6106ed78b89e3a719c64557dd0ed"
+              },
+              {
+                "path": "test/tst_pmnrg.f90",
+                "url": "https://github.com/patti-favaron/normal-deviates/blob/9b5746d11e2991ca12868dddc196580e1ddabdfb/test/tst_pmnrg.f90",
+                "sha256": "88af46343f36999d4a6d6e74235940be39c7090f021f8fe350e1900e88fda38b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "get",
+                "role": "public-entry-point",
+                "summary": "Public function binding returning integer status: zero succeeds, 1 means uninitialized object, 2-6 invalid sizes, 7 asymmetry and 8 failed covariance factorization. REAL(8) mean(n), covariance(n,n) and output(samples,n) are required. Construct the object with MultiNormalGenerator() before calling.",
+                "signature": "status = generator%get(rvMean, rmCov, rmData)",
+                "declarations": [
+                  {
+                    "path": "src/pmnrg.f90",
+                    "line_start": 29,
+                    "line_end": 50
+                  },
+                  {
+                    "path": "src/pmnrg.f90",
+                    "line_start": 116,
+                    "line_end": 124
+                  }
+                ],
+                "path": "src/pmnrg.f90",
+                "line_start": 116,
+                "line_end": 206,
+                "module": "pmnrg",
+                "derived_type": "MultiNormalGenerator",
+                "usage": "use pmnrg, only: MultiNormalGenerator\ntype(MultiNormalGenerator) :: generator\nreal(8) :: mean(2), covariance(2,2), samples(10,2)\ninteger :: status\ngenerator = MultiNormalGenerator()\nmean = 0.0d0\ncovariance = reshape([1.0d0, 0.0d0, 0.0d0, 1.0d0], [2,2])\nstatus = generator%get(mean, covariance, samples)\nif (status /= 0) error stop \"normal generation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Rows hold sample vectors, columns hold components. Successful status is not a goodness-of-fit check. Kind number 8 is compiler dependent. The fixed covariance thresholds, nonuniform strip selection and unguarded logarithm endpoints recorded in the review require attention before relying on distributional results; no independent random streams or cryptographic properties are claimed."
+              },
+              {
+                "procedure": "InitZiggurat",
+                "role": "implementation-helper",
+                "path": "src/pmnrg.f90",
+                "line_start": 60,
+                "line_end": 83,
+                "module": "pmnrg"
+              },
+              {
+                "procedure": "Ziggurat",
+                "role": "implementation-helper",
+                "path": "src/pmnrg.f90",
+                "line_start": 210,
+                "line_end": 252,
+                "module": "pmnrg"
+              },
+              {
+                "procedure": "Cholesky",
+                "role": "implementation-helper",
+                "path": "src/pmnrg.f90",
+                "line_start": 260,
+                "line_end": 300,
+                "module": "pmnrg"
+              },
+              {
+                "procedure": "DRanNormalTail",
+                "role": "implementation-helper",
+                "path": "src/pmnrg.f90",
+                "line_start": 304,
+                "line_end": 333,
+                "module": "pmnrg"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "9b5746d11e2991ca12868dddc196580e1ddabdfb",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE and defining module carry MIT permission/disclaimer text. The review does not certify every algorithm attribution or external dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/patti-favaron/normal-deviates/blob/9b5746d11e2991ca12868dddc196580e1ddabdfb/LICENSE",
+              "sha256": "6045455b07445988230ce91143060ec8273495565e0ca65b4f34b801672fd00e"
+            },
+            {
+              "path": "src/pmnrg.f90",
+              "url": "https://github.com/patti-favaron/normal-deviates/blob/9b5746d11e2991ca12868dddc196580e1ddabdfb/src/pmnrg.f90",
+              "sha256": "db13e00bca7ab5cbacc147fbae30a103d7df6106ed78b89e3a719c64557dd0ed"
+            }
+          ]
         }
       },
       "imports": {}
@@ -10447,12 +10643,123 @@
             ],
             "notes": "The README documents direction-number initialization and strided generation. This is a deterministic low-discrepancy sequence, not a source of independent pseudorandom variates; no quadrature accuracy guarantee is inferred.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "0f53525f14ddb7b51d2268be06a0ee3be613c2d6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected module constructs 31 direction numbers from user-supplied primitive-polynomial parameters, updates a coordinate by Gray-code XOR and lowest-zero-bit position, and supports direct-index Gray-code skip-ahead. L6a21 is used for uniform-sequence generation, explicitly a deterministic low-discrepancy Sobol coordinate rather than independent pseudorandom draws. Users supply a state/direction set per coordinate; no multidimensional direction-number database is bundled in this API. Results use default REAL, so the 31-bit integer construction does not guarantee 31 bits of output precision and rounding may reach 1. Exhaustion, polynomial/seed validity and index bounds are not checked. Strided generation is outside the reviewed usage path. No sequence or discrepancy test was executed.",
+            "evidence": [
+              {
+                "path": "mod_sobseq.f90",
+                "url": "https://github.com/DaanVanVugt/sobseq/blob/0f53525f14ddb7b51d2268be06a0ee3be613c2d6/mod_sobseq.f90",
+                "sha256": "e86fc1aaa58d0ff5fd84c0c8323dc14aee92455356d808ef56038144e48cd1fc"
+              },
+              {
+                "path": "test_sobseq.f90",
+                "url": "https://github.com/DaanVanVugt/sobseq/blob/0f53525f14ddb7b51d2268be06a0ee3be613c2d6/test_sobseq.f90",
+                "sha256": "b5c9b7ee47b26076e8dd2228f446081133dbf8b8551c68fdcea82014bb7fd95d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "initialize",
+                "role": "public-entry-point",
+                "summary": "Public Sobol-coordinate initializer. Default integers s, a and m_in(s) describe the primitive polynomial and starting direction numbers. It resets index and state to zero. Optional stride is separate from ordinary next(); this sketch uses the author test parameters and ordinary next only.",
+                "signature": "CALL state%initialize(s, a, m_in [, stride])",
+                "declarations": [
+                  {
+                    "path": "mod_sobseq.f90",
+                    "line_start": 13,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "mod_sobseq.f90",
+                    "line_start": 29,
+                    "line_end": 35
+                  }
+                ],
+                "path": "mod_sobseq.f90",
+                "line_start": 29,
+                "line_end": 59,
+                "module": "mod_sobseq",
+                "derived_type": "sobol_state",
+                "examples": [
+                  {
+                    "path": "test_sobseq.f90",
+                    "line_start": 1,
+                    "line_end": 21
+                  }
+                ],
+                "usage": "use mod_sobseq, only: sobol_state\ntype(sobol_state) :: state\nreal :: u\ncall state%initialize(1, 0, [1])\nu = state%next()\nu = state%skip_ahead(16)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. One coordinate state, not a complete multidimensional sampler. Use valid direction-number parameters and nonnegative in-range indices; stop before direction/index exhaustion. Ordinary next omits the initial zero point, which can instead be obtained through skip_ahead(0). Default REAL conversion can round away low bits or round to 1; no open/half-open endpoint guarantee is certified."
+              },
+              {
+                "procedure": "next",
+                "role": "public-entry-point",
+                "summary": "Public default-REAL function advancing the initialized coordinate using the rightmost zero bit of the current index. It has no error/status return.",
+                "signature": "u = state%next()",
+                "declarations": [
+                  {
+                    "path": "mod_sobseq.f90",
+                    "line_start": 87,
+                    "line_end": 90
+                  }
+                ],
+                "path": "mod_sobseq.f90",
+                "line_start": 87,
+                "line_end": 94,
+                "module": "mod_sobseq",
+                "derived_type": "sobol_state"
+              },
+              {
+                "procedure": "skip_ahead",
+                "role": "public-entry-point",
+                "summary": "Public default-REAL function computing a coordinate at index i and replacing the state/index, so subsequent next calls continue from that location.",
+                "signature": "u = state%skip_ahead(i)",
+                "declarations": [
+                  {
+                    "path": "mod_sobseq.f90",
+                    "line_start": 63,
+                    "line_end": 69
+                  }
+                ],
+                "path": "mod_sobseq.f90",
+                "line_start": 63,
+                "line_end": 82,
+                "module": "mod_sobseq",
+                "derived_type": "sobol_state"
+              },
+              {
+                "procedure": "i4_bit_lo0",
+                "role": "implementation-helper",
+                "path": "mod_sobseq.f90",
+                "line_start": 123,
+                "line_end": 132,
+                "module": "mod_sobseq"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "0f53525f14ddb7b51d2268be06a0ee3be613c2d6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE supplies an MIT grant and disclaimer. Scope records that notice and the reviewed coordinate module, not external direction-number tables users may choose.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DaanVanVugt/sobseq/blob/0f53525f14ddb7b51d2268be06a0ee3be613c2d6/LICENSE",
+              "sha256": "5ec1a23c416e93b566c65824ce5786d5dd48cac1d6d3a2eec520727fab28d56a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -12922,12 +13229,166 @@
             ],
             "notes": "The README enumerates supported state/output permutations and explicitly excludes variants requiring int128. Availability of the PCG family name does not imply that every PCG configuration is implemented.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected oneseq 64-state/32-output XSH-RR branch initializes a fixed state, saves the old state, advances an LCG using multiplier 6364136223846793005 and increment 1442695040888963407, then xor-shifts/narrows/rotates the old state to an INT32 bit word. L6a21 records uniform pseudorandom word generation. Signed negative INT32 results are bit patterns, not failed draws; there is no real scaling or unbiased bounded-integer conversion in this binding. The arithmetic relies on compiler behavior for signed integer overflow and out-of-range narrowing, which Fortran does not portably define as unsigned modular arithmetic. Other PCG widths, stream families, output permutations, seeding and jump-ahead methods are outside this implementation review. The author C-comparison test was inspected but not run; no sequence or statistical quality claim is validated.",
+            "evidence": [
+              {
+                "path": "src/pcg_fortran.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_fortran.f90",
+                "sha256": "6add29cc1728750433ea496c2bd6edd5490794eaff2b523c6a01eb9097b99e67"
+              },
+              {
+                "path": "src/pcg_random_number_xsh_rr_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_random_number_xsh_rr_implementation.f90",
+                "sha256": "11bc470b4a2432e99dd1cc220dc40a357737e4171f1acb63aa021d612463b204"
+              },
+              {
+                "path": "src/pcg_initialize_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_initialize_implementation.f90",
+                "sha256": "e8a85b3132d80922a8a7a83bb4ab7eb5aa6c8a6b78683a9dd77c8151e41ee4ab"
+              },
+              {
+                "path": "src/pcg_step_oneseq_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_step_oneseq_implementation.f90",
+                "sha256": "4107ce3e165633c7d1ad43dd18213fa43a0a13760e667263878cde96608cd089"
+              },
+              {
+                "path": "src/pcg_output_xsh_rr_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_output_xsh_rr_implementation.f90",
+                "sha256": "1ee58f62e4d20d5eb15a213ea0588a7a26014a7440090d9c4eebc3dd484a2aa5"
+              },
+              {
+                "path": "src/pcg_rotr_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_rotr_implementation.f90",
+                "sha256": "9c664927effbd01cd525cf0f837e6257097b0fd4cae3b2ba6623076c16bc6fb1"
+              },
+              {
+                "path": "src/pcg_default_multiplier_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_default_multiplier_implementation.f90",
+                "sha256": "8fa0807fec2586087f9de409b4596c7a7181b66b72fa3eae40ac5b86e057b1de"
+              },
+              {
+                "path": "src/pcg_default_increment_implementation.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/src/pcg_default_increment_implementation.f90",
+                "sha256": "90a7fad9f321e8dded9274aab1f9d1062256b56587179b6f58111722ffaa9af5"
+              },
+              {
+                "path": "test/pcg_random_number_xsh_rr/src/main.f90",
+                "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/test/pcg_random_number_xsh_rr/src/main.f90",
+                "sha256": "eacae4c15a95b1ef98a7cd6038710d3609a6e0308f84745dc28d0abde23cd529"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "random_number_xsh_rr",
+                "role": "public-entry-point",
+                "summary": "Public inherited generic binding, shown only on pcg_state_oneseq_64_type: CALL takes an INT32 harvest output, updates the private INT64 state and emits a word from the previous state. Call initialize first for the fixed default sequence. Generic specifics are private implementation names.",
+                "signature": "CALL rng%initialize()\nCALL rng%random_number_xsh_rr(harvest)",
+                "declarations": [
+                  {
+                    "path": "src/pcg_fortran.f90",
+                    "line_start": 163,
+                    "line_end": 194
+                  },
+                  {
+                    "path": "src/pcg_fortran.f90",
+                    "line_start": 451,
+                    "line_end": 464
+                  },
+                  {
+                    "path": "src/pcg_fortran.f90",
+                    "line_start": 989,
+                    "line_end": 994
+                  },
+                  {
+                    "path": "src/pcg_fortran.f90",
+                    "line_start": 1174,
+                    "line_end": 1182
+                  }
+                ],
+                "path": "src/pcg_random_number_xsh_rr_implementation.f90",
+                "line_start": 34,
+                "line_end": 43,
+                "module": "pcg_fortran",
+                "derived_type": "pcg_state_oneseq_64_type",
+                "examples": [
+                  {
+                    "path": "test/pcg_random_number_xsh_rr/src/main.f90",
+                    "line_start": 384,
+                    "line_end": 418
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: int32\nuse pcg_fortran, only: pcg_state_oneseq_64_type\ntype(pcg_state_oneseq_64_type) :: rng\ninteger(int32) :: word\ncall rng%initialize()\ncall rng%random_number_xsh_rr(word)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the parent module and required submodules in dependency order using the author build system. initialize resets to the same fixed sequence; this sketch does not choose distinct streams or use custom seeding. Output is a signed storage word, not a nonnegative bounded integer or uniform REAL. Compiler overflow/narrowing semantics must match the intended modular implementation; no flag set or C-reference comparison was verified here."
+              },
+              {
+                "procedure": "pcg_initialize_oneseq_64",
+                "role": "implementation-helper",
+                "path": "src/pcg_initialize_implementation.f90",
+                "line_start": 52,
+                "line_end": 55
+              },
+              {
+                "procedure": "pcg_step_64_oneseq",
+                "role": "implementation-helper",
+                "path": "src/pcg_step_oneseq_implementation.f90",
+                "line_start": 26,
+                "line_end": 28
+              },
+              {
+                "procedure": "pcg_output_xsh_rr_64_32",
+                "role": "implementation-helper",
+                "path": "src/pcg_output_xsh_rr_implementation.f90",
+                "line_start": 20,
+                "line_end": 22
+              },
+              {
+                "procedure": "pcg_rotr_32",
+                "role": "implementation-helper",
+                "path": "src/pcg_rotr_implementation.f90",
+                "line_start": 20,
+                "line_end": 22
+              },
+              {
+                "procedure": "pcg_multiply_default_multiplier_64",
+                "role": "implementation-helper",
+                "path": "src/pcg_default_multiplier_implementation.f90",
+                "line_start": 11,
+                "line_end": 11
+              },
+              {
+                "procedure": "pcg_add_default_increment_64",
+                "role": "implementation-helper",
+                "path": "src/pcg_default_increment_implementation.f90",
+                "line_start": 11,
+                "line_end": 11
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE supplies the MIT grant and disclaimer. This review covers the selected Fortran branch, not every original C reference dependency or output variant.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DSCF-1224/pcg-fortran/blob/b07ffaa552c2da4d3e2c8b361d5c860478b4f7ad/LICENSE",
+              "sha256": "88ed7a93c3c85575db65ec2d9ae777a893fe7dd389a8ed2646d6930100591614"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21964,12 +22425,88 @@
             ],
             "notes": "The README lists scalar/vector error metrics and automatic missing-data skipping. These routines assess predictions; they do not themselves produce forecasts. Missing-value and zero-denominator behavior need more detailed review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1",
+            "level": "source-reviewed",
+            "revision": "e432d745265027e45ade8197710ba1bb4402e5d2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The vector calc binding forms prediction-minus-observation errors after removing pairs matching the -999 sentinel, then returns N, mean bias, mean absolute error, root mean squared error and a percentage summary. L1 records data/error summarization; these are not confidence intervals or distribution tests. The implemented vector MAPE is SUM(ABS(error)/observation*100)/N, with a signed observation denominator: negative observations can give negative contributions and zero observations divide by zero. Scalar APE instead takes ABS of the percentage error. Arrays must conform, default REAL precision is used, and sentinel matching is not IEEE NaN handling. No outputs were checked by execution.",
+            "evidence": [
+              {
+                "path": "src/metrics_mo.f90",
+                "url": "https://github.com/tkdhss111/fortran-metrics/blob/e432d745265027e45ade8197710ba1bb4402e5d2/src/metrics_mo.f90",
+                "sha256": "3d58d65609612b3c16d797d8031a5fd24ae5cf7f0e7a4610de93e4f6126c296c"
+              },
+              {
+                "path": "test/unit_test.f90",
+                "url": "https://github.com/tkdhss111/fortran-metrics/blob/e432d745265027e45ade8197710ba1bb4402e5d2/test/unit_test.f90",
+                "sha256": "745ed16543f21a3fbf0a63b0e7c8d30074f8199d768b4a97b810eadd52ce27c2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calc",
+                "role": "public-entry-point",
+                "summary": "Public generic type binding, shown for its rank-one vector overload. Predictions yhat and observations y are conformable default-REAL vectors; results are public components of metrics_ty. The scalar overload fills different components. Missing pairs are excluded using NA=-999; all missing sets N=iNA and vector summaries to NA.",
+                "signature": "CALL metrics%calc(yhat, y)",
+                "declarations": [
+                  {
+                    "path": "src/metrics_mo.f90",
+                    "line_start": 7,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "src/metrics_mo.f90",
+                    "line_start": 56,
+                    "line_end": 63
+                  }
+                ],
+                "path": "src/metrics_mo.f90",
+                "line_start": 56,
+                "line_end": 84,
+                "module": "metrics_mo",
+                "derived_type": "metrics_ty",
+                "usage": "use metrics_mo, only: metrics_ty\ntype(metrics_ty) :: metrics\ncall metrics%calc([2.0, 4.0], [1.0, 3.0])\nprint *, metrics%N, metrics%MBE, metrics%MAE, metrics%RMSE",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use equal-length finite arrays and positive nonzero observations if using percentage summaries. Legitimate values near the NA sentinel are treated as missing. Vector MAPE uses signed y, not ABS(y). Read components for the active overload only; the object does not reset every component on every call. Allocatable assignment/reallocation is used internally."
+              },
+              {
+                "procedure": "calc_metrics_scalar",
+                "role": "implementation-helper",
+                "path": "src/metrics_mo.f90",
+                "line_start": 33,
+                "line_end": 54,
+                "module": "metrics_mo"
+              },
+              {
+                "procedure": "is_eq",
+                "role": "implementation-helper",
+                "path": "src/metrics_mo.f90",
+                "line_start": 105,
+                "line_end": 109,
+                "module": "metrics_mo"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "e432d745265027e45ade8197710ba1bb4402e5d2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE supplies the MIT grant and disclaimer. This scoped review covers the defining metrics module and root notice, not every downstream use.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tkdhss111/fortran-metrics/blob/e432d745265027e45ade8197710ba1bb4402e5d2/LICENSE",
+              "sha256": "792c088d60db7b8f1b9eaf28602b71f1498d69d0cab547ab45e13c29c21f9977"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24507,12 +25044,96 @@
             ],
             "notes": "The README documents a standalone LAPACK-based Fortran utility, fitted-function evaluation and intersections. Its resampling uncertainties depend on the data/error model; the example values were not reproduced and do not certify arbitrary extrapolations.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K1a1a2",
+            "level": "source-reviewed",
+            "revision": "af5769dbf39c3ecd4bb98ea149d0e7008c0f5402",
+            "reviewed_on": "2026-11-05",
+            "notes": "The PROGRAM contains its fitting helpers; they are not externally callable public library routines. In the independent-coefficient path, the code builds sums of weighted powers of shifted abscissae, factors and inverts the symmetric normal matrix via DSYTRF/DSYTRI, multiplies by the weighted data vector, and accumulates weighted squared residuals. Ordinary polynomial powers support K1a1a2 (unconstrained univariate polynomial least squares). More general exponents are accepted, but this mapping does not certify those domains or shared-coefficient, resampling or intersection branches. Fewer-than-coefficient point sets are skipped with zero-initialized coefficient storage; near-singularity and normal-equation conditioning remain user concerns. No upstream code or author example was compiled or run.",
+            "evidence": [
+              {
+                "path": "polyfit.f90",
+                "url": "https://github.com/plopezrios/polyfit/blob/af5769dbf39c3ecd4bb98ea149d0e7008c0f5402/polyfit.f90",
+                "sha256": "3293a51b6fc21582279a1011153ec21dbc9b4a0dec2f50bf68491eecfa7d643c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/plopezrios/polyfit/blob/af5769dbf39c3ecd4bb98ea149d0e7008c0f5402/README.md",
+                "sha256": "8000161a3ebe58d7bf0f2bfaeb1f42f6a7115da5efad8ee774a993684f00e0f8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "polyfit",
+                "role": "program-entry-point",
+                "summary": "Standalone interactive/scripted program, not a linkable module API. Reads commands from standard input and loads data files. The inspected independent-coefficient fitting path forms weighted normal equations and explicitly inverts their symmetric matrix with LAPACK DSYTRF/DSYTRI. Build with a compatible double-precision LAPACK library.",
+                "signature": "./polyfit < input > output",
+                "declarations": [
+                  {
+                    "path": "README.md",
+                    "line_start": 13,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "README.md",
+                    "line_start": 94,
+                    "line_end": 122
+                  }
+                ],
+                "path": "polyfit.f90",
+                "line_start": 1,
+                "line_end": 125,
+                "usage": "gfortran -o polyfit polyfit.f90 -llapack\n# Supply an input command deck and its referenced data files.\n# The pinned README documents examples/heg_demo/input.\n./polyfit < input > output",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Shell invocation, not a complete fit driver. Use the supplied README input/data example or prepare a matching command deck. The K1a1a2 claim concerns ordinary polynomial powers in the independent fit path; noninteger-power models, shared-coefficient fitting, Monte Carlo uncertainty propagation and intersection calculations are outside this implementation review. Normal equations and explicit inversion are sensitive to scaling/conditioning. Datasets with fewer points than coefficients are skipped by the reviewed helper; LAPACK status is not a rank/accuracy certificate."
+              },
+              {
+                "procedure": "main",
+                "role": "implementation-helper",
+                "path": "polyfit.f90",
+                "line_start": 128,
+                "line_end": 230
+              },
+              {
+                "procedure": "perform_multifit",
+                "role": "implementation-helper",
+                "path": "polyfit.f90",
+                "line_start": 6052,
+                "line_end": 6091
+              },
+              {
+                "procedure": "perform_multifit_indep",
+                "role": "implementation-helper",
+                "path": "polyfit.f90",
+                "line_start": 6094,
+                "line_end": 6183
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "af5769dbf39c3ecd4bb98ea149d0e7008c0f5402",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies GPL version 3 text. The reviewed README and defining program do not settle a version-only versus or-later choice for this project. This records the root text, not a license audit of the separately linked LAPACK implementation.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/plopezrios/polyfit/blob/af5769dbf39c3ecd4bb98ea149d0e7008c0f5402/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/plopezrios/polyfit/blob/af5769dbf39c3ecd4bb98ea149d0e7008c0f5402/README.md",
+              "sha256": "8000161a3ebe58d7bf0f2bfaeb1f42f6a7115da5efad8ee774a993684f00e0f8"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30350,12 +30971,164 @@
             ],
             "notes": "The README documents means, sample standard deviations, extrema and confidence-level controls. Its IEEE-based portability and probability interpretations are not universal guarantees: distributional assumptions, rounding and compiler behavior require independent checking.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "5141c732e9d0dbb0954db0426b463c4a54533cb0",
+            "reviewed_on": "2026-11-05",
+            "notes": "SampleStatistics::ArithMean calls Sums on X(1:N) and divides the sum by N. This supports location summaries of univariate raw data (L1a1a), not a statistical hypothesis-test mapping. REAL(DP) is selected in SysConst with SELECTED_REAL_KIND(15,307). N must be positive and no larger than SIZE(X); no input validation or status output is present. Summation is direct, not a compensated/streaming estimator. No numerical result or CLI workflow was run.",
+            "evidence": [
+              {
+                "path": "samplestatistics_mdl.f90",
+                "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/samplestatistics_mdl.f90",
+                "sha256": "1e0258af916db0d86626aba3949eefc107ad5a3e531e2abe0c761b8b6cc9af30"
+              },
+              {
+                "path": "sysconst_mdl.F90",
+                "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/sysconst_mdl.F90",
+                "sha256": "082a87fbc86f3526078dd03103a41c53822ed92001e644ab47dedb8f9a048b9a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ArithMean",
+                "role": "public-entry-point",
+                "summary": "REAL(DP) arithmetic-mean function over the first N entries of an assumed-shape vector. Import the module interface and SysConst kind; provide 1 <= N <= SIZE(X).",
+                "signature": "mean = ArithMean(X, N)",
+                "declarations": [
+                  {
+                    "path": "samplestatistics_mdl.f90",
+                    "line_start": 110,
+                    "line_end": 116
+                  },
+                  {
+                    "path": "samplestatistics_mdl.f90",
+                    "line_start": 30,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "sysconst_mdl.F90",
+                    "line_start": 40,
+                    "line_end": 44
+                  }
+                ],
+                "path": "samplestatistics_mdl.f90",
+                "line_start": 110,
+                "line_end": 123,
+                "module": "SampleStatistics",
+                "usage": "use SysConst, only: DP\nuse SampleStatistics, only: ArithMean\nreal(DP) :: x(3), mean\nx = [1.0_DP, 2.0_DP, 3.0_DP]\nmean = ArithMean(x, size(x))",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile SysConst before SampleStatistics; sysconst_mdl.F90 contains preprocessor directives. No empty-input, NaN or overflow protection is supplied by the reviewed routine."
+              },
+              {
+                "procedure": "Sums",
+                "role": "implementation-helper",
+                "path": "samplestatistics_mdl.f90",
+                "line_start": 93,
+                "line_end": 106,
+                "module": "SampleStatistics"
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "5141c732e9d0dbb0954db0426b463c4a54533cb0",
+            "reviewed_on": "2026-11-05",
+            "notes": "Variance computes (SUM(X**2)-SUM(X)**2/N)/(N-1) over X(1:N); StdDev returns its square root. L1a1b records dispersion of univariate raw data, specifically sample variance with N-1 denominator. Require 2 <= N <= SIZE(X). The subtractive raw-moment formula can lose precision for small spread around large offsets and can yield a negative computed variance; there is no status or clamp. This review does not cover the Student-factor/confidence routines or verify distributional assumptions by execution.",
+            "evidence": [
+              {
+                "path": "samplestatistics_mdl.f90",
+                "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/samplestatistics_mdl.f90",
+                "sha256": "1e0258af916db0d86626aba3949eefc107ad5a3e531e2abe0c761b8b6cc9af30"
+              },
+              {
+                "path": "sysconst_mdl.F90",
+                "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/sysconst_mdl.F90",
+                "sha256": "082a87fbc86f3526078dd03103a41c53822ed92001e644ab47dedb8f9a048b9a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Variance",
+                "role": "public-entry-point",
+                "summary": "REAL(DP) sample-variance function. N is a separate default integer selecting X(1:N). The denominator is N-1; this is not population variance.",
+                "signature": "sample_variance = Variance(X, N)",
+                "declarations": [
+                  {
+                    "path": "samplestatistics_mdl.f90",
+                    "line_start": 171,
+                    "line_end": 177
+                  },
+                  {
+                    "path": "sysconst_mdl.F90",
+                    "line_start": 40,
+                    "line_end": 44
+                  }
+                ],
+                "path": "samplestatistics_mdl.f90",
+                "line_start": 171,
+                "line_end": 184,
+                "module": "SampleStatistics",
+                "usage": "use SysConst, only: DP\nuse SampleStatistics, only: Variance, StdDev\nreal(DP) :: x(3), v, sd\nx = [1.0_DP, 2.0_DP, 3.0_DP]\nv = Variance(x, size(x))\nsd = StdDev(x, size(x))",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Require at least two finite samples. These raw-moment routines have no error status or cancellation protection. Source mapping is not a recommendation over numerically stable online/two-pass estimators."
+              },
+              {
+                "procedure": "StdDev",
+                "role": "public-entry-point",
+                "summary": "REAL(DP) standard deviation obtained as SQRT(Variance(X,N)); the sample-size and cancellation limitations of Variance propagate.",
+                "signature": "sample_sd = StdDev(X, N)",
+                "declarations": [
+                  {
+                    "path": "samplestatistics_mdl.f90",
+                    "line_start": 188,
+                    "line_end": 194
+                  }
+                ],
+                "path": "samplestatistics_mdl.f90",
+                "line_start": 188,
+                "line_end": 197,
+                "module": "SampleStatistics"
+              },
+              {
+                "procedure": "Sums",
+                "role": "implementation-helper",
+                "path": "samplestatistics_mdl.f90",
+                "line_start": 93,
+                "line_end": 106,
+                "module": "SampleStatistics"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL notice; version and module-wide scope unresolved",
+          "spdx_expression": null,
+          "revision": "5141c732e9d0dbb0954db0426b463c4a54533cb0",
+          "reviewed_on": "2026-11-05",
+          "notes": "The CLI Version routine prints GNU General Public License redistribution terms without a version (sampleSTAT.f90 lines 45-54). No separately named license file or explicit grant/version in the reviewed SampleStatistics module settles the scope for isolated module reuse. Do not infer a specific SPDX version from the GPL web link.",
+          "evidence": [
+            {
+              "path": "sampleSTAT.f90",
+              "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/sampleSTAT.f90",
+              "sha256": "55023bcc061ef17d2c6c1c7d0482785c3fe0998bd5e36a62eb7d3ce722b13999"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/README.md",
+              "sha256": "25cbc791fd4566f7dab69e8d552ab48bcdff30cd1142f278ab6018ece918cd07"
+            },
+            {
+              "path": "samplestatistics_mdl.f90",
+              "url": "https://github.com/haniibrahim/sampleSTAT/blob/5141c732e9d0dbb0954db0426b463c4a54533cb0/samplestatistics_mdl.f90",
+              "sha256": "1e0258af916db0d86626aba3949eefc107ad5a3e531e2abe0c761b8b6cc9af30"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30534,12 +31307,90 @@
             ],
             "notes": "The README labels the collection alpha stage and notes programs still awaiting inclusion. It requires libSUFR; a general tools description does not establish the availability or correctness of every intended statistic.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1",
+            "level": "source-reviewed",
+            "revision": "7f2297dc741b4c1938097b4246e7de2cf51b8f67",
+            "reviewed_on": "2026-11-05",
+            "notes": "The standalone statistics driver reads numeric command arguments into REAL(SUFR double) storage, computes direct sums/means/min/max and geometric product-root summaries, and delegates median and standard deviation/variance to SUFR_statistics. CMake names the executable st_statistics. L1a1 records raw univariate data summarization, scoped to this driver and dispatch rather than an inspection of external libSUFR statistical kernels. Source output includes ratios with unguarded zero denominators and geometric means can overflow or be undefined for negative products. No executable or dependencies were built or run.",
+            "evidence": [
+              {
+                "path": "src/statistics.f90",
+                "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/src/statistics.f90",
+                "sha256": "76819acf23a770eb3c190877c3dea40591fbd8b31bb6e2085ca42d192ed231ab"
+              },
+              {
+                "path": "CMakeLists.txt",
+                "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/CMakeLists.txt",
+                "sha256": "3f7f737a94bcc4bf0f21a44d639adb857fa022203a020dafefcc40c948461c4c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/README.md",
+                "sha256": "23fe6540a75edf45aebb6c2db52ea7e0effcf32fa197a148f06858dd419ef019"
+              },
+              {
+                "path": "src/functions.f90",
+                "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/src/functions.f90",
+                "sha256": "f1c8e9e5644a08437bf8cf4de2ed29db3ab0428a480a53a80548bbac918bce39"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "statistics",
+                "role": "program-entry-point",
+                "summary": "Standalone command-line program installed as st_statistics by CMake. Accepts at least two numeric command arguments; prints count, sum, mean/error, median, variance, standard deviation, geometric mean and ranges. Median and standard deviation/variance dispatch to separately installed libSUFR routines.",
+                "signature": "st_statistics x_1 x_2 [x_3 ... x_n]",
+                "declarations": [
+                  {
+                    "path": "src/statistics.f90",
+                    "line_start": 15,
+                    "line_end": 41
+                  },
+                  {
+                    "path": "CMakeLists.txt",
+                    "line_start": 85,
+                    "line_end": 97
+                  }
+                ],
+                "path": "src/statistics.f90",
+                "line_start": 15,
+                "line_end": 112,
+                "usage": "st_statistics 1 2 3 4",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build/install with CMake and libSUFR as described in README. This is a program invocation, not a library CALL. Positive finite values avoid the obvious zero-mean/minimum ratios and negative-product fractional powers. The external libSUFR median/stdev kernels were not audited here; no sample/population denominator claim is inferred. Numeric parsing has no IOSTAT recovery and formatting has an author TODO."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later for reviewed support source; root GPL v3 text",
+          "spdx_expression": null,
+          "revision": "7f2297dc741b4c1938097b4246e7de2cf51b8f67",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root doc/LICENCE contains GPLv3 text and README permits GPL version 3. The linked ST_general support source explicitly permits version 3 or later. The statistics program has no equivalent header in the inspected file, so the combined project-wide version-only/or-later scope is left unresolved; external libSUFR terms are separate.",
+          "evidence": [
+            {
+              "path": "doc/LICENCE",
+              "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/doc/LICENCE",
+              "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/README.md",
+              "sha256": "23fe6540a75edf45aebb6c2db52ea7e0effcf32fa197a148f06858dd419ef019"
+            },
+            {
+              "path": "src/functions.f90",
+              "url": "https://github.com/AstroFloyd/statTools/blob/7f2297dc741b4c1938097b4246e7de2cf51b8f67/src/functions.f90",
+              "sha256": "f1c8e9e5644a08437bf8cf4de2ed29db3ab0428a480a53a80548bbac918bce39"
+            }
+          ]
         }
       },
       "imports": {}

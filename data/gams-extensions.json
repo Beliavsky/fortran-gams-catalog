@@ -96,6 +96,42 @@
       "parent": "K1b1a",
       "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=23",
       "reviewed_on": "2026-11-05"
+    },
+    "K1a": {
+      "label": "Linear least squares (search also classes D5, D6, D9)",
+      "parent": "K1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1a1": {
+      "label": "Unconstrained",
+      "parent": "K1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1a1a": {
+      "label": "Univariate data (curve fitting)",
+      "parent": "K1a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "K1a1a2": {
+      "label": "Polynomials",
+      "parent": "K1a1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L6b": {
+      "label": "Multivariate",
+      "parent": "L6",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L6b14": {
+      "label": "Normal",
+      "parent": "L6b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
