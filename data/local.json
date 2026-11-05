@@ -37,12 +37,113 @@
             ],
             "notes": "Documents complex FFTs and real/complex transforms; multidimensional coverage is recorded at J1 rather than treating every routine as one-dimensional.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "33b3400dcf9ced8576ce12282932ce772bdf0062",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected ZFFT1D driver initializes twiddle tables with IOPT=0, factors supported lengths into powers of 2/3/5, and dispatches the complex FFT235 radix passes directly or through a blocked two-factor decomposition for larger vectors. IOPT=-1 selects the forward transform; IOPT=1 conjugates before the same FFT and conjugates/scales by 1/N afterward for the inverse. J1a2 records one-dimensional complex discrete Fourier transforms. The source requires N=2**p*3**q*5**r; FACTOR does not return an unsupported-factor error, so callers must validate the positive length themselves. B has 2*N complex entries and holds both scratch and coefficients. Large-path WX/WY tables are SAVE state: initialize again for the current length and do not assume independent large-length setups can be interleaved. Compiled param.h dimensions bound decomposition axes and no runtime bounds/status validation is supplied. Review covers the driver, factorization and radix dispatch, not every kernel, OpenMP behavior, MPI/GPU variants or numerical accuracy. No transform or round-trip was executed.",
+            "evidence": [
+              {
+                "path": "zfft1d.f",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/zfft1d.f",
+                "sha256": "2018818828111639058be522490d54290b391a1d836f16bdbb516e43ff90326d"
+              },
+              {
+                "path": "factor.f",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/factor.f",
+                "sha256": "02c51ed18ad3e30a1e82fd7912cc48a633014e2ffe6221dacd227ebc8830f1ef"
+              },
+              {
+                "path": "fft235.f",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/fft235.f",
+                "sha256": "f587ec22ed477764f39458e39870a63ac89d208f0e18dfcbb0bf518e20d3d4df"
+              },
+              {
+                "path": "param.h",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/param.h",
+                "sha256": "73c150971bcf9c7d8e6f603cd9e667af100da48b0691e5370bc11ea91ab4f2ea"
+              },
+              {
+                "path": "tests/test1d.f",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/tests/test1d.f",
+                "sha256": "72a695cc29d6213f72219b397ddff4704d624249c781291bf49d29e26756e78a"
+              },
+              {
+                "path": "tests/Makefile",
+                "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/tests/Makefile",
+                "sha256": "82f514b119dd6718518eabd75bb93a4f79ad5e06d2447dafc5b2ba570d720ccb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZFFT1D",
+                "role": "public-entry-point",
+                "summary": "External in-place complex-double FFT driver. A needs N entries, B needs 2*N entries; INTEGER N/IOPT must match the fixed-form build ABI. Initialize with IOPT=0, then use -1 forward or +1 inverse. Forward output is unscaled; inverse includes 1/N. Only positive 2/3/5-smooth lengths are supported, with additional compiled workspace-size constraints. There is no status dummy.",
+                "signature": "CALL ZFFT1D(A, N, IOPT, B)",
+                "declarations": [
+                  {
+                    "path": "zfft1d.f",
+                    "line_start": 18,
+                    "line_end": 39
+                  }
+                ],
+                "path": "zfft1d.f",
+                "line_start": 32,
+                "line_end": 85,
+                "examples": [
+                  {
+                    "path": "tests/test1d.f",
+                    "line_start": 19,
+                    "line_end": 34
+                  }
+                ],
+                "usage": "external :: zfft1d\ninteger, parameter :: n=8\ncomplex(kind(0.0d0)) :: a(n), work(2*n)\na=cmplx(0.0d0,0.0d0,kind(0.0d0))\na(1)=cmplx(1.0d0,0.0d0,kind(0.0d0))\ncall zfft1d(a,n,0,work)\ncall zfft1d(a,n,-1,work)\n! For this impulse the unscaled spectrum is all ones.\ncall zfft1d(a,n,1,work)",
+                "usage_notes": "Uncompiled small-path fragment. No spectrum or round-trip comparison was performed. Build/link zfft1d.f, fft235.f, kernel.f and factor.f with a consistent param.h include and compatible COMPLEX*16/default INTEGER conventions; the upstream test Makefile shows that source set and OpenMP flags. Retain the coefficient part of work between calls, reinitialize when changing length, and do not assume shared large-path tables are reentrant. The sample avoids unsupported prime factors and large decomposition dimensions."
+              },
+              {
+                "procedure": "FACTOR",
+                "role": "implementation-evidence",
+                "summary": "Counts powers of 2, 3 and 5 without returning a validation status for remaining prime factors.",
+                "path": "factor.f",
+                "line_start": 19,
+                "line_end": 43
+              },
+              {
+                "procedure": "FFT235",
+                "role": "implementation-helper",
+                "summary": "Radix dispatch only reviewed; individual arithmetic kernels remain outside this audit.",
+                "path": "fft235.f",
+                "line_start": 20,
+                "line_end": 121
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom use/modification grant; original-package redistribution",
+          "spdx_expression": null,
+          "revision": "33b3400dcf9ced8576ce12282932ce772bdf0062",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README permits use, copying and modification for any purpose including commercial use without fee, and explicitly permits distribution of the ORIGINAL package. It does not spell out equivalent redistribution permission for modified packages. Preserve that distinction rather than infer MIT/BSD or another SPDX license. No separately named LICENSE/COPYING file occurs in the reviewed tree.",
+          "evidence": [
+            {
+              "path": "readme.txt",
+              "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/readme.txt",
+              "sha256": "20256f9e26f6e8735b5ae646410cabddca25f122b92421f8a91dd8442f556d3b"
+            },
+            {
+              "path": "zfft1d.f",
+              "url": "https://github.com/certik/ffte/blob/33b3400dcf9ced8576ce12282932ce772bdf0062/zfft1d.f",
+              "sha256": "2018818828111639058be522490d54290b391a1d836f16bdbb516e43ff90326d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3339,12 +3440,172 @@
             ],
             "notes": "The README describes FFTPACK modernization and forward/inverse examples. Language-standard compliance and transform normalization are author claims awaiting independent checks.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "6909d44988925dcae1ee478c06be31e5605d3974",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reviewed FFTpack type exposes public fft/ifft generics for in-place one-dimensional complex transforms. Each method determines N from the array, destroys/reallocates workspace, initializes factors/twiddle tables through CFFT1I, calls CFFT1F or CFFT1B and destroys workspace again. It is not a cached-plan interface. The low-level forward path reinterprets complex storage through ISO_C_BINDING and dispatches radix passes; the inspected terminal radix-four case scales by 1/(4*l1), consistent with the documented forward-normalized/inverse-unscaled convention. This differs from FFTE/FFTW-wrapper forward-unscaled conventions. J1a2 records complex 1D transforms, not all real, multidimensional or trigonometric variants. Supply a nonempty vector; workspace sizing uses log(N) and does not validate N>0 first. Errors may ERROR STOP instead of returning to the caller. Parent/submodule CFFT1F declarations differ in workspace INTENT attributes; compiler acceptance was not checked. Source review covers the wrapper, setup/dispatch and a normalization path, not all factorization/radix arithmetic, build portability or round-trip accuracy. No transform or author test was executed.",
+            "evidence": [
+              {
+                "path": "src/type_FFTpack.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/type_FFTpack.f90",
+                "sha256": "1db5d5772ea9e49460c94a7f4bfe3810aa8865f7f497197028c3f533712158a8"
+              },
+              {
+                "path": "src/fftpack_library.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/fftpack_library.f90",
+                "sha256": "a71fdcaf5beb05d862a55de39309b9fb26484c8bfbe844421583aaa5a5e22fd3"
+              },
+              {
+                "path": "src/fftpack_precision.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/fftpack_precision.f90",
+                "sha256": "98895c2353bc7b386648e3d73e97c4824e80bc4d3fbad16bfb95294ec27414d2"
+              },
+              {
+                "path": "src/complex_transform_routines.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/complex_transform_routines.f90",
+                "sha256": "5dd6da3b84821a49e65f4ebf6813287fb3990e4f7f13ec215ddf02f43d4506de"
+              },
+              {
+                "path": "src/complex_forward_1d.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/complex_forward_1d.f90",
+                "sha256": "eb6a7b4ab2f6887736012addf02a09c4ecf64dbf7522672e28aa8e7e808b357b"
+              },
+              {
+                "path": "src/complex_backward_1d.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/complex_backward_1d.f90",
+                "sha256": "5b995a39ce9a74bec9ab329f64b95927b98f538252b01040b1f253d34fc59ed6"
+              },
+              {
+                "path": "src/complex_initialization_routines.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/complex_initialization_routines.f90",
+                "sha256": "4ac4da85e1570d0e9e015e31f9aa1745c7990170ec233c67081ef4879a89784d"
+              },
+              {
+                "path": "src/auxiliary_routines.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/src/auxiliary_routines.f90",
+                "sha256": "9b48a569daa6c07675b5208e801a68856d67cdc9ff03f5da6c5e64a3abb5ad44"
+              },
+              {
+                "path": "test/tcfft1.f90",
+                "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/test/tcfft1.f90",
+                "sha256": "2495c71b368895981349bf37f3da4b87f98e66e0ba6d900ec54bf62a4eea6b97"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fft",
+                "role": "public-entry-point",
+                "summary": "Public type-bound generic, scoped to COMPLEX(wp) one-dimensional data, overwritten in place. wp is selected_real_kind(15,307) in this revision. A default-declared FFTpack object is sufficient; the method creates/initializes/releases workspaces itself. Forward normalization includes 1/N, unlike many FFT interfaces. Private complex_1d_forward is not the user entry point.",
+                "signature": "CALL transform%fft(data)",
+                "declarations": [
+                  {
+                    "path": "src/type_FFTpack.f90",
+                    "line_start": 304,
+                    "line_end": 313
+                  },
+                  {
+                    "path": "src/type_FFTpack.f90",
+                    "line_start": 60,
+                    "line_end": 61
+                  },
+                  {
+                    "path": "src/fftpack_precision.f90",
+                    "line_start": 14,
+                    "line_end": 18
+                  }
+                ],
+                "path": "src/type_FFTpack.f90",
+                "line_start": 60,
+                "line_end": 60,
+                "module": "type_FFTpack",
+                "derived_type": "FFTpack",
+                "examples": [
+                  {
+                    "path": "test/tcfft1.f90",
+                    "line_start": 89,
+                    "line_end": 100
+                  }
+                ],
+                "usage": "use fftpack_library, only: FFTpack, wp\ntype(FFTpack) :: transform\ncomplex(wp) :: data(4)\ndata=cmplx(0.0_wp,0.0_wp,wp)\ndata(1)=cmplx(1.0_wp,0.0_wp,wp)\ncall transform%fft(data)\n! Forward-normalized impulse spectrum is 0.25 in each bin.\ncall transform%ifft(data)",
+                "usage_notes": "Uncompiled fragment for the public complex 1D generics; expected values are not checked. Build the full module/submodule dependency chain with a compatible Fortran compiler. The high-level path repeats allocation and factor/table setup on every call, even with unchanged N. The constructor is not a reusable plan for these methods because create first destroys its workspaces. Errors can terminate execution. Parent/submodule workspace-INTENT differences and inherited numerical kernels need build/numerical checking before claiming portability or accuracy."
+              },
+              {
+                "procedure": "ifft",
+                "role": "public-entry-point",
+                "summary": "Public type-bound inverse generic for the same in-place COMPLEX(wp) vector. The documented pair fft/ifft reproduces input without caller scaling; inverse is unscaled under the forward-normalized convention. It also rebuilds and destroys workspace per call and reports listed errors with ERROR STOP.",
+                "signature": "CALL transform%ifft(data)",
+                "declarations": [
+                  {
+                    "path": "src/type_FFTpack.f90",
+                    "line_start": 377,
+                    "line_end": 386
+                  },
+                  {
+                    "path": "src/type_FFTpack.f90",
+                    "line_start": 60,
+                    "line_end": 61
+                  }
+                ],
+                "path": "src/type_FFTpack.f90",
+                "line_start": 61,
+                "line_end": 61,
+                "module": "type_FFTpack",
+                "derived_type": "FFTpack"
+              },
+              {
+                "procedure": "complex_1d_forward",
+                "module": "type_FFTpack",
+                "role": "implementation-helper",
+                "path": "src/type_FFTpack.f90",
+                "line_start": 304,
+                "line_end": 373
+              },
+              {
+                "procedure": "complex_1d_backward",
+                "module": "type_FFTpack",
+                "role": "implementation-helper",
+                "path": "src/type_FFTpack.f90",
+                "line_start": 377,
+                "line_end": 446
+              },
+              {
+                "procedure": "complex_pass_4_forward",
+                "module": "complex_transform_routines",
+                "role": "implementation-evidence",
+                "summary": "Inspected terminal normalization case; not an audit of every radix pass.",
+                "path": "src/complex_forward_1d.f90",
+                "line_start": 392,
+                "line_end": 453
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice",
+          "spdx_expression": "MIT",
+          "revision": "6909d44988925dcae1ee478c06be31e5605d3974",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE.mit.md has the MIT grant, retention condition and disclaimer for Jon Lo Kim Lin. README identifies a modernization of NCAR FFTPACK5.1; this finding records the project root notice, not a full audit of every inherited numerical component or its historical terms.",
+          "evidence": [
+            {
+              "path": "LICENSE.mit.md",
+              "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/LICENSE.mit.md",
+              "sha256": "dd1f85eb2646fcc6a2e36e3ed5e3f106d00675506151d4567eec4139548a675c"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/jlokimlin/modern_fftpack/blob/6909d44988925dcae1ee478c06be31e5605d3974/README.md",
+              "sha256": "a615c8c427449834274a45d08c4d840a5cf376a5ac4fa30254210ef0f7572782"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3386,12 +3647,143 @@
             ],
             "notes": "The documented wrapper supplies generic and specific interfaces and requires an FFTW installation. Planned CMake support is not recorded as an available build system.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "1886e06c68a49597c964cb25a1352866936a8807",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected 1D COMPLEX(real64) dcfft1/dicfft1 bindings allocate FFTW-aligned complex storage, create an in-place FFTW_ESTIMATE plan, copy input after planning, execute the forward/backward FFTW call, copy output and destroy/free the plan/buffer. The public fft/ifft generics select these specifics for complex double vectors. Forward is unscaled; inverse divides by the requested length. Optional num(1) truncates input or pads trailing zeros; output is allocatable and replaced on entry. This supports J1a2 as an interface to an external complex DFT implementation, not a new FFT-kernel audit. Each call plans afresh; there is no persistent plan/wisdom reuse in this path. Nonpositive lengths are not validated before allocation/planning, failure uses STOP 1 rather than a status result, and module/caller precision and C interoperability must match the linked FFTW build. Real, other-rank, single-precision and shift families are outside this source review. No wrapper tests, FFTW execution, scaling comparison or timing was run.",
+            "evidence": [
+              {
+                "path": "source/fftw3_wrapper.f90",
+                "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/source/fftw3_wrapper.f90",
+                "sha256": "c97e047fc9789947566537e026e24619f8e2790964dd89de630ae8cab067fb96"
+              },
+              {
+                "path": "source/fftw3.f90",
+                "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/source/fftw3.f90",
+                "sha256": "a24cfb16302241213487c5e20a0d7ea31517f324b520d9b1a36bd2869264a66c"
+              },
+              {
+                "path": "test/fftw3_wrapper_test.f90",
+                "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/test/fftw3_wrapper_test.f90",
+                "sha256": "c9fde0d05c9c9285ff60bfbb796e0c05bb607c76ec329114b9e73cccf0bd2b23"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/README.md",
+                "sha256": "58a7f14905ecb8067765718b54c0a9d1d3f0b40f8fb84a30aef3da6105f3e15b"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/Makefile",
+                "sha256": "f44b8119a01ad64696f6f9fd6e2084a5307342802f22e37ec96f14f742556fc9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fft",
+                "role": "public-entry-point",
+                "summary": "Public module generic, scoped to the dcfft1 binding with COMPLEX(real64) input. out is allocatable INTENT(OUT), inp is INTENT(IN), optional num is a default-INTEGER array of length one. It returns num(1) bins, or size(inp) when absent, in FFTW native ordering with DC first. Use distinct input/output variables.",
+                "signature": "CALL fft(out, inp, num)",
+                "declarations": [
+                  {
+                    "path": "source/fftw3_wrapper.f90",
+                    "line_start": 127,
+                    "line_end": 139
+                  },
+                  {
+                    "path": "source/fftw3_wrapper.f90",
+                    "line_start": 111,
+                    "line_end": 120
+                  }
+                ],
+                "path": "source/fftw3_wrapper.f90",
+                "line_start": 8,
+                "line_end": 19,
+                "module": "fftw3_wrapper",
+                "examples": [
+                  {
+                    "path": "test/fftw3_wrapper_test.f90",
+                    "line_start": 148,
+                    "line_end": 167
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse fftw3_wrapper, only: fft, ifft\ncomplex(real64) :: input(4)\ncomplex(real64), allocatable :: spectrum(:), restored(:)\ninput=cmplx(0.0_real64,0.0_real64,real64)\ninput(1)=cmplx(1.0_real64,0.0_real64,real64)\ncall fft(spectrum,input)\n! Unscaled impulse spectrum is one in each bin.\ncall ifft(restored,spectrum)",
+                "usage_notes": "Uncompiled fragment; no spectrum or round-trip error was checked. Outputs must be allocatable and must not alias the input. The distributed module references single- and double-precision FFTW symbols, so the documented build links both libfftw3 and libfftw3f and needs the FFTW fftw3.f03 include file. Use positive lengths representable in C_INT. Optional resizing changes the transformed sequence; an inverse after truncation is not recovery of discarded samples. No plan reuse or concurrency guarantee was tested."
+              },
+              {
+                "procedure": "ifft",
+                "role": "public-entry-point",
+                "summary": "Public module inverse generic, scoped to dicfft1. Takes COMPLEX(real64) input, returns a separately allocated COMPLEX(real64) vector and divides by its requested transform length. Optional num(1) has the same truncation/zero-padding behavior as fft. Allocation/planning failure stops the process.",
+                "signature": "CALL ifft(out, inp, num)",
+                "declarations": [
+                  {
+                    "path": "source/fftw3_wrapper.f90",
+                    "line_start": 261,
+                    "line_end": 273
+                  },
+                  {
+                    "path": "source/fftw3_wrapper.f90",
+                    "line_start": 299,
+                    "line_end": 314
+                  }
+                ],
+                "path": "source/fftw3_wrapper.f90",
+                "line_start": 47,
+                "line_end": 58,
+                "module": "fftw3_wrapper"
+              },
+              {
+                "procedure": "dcfft1",
+                "module": "fftw3_wrapper",
+                "role": "implementation-evidence",
+                "summary": "Specific binding is also public; the calling sketch uses the public generic fft.",
+                "path": "source/fftw3_wrapper.f90",
+                "line_start": 127,
+                "line_end": 179
+              },
+              {
+                "procedure": "dicfft1",
+                "module": "fftw3_wrapper",
+                "role": "implementation-evidence",
+                "summary": "Specific binding is also public; inverse applies 1/N scaling after FFTW execution.",
+                "path": "source/fftw3_wrapper.f90",
+                "line_start": 261,
+                "line_end": 314
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "1886e06c68a49597c964cb25a1352866936a8807",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE is the GNU GPL version 3 text. No inspected project-specific version-only versus or-later notice resolves a precise SPDX election. FFTW is separately required and its own license/build terms are not superseded or audited by this root-notice finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/README.md",
+              "sha256": "58a7f14905ecb8067765718b54c0a9d1d3f0b40f8fb84a30aef3da6105f3e15b"
+            },
+            {
+              "path": "Makefile",
+              "url": "https://github.com/kuanchihwang/fftw3_wrapper/blob/1886e06c68a49597c964cb25a1352866936a8807/Makefile",
+              "sha256": "f44b8119a01ad64696f6f9fd6e2084a5307342802f22e37ec96f14f742556fc9"
+            }
+          ]
         }
       },
       "imports": {}

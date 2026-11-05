@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Fifty-four repositories now have seventy-one source-reviewed
+Reviewed on 2026-11-05. Fifty-seven repositories now have seventy-four source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Fifty-three repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A fifty-fourth, DDFSA, identifies the supplied
+Fifty-six repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A fifty-seventh, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All fifty-four independently source-reviewed repositories now have an
+separately. All fifty-seven independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -77,6 +77,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Akima86 | External `uvipia` (reviewed general ND>=5 path) | Custom NRLMMD/GeoIPS redistribution and acknowledgment terms |
 | FoLLiA | `follia::lagrange_interpolator%initialize_interpolator`, `%compute_coefficients`, `%compute_interpolations` | README conditional GPL/BSD/MIT licensing notice |
 | SPRINT | `bilinear_interpolator_mod::bilinear_interpolator_type%init`, `%prepare`, `%apply` (restricted REAL(4) illustration) | No project license identified in reviewed material |
+| FFTE | External `ZFFT1D` (complex 1D driver) | Custom use/modification grant; original-package redistribution |
+| modern_fftpack | `type_FFTpack::FFTpack%fft`, `%ifft` (complex 1D bindings; facade `fftpack_library`) | MIT root notice; inherited FFTPACK terms not fully audited |
+| FFTW3 wrapper | `fftw3_wrapper::fft`, `::ifft` (complex REAL64 1D bindings) | GNU GPL version 3; version scope unresolved; FFTW terms separate |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -150,6 +153,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Akima86](https://github.com/NRLMMD-GEOIPS/akima86) | E1a | Weighted endpoint-slope estimates and interval polynomial evaluation | General query loop prints thread/index diagnostics. Four-node cubic formula repeats one ordinate term; sketch uses seven nodes. Invalid input returns sentinel values without status. No shape-preservation claim. |
 | [FoLLiA](https://github.com/giacrossi/FoLLiA) | E1b | Lagrange coefficient products and separate overlapping-stencil estimates | S>=2, 2*S-1 distinct ordered nodes and restricted target required. No automatic stencil combination. PENF/preprocessing required; initializer clears data. |
 | [SPRINT](https://github.com/dongli/sprint) | E2a | Cached tensor-product bilinear weights and four-value application | Index/boundary defects, unassigned first apply return, unusual upper-corner order and no outside guard. REAL(4) sketch is strictly interior and explicitly prepared; general use needs fixes. Dependencies/curvilinear path unverified. |
+| [FFTE](https://github.com/certik/ffte) | J1a2 | Complex driver setup, 2/3/5 factorization, radix dispatch and conjugate/scaled inverse | Initialize for current N; only 2/3/5-smooth lengths with compiled dimension limits. Large tables are saved state. No status or kernel/numerical audit. |
+| [modern_fftpack](https://github.com/jlokimlin/modern_fftpack) | J1a2 | Complex 1D wrapper, setup/dispatch and inspected forward-normalization path | Forward scaled, inverse unscaled. Workspace/setup rebuilt per call. Positive N required; errors may terminate. Parent/submodule workspace INTENT differences need build checking. |
+| [FFTW3 wrapper](https://github.com/kuanchihwang/fftw3_wrapper) | J1a2 | FFTW aligned-buffer planning/execution/cleanup for complex REAL64 1D | Forward unscaled, inverse divided by N. Optional length truncates/pads. New plan per call, allocatable distinct output required, failures STOP. External FFTW kernels not audited. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
