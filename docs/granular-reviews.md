@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 212 repositories now have 260 source-reviewed
+Reviewed on 2026-11-05. 220 repositories now have 271 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-205 repository cards now identify public routines and link their usage lines
+213 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 212 independently source-reviewed repositories now have an
+separately. All 220 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -236,6 +236,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | scivision L-BFGS-B | `solver_lbfgsb::setulb` | Apache-2.0 root; upstream component provenance separate |
 | Bessel-Hankel | `Hankel_Transform::HankelJ0Transform`, `HankelJ1Transform` and Fast variants | MIT link in README; component scope not audited |
 | rpact.as251 | External `MVNPRD`, `ALNORM` | LGPL-3 package declaration; legacy algorithm scope unresolved |
+| EDAT | `pairwise_mean::mean`, `pairwise_variance::variance`; rank-one real64 specializations | BSD-3-Clause |
+| lib_probability_distributions | `mod_discrete_dist::poisson_pmf`, `poisson_log_pmf`; `mod_continuous_dist::normal_pdf`, `normal_log_pdf` | MIT |
+| statislib | `statislib_exponential::exponential_distribution_pdf`, `exponential_distribution_cdf` | BSD-3-Clause |
+| FSML | `fsml_sts::f_sts_mean`, `f_sts_pcc` | MIT |
+| Fortran-Code-Snippits | External `FINDI` | GPL v3 for author work; inherited-source terms unresolved |
+| fortran-weno | `weno_square_mod::weno_square_type%init/%calc_ideal_coefs/%reconstruct` | No license grant identified in reviewed material |
+| polynomial_arnoldi | `polynomial_arnoldi::gmres`, restricted to external `Poisson2D` | No license grant identified in reviewed material |
+| tri_indices | `mod_tri_indices::pack_tri_indices`, `unpack_tri_indices`; selected INT64 overloads | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -467,6 +475,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [scivision L-BFGS-B](https://github.com/scivision/L-BFGS-B) | G2h1a2 | Limited-memory smooth box-constrained optimization with caller gradients | Pin-specific v2.3 workspace. Handle FG/NEW_X/terminal TASK states and distinguish projected-gradient from small objective-reduction stopping. |
 | [Bessel-Hankel](https://github.com/TcheL/Bessel-Hankel) | J | Order-zero/one Hankel digital filters | Kernel callback takes a string and abscissa; the integral has d(lambda), without an extra lambda measure. Fixed tables have no error estimate. |
 | [rpact.as251](https://github.com/rpact-com/rpact.as251) | L5b1n; C8a | Product-correlation normal rectangular probabilities and AS 66 univariate tails | N<=50 and default REAL/float kernel. Not arbitrary covariance support; inspect IFAULT, and account for hard-coded tail clipping. |
+| [EDAT](https://github.com/koseiohara/EDAT) | L1a1a; L1a1b | Pairwise-reduced arithmetic mean and centered population/sample variance | Reduction remains in the selected kind. Empty input returns zero; singleton sample variance returns NaN. Preprocessed rank-one paths only. |
+| [lib_probability_distributions](https://github.com/barisbarisgithub/lib_probability_distributions) | L5a1p; L5a1n | Poisson mass/log mass and normal density/log density | C_LONG_DOUBLE is platform-dependent. Check integer errors; Poisson rejects lambda=0, and sigma is a standard deviation. |
+| [statislib](https://github.com/Jim-215-Fisher/statislib) | L5a1e | Real exponential PDF/CDF from Fypp templates | Lambda is a rate. Result is default REAL even for DP/QP inputs; invalid domains call error_stop. CDF can lose small-argument precision. |
+| [FSML](https://github.com/sebastian-mutz/fsml) | L1a1a; L1b | Arithmetic mean and descriptive Pearson correlation | Wrappers reject size<=1 using printed diagnostics/NaN. Pearson path does not guard zero variance; no significance test is supplied. |
+| [Fortran-Code-Snippits](https://github.com/aussie-pete/fortran-code-snippits) | N5c | Ascending-array exact-key binary search | FINDI returns one-based match or -1, not an insertion position. No first/last duplicate or approximate-match guarantee. |
+| [fortran-weno](https://github.com/dongli/fortran-weno) | E2a | Tensor-polynomial WENO-Z reconstruction from 2D cell averages | Resolve inversion helper's unassigned success IERR before relying on setup. Uses REAL(16) setup; no positivity or accuracy guarantee. |
+| [polynomial_arnoldi](https://github.com/loiseaujc/polynomial_arnoldi) | D2 | Restarted GMRES with reorthogonalized Arnoldi and Givens rotations | Poisson2D-only external operator API; internal tolerance, no returned status. Zero RHS and inner-cycle budget boundaries need care. |
+| [tri_indices](https://github.com/yymmt742/tri_indices) | D1b9 | Index mapping for upper-triangle packed matrix storage | Index service only, without copying matrix values. Integer intermediates can overflow; inverse uses default-real SQRT even for INT64. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -899,3 +915,25 @@ single-precision ABI, separately from the AS 66 tail helper.
 All new sketches remain uncompiled and unrun. The reviews identify implemented
 paths and contracts, not numerical certification or complete dependency/license
 audits. Pinned line links, hashes and author examples remain in the ledger.
+
+## Statistical conventions, generated precision and storage indices
+
+The EDAT and FSML cards distinguish public wrappers, selected template
+specializations and implementation helpers. They record empty/singleton input
+behavior, population versus sample denominators, and correlation without
+inferential claims. The probability cards distinguish mass/density evaluation
+from cumulative/inverse probabilities and random generation. In particular,
+C_LONG_DOUBLE is not a fixed-width quadruple kind, and statislib's inspected
+exponential PDF/CDF result declarations remain default REAL.
+
+FINDI is an exact-key search, while tri_indices is an address-mapping service
+for packed storage. Their indexing conventions and arithmetic limits are part
+of the recorded calling contracts. The WENO review records the unassigned
+inversion-success status and restricts its claim to a selected 2D cell-average
+reconstruction path. The GMRES card retains a broad D2 mapping because its
+public operator type comes from an external dependency; it does not claim an
+arbitrary-matrix or unrestricted sparse-solver interface.
+
+All new sketches remain uncompiled and unrun. Source review and linked upstream
+examples do not establish numerical accuracy, successful builds or complete
+component-license provenance. The generated ledger retains pins and file hashes.

@@ -312,6 +312,18 @@
       "parent": "F1a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L1b": {
+      "label": "Two dimensional data (search also class L1c)",
+      "parent": "L1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "N5c": {
+      "label": "On a key",
+      "parent": "N5",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

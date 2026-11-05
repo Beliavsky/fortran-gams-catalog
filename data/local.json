@@ -27535,12 +27535,190 @@
             ],
             "notes": "The README lists basic statistics, distributions, tests, OLS/discriminant analysis and k-means, with a Fortran 2008/stdlib requirement. Individual procedures and statistical assumptions need deeper review before granular mappings are assigned.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "75e895d3f4a78bfb40101993f762253bc620816b",
+            "reviewed_on": "2026-11-05",
+            "notes": "f_sts_mean checks for at least two values then calls the pure mean core, which divides SUM(X) by SIZE(X). L1a1a records arithmetic location of raw univariate data, not a median, weighted estimator or missing-data mean. The wrapper prints an error and returns a NaN for size<=1, including a mathematically defined singleton mean. The public core has fewer checks and is not a drop-in validated wrapper. Working kind WP is REAL64; accumulation is a direct intrinsic SUM, not an explicitly compensated algorithm. Nonfinite/missing-data handling is not supplied by this selected path. No sample summaries or error paths were run.",
+            "evidence": [
+              {
+                "path": "src/core/fsml_sts.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/src/core/fsml_sts.f90",
+                "sha256": "b7e96556f2767dd2ba42b27a91e9f463f8a7dd88a3fa540867d6bed96d2df922"
+              },
+              {
+                "path": "src/def/fsml_ini.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/src/def/fsml_ini.f90",
+                "sha256": "8fc651913ac18e295399c4732a657fa85f2b06721bf41f61da099108b12f3716"
+              },
+              {
+                "path": "example/example_sts.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/example/example_sts.f90",
+                "sha256": "c8d7571b3ca8ed0b8c5f4270831a4421c1edd73b87b86f97b218a3bd1410f8a9"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/README.md",
+                "sha256": "ca12942e0ab8a4af03f8997db41b1839f4fa310c709666bd4775d59c6e67c99e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "f_sts_mean",
+                "role": "public-entry-point",
+                "summary": "Public fsml_sts wrapper returning REAL(wp) from REAL(wp) X(:). WP is defined in fsml_ini as REAL64. Error signaling is printed diagnostics plus NaN, not an integer status output; core is separately public with a narrower contract.",
+                "signature": "value = f_sts_mean(x)",
+                "declarations": [
+                  {
+                    "path": "src/core/fsml_sts.f90",
+                    "line_start": 17,
+                    "line_end": 35
+                  },
+                  {
+                    "path": "src/core/fsml_sts.f90",
+                    "line_start": 42,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "src/def/fsml_ini.f90",
+                    "line_start": 43,
+                    "line_end": 50
+                  }
+                ],
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 42,
+                "line_end": 68,
+                "module": "fsml_sts",
+                "examples": [
+                  {
+                    "path": "example/example_sts.f90",
+                    "line_start": 14,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "example/example_sts.f90",
+                    "line_start": 50,
+                    "line_end": 52
+                  }
+                ],
+                "usage": "use fsml_ini, only: wp\nuse fsml_sts, only: f_sts_mean\nreal(wp) :: x(3),value\nx=[1._wp,2._wp,3._wp]\nvalue=f_sts_mean(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use at least two finite samples for this wrapper. Its empty/singleton behavior differs from EDAT. NaN returns need an IEEE-aware caller check; the routine does not return an uncertainty estimate. The pinned author example uses a facade alias, while the sketch imports the defining public wrapper directly."
+              },
+              {
+                "procedure": "f_sts_mean_core",
+                "role": "implementation-helper",
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 73,
+                "line_end": 85,
+                "module": "fsml_sts"
+              }
+            ]
+          },
+          {
+            "code": "L1b",
+            "level": "source-reviewed",
+            "revision": "75e895d3f4a78bfb40101993f762253bc620816b",
+            "reviewed_on": "2026-11-05",
+            "notes": "f_sts_pcc validates equal-length vectors with more than one entry, then computes centered covariance divided by the square root of the product of centered population variances. L1b records descriptive two-variable Pearson correlation, not a correlation hypothesis test or a fitted regression model. The covariance/variance cores use direct centered dot products and divide by N in this selected call. The wrapper does not guard zero variance, near-overflow products or nonfinite inputs; constant series can divide by zero. Private error/NaN utilities are dependencies, and core calls bypass wrapper validation. No correlation result, significance or numerical stability test was run.",
+            "evidence": [
+              {
+                "path": "src/core/fsml_sts.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/src/core/fsml_sts.f90",
+                "sha256": "b7e96556f2767dd2ba42b27a91e9f463f8a7dd88a3fa540867d6bed96d2df922"
+              },
+              {
+                "path": "src/def/fsml_ini.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/src/def/fsml_ini.f90",
+                "sha256": "8fc651913ac18e295399c4732a657fa85f2b06721bf41f61da099108b12f3716"
+              },
+              {
+                "path": "example/example_sts.f90",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/example/example_sts.f90",
+                "sha256": "c8d7571b3ca8ed0b8c5f4270831a4421c1edd73b87b86f97b218a3bd1410f8a9"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/README.md",
+                "sha256": "ca12942e0ab8a4af03f8997db41b1839f4fa310c709666bd4775d59c6e67c99e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "f_sts_pcc",
+                "role": "public-entry-point",
+                "summary": "Public REAL(wp) Pearson coefficient wrapper over conformable X(:),Y(:). Invalid lengths print diagnostics and return NaN; zero variance is not explicitly rejected. WP=REAL64. This call does not return p-values, confidence intervals or degrees-of-freedom tests.",
+                "signature": "correlation = f_sts_pcc(x, y)",
+                "declarations": [
+                  {
+                    "path": "src/core/fsml_sts.f90",
+                    "line_start": 429,
+                    "line_end": 456
+                  },
+                  {
+                    "path": "src/def/fsml_ini.f90",
+                    "line_start": 43,
+                    "line_end": 50
+                  }
+                ],
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 429,
+                "line_end": 464,
+                "module": "fsml_sts",
+                "usage": "use fsml_ini, only: wp\nuse fsml_sts, only: f_sts_pcc\nreal(wp) :: x(3),y(3),correlation\nx=[1._wp,2._wp,3._wp]; y=[2._wp,1._wp,4._wp]\ncorrelation=f_sts_pcc(x,y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite equal-length vectors with nonzero variance. This is a descriptive coefficient only; inferential assumptions or significance are not provided by the call. Independently check finite output and conditioning for nearly constant data."
+              },
+              {
+                "procedure": "f_sts_pcc_core",
+                "role": "implementation-helper",
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 469,
+                "line_end": 483,
+                "module": "fsml_sts"
+              },
+              {
+                "procedure": "f_sts_cov_core",
+                "role": "implementation-helper",
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 347,
+                "line_end": 366,
+                "module": "fsml_sts"
+              },
+              {
+                "procedure": "f_sts_var_core",
+                "role": "implementation-helper",
+                "path": "src/core/fsml_sts.f90",
+                "line_start": 205,
+                "line_end": 221,
+                "module": "fsml_sts"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "75e895d3f4a78bfb40101993f762253bc620816b",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENCE and selected defining module identify MIT. This scoped source review covers the selected mean/correlation paths and does not establish correctness of all descriptive statistics, ranking or machine-learning routines.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/LICENCE",
+              "sha256": "16c255861565330ce272da37843b087b4a7c615795efedcb0f9cac8bc3add9af"
+            },
+            {
+              "path": "src/core/fsml_sts.f90",
+              "url": "https://github.com/sebastian-mutz/fsml/blob/75e895d3f4a78bfb40101993f762253bc620816b/src/core/fsml_sts.f90",
+              "sha256": "b7e96556f2767dd2ba42b27a91e9f463f8a7dd88a3fa540867d6bed96d2df922"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29825,12 +30003,166 @@
             ],
             "notes": "The brief README identifies the currently implemented WENO variant. Reconstruction is a numerical component; no complete time-dependent PDE solver, arbitrary-dimensional WENO family or convergence test is inferred.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "d60cd19cd23805203eccac1dc90a260bc0bfa82a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The two-dimensional square-stencil path constructs tensor-polynomial reconstruction matrices from cell integrals, solves for ideal sub-stencil coefficients and blends reconstructed point values with WENO-Z smoothness weights and positive/negative coefficient splitting. E2a records reconstruction on a gridded bivariate stencil, scoped to cell-average inputs rather than scattered point interpolation or a complete PDE solver. Initialize the stencil, add evaluation points and compute ideal coefficients before rank-two reconstruct. The inspected inversion helper has INTENT(OUT) IERR but assigns it only on failure; its success return is undefined and is then checked by setup. This must be resolved/validated before relying on the setup status. REAL(16) setup arithmetic and preprocessing limit portability. NDEBUG removes size checks; reconstruction does not return an accuracy estimate or enforce positivity. Other widths/masks, rhombus and one-dimensional paths are excluded. No reconstruction or formal-order test was run.",
+            "evidence": [
+              {
+                "path": "src/weno_square_mod.F90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/weno_square_mod.F90",
+                "sha256": "426ce004ad3d5c7ab9d33d79a0566c8ce18956c2beea22a58ddc8c6154d2edf2"
+              },
+              {
+                "path": "src/math_mod.F90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/math_mod.F90",
+                "sha256": "224c2a4b98e16840876570814cbaeb7c704512fc1ae79ad480d416dd32007f62"
+              },
+              {
+                "path": "src/poly_utils_mod.F90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/poly_utils_mod.F90",
+                "sha256": "c2fe31617448a7b19077d4e84498fe8e692b7c8bf24f3dd091d8a633486aa848"
+              },
+              {
+                "path": "src/smooth_indicators_mod.F90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/smooth_indicators_mod.F90",
+                "sha256": "6ed221bbc75f448e32dc7e2ee6cf0d410cf1f3904a0d3da7e2dce3c6b83848c6"
+              },
+              {
+                "path": "src/test.f90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/test.f90",
+                "sha256": "c3c24c466f4060a034c639f446f23181b5f5ea84f94a38afa24f3cf9e740c8ec"
+              },
+              {
+                "path": "src/weno.F90",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/weno.F90",
+                "sha256": "6f938fe3f5f07fec9ef2f18ca43540f4da6543b78bf1e66bd407c5e6c4e90397"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/README.md",
+                "sha256": "a0c2cb5105c138596eaf7ed30afb85e83b18a09a07f1a4703c45570d10632330"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "reconstruct",
+                "role": "public-entry-point",
+                "summary": "Public generic type binding on weno_square_mod::weno_square_type; selected rank-two overload takes REAL(8) cell-average FI(:,:), REAL(8) FO(:) at registered points and INTEGER IERR. Type state includes sub-stencils, reconstruction matrices and a smoothness callback; it is not initialized by merely declaring the object.",
+                "signature": "CALL stencil%reconstruct(fi, fo, ierr)",
+                "declarations": [
+                  {
+                    "path": "src/weno_square_mod.F90",
+                    "line_start": 13,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "src/weno_square_mod.F90",
+                    "line_start": 419,
+                    "line_end": 444
+                  }
+                ],
+                "path": "src/weno_square_mod.F90",
+                "line_start": 419,
+                "line_end": 476,
+                "module": "weno_square_mod",
+                "derived_type": "weno_square_type",
+                "examples": [
+                  {
+                    "path": "src/test.f90",
+                    "line_start": 196,
+                    "line_end": 213
+                  }
+                ],
+                "usage": "use weno_square_mod, only: weno_square_type\ntype(weno_square_type) :: stencil\nreal(8) :: fi(5,5),fo(1)\ninteger :: ierr\n! First resolve/validate the inverse_matrix success-status issue in the pinned setup.\ncall stencil%init(nd=2,sw=5)\ncall stencil%add_point(x=-0.5d0,y=0d0)\ncall stencil%calc_ideal_coefs(ierr)\nif(ierr/=0) error stop \"WENO setup failed\"\n! Supply actual cell averages on the initialized stencil, not nodal samples.\ncall stencil%reconstruct(fi,fo,ierr)\nif(ierr/=0) error stop \"WENO reconstruction failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Incomplete setup/data protocol, not a working numerical driver: FI must be filled with compatible cell averages. The pinned inversion success path leaves IERR undefined; fixing that helper or independently validating setup is a prerequisite, and initializing IERR only in the caller does not repair an INTENT(OUT) dummy. Default local coordinates are centered unit-cell coordinates, not global query coordinates. Size checks depend on NDEBUG; check masks, supported smoothness callbacks and nonlinear-weight denominators. No claimed positivity or accuracy follows from IERR=0."
+              },
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Public recursive initializer, selected ND=2/SW=5 square stencil with default centered cell coordinates. Allocates sub-stencils and assigns supported smoothness callbacks; it does not alone compute evaluation matrices.",
+                "signature": "CALL stencil%init(nd,sw [, xc,yc,is,ie,js,je,mask,id])",
+                "declarations": [
+                  {
+                    "path": "src/weno_square_mod.F90",
+                    "line_start": 59,
+                    "line_end": 71
+                  },
+                  {
+                    "path": "src/weno_square_mod.F90",
+                    "line_start": 112,
+                    "line_end": 159
+                  }
+                ],
+                "path": "src/weno_square_mod.F90",
+                "line_start": 59,
+                "line_end": 161,
+                "module": "weno_square_mod",
+                "derived_type": "weno_square_type"
+              },
+              {
+                "procedure": "calc_ideal_coefs",
+                "role": "public-entry-point",
+                "summary": "Public type-bound matrix/ideal-weight preparation. IERR is passed through the inversion helpers whose success assignment issue is documented in the review.",
+                "signature": "CALL stencil%calc_ideal_coefs(ierr)",
+                "declarations": [
+                  {
+                    "path": "src/weno_square_mod.F90",
+                    "line_start": 304,
+                    "line_end": 325
+                  }
+                ],
+                "path": "src/weno_square_mod.F90",
+                "line_start": 304,
+                "line_end": 365,
+                "module": "weno_square_mod",
+                "derived_type": "weno_square_type"
+              },
+              {
+                "procedure": "inverse_matrix_r16",
+                "role": "implementation-helper",
+                "path": "src/math_mod.F90",
+                "line_start": 87,
+                "line_end": 157,
+                "module": "math_mod"
+              },
+              {
+                "procedure": "smooth_indicator_3x3",
+                "role": "implementation-helper",
+                "path": "src/smooth_indicators_mod.F90",
+                "line_start": 29,
+                "line_end": 37,
+                "module": "smooth_indicators_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "d60cd19cd23805203eccac1dc90a260bc0bfa82a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README names authors and describes WENO but provides no explicit reuse grant, and the pinned tree has no separately named LICENSE/COPYING identified. Source availability and literature references are not substituted for licensing terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/README.md",
+              "sha256": "a0c2cb5105c138596eaf7ed30afb85e83b18a09a07f1a4703c45570d10632330"
+            },
+            {
+              "path": "src/weno_square_mod.F90",
+              "url": "https://github.com/dongli/fortran-weno/blob/d60cd19cd23805203eccac1dc90a260bc0bfa82a/src/weno_square_mod.F90",
+              "sha256": "426ce004ad3d5c7ab9d33d79a0566c8ce18956c2beea22a58ddc8c6154d2edf2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30403,12 +30735,214 @@
             ],
             "notes": "The README documents mean, covariance, variance, correlation and quicksort interfaces along with meteorological, string and binary-I/O helpers. Only the documented statistics and sorting areas are mapped here; test commands are upstream instructions rather than tests run for this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "d4353eba94fad09617cbee241249b7919110a7fa",
+            "reviewed_on": "2026-11-05",
+            "notes": "The rank-one pairwise_mean::mean specialization computes SUM_HP(arr)/N. Its reduction wrapper copies input and calls a balanced pairwise reduction for more than three values; shorter arrays use direct additions. L1a1a records arithmetic location of univariate raw data, not missing-data estimation or an error bound. Real32/64/128 specializations are generated with preprocessor includes. SUM_HP uses the selected input kind, not an automatically wider accumulator or arbitrary precision. Empty input deliberately returns zero, which should not be interpreted as a statistically defined empty-sample mean. Optional DIM on this rank-one path must be 1. No mean, cancellation benchmark or reduction-accuracy test was run.",
+            "evidence": [
+              {
+                "path": "src/pairwise_mean_spec.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_mean_spec.F90",
+                "sha256": "3ebc2ea32c8e90bb96474d2b0b17aca2395ee7b99f49ec216d6f9f82d80e92d1"
+              },
+              {
+                "path": "src/pairwise_mean.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_mean.F90",
+                "sha256": "aab582f3674298199606081ec7d57b7fa59aee2532cf1e3858cee57b7303340a"
+              },
+              {
+                "path": "src/pairwise_sum.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum.F90",
+                "sha256": "418a630af68f95844f71474898e2e83ca0ba1d1791b77ba7b991dcea939e98a8"
+              },
+              {
+                "path": "src/pairwise_sum_spec.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum_spec.F90",
+                "sha256": "552bfd51d07c464765b9ccb6b589941dad047d44ccd750d5beebdf504acc005e"
+              },
+              {
+                "path": "src/pairwise_sum_core.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum_core.F90",
+                "sha256": "0f23aa6484de9e5feb2b2d10ec41c08f4f6eb8edc2abacb6d1f845af0d629252"
+              },
+              {
+                "path": "tests/test_external_consumer.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/tests/test_external_consumer.F90",
+                "sha256": "e628fb18a45d0b52133b8e4a05c9ea322670e432de95b3aa5bb804d4436d571c"
+              },
+              {
+                "path": "src/edat_math.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/edat_math.F90",
+                "sha256": "39ebbf7f49d90bacb14cc74c6bd3c1617b2b85ddb1c6fe3946cbc16bd0492a9c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/README.md",
+                "sha256": "8fa797d2e4521a94f6fcaa0106a92afa3925f65627b78780afb7c91e01350535"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "Public generic in pairwise_mean, re-exported by EDAT_Math. Selected rank-one specialization takes REAL(RK) ARR(:) and optional default-INTEGER DIM, returning the same real kind. Source macros instantiate real32, real64 and real128; the shown usage selects real64.",
+                "signature": "value = mean(arr [, dim])",
+                "declarations": [
+                  {
+                    "path": "src/pairwise_mean_spec.F90",
+                    "line_start": 3,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/pairwise_mean.F90",
+                    "line_start": 3,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/pairwise_mean.F90",
+                    "line_start": 117,
+                    "line_end": 137
+                  },
+                  {
+                    "path": "src/edat_math.F90",
+                    "line_start": 2,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/pairwise_mean_spec.F90",
+                "line_start": 4,
+                "line_end": 29,
+                "module": "pairwise_mean",
+                "examples": [
+                  {
+                    "path": "tests/test_external_consumer.F90",
+                    "line_start": 1,
+                    "line_end": 10
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse pairwise_mean, only: mean\nreal(real64) :: x(4),value\nx=[1._real64,2._real64,3._real64,4._real64]\nvalue=mean(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the preprocessed pairwise modules in dependency order. Use nonempty finite input for a meaningful sample summary. The HP name refers to pairwise reduction behavior, not a guarantee of wider or exact arithmetic. Rank/dimension and missing-value paths beyond this selected unmasked rank-one specialization are not certified."
+              },
+              {
+                "procedure": "SUM_HP_1",
+                "role": "implementation-helper",
+                "path": "src/pairwise_sum_spec.F90",
+                "line_start": 4,
+                "line_end": 50,
+                "module": "pairwise_sum"
+              },
+              {
+                "procedure": "CORE",
+                "role": "implementation-helper",
+                "path": "src/pairwise_sum_core.F90",
+                "line_start": 8,
+                "line_end": 142,
+                "module": "pairwise_sum"
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "d4353eba94fad09617cbee241249b7919110a7fa",
+            "reviewed_on": "2026-11-05",
+            "notes": "The rank-one variance specialization computes a mean, forms squared centered deviations and reduces them with SUM_HP, dividing by N by default or N-1 when SAMPLE=.TRUE. L1a1b records univariate dispersion, scoped to this centered two-pass variance, not uncertainty intervals or a population-model guarantee. Empty input returns zero even with SAMPLE requested; a single sample with SAMPLE=.TRUE. returns an IEEE quiet NaN. Other NaNs/nonfinite data are not masked or rejected by this path. Centering avoids the raw E(X**2)-E(X)**2 formula but squared deviations can overflow and pairwise reduction is still rounded in the selected kind. No variance or extreme-offset cases were executed.",
+            "evidence": [
+              {
+                "path": "src/pairwise_variance_spec.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_variance_spec.F90",
+                "sha256": "63abb4fc771473ab38daed10e934d78f14d3caaefc6de616e33b40c964a072d8"
+              },
+              {
+                "path": "src/pairwise_variance.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_variance.F90",
+                "sha256": "97185413e34bf7db6a04daf4cde8d1157497411d3d5fe1e2083ee277fd29e6a1"
+              },
+              {
+                "path": "src/pairwise_mean_spec.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_mean_spec.F90",
+                "sha256": "3ebc2ea32c8e90bb96474d2b0b17aca2395ee7b99f49ec216d6f9f82d80e92d1"
+              },
+              {
+                "path": "src/pairwise_mean.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_mean.F90",
+                "sha256": "aab582f3674298199606081ec7d57b7fa59aee2532cf1e3858cee57b7303340a"
+              },
+              {
+                "path": "src/pairwise_sum.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum.F90",
+                "sha256": "418a630af68f95844f71474898e2e83ca0ba1d1791b77ba7b991dcea939e98a8"
+              },
+              {
+                "path": "src/pairwise_sum_spec.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum_spec.F90",
+                "sha256": "552bfd51d07c464765b9ccb6b589941dad047d44ccd750d5beebdf504acc005e"
+              },
+              {
+                "path": "src/pairwise_sum_core.F90",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/src/pairwise_sum_core.F90",
+                "sha256": "0f23aa6484de9e5feb2b2d10ec41c08f4f6eb8edc2abacb6d1f845af0d629252"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/README.md",
+                "sha256": "8fa797d2e4521a94f6fcaa0106a92afa3925f65627b78780afb7c91e01350535"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "variance",
+                "role": "public-entry-point",
+                "summary": "Public pairwise_variance generic, selected REAL64 rank-one overload generated from REAL(RK) ARR(:), optional LOGICAL SAMPLE. SAMPLE defaults to population denominator N; explicit .TRUE. selects N-1. Result uses input kind; no numerical status is returned.",
+                "signature": "value = variance(arr [, sample])",
+                "declarations": [
+                  {
+                    "path": "src/pairwise_variance_spec.F90",
+                    "line_start": 3,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "src/pairwise_variance.F90",
+                    "line_start": 3,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/pairwise_variance.F90",
+                    "line_start": 124,
+                    "line_end": 145
+                  }
+                ],
+                "path": "src/pairwise_variance_spec.F90",
+                "line_start": 4,
+                "line_end": 38,
+                "module": "pairwise_variance",
+                "usage": "use iso_fortran_env, only: real64\nuse pairwise_variance, only: variance\nreal(real64) :: x(4),population,sample\nx=[1._real64,2._real64,3._real64,4._real64]\npopulation=variance(x)\nsample=variance(x,sample=.true.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use at least two finite observations for the sample estimate. Empty input returns zero by implementation convention; that is not a meaningful estimate of unknown dispersion. Build with IEEE support and the preprocessed mean/sum dependencies. No error estimate or missing-value policy is supplied by this selected path."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "d4353eba94fad09617cbee241249b7919110a7fa",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies the BSD three-clause grant and disclaimer. This accompanies the selected pairwise mean/variance/reduction paths; no whole-library numerical certification or audit of unrelated C/meteorological components is implied.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/koseiohara/EDAT/blob/d4353eba94fad09617cbee241249b7919110a7fa/LICENSE",
+              "sha256": "28da2f9f5b7692442fb9196de40d8573307a3cc0d500622bedd3bdf4b1c00178"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40765,12 +41299,178 @@
             ],
             "notes": "The README describes probability/log-probability routines and status outputs. Its identification of c_long_double with 128-bit quad precision is not assumed portable: actual representation is platform/compiler dependent. Overflow/underflow and precision claims have not been independently tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L5a1p",
+            "level": "source-reviewed",
+            "revision": "fe70c55ef64f5fc97926026bf35f280d83d7f435",
+            "reviewed_on": "2026-11-05",
+            "notes": "poisson_log_pmf evaluates k*LOG(lambda)-lambda-LOG(k!) using the log_factorial helper, and poisson_pmf exponentiates that result and converts it to DP. L5a1p records Poisson probability masses/log masses, not cumulative/inverse probabilities or random draws. K is an INTEGER(C_INT), lambda a REAL(C_DOUBLE); log results use REAL(C_LONG_DOUBLE). C_LONG_DOUBLE is platform-dependent and must not be assumed to be IEEE binary128 despite QP comments. This implementation rejects K<0 and lambda<=0 with error -1, including the valid degenerate lambda=0 distribution, rather than returning its mathematical mass. Check ERR_CODE before interpreting sentinel -1 log values. Log-factorial uses a sum for N<35 and LOG_GAMMA(N+1) otherwise; the integer N+1 can overflow at the representable limit. NaNs and every nonfinite case are not explicitly validated. No probability or overflow test was run.",
+            "evidence": [
+              {
+                "path": "src/mod_discrate_dist.f90",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/src/mod_discrate_dist.f90",
+                "sha256": "2bc36167195eaa6db30a3c67a0d84f152993cfe40e52097e3d0caf04ea8c385d"
+              },
+              {
+                "path": "src/mod_math_utils.f90",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/src/mod_math_utils.f90",
+                "sha256": "53cc33336ed78480b19e4d864e68a9742ba4c620c2286f9dd991be53cd51309f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/README.md",
+                "sha256": "a7f57e8258d348848bfa4e6251b6200cb6edb0e3318220828ab687d9c68caf3c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poisson_pmf",
+                "role": "public-entry-point",
+                "summary": "Public mod_discrete_dist function, defined in the differently spelled file mod_discrate_dist.f90. K/ERR_CODE use exported IN=C_INT; LAMBDA/result use DP=C_DOUBLE. No BIND(C) is attached to this module procedure; separate C wrappers are outside the review.",
+                "signature": "mass = poisson_pmf(k, lambda, err_code)",
+                "declarations": [
+                  {
+                    "path": "src/mod_discrate_dist.f90",
+                    "line_start": 1,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/mod_discrate_dist.f90",
+                    "line_start": 148,
+                    "line_end": 160
+                  },
+                  {
+                    "path": "src/mod_math_utils.f90",
+                    "line_start": 1,
+                    "line_end": 13
+                  }
+                ],
+                "path": "src/mod_discrate_dist.f90",
+                "line_start": 148,
+                "line_end": 160,
+                "module": "mod_discrete_dist",
+                "usage": "use mod_math_utils, only: IN,DP,QP\nuse mod_discrete_dist, only: poisson_pmf,poisson_log_pmf\ninteger(IN) :: ierr\nreal(DP) :: mass\nreal(QP) :: log_mass\nmass=poisson_pmf(3_IN,2._DP,ierr)\nif(ierr/=0_IN) error stop \"Poisson mass failed\"\nlog_mass=poisson_log_pmf(3_IN,2._DP,ierr)\nif(ierr/=0_IN) error stop \"Poisson log mass failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite positive lambda and a moderate nonnegative count. The log API can retain values when a DP probability underflows, but QP is the compiler C_LONG_DOUBLE kind, not a portable precision guarantee. Error -1 is signaled through a separate integer and is not a probability. These module calls do not use the separate C-API wrappers."
+              },
+              {
+                "procedure": "poisson_log_pmf",
+                "role": "public-entry-point",
+                "summary": "Public log-mass function with the same count/rate checks; returns REAL(QP), not DP. Check ERR_CODE before consuming its sentinel result.",
+                "signature": "log_mass = poisson_log_pmf(k, lambda, err_code)",
+                "declarations": [
+                  {
+                    "path": "src/mod_discrate_dist.f90",
+                    "line_start": 131,
+                    "line_end": 145
+                  }
+                ],
+                "path": "src/mod_discrate_dist.f90",
+                "line_start": 131,
+                "line_end": 146,
+                "module": "mod_discrete_dist"
+              },
+              {
+                "procedure": "log_factorial",
+                "role": "implementation-helper",
+                "path": "src/mod_math_utils.f90",
+                "line_start": 17,
+                "line_end": 39,
+                "module": "mod_math_utils"
+              }
+            ]
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "fe70c55ef64f5fc97926026bf35f280d83d7f435",
+            "reviewed_on": "2026-11-05",
+            "notes": "normal_log_pdf computes -LOG(sigma)-LOG(SQRT(2*pi))-0.5*((x-mu)/sigma)**2 in the configured C_LONG_DOUBLE kind; normal_pdf exponentiates and converts to C_DOUBLE. L5a1n records univariate normal densities/log densities, not a CDF, tail probability, inverse or random generator. SIGMA is a positive standard deviation, not variance; nonpositive values return ERR_CODE=-1. The source does not explicitly reject NaNs/nonfinite X/MU/SIGMA. QP is a C_LONG_DOUBLE alias with platform-dependent precision. A log-density sentinel of -1 on failure is not distinguishable from a valid value without checking ERR_CODE. Density conversion can underflow or overflow independently of the log representation. No density values or tail behavior were run.",
+            "evidence": [
+              {
+                "path": "src/mod_continuous_dist.f90",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/src/mod_continuous_dist.f90",
+                "sha256": "e3e4ce1c806f77c7de5c4bc8f91f1e6193c57f79aa738629c22fd403c71a2d90"
+              },
+              {
+                "path": "src/mod_math_utils.f90",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/src/mod_math_utils.f90",
+                "sha256": "53cc33336ed78480b19e4d864e68a9742ba4c620c2286f9dd991be53cd51309f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/README.md",
+                "sha256": "a7f57e8258d348848bfa4e6251b6200cb6edb0e3318220828ab687d9c68caf3c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "normal_pdf",
+                "role": "public-entry-point",
+                "summary": "Public REAL(DP) normal density function with REAL(DP) X/MU/SIGMA and INTEGER(IN) output ERR_CODE. DP=C_DOUBLE; the log counterpart returns QP=C_LONG_DOUBLE.",
+                "signature": "density = normal_pdf(x, mu, sigma, err_code)",
+                "declarations": [
+                  {
+                    "path": "src/mod_continuous_dist.f90",
+                    "line_start": 1,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/mod_continuous_dist.f90",
+                    "line_start": 99,
+                    "line_end": 120
+                  },
+                  {
+                    "path": "src/mod_math_utils.f90",
+                    "line_start": 6,
+                    "line_end": 11
+                  }
+                ],
+                "path": "src/mod_continuous_dist.f90",
+                "line_start": 112,
+                "line_end": 120,
+                "module": "mod_continuous_dist",
+                "usage": "use mod_math_utils, only: IN,DP,QP\nuse mod_continuous_dist, only: normal_pdf,normal_log_pdf\ninteger(IN) :: ierr\nreal(DP) :: density\nreal(QP) :: log_density\ndensity=normal_pdf(0._DP,0._DP,1._DP,ierr)\nif(ierr/=0_IN) error stop \"Normal density failed\"\nlog_density=normal_log_pdf(0._DP,0._DP,1._DP,ierr)\nif(ierr/=0_IN) error stop \"Normal log density failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply finite inputs with positive standard deviation. A density is not a probability and may exceed one for narrow distributions. Do not mistake the log API for an error estimate or the QP name for fixed quadruple precision."
+              },
+              {
+                "procedure": "normal_log_pdf",
+                "role": "public-entry-point",
+                "summary": "Public REAL(QP) log-density function; positive-sigma check and separate error code are part of the contract.",
+                "signature": "log_density = normal_log_pdf(x, mu, sigma, err_code)",
+                "declarations": [
+                  {
+                    "path": "src/mod_continuous_dist.f90",
+                    "line_start": 99,
+                    "line_end": 109
+                  }
+                ],
+                "path": "src/mod_continuous_dist.f90",
+                "line_start": 99,
+                "line_end": 110,
+                "module": "mod_continuous_dist"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "fe70c55ef64f5fc97926026bf35f280d83d7f435",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENCE supplies the MIT grant and disclaimer. The scoped findings cover the selected probability and kind/log-factorial paths, not every discrete/continuous formula or foreign-language wrapper.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/barisbarisgithub/lib_probability_distributions/blob/fe70c55ef64f5fc97926026bf35f280d83d7f435/LICENCE",
+              "sha256": "74f2229b0edfc24fe91c0acb3884d9c35c3e0bc3ba9cfc3d3530149177a338bc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41695,12 +42395,115 @@
             ],
             "notes": "The README documents fypp/stdlib requirements and a uniform-distribution example, with more distributions planned. It does not establish that every desired distribution or function is present or numerically validated.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L5a1e",
+            "level": "source-reviewed",
+            "revision": "afc812f2d1bc7e11ee09a5b8589a847b91117f60",
+            "reviewed_on": "2026-11-05",
+            "notes": "The real exponential-distribution PDF specialization evaluates lambda*EXP(-x*lambda), and the CDF evaluates 1-EXP(-x*lambda). L5a1e records exponential densities/cumulative probabilities; lambda is a rate (mean 1/lambda), not a scale. The generic real32/64/128 input overloads are produced by Fypp templates, but these PDF/CDF implementations declare their result as default REAL for every input kind. Higher-kind inputs therefore do not imply a higher-kind returned value. X<0 or lambda<=0 calls stdlib error_stop rather than returning support-zero/status; provide finite X>=0 and rate>0. The subtractive CDF formula can lose relative accuracy for small x*lambda. Complex overloads, ziggurat random generation and distribution-tail accuracy are excluded. No template build or distribution values were run.",
+            "evidence": [
+              {
+                "path": "src/exponential_distribution.fypp",
+                "url": "https://github.com/Jim-215-Fisher/statislib/blob/afc812f2d1bc7e11ee09a5b8589a847b91117f60/src/exponential_distribution.fypp",
+                "sha256": "99a80f5c9ca887704051e065efbb26ceb285b955e0779185bc52c73fcf47c01d"
+              },
+              {
+                "path": "src/common.fypp",
+                "url": "https://github.com/Jim-215-Fisher/statislib/blob/afc812f2d1bc7e11ee09a5b8589a847b91117f60/src/common.fypp",
+                "sha256": "3268f1f1609d0fa4ba6b25ae1f97bc292223cbc4d6cb6a96b2c32cce10b64013"
+              },
+              {
+                "path": "doc/exponential_distribution.md",
+                "url": "https://github.com/Jim-215-Fisher/statislib/blob/afc812f2d1bc7e11ee09a5b8589a847b91117f60/doc/exponential_distribution.md",
+                "sha256": "e357ccc84fccfdbbca14804c108af62b4eccb6a856e94655611a9164113bb988"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Jim-215-Fisher/statislib/blob/afc812f2d1bc7e11ee09a5b8589a847b91117f60/README.md",
+                "sha256": "8e4a5ea8cf724a02d0da6028551e4dcb3bd063ae3b1ef1a4fa5c74c203c43d34"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "exponential_distribution_pdf",
+                "role": "public-entry-point",
+                "summary": "Public statislib_exponential generic, selected real-input impure elemental specialization. X/LAMDA have the same templated real kind; the returned value is default REAL. Build with Fypp and matching stdlib modules, not by compiling the .fypp file directly.",
+                "signature": "density = exponential_distribution_pdf(x, lamda)",
+                "declarations": [
+                  {
+                    "path": "src/exponential_distribution.fypp",
+                    "line_start": 3,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/exponential_distribution.fypp",
+                    "line_start": 40,
+                    "line_end": 62
+                  },
+                  {
+                    "path": "src/exponential_distribution.fypp",
+                    "line_start": 267,
+                    "line_end": 280
+                  },
+                  {
+                    "path": "src/common.fypp",
+                    "line_start": 1,
+                    "line_end": 8
+                  }
+                ],
+                "path": "src/exponential_distribution.fypp",
+                "line_start": 267,
+                "line_end": 282,
+                "module": "statislib_exponential",
+                "examples": [
+                  {
+                    "path": "doc/exponential_distribution.md",
+                    "line_start": 124,
+                    "line_end": 141
+                  }
+                ],
+                "usage": "use stdlib_kinds, only: dp\nuse statislib_exponential, only: exponential_distribution_pdf,exponential_distribution_cdf\nreal :: density,probability\ndensity=exponential_distribution_pdf(0.5_dp,2._dp)\nprobability=exponential_distribution_cdf(0.5_dp,2._dp)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The selected formulas use rate 2, not scale 2. Return variables are deliberately default REAL to match the source, even with DP inputs. Invalid-domain inputs terminate via stdlib error_stop; no IERR exists. Fypp/stdlib dependencies and other template branches were not built or audited."
+              },
+              {
+                "procedure": "exponential_distribution_cdf",
+                "role": "public-entry-point",
+                "summary": "Public real-input impure elemental CDF generic, also returning default REAL. Uses direct 1-EXP(-x*lambda), not an EXPM1-based small-argument implementation.",
+                "signature": "probability = exponential_distribution_cdf(x, lamda)",
+                "declarations": [
+                  {
+                    "path": "src/exponential_distribution.fypp",
+                    "line_start": 299,
+                    "line_end": 312
+                  }
+                ],
+                "path": "src/exponential_distribution.fypp",
+                "line_start": 299,
+                "line_end": 314,
+                "module": "statislib_exponential"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "afc812f2d1bc7e11ee09a5b8589a847b91117f60",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies BSD three-clause terms. Selected PDF/CDF formulas are scoped here; separately attributed random-generation kernels, stdlib and other distribution templates have not received a complete component audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Jim-215-Fisher/statislib/blob/afc812f2d1bc7e11ee09a5b8589a847b91117f60/LICENSE",
+              "sha256": "e35fe37d7d7971dd2e0843499e662fdc4e2bd1c108737277c4bbb60789cd60e5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44207,12 +45010,75 @@
             ],
             "notes": "The README identifies mixed original/collected code and some C-backed routines. Availability and licensing vary by snippet; no particular complexity, stability or cross-language performance guarantee is inferred.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N5c",
+            "level": "source-reviewed",
+            "revision": "764decc9979b8e6eac2942003d7b1d89054a4afd",
+            "reviewed_on": "2026-11-05",
+            "notes": "FINDI performs a binary search for an exactly equal default-REAL key in an ascending array, returning the matching one-based index or -1. N5c records searching on a key, not insertion position, an interpolation bracket or approximate floating-point comparison. Empty N=0 and one-element cases follow the same outer-bound loop; N must be nonnegative and agree with the actual array capacity. Duplicates can yield any encountered match. NaN keys/comparands are not a meaningful ordering and are not rejected. Computing R=N+1 can still overflow even though the midpoint uses a difference formula. The README makes no guarantee of compiler-independent speed; none was benchmarked. No search cases were run.",
+            "evidence": [
+              {
+                "path": "binary_search.f90",
+                "url": "https://github.com/Aussie-Pete/Fortran-Code-Snippits/blob/764decc9979b8e6eac2942003d7b1d89054a4afd/binary_search.f90",
+                "sha256": "c7cf4599f0f7fc5ea3ea8cbf488ef91fe93c6b75337b30625d72b4fa369b6171"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Aussie-Pete/Fortran-Code-Snippits/blob/764decc9979b8e6eac2942003d7b1d89054a4afd/README.md",
+                "sha256": "90d5faf13c0ffb687432846330ed04370f53416c825e6a66c9136ec387abb761"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "FINDI",
+                "role": "public-entry-point",
+                "summary": "External INTEGER function with default-REAL X and A(N), default-INTEGER N, all intent IN. Under IMPLICIT NONE declare its integer result explicitly. Not found is -1, not zero or an insertion point.",
+                "signature": "index = FINDI(x, a, n)",
+                "declarations": [
+                  {
+                    "path": "binary_search.f90",
+                    "line_start": 10,
+                    "line_end": 22
+                  }
+                ],
+                "path": "binary_search.f90",
+                "line_start": 10,
+                "line_end": 51,
+                "usage": "integer,external :: findi\nreal :: a(4)=[1.,2.,4.,8.]\ninteger :: position\nposition=findi(4.,a,size(a))\nif(position==-1) error stop \"key not found\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Exact key search over a finite ascending default-REAL vector. Duplicate keys have no first/last-match guarantee. This mapping concerns binary_search.f90 only; Boyer-Moore and parallel sorting code in the repository were not validated or included in the algorithm claim."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL v3 for author work; inherited-source terms unresolved",
+          "spdx_expression": null,
+          "revision": "764decc9979b8e6eac2942003d7b1d89054a4afd",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root provides GPL v3 text and README says that covers the author work while directing users to upstream terms for attributed/collected routines. FINDI specifically credits an unattributed Rosetta Code rewrite. Preserve that unresolved inherited provenance rather than assigning the entire collection one unqualified SPDX license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Aussie-Pete/Fortran-Code-Snippits/blob/764decc9979b8e6eac2942003d7b1d89054a4afd/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Aussie-Pete/Fortran-Code-Snippits/blob/764decc9979b8e6eac2942003d7b1d89054a4afd/README.md",
+              "sha256": "90d5faf13c0ffb687432846330ed04370f53416c825e6a66c9136ec387abb761"
+            },
+            {
+              "path": "binary_search.f90",
+              "url": "https://github.com/Aussie-Pete/Fortran-Code-Snippits/blob/764decc9979b8e6eac2942003d7b1d89054a4afd/binary_search.f90",
+              "sha256": "c7cf4599f0f7fc5ea3ea8cbf488ef91fe93c6b75337b30625d72b4fa369b6171"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45496,12 +46362,100 @@
             ],
             "notes": "The README examples cover upper-triangular indexing with and without the diagonal. This is storage/indexing support, not a triangular linear-system solver or matrix factorization implementation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b9",
+            "level": "source-reviewed",
+            "revision": "8f9037b16bcda22201dc491c3f6b47f8fd98a013",
+            "reviewed_on": "2026-11-05",
+            "notes": "pack_tri_indices maps a one-based symmetric index pair to columnwise upper-triangle packed position using triangular numbers; swapping I/J gives the same position. unpack_tri_indices estimates the inverse triangular number using SQRT and returns the upper-triangle representative. D1b9 records the indexing service for matrix storage-mode conversion, not a routine copying/converting full matrix data. The selected INT64 three-argument pack and inverse are PURE ELEMENTAL; other integer kinds and diagonal-shift overloads exist but are not certified here. There is no matrix dimension or status argument, positivity/range checks or overflow protection. Packing multiplies before dividing, and inversion forms 8*K-7 in integer arithmetic then converts to default REAL for SQRT; representable final indices do not guarantee safe intermediates or an accurate large-index inverse. No round-trip, boundary or overflow tests were executed.",
+            "evidence": [
+              {
+                "path": "src/mod_tri_indices.f90",
+                "url": "https://github.com/yymmt742/tri_indices/blob/8f9037b16bcda22201dc491c3f6b47f8fd98a013/src/mod_tri_indices.f90",
+                "sha256": "d18f16e28a411908d27a7fffeb28697f1bb0899bf882d8ef56a1257105c8837b"
+              },
+              {
+                "path": "test/test_pack_tri_indices.f90",
+                "url": "https://github.com/yymmt742/tri_indices/blob/8f9037b16bcda22201dc491c3f6b47f8fd98a013/test/test_pack_tri_indices.f90",
+                "sha256": "4fda5048edd611d827df89071836dc5a78327758b7d5df234e506d70b689a4a7"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/yymmt742/tri_indices/blob/8f9037b16bcda22201dc491c3f6b47f8fd98a013/README.md",
+                "sha256": "d44c3118fb48af120814e4af81623f11e58a456ae0cc6afb92021c5f2c9cee28"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "pack_tri_indices",
+                "role": "public-entry-point",
+                "summary": "Public generic in mod_tri_indices; selected PURE ELEMENTAL INT64 overload with INTEGER(INT64) I/J inputs and K output. No dimension is supplied. Treat I/J as positive one-based coordinates; mapping folds lower triangle onto upper.",
+                "signature": "CALL pack_tri_indices(i,j,k)",
+                "declarations": [
+                  {
+                    "path": "src/mod_tri_indices.f90",
+                    "line_start": 1,
+                    "line_end": 28
+                  },
+                  {
+                    "path": "src/mod_tri_indices.f90",
+                    "line_start": 84,
+                    "line_end": 97
+                  }
+                ],
+                "path": "src/mod_tri_indices.f90",
+                "line_start": 84,
+                "line_end": 97,
+                "module": "mod_tri_indices",
+                "examples": [
+                  {
+                    "path": "test/test_pack_tri_indices.f90",
+                    "line_start": 7,
+                    "line_end": 24
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: int64\nuse mod_tri_indices, only: pack_tri_indices,unpack_tri_indices\ninteger(int64) :: k,i,j\ncall pack_tri_indices(2_int64,3_int64,k)\ncall unpack_tri_indices(k,i,j)\n! Validate i/j and round trips independently before using large indices.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Small INT64 no-shift sketch; this is an indexing service, not an array-conversion routine. Keep indices modest enough for all intermediates and default-real inverse arithmetic. INT64 storage alone does not make the inverse accurate over the full 64-bit range. Diagonal-shift overloads require their documented coordinate domain and have not been reviewed here."
+              },
+              {
+                "procedure": "unpack_tri_indices",
+                "role": "public-entry-point",
+                "summary": "Public generic, selected PURE ELEMENTAL INT64 inverse. Output I<=J is an upper-triangle representative; original lower/upper orientation cannot be recovered. Uses default-REAL SQRT internally despite INT64 input/output.",
+                "signature": "CALL unpack_tri_indices(k,i,j)",
+                "declarations": [
+                  {
+                    "path": "src/mod_tri_indices.f90",
+                    "line_start": 223,
+                    "line_end": 233
+                  }
+                ],
+                "path": "src/mod_tri_indices.f90",
+                "line_start": 223,
+                "line_end": 233,
+                "module": "mod_tri_indices"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "8f9037b16bcda22201dc491c3f6b47f8fd98a013",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies the MIT grant/disclaimer. This accompanies the selected indexing implementations, not an arithmetic-safety guarantee for every integer-kind or shifted overload.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/yymmt742/tri_indices/blob/8f9037b16bcda22201dc491c3f6b47f8fd98a013/LICENSE",
+              "sha256": "0e74adaeb321daf6a8505860bdad6dd64902f5d0af5fd777298efb7f87ffab10"
+            }
+          ]
         }
       },
       "imports": {}
@@ -47170,12 +48124,132 @@
             ],
             "notes": "The README is a placeholder, so the review uses documented interfaces in the pinned module and its FPM manifest. The operator is typed as Poisson2D rather than an arbitrary user matrix. This broad mapping does not validate stability control, zero-residual handling or general convergence.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2",
+            "level": "source-reviewed",
+            "revision": "83a6625e94504151bf27aea023568a2eec34256b",
+            "reviewed_on": "2026-11-05",
+            "notes": "polynomial_arnoldi::gmres builds a Krylov basis using twice-applied modified Gram-Schmidt, applies Givens rotations to a Hessenberg least-squares problem and updates X through a triangular solve, restarting when the subspace fills. D2 records this linear-system solver implementation. The public API is hardwired to external SpecialMatrices::Poisson2D, not a general dense/sparse matrix or arbitrary operator callback, so no unrestricted matrix-storage subclass is inferred without a dependency implementation review. The tolerance is internal ATOL+RTOL*NORM(B), with no caller tolerance/status dummy. A zero RHS is normalized before an early-exit check, and the total iteration cap is tested only at outer-cycle boundaries using <=; a full cycle can exceed it. Happy-breakdown/zero rotations and triangular pivots need independent validation. It prints a final true residual but returns X even if the budget is exhausted. Polynomial-preconditioned variants/root extraction and dependency kernels are outside this review. No solve or convergence experiment was run.",
+            "evidence": [
+              {
+                "path": "src/polynomial_arnoldi.f90",
+                "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/src/polynomial_arnoldi.f90",
+                "sha256": "89b90d92ad48581b7baf4e919991af532a966b21bbcbb1153b4473c9852d2c4d"
+              },
+              {
+                "path": "app/main.f90",
+                "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/app/main.f90",
+                "sha256": "560e0772a2c3bf858b9f39b352eb7ffbdafefd55561eff453b43c849ec3cffd7"
+              },
+              {
+                "path": "fpm.toml",
+                "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/fpm.toml",
+                "sha256": "eefe38eeffc4ff52d9167f2aeec0eca0e7f2d66a280ef9c0a182777328e11f71"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/README.md",
+                "sha256": "a460d285dbad155251f2686dcc96a0915660ab9fa0d1d4eed28aca89f0318465"
+              },
+              {
+                "path": "test/check.f90",
+                "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/test/check.f90",
+                "sha256": "3cbc24a12a9304e28d4da501210bd4546081c564b90bc82918b7eb91fe1a7b46"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gmres",
+                "role": "public-entry-point",
+                "summary": "Public module function accepting TYPE(Poisson2D), REAL(dp) B(:), optional INTEGER(ilp) KMAX/MAXITER, returning allocatable REAL(dp) X(:). Kinds come from stdlib_linalg_constants. Requires stdlib and external SpecialMatrices; it is not a reusable arbitrary-matrix interface. No returned convergence flag.",
+                "signature": "x = gmres(A,b [, kmax,maxiter])",
+                "declarations": [
+                  {
+                    "path": "src/polynomial_arnoldi.f90",
+                    "line_start": 1,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/polynomial_arnoldi.f90",
+                    "line_start": 36,
+                    "line_end": 47
+                  },
+                  {
+                    "path": "fpm.toml",
+                    "line_start": 22,
+                    "line_end": 24
+                  }
+                ],
+                "path": "src/polynomial_arnoldi.f90",
+                "line_start": 67,
+                "line_end": 145,
+                "module": "polynomial_arnoldi",
+                "examples": [
+                  {
+                    "path": "app/main.f90",
+                    "line_start": 16,
+                    "line_end": 41
+                  }
+                ],
+                "usage": "use stdlib_linalg_constants, only: dp,ilp\nuse specialmatrices\nuse polynomial_arnoldi, only: gmres\ntype(Poisson2D) :: a\nreal(dp) :: b(16)\nreal(dp),allocatable :: x(:)\na=Poisson2D(4_ilp,4_ilp); b=1._dp\nx=gmres(a,b,kmax=8_ilp,maxiter=64_ilp)\n! Independently check the printed/actual residual and finite X; no status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. External-operator sketch requiring a compatible SpecialMatrices build; its constructor and overloaded operations belong to that dependency, not this repository. Use a nonzero RHS, positive reasonable subspace/cycle limits and independent residual checks. MAXITER is not enforced at every inner iteration. The repository test/check program is only a placeholder, not an upstream numerical regression test."
+              },
+              {
+                "procedure": "arnoldi",
+                "role": "implementation-helper",
+                "path": "src/polynomial_arnoldi.f90",
+                "line_start": 151,
+                "line_end": 201,
+                "module": "polynomial_arnoldi"
+              },
+              {
+                "procedure": "apply_givens_rotation",
+                "role": "implementation-helper",
+                "path": "src/polynomial_arnoldi.f90",
+                "line_start": 215,
+                "line_end": 242,
+                "module": "polynomial_arnoldi"
+              },
+              {
+                "procedure": "solve_triangular",
+                "role": "implementation-helper",
+                "path": "src/polynomial_arnoldi.f90",
+                "line_start": 248,
+                "line_end": 268,
+                "module": "polynomial_arnoldi"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "83a6625e94504151bf27aea023568a2eec34256b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root has no separately named license file identified and the manifest license field is the placeholder string \"license\". The reviewed source/README do not resolve a reuse grant. Separate stdlib and SpecialMatrices dependencies retain their own terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/README.md",
+              "sha256": "a460d285dbad155251f2686dcc96a0915660ab9fa0d1d4eed28aca89f0318465"
+            },
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/fpm.toml",
+              "sha256": "eefe38eeffc4ff52d9167f2aeec0eca0e7f2d66a280ef9c0a182777328e11f71"
+            },
+            {
+              "path": "src/polynomial_arnoldi.f90",
+              "url": "https://github.com/loiseaujc/polynomial_arnoldi/blob/83a6625e94504151bf27aea023568a2eec34256b/src/polynomial_arnoldi.f90",
+              "sha256": "89b90d92ad48581b7baf4e919991af532a966b21bbcbb1153b4473c9852d2c4d"
+            }
+          ]
         }
       },
       "imports": {}
