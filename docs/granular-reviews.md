@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 124 repositories now have 146 source-reviewed
+Reviewed on 2026-11-05. 132 repositories now have 155 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-120 repository cards now identify public routines and link their usage lines
+128 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Four further cards (DDFSA, CWT, polyfit and
 StatTools) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 124 independently source-reviewed repositories now have an
+separately. All 132 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -148,6 +148,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Fortran-quicksort | `qsort_mod::indexx`, `::quick_sort_in_place` (real overloads) | MIT root; adapted-source scope unresolved |
 | numerical-analysis | `numa__integrate::simpson_integrator_vals` | BSD-3-Clause with component notices |
 | INTEGRAL | `integral_core::adaptive_integrator%integrate` | GPL v3 text; component/version scope unresolved |
+| Audito | `FG_m::operator(*)`, `::operator(+)` (same-basis FG_t branch) | GPL v3 text; version scope unresolved |
+| DNAOAD | `diff_mod::gradient` (selected GNU REAL64 sources) | MIT with citation request |
+| auto-diff | `ad_types::tree_t%backward`, `%get_grad` | MIT |
+| mp-interp | `mp_interp_killworth_subs::ainv_int` | GPL v3 text; version scope unresolved |
+| libcoulcc | `libcoulcc::COULCC` (explicit status interface) | MIT packaging; numerical-core scope unresolved |
+| FortVSH | `VSH::LEGENDRE`, `::SHGLQ` | BSD-3-Clause |
+| Butterworth-Filter | External `buttlp`, `buttfilt` (normalized forward filter) | GPL-3.0-or-later |
+| RKSUITE | `rksuite_90::setup`, `::range_integrate`, `::collect_garbage` | Custom free scientific-use/citation notice |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -291,6 +299,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Fortran-quicksort](https://github.com/Beliavsky/Fortran-quicksort) | N6a1b; N6a2b | Pure real permutation sorting and overwrite-by-permutation wrapper | indexx returns identity on NaNs; overwrite wrapper lacks that guard. Automatic O(N) index storage; integer conversion path unreviewed. |
 | [numerical-analysis](https://github.com/jeffirwin/numerical-analysis) | H2a1b2 | Composite sampled Simpson 1/3 with final 3/8 panel for even counts | Uniform grid, >=3 odd or >=4 even samples required. No error estimate, validation or automatic refinement. |
 | [INTEGRAL](https://github.com/jchristopherson/integral) | H2a1a1 | Procedure-pointer wrapper and finite-interval DQAGS/DQAGSE adaptive-controller path | FERROR dependency; workspace-reuse flag and breakpoint-name findings require repair/checks. Numerical kernels not fully audited. |
+| [Audito](https://github.com/michel-heinz/audito) | H1 | Forward first-gradient product/addition propagation with explicit seed vectors | Equal allocated seed bases required; distinct concatenating operator and Hessian/Laplacian modules unreviewed. |
+| [DNAOAD](https://github.com/fpenunuri/DNAOAD) | H1 | Coordinate directional evaluations via dual arithmetic and order save/restore | Global order state; REAL64 GNU variant. Callback must retain dual components; higher-order and complex nonanalytic differentiation unverified. |
+| [auto-diff](https://github.com/zoziha/auto-diff) | H1 | Pointer-graph reverse adjoint accumulation and scalar gradient access | REAL32 by default. Repeated backward calls accumulate; ownership, reassignment and node reclamation need validation. |
+| [mp-interp](https://github.com/pjbartlein/mp-interp) | E1a | Cyclic adjusted-input mean interpolation via inverse mean matrix and piecewise-linear midpoint interpolation | Inputs are interval means. INFO ignored; coordinates debug-only; discrete mean agreement and padding must be checked. |
+| [libcoulcc](https://github.com/banana-bred/libcoulcc) | C12 | Coulomb-wave interface, initialization and continued-fraction dispatch | Partial core review. Wrapper IFAIL uninitialized; convenience G function requests an F-only mode. Raw interface exposes status. |
+| [FortVSH](https://github.com/justinelfritz/FortVSH) | C3a2; H2c | Ordinary Legendre recurrence and Gauss-Legendre node/weight generation | Validate degree/count. Fixed Newton tolerance/cap with no convergence status; other harmonic/coupling routines unreviewed. |
+| [Butterworth-Filter](https://github.com/youshanliu/Butterworth-Filter) | L10a1c3 | Low-pass coefficient construction and causal recursive forward filtering | Normalize a(0)=1. Zero history; no streaming state or status. Validate cutoff/order; high-order conditioning unverified. |
+| [RKSUITE](https://github.com/jacobwilliams/rksuite) | I1a1a | F90 setup, requested-output driver and explicit embedded-RK error-control paths | Stateful pointers need cleanup; callback is a function, not the F77 subroutine API. Stiffness warning is not stiff-solver support. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -485,3 +501,24 @@ The two quadrature cards distinguish fixed-grid sampled Simpson rules from an
 adaptive callback wrapper. The latter retains workspace-reuse and breakpoint
 source findings, and depends on FERROR for reporting failures.
 No upstream routine or calling sketch in this batch was compiled or run.
+
+## Differentiation, interval means and stateful numerical interfaces
+
+The three differentiation entries distinguish forward gradient-vector seeds,
+dual directional evaluations and reverse scalar adjoints. H1 is already a
+leaf, so procedure names and interface scope supply the useful detail.
+No higher-order or whole-library claim is inferred from an inspected first-order
+path. The reverse implementation has gradient-reuse and node-lifecycle findings.
+
+mp-interp takes interval averages and uses cyclic midpoint interpolation;
+its coordinate arrays do not provide an arbitrary-query interface in the
+reviewed path. FortVSH separately exposes ordinary Legendre values and quadrature
+rules. A node/weight generator requires the caller to form a weighted sum.
+The Butterworth entry uses the detailed L10a1c3 filtering branch from the
+[Netlib GAMS taxonomy](https://netlib.org/bib/gams.html), with coefficient
+normalization and zero-history semantics recorded. RKSUITE's F90 communication
+object and array-valued derivative callback are distinct from its legacy F77
+examples. libcoulcc's raw status-returning interface is shown because its
+convenience wrappers have source findings.
+No upstream routine, derivative, filter, interpolation or ODE example in this
+batch was compiled or run.

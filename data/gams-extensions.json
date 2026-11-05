@@ -132,6 +132,24 @@
       "parent": "L6b",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L10a1": {
+      "label": "Transformations",
+      "parent": "L10a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a1c": {
+      "label": "Filters (search also class K5)",
+      "parent": "L10a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a1c3": {
+      "label": "Autoregressive linear",
+      "parent": "L10a1c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

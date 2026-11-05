@@ -5418,12 +5418,105 @@
             ],
             "notes": "The README distinguishes four mean-preserving approaches and explains monthly-to-daily examples. This mapping concerns temporal interpolation, not statistical inference from the interpolated series.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "5c8efd24551083f6d64b5e882ff2961c0799ef4d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected public ainv_int path constructs a cyclic neighboring-interval mean matrix from interval lengths, explicitly inverts it with LAPACK DGETRF/DGETRI, adjusts the input means, then calls a midpoint-based piecewise-linear daily interpolator and computes discrete interval means. E1a records this adjusted-input piecewise-polynomial interpolation intent. Inputs are interval averages rather than ordinary point values; x_ctrl/x_targ are read for debug output, not used as a general arbitrary-coordinate grid. Require positive interval lengths summing to ntargs and at least three intervals. LAPACK INFO is not checked and no failure status is returned. The interpolator uses cyclic padding with a specific left-end offset; exact preservation of requested discrete means must be checked independently. Outer-series padding, clipping, missing-data and enforce_mean correction workflows remain outside this implementation review. No interpolation or residual check was run.",
+            "evidence": [
+              {
+                "path": "f90/modules/mp_interp_killworth_subs.f90",
+                "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/f90/modules/mp_interp_killworth_subs.f90",
+                "sha256": "df1687c550663866c5d06989642b123ee3a47cdb6e81528133164533ddd0d556"
+              },
+              {
+                "path": "f90/modules/pseudo_daily_interp_subs.f90",
+                "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/f90/modules/pseudo_daily_interp_subs.f90",
+                "sha256": "cb4d393d36664657c8cc72545b8d3a3d118ab1bb49a6d6337b5849ec6acc5254"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/README.md",
+                "sha256": "51a5a038af526c8a1d28792e72f2f5df6d263019b645c8cd33d84e7f171fe4d7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ainv_int",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine for one cyclic set of interval means. INTEGER(4) sizes/lengths and REAL(8) arrays are required. Outputs are y_int(ntargs) and its recomputed ym_int(nctrl). Link a compatible double-precision LAPACK library; the routine has no status argument.",
+                "signature": "CALL ainv_int(nctrl, ym, ymiss, x_ctrl, nsubint, ntargs, &\n              x_targ, y_int, ym_int)",
+                "declarations": [
+                  {
+                    "path": "f90/modules/mp_interp_killworth_subs.f90",
+                    "line_start": 174,
+                    "line_end": 189
+                  }
+                ],
+                "path": "f90/modules/mp_interp_killworth_subs.f90",
+                "line_start": 174,
+                "line_end": 280,
+                "module": "mp_interp_killworth_subs",
+                "usage": "use mp_interp_killworth_subs, only: ainv_int\ninteger(4) :: lengths(4), i\nreal(8) :: means(4), control_x(4), target_x(120), values(120), recovered(4)\nlengths = 30\nmeans = [1.0d0, 2.0d0, 3.0d0, 2.0d0]\ncontrol_x = [15.0d0, 45.0d0, 75.0d0, 105.0d0]\ntarget_x = [(dble(i), i=1,120)]\ncall ainv_int(4, means, -999.0d0, control_x, lengths, 120, &\n              target_x, values, recovered)\n! Inspect recovered-means; no preservation check was executed here.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile pseudo_daily_interp_subs before this module and link LAPACK. Use finite nonmissing means, positive lengths and matching total target count. This lower-level path does not clip or enforce exact mean agreement; x arrays do not select arbitrary evaluation locations. The inverse uses unchecked INFO and may fail silently. Periodicity and the actual discrete averaging/padding convention require independent checks."
+              },
+              {
+                "procedure": "dayinterp",
+                "role": "implementation-helper",
+                "path": "f90/modules/pseudo_daily_interp_subs.f90",
+                "line_start": 362,
+                "line_end": 399,
+                "module": "pseudo_daily_interp_subs"
+              },
+              {
+                "procedure": "interval_mean",
+                "role": "implementation-helper",
+                "path": "f90/modules/pseudo_daily_interp_subs.f90",
+                "line_start": 559,
+                "line_end": 590,
+                "module": "pseudo_daily_interp_subs"
+              },
+              {
+                "procedure": "midmonth_real",
+                "role": "implementation-helper",
+                "path": "f90/modules/pseudo_daily_interp_subs.f90",
+                "line_start": 445,
+                "line_end": 466,
+                "module": "pseudo_daily_interp_subs"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "5c8efd24551083f6d64b5e882ff2961c0799ef4d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE contains GPLv3 text. The reviewed README/module does not settle version-only versus or-later terms; linked LAPACK and other source branches require their own scoped notices. No complete dependency license audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/README.md",
+              "sha256": "51a5a038af526c8a1d28792e72f2f5df6d263019b645c8cd33d84e7f171fe4d7"
+            },
+            {
+              "path": "f90/modules/mp_interp_killworth_subs.f90",
+              "url": "https://github.com/pjbartlein/mp-interp/blob/5c8efd24551083f6d64b5e882ff2961c0799ef4d/f90/modules/mp_interp_killworth_subs.f90",
+              "sha256": "df1687c550663866c5d06989642b123ee3a47cdb6e81528133164533ddd0d556"
+            }
+          ]
         }
       },
       "imports": {}
@@ -7711,12 +7804,110 @@
             ],
             "notes": "The README labels this wrapper untested. Its convenience routines use complex parameters despite a broad introductory real-argument statement; domain and wrapper correctness need source/driver review before narrower claims are made.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C12",
+            "level": "source-reviewed",
+            "revision": "02c4e0156d2cb382050d33098ec7a679428807f5",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public lower-level COULCC interface takes complex argument, Coulomb parameter and starting order, with integer-spaced order output arrays and explicit MODE/KFN/IFAIL controls. Inspected implementation paths select Coulomb versus Bessel families, form gamma-based phase/normalization, choose real/complex continued-fraction routines and begin order recurrence. C12 records Coulomb-wave driver/dispatch scope, not a complete audit of the large Steed algorithm or its special-function helpers. IFAIL must be initialized because its input controls diagnostics; nonzero output indicates failure or incomplete order coverage. Convenience coulcc_wrapper passes an uninitialized IFAIL and terminates on errors; coulg requests MODE=4, which does not fill GC, before returning GC. Use the lower-level interface in the calling sketch. The README itself labels this repackaging untested; no values or complex-domain accuracy were checked here.",
+            "evidence": [
+              {
+                "path": "src/libcoulcc.f",
+                "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/src/libcoulcc.f",
+                "sha256": "0ed19dedcadb7b64ab59bc3e63e228683ddb9b4cc5a52b5b1faa812f5ad3fc25"
+              },
+              {
+                "path": "src/libcoulcc_coulcc.f",
+                "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/src/libcoulcc_coulcc.f",
+                "sha256": "cad8ef35ed53da8a267dfd6ed60db22815b75375422700f70d28c5480817a79f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/README.md",
+                "sha256": "dc70ba89aa421b52d67bc91a3303a46e58feed9372c49e8dec4ddec35df24359"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "COULCC",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine with COMPLEX(real64) inputs/outputs. NL counts consecutive orders from ZLMIN. MODE=1 and KFN=0 request Coulomb F/G, their derivatives and phase shifts; initialize IFAIL=0 to suppress diagnostics and inspect it on return. Shared helper-module state prevents assuming reentrancy.",
+                "signature": "CALL COULCC(XX, ETA1, ZLMIN, NL, FC, GC, FCP, GCP, &\n            SIG, MODE1, KFN, IFAIL)",
+                "declarations": [
+                  {
+                    "path": "src/libcoulcc.f",
+                    "line_start": 17,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "src/libcoulcc_coulcc.f",
+                    "line_start": 78,
+                    "line_end": 87
+                  }
+                ],
+                "path": "src/libcoulcc.f",
+                "line_start": 23,
+                "line_end": 37,
+                "module": "libcoulcc",
+                "usage": "use iso_fortran_env, only: real64\nuse libcoulcc, only: COULCC\ncomplex(real64) :: x, eta, first_order, f(1), g(1), fp(1), gp(1), phase(1)\ninteger :: status\nx = cmplx(1.0_real64, 0.0_real64, real64)\neta = cmplx(0.0_real64, 0.0_real64, real64)\nfirst_order = eta\nstatus = 0\ncall COULCC(x, eta, first_order, 1, f, g, fp, gp, phase, 1, 0, status)\nif (status /= 0) error stop \"COULCC failed or returned partial results\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the package parent/submodules and numerical helpers with compatible kinds; the implementation imports REAL128 in addition to its REAL64 public interface. Keep array lengths >=NL and use a valid nonzero argument. Only requested arrays are defined; scaled modes and complex branch conventions need the author documentation. This bypasses the two recorded convenience-wrapper findings but does not establish correctness of the underlying repackaging."
+              },
+              {
+                "procedure": "COULCC",
+                "role": "implementation-helper",
+                "path": "src/libcoulcc_coulcc.f",
+                "line_start": 183,
+                "line_end": 321,
+                "module": "libcoulcc"
+              },
+              {
+                "procedure": "coulcc_wrapper",
+                "role": "implementation-helper",
+                "path": "src/libcoulcc.f",
+                "line_start": 99,
+                "line_end": 190,
+                "module": "libcoulcc"
+              },
+              {
+                "procedure": "coulg",
+                "role": "implementation-helper",
+                "path": "src/libcoulcc.f",
+                "line_start": 72,
+                "line_end": 96,
+                "module": "libcoulcc"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT packaging notice; original numerical-core scope unresolved",
+          "spdx_expression": null,
+          "revision": "02c4e0156d2cb382050d33098ec7a679428807f5",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE is MIT for the packaging author. README and implementation attribute the original algorithms to Barnett/Thompson and describe repackaging rather than original authorship. The inspected original-core header provides references but no separate grant; the root notice is not treated as a complete historical component-rights audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/LICENSE",
+              "sha256": "e20e4a9961ef3adf4330d94a48393760ddb535cc9fc5d32c514abc92a26e1335"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/README.md",
+              "sha256": "dc70ba89aa421b52d67bc91a3303a46e58feed9372c49e8dec4ddec35df24359"
+            },
+            {
+              "path": "src/libcoulcc_coulcc.f",
+              "url": "https://github.com/banana-bred/libcoulcc/blob/02c4e0156d2cb382050d33098ec7a679428807f5/src/libcoulcc_coulcc.f",
+              "sha256": "cad8ef35ed53da8a267dfd6ed60db22815b75375422700f70d28c5480817a79f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8162,12 +8353,126 @@
             ],
             "notes": "The README distinguishes FG, FGL and FGH modules and states that the AD types currently use 64-bit reals. Operations accepting other scalar kinds do not establish full AD-type support at every precision.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "32693b0ae345ef0bf54f00219a894b6bd00c05ce",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reviewed FG_t branch stores a REAL64 value and an allocatable gradient vector. Its ordinary product overload propagates the product rule for operands using the same independent-variable basis; addition adds their gradient vectors. Unit-vector seeds therefore propagate a first gradient without finite-difference step sizes. H1 is the differentiation leaf. This review covers the same-basis product/addition and assignment paths, not all intrinsic overloads, the distinct concatenating .mul. operator, or the separate Hessian/Laplacian modules. Both operands need allocated, conformable seed vectors; no shape/domain/status validation is supplied. No derivative, example optimizer or numerical comparison was executed.",
+            "evidence": [
+              {
+                "path": "FG_m.F90",
+                "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/FG_m.F90",
+                "sha256": "88c077c2ce781a57f83a2c7e22e99f523da3c6a7be82af43203b467707798cf0"
+              },
+              {
+                "path": "F_functions.inc",
+                "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/F_functions.inc",
+                "sha256": "26b452ad453c0809330b22402902fa879216f9fb4d84beab2ec56d8dd150a901"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/README.md",
+                "sha256": "bb84a3648d495d557fd4a372e9efc6f213326d53eec259070a615e932a6d73a4"
+              },
+              {
+                "path": "ExampleFG.f90",
+                "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/ExampleFG.f90",
+                "sha256": "4aee54c1b6185ba0e5dd82f5bc50993ed8a4463bc98411e485bd9e0c7218c691"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "operator(*)",
+                "role": "public-entry-point",
+                "summary": "Public type-bound product generic on FG_t; private FG_MulSame is its implementation. Construct operands with REAL(r8) values and allocated gradient vectors in the same coordinate basis. The result carries value in %f and gradient in %g.",
+                "signature": "result = x * y",
+                "declarations": [
+                  {
+                    "path": "FG_m.F90",
+                    "line_start": 14,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "FG_m.F90",
+                    "line_start": 38,
+                    "line_end": 39
+                  },
+                  {
+                    "path": "FG_m.F90",
+                    "line_start": 414,
+                    "line_end": 418
+                  }
+                ],
+                "path": "FG_m.F90",
+                "line_start": 414,
+                "line_end": 419,
+                "module": "FG_m",
+                "usage": "use FG_m\ntype(FG_t) :: x, y, result\nx = FG_t(2.0_r8, [1.0_r8, 0.0_r8])\ny = FG_t(3.0_r8, [0.0_r8, 1.0_r8])\nresult = x*x + y\nprint *, result%f, result%g",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build FG_m.F90 with preprocessing and its F_functions.inc include. Seeds must be allocated and have equal lengths representing the same variables. Ordinary * differs from the separate .mul. binding that concatenates seed spaces. This simple polynomial sketch does not validate other operations, branch derivatives or the optimizer in the author example."
+              },
+              {
+                "procedure": "operator(+)",
+                "role": "public-entry-point",
+                "summary": "Public same-basis addition generic on FG_t. Adds values and elementwise gradient vectors; conformable allocated vectors are required.",
+                "signature": "result = x + y",
+                "declarations": [
+                  {
+                    "path": "FG_m.F90",
+                    "line_start": 34,
+                    "line_end": 35
+                  },
+                  {
+                    "path": "FG_m.F90",
+                    "line_start": 390,
+                    "line_end": 394
+                  }
+                ],
+                "path": "FG_m.F90",
+                "line_start": 390,
+                "line_end": 395,
+                "module": "FG_m"
+              },
+              {
+                "procedure": "FG_Assign",
+                "role": "implementation-helper",
+                "path": "FG_m.F90",
+                "line_start": 322,
+                "line_end": 329,
+                "module": "FG_m"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "32693b0ae345ef0bf54f00219a894b6bd00c05ce",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies GPLv3 text and the defining module credits Michel Heinz. The reviewed README/source does not settle a version-only versus or-later choice. This is a scoped notice review, not an audit of all example material.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/README.md",
+              "sha256": "bb84a3648d495d557fd4a372e9efc6f213326d53eec259070a615e932a6d73a4"
+            },
+            {
+              "path": "FG_m.F90",
+              "url": "https://github.com/Michel-Heinz/Audito/blob/32693b0ae345ef0bf54f00219a894b6bd00c05ce/FG_m.F90",
+              "sha256": "88c077c2ce781a57f83a2c7e22e99f523da3c6a7be82af43203b467707798cf0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8207,12 +8512,154 @@
             ],
             "notes": "The README explicitly calls this a toy/experimental project, notes gfortran-only availability and possible memory leaks, and points to Fazang as an alternative. It is not presented as a production-ready AD system.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "35e62246675cbe6dcd04ce25a81f7885653feabe",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected scalar reverse-mode path builds pointer-linked nodes with local product/addition/exponential derivatives. tree_t%backward seeds the output adjoint to one, then recursively distributes local-derivative products; shared input nodes accumulate contributions. get_grad reads the stored scalar adjoint. H1 describes this reverse differentiation path rather than a finite-difference approximation. Repeated backward calls do not clear reachable gradients, and there is no reviewed zero-grad operation. Real assignment allocates a new node without releasing the old one; destructors recurse/nullify links without deallocating the node targets. Copy ownership, repeated graph reuse and cleanup therefore need validation. The configured rk is REAL32, despite some printed double-looking example output. No graph or gradient was executed.",
+            "evidence": [
+              {
+                "path": "src/ad_types.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/src/ad_types.f90",
+                "sha256": "0d1c37f498c3b61c7b93ed843053fb0f2d1f85b5686a0591294bcd92056ce1e1"
+              },
+              {
+                "path": "src/ad_operator.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/src/ad_operator.f90",
+                "sha256": "7261b2c2d42f1b0f2dea0f3f4e746f1a0944fabccc23a8f0bb7ffd5304fcda04"
+              },
+              {
+                "path": "src/ad_intrinsic.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/src/ad_intrinsic.f90",
+                "sha256": "5bfad1472329957dde9f618747459de3e3e72969ec8efa7426b75836c451c125"
+              },
+              {
+                "path": "src/ad_kinds.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/src/ad_kinds.f90",
+                "sha256": "58d9e6f8fe968c6d2271c720a5e06227be59b5b3d4757345b3c56ae417ec0e1f"
+              },
+              {
+                "path": "src/auto_diff.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/src/auto_diff.f90",
+                "sha256": "3263e077e89d6fbbeb2534c71a3c9ba332f631c72dbc59706f83405d6c653c14"
+              },
+              {
+                "path": "example/demo1.f90",
+                "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/example/demo1.f90",
+                "sha256": "284e6e9c79baab5f065543aeb06dca686a68d28bf4bc6bb907edbe490006f91e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "backward",
+                "role": "public-entry-point",
+                "summary": "Public binding on tree_t, re-exported through auto_diff. Requires an initialized expression graph. It sets the output gradient to one and adds contributions to existing operand gradients; use one backward pass on a fresh graph for this sketch.",
+                "signature": "CALL expression%backward()",
+                "declarations": [
+                  {
+                    "path": "src/ad_types.f90",
+                    "line_start": 7,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "src/ad_types.f90",
+                    "line_start": 73,
+                    "line_end": 83
+                  },
+                  {
+                    "path": "src/ad_kinds.f90",
+                    "line_start": 3,
+                    "line_end": 9
+                  }
+                ],
+                "path": "src/ad_types.f90",
+                "line_start": 73,
+                "line_end": 87,
+                "module": "ad_types",
+                "derived_type": "tree_t",
+                "examples": [
+                  {
+                    "path": "example/demo1.f90",
+                    "line_start": 4,
+                    "line_end": 22
+                  }
+                ],
+                "usage": "use auto_diff, only: tree_t, rk, assignment(=), operator(*), operator(+)\ntype(tree_t) :: x, y, expression\nx = 2.0_rk\ny = 3.0_rk\nexpression = x*x + y\ncall expression%backward()\nprint *, expression%get_value(), x%get_grad(), y%get_grad()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. A single fresh scalar graph; repeated backward calls accumulate stale adjoints. Keep operands alive through differentiation and investigate pointer ownership/finalization before graph reuse or long-running use. rk is REAL32 in the pinned ad_kinds module. Neither memory behavior nor gradients were validated by execution."
+              },
+              {
+                "procedure": "get_grad",
+                "role": "public-entry-point",
+                "summary": "Public scalar REAL(rk) gradient accessor on an initialized tree node. Read after the backward pass; null nodes have no guard.",
+                "signature": "gradient = variable%get_grad()",
+                "declarations": [
+                  {
+                    "path": "src/ad_types.f90",
+                    "line_start": 108,
+                    "line_end": 112
+                  }
+                ],
+                "path": "src/ad_types.f90",
+                "line_start": 108,
+                "line_end": 114,
+                "module": "ad_types",
+                "derived_type": "tree_t"
+              },
+              {
+                "procedure": "node_t_backward",
+                "role": "implementation-helper",
+                "path": "src/ad_types.f90",
+                "line_start": 89,
+                "line_end": 98,
+                "module": "ad_types"
+              },
+              {
+                "procedure": "mul_tt",
+                "role": "implementation-helper",
+                "path": "src/ad_operator.f90",
+                "line_start": 104,
+                "line_end": 116,
+                "module": "ad_operator"
+              },
+              {
+                "procedure": "add_tt",
+                "role": "implementation-helper",
+                "path": "src/ad_operator.f90",
+                "line_start": 43,
+                "line_end": 55,
+                "module": "ad_operator"
+              },
+              {
+                "procedure": "exp_t",
+                "role": "implementation-helper",
+                "path": "src/ad_intrinsic.f90",
+                "line_start": 175,
+                "line_end": 184,
+                "module": "ad_intrinsic"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "35e62246675cbe6dcd04ce25a81f7885653feabe",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE provides the MIT grant and disclaimer. Scope covers the inspected scalar graph implementation; this does not verify graph memory ownership or numerical correctness.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/zoziha/Auto-Diff/blob/35e62246675cbe6dcd04ce25a81f7885653feabe/LICENSE",
+              "sha256": "9646c808e746d5c507d38d27effb6c2e1bd7dccb09100339b7d566e11a13c689"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8254,12 +8701,134 @@
             ],
             "notes": "The README identifies separate Intel and gfortran source arrangements and links a separate DNAOAD-FPM repository. This entry describes the original repository, not the independently cataloged FPM adaptation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "38f4c044a5336c72e64c6fc00390a69ff071ea7c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected gradient wrapper evaluates a dual-valued scalar callback once per coordinate basis vector. d1fscalar temporarily sets the module-wide order to one, forms a dual point with the chosen direction as first derivative, extracts component one and restores the previous order on normal return. The inspected dual addition/product rules propagate coefficients; multiplication uses binomial factors, so stored components represent derivatives rather than factorial-divided Taylor coefficients. H1 records this first-gradient path only, not an arbitrary-order certification, Hessian audit or complex Wirtinger derivative implementation. Precision is REAL64 in the selected GNU source variant; global order changes prevent assuming independent concurrent contexts. Dimensions, allocation and callback compatibility are caller obligations. No derivative or author example was run.",
+            "evidence": [
+              {
+                "path": "SourcesF_gfortran/diff_mod.f90",
+                "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/SourcesF_gfortran/diff_mod.f90",
+                "sha256": "3749c08c44a35f342eeec95faad4b3dbbdb79e1375c32ca25490b2aaa09d3675"
+              },
+              {
+                "path": "SourcesF_gfortran/dualzn_mod.f90",
+                "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/SourcesF_gfortran/dualzn_mod.f90",
+                "sha256": "c562d258b150f238a79fa42d71dc90564f746228e32be1cdae61fc3a65165d83"
+              },
+              {
+                "path": "SourcesF_gfortran/precision_mod.f90",
+                "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/SourcesF_gfortran/precision_mod.f90",
+                "sha256": "ba2a21be2619c7dee69429d928f49b49986cdd2e213266bd00629081b26f552c"
+              },
+              {
+                "path": "SourcesF_gfortran/ex1.f90",
+                "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/SourcesF_gfortran/ex1.f90",
+                "sha256": "099df1d4de25bf954cfe7f984f9d041b22edfc0994399bfc9bad4e12af94a502"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gradient",
+                "role": "public-entry-point",
+                "summary": "Public function in diff_mod. Supply a scalar dual-valued callback accepting an assumed-shape dualzn vector and COMPLEX(prec) coordinates; the result is a COMPLEX(prec) vector of coordinate directional derivatives. Callback arithmetic must retain dual values instead of discarding derivative components.",
+                "signature": "g = gradient(fsd, q)",
+                "declarations": [
+                  {
+                    "path": "SourcesF_gfortran/diff_mod.f90",
+                    "line_start": 7,
+                    "line_end": 21
+                  },
+                  {
+                    "path": "SourcesF_gfortran/diff_mod.f90",
+                    "line_start": 160,
+                    "line_end": 164
+                  },
+                  {
+                    "path": "SourcesF_gfortran/precision_mod.f90",
+                    "line_start": 1,
+                    "line_end": 7
+                  }
+                ],
+                "path": "SourcesF_gfortran/diff_mod.f90",
+                "line_start": 160,
+                "line_end": 172,
+                "module": "diff_mod",
+                "usage": "use precision_mod, only: prec\nuse diff_mod, only: gradient\ncomplex(prec) :: point(2), g(2)\npoint = [cmplx(2.0_prec,0.0_prec,prec), cmplx(3.0_prec,0.0_prec,prec)]\n! Supply scalar_dual(x): TYPE(dualzn), INTENT(IN) :: x(:),\n! returning a TYPE(dualzn), for example x(1)*x(1)+x(2).\ng = gradient(scalar_dual, point)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment: define scalar_dual with USE dualzn_mod and the callback declaration linked above. Compile the selected precision, dual and diff modules in order; do not use prebuilt .mod files for a different compiler. Keep order/state and allocations consistent; exceptions do not provide a guaranteed restoration path. Complex arithmetic here does not establish derivatives of nonanalytic functions or Wirtinger calculus."
+              },
+              {
+                "procedure": "d1fscalar",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/diff_mod.f90",
+                "line_start": 176,
+                "line_end": 190,
+                "module": "diff_mod"
+              },
+              {
+                "procedure": "add_vecdzn",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/diff_mod.f90",
+                "line_start": 192,
+                "line_end": 201,
+                "module": "diff_mod"
+              },
+              {
+                "procedure": "timesd",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/dualzn_mod.f90",
+                "line_start": 1093,
+                "line_end": 1102,
+                "module": "dualzn_mod"
+              },
+              {
+                "procedure": "timesdzn",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/dualzn_mod.f90",
+                "line_start": 1104,
+                "line_end": 1114,
+                "module": "dualzn_mod"
+              },
+              {
+                "procedure": "sumad",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/dualzn_mod.f90",
+                "line_start": 521,
+                "line_end": 530,
+                "module": "dualzn_mod"
+              },
+              {
+                "procedure": "initialize_dualzn",
+                "role": "implementation-helper",
+                "path": "SourcesF_gfortran/dualzn_mod.f90",
+                "line_start": 313,
+                "line_end": 318,
+                "module": "dualzn_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT with publication citation request",
+          "spdx_expression": "MIT",
+          "revision": "38f4c044a5336c72e64c6fc00390a69ff071ea7c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies the MIT grant/disclaimer and separately requests citation of the linked publication. The review records that request without treating the shipped compiler-specific binaries as portable artifacts.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/fpenunuri/DNAOAD/blob/38f4c044a5336c72e64c6fc00390a69ff071ea7c/LICENSE",
+              "sha256": "c95557dad27bb3b6ed0e454b6dad4f8908e6c7c2c6b260e5c720b479418806ee"
+            }
+          ]
         }
       },
       "imports": {}
@@ -10186,12 +10755,126 @@
             ],
             "notes": "The original RKSUITE README documents the intended initial-value problem class. This pinned distribution is not assumed to have every modernization or compiler adaptation found in other forks.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "3adda0cb876b2cc0610eed9a5a789101e4203885",
+            "reviewed_on": "2026-11-05",
+            "notes": "The reviewed Fortran 90 module provides setup plus range_integrate/step_integrate for a real first-order ODE vector. Setup validates shapes, tolerance/thresholds and direction, selects an explicit RK method and allocates state. The controller calls explicit stage combinations, estimates local error from an embedded pair with threshold-weighted max norm, rejects/shrinks or accepts/rescales steps, and returns requested output through interpolation when supported. I1a1a records one-step nonstiff IVP methods. Stiffness detection warns rather than turning this into an implicit stiff solver. This review covers the public stateful driver contract and selected stage/error-control paths, not all coefficient tables, interpolants or global-error assessment. Fatal errors stop by default and successful flag=1 is not a global-accuracy bound. Setup nullifies pointers, so collect_garbage before reinitializing allocated state; shallow copying communication objects is unsafe. No ODE or author template was run.",
+            "evidence": [
+              {
+                "path": "rksuite.f90",
+                "url": "https://github.com/jacobwilliams/rksuite/blob/3adda0cb876b2cc0610eed9a5a789101e4203885/rksuite.f90",
+                "sha256": "f3a76c8fa96c72035f9cc1857f06a4dd3dc28a27064e6f92535e8e84ea7a5818"
+              },
+              {
+                "path": "readme.txt",
+                "url": "https://github.com/jacobwilliams/rksuite/blob/3adda0cb876b2cc0610eed9a5a789101e4203885/readme.txt",
+                "sha256": "664e24643eb4e27d80216b393eb76e14c8d2b3d774399f3ce30d1e2d46df1284"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup",
+                "role": "public-entry-point",
+                "summary": "Public generic initializer for rk_comm_real_1d. Match y_start and thresholds extents and use module wp. Optional method begins L/M/H and task begins R/S; choose range task explicitly when calling range_integrate. This is the F90 object interface, distinct from the supplied legacy F77 templates.",
+                "signature": "CALL setup(comm, t_start, y_start, t_end, tolerance, thresholds, &\n           method, task, error_assess, h_start, message)",
+                "declarations": [
+                  {
+                    "path": "rksuite.f90",
+                    "line_start": 29,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "rksuite.f90",
+                    "line_start": 589,
+                    "line_end": 606
+                  }
+                ],
+                "path": "rksuite.f90",
+                "line_start": 589,
+                "line_end": 849,
+                "module": "rksuite_90",
+                "usage": "use rksuite_90, only: wp, rk_comm_real_1d, setup, range_integrate, collect_garbage\ntype(rk_comm_real_1d) :: comm\nreal(wp) :: t, y(1), dy(1)\ninteger :: flag\n! Supply rhs(t,y) returning a REAL(wp) array of SIZE(y).\ncall setup(comm, 0.0_wp, [1.0_wp], 1.0_wp, 1.0e-6_wp, &\n           [1.0e-10_wp], method=\"M\", task=\"R\")\ncall range_integrate(comm, rhs, 1.0_wp, t, y, dy, flag)\ncall collect_garbage(comm)\nif (flag /= 1) error stop \"RKSUITE did not reach requested output\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment: provide an explicit-interface rhs FUNCTION with scalar REAL(wp) t INTENT(IN), assumed-shape REAL(wp) y(:) INTENT(IN), and result dimension SIZE(y). Keep requested times strictly advancing toward t_end and inspect the returned flag/time. Default fatal handling may STOP before the flag check. Release initialized state before reuse and do not shallow-copy pointer components. Tolerances control estimated local error, not a rigorous bound on final error."
+              },
+              {
+                "procedure": "range_integrate",
+                "role": "public-entry-point",
+                "summary": "Public output-at-requested-time generic. Requires prior setup with range task; returns t_got, y_got, derivative vector and optional integer flag. Normal success is flag=1; other statuses need the author recovery protocol.",
+                "signature": "CALL range_integrate(comm, f, t_want, t_got, y_got, yderiv_got, flag)",
+                "declarations": [
+                  {
+                    "path": "rksuite.f90",
+                    "line_start": 929,
+                    "line_end": 952
+                  }
+                ],
+                "path": "rksuite.f90",
+                "line_start": 929,
+                "line_end": 1165,
+                "module": "rksuite_90"
+              },
+              {
+                "procedure": "collect_garbage",
+                "role": "public-entry-point",
+                "summary": "Public generic cleanup for initialized communication-object pointer allocations. Call after use and before setting up a new problem on the same allocated object.",
+                "signature": "CALL collect_garbage(comm)",
+                "declarations": [
+                  {
+                    "path": "rksuite.f90",
+                    "line_start": 852,
+                    "line_end": 862
+                  }
+                ],
+                "path": "rksuite.f90",
+                "line_start": 852,
+                "line_end": 927,
+                "module": "rksuite_90"
+              },
+              {
+                "procedure": "step_integrate_r1",
+                "role": "implementation-helper",
+                "path": "rksuite.f90",
+                "line_start": 1382,
+                "line_end": 1482,
+                "module": "rksuite_90"
+              },
+              {
+                "procedure": "step_r1",
+                "role": "implementation-helper",
+                "path": "rksuite.f90",
+                "line_start": 1753,
+                "line_end": 1853,
+                "module": "rksuite_90"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom free scientific-use notice with citation expectation",
+          "spdx_expression": null,
+          "revision": "3adda0cb876b2cc0610eed9a5a789101e4203885",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README makes RKSUITE available free of charge to the scientific community as a public service and expects acknowledgment/citation for substantial use. The F90 source attributes Brankin and Gladwell separately from the legacy release description. No standard SPDX license or unrestricted redistribution grant is inferred from availability alone.",
+          "evidence": [
+            {
+              "path": "readme.txt",
+              "url": "https://github.com/jacobwilliams/rksuite/blob/3adda0cb876b2cc0610eed9a5a789101e4203885/readme.txt",
+              "sha256": "664e24643eb4e27d80216b393eb76e14c8d2b3d774399f3ce30d1e2d46df1284"
+            },
+            {
+              "path": "rksuite.f90",
+              "url": "https://github.com/jacobwilliams/rksuite/blob/3adda0cb876b2cc0610eed9a5a789101e4203885/rksuite.f90",
+              "sha256": "f3a76c8fa96c72035f9cc1857f06a4dd3dc28a27064e6f92535e8e84ea7a5818"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13680,12 +14363,156 @@
             ],
             "notes": "The README identifies these separate facilities and warns that its normalization/sign-convention whitepaper is not yet available. Convention consistency and individual numerical routines require further review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C3a2",
+            "level": "source-reviewed",
+            "revision": "5712f2fd77e09c565f44961cba02a7e69db3c4e9",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public LEGENDRE generic selects a private double-precision routine that returns P0=1, P1=x, and otherwise applies the standard three-term Legendre-polynomial recurrence. C3a2 records ordinary Legendre polynomial evaluation, not all associated functions, normalized harmonics or coupling coefficients in the module. The routine documents nonnegative degree and -1<=x<=1 but does not validate either or return a status. Negative degrees fall through to the initialized P0=x instead of signalling invalid input. High-degree recurrence accuracy and overflow were not tested. No polynomial or harmonic was evaluated for this catalog.",
+            "evidence": [
+              {
+                "path": "src/vsh.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/vsh.f90",
+                "sha256": "b93e97d95d09a71bc1706d43887646653d053cb2444d3f76d2f3d9879ea9d330"
+              },
+              {
+                "path": "src/kinds.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/kinds.f90",
+                "sha256": "25e6a21ff9b1ad285bd5084d6a9fee893674faa9a1d28a2be53d839a92399f8e"
+              },
+              {
+                "path": "src/globals.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/globals.f90",
+                "sha256": "7e02da1d08f6e85fbbb79861e84b14d08c926020ddbeb22b85797dc3310d39b3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LEGENDRE",
+                "role": "public-entry-point",
+                "summary": "Public generic REAL(dp) function of INTEGER(i4) degree L and REAL(dp) X. Use the library KINDS parameters; the specific LEGENDRE_DP remains private. Supply L>=0 and finite X in the documented interval.",
+                "signature": "value = LEGENDRE(L, X)",
+                "declarations": [
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 29,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 59,
+                    "line_end": 61
+                  },
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 240,
+                    "line_end": 246
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 10,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 20,
+                    "line_end": 21
+                  }
+                ],
+                "path": "src/vsh.f90",
+                "line_start": 240,
+                "line_end": 266,
+                "module": "VSH",
+                "usage": "use KINDS, only: dp, i4\nuse VSH, only: LEGENDRE\nreal(dp) :: value\nvalue = LEGENDRE(3_i4, 0.5_dp)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile KINDS, GLOBALS and VSH in dependency order, or use the author library build. Validate degree and argument before calling. This is ordinary P_L, without an associated order or harmonic normalization; other functions do not inherit this source review. No accuracy comparison was run."
+              }
+            ]
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "5712f2fd77e09c565f44961cba02a7e69db3c4e9",
+            "reviewed_on": "2026-11-05",
+            "notes": "SHGLQ uses LMAX+1 nodes for Gauss-Legendre quadrature on [-1,1]. The inspected implementation initializes symmetric root guesses, evaluates Legendre recurrences and derivatives, performs up to 100 Newton updates, mirrors the nodes and computes reciprocal-derivative weights. H2c records a rule-generation service; callers still evaluate their integrand and form the weighted sum. LMAX must be nonnegative and outputs have LMAX+1 entries. The absolute Newton-step tolerance is fixed at 1e-15 and no status is returned if the iteration cap is reached. Exactness statements describe the mathematical rule, not verified floating-point output. No node/weight, moment-exactness or convergence test was executed.",
+            "evidence": [
+              {
+                "path": "src/vsh.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/vsh.f90",
+                "sha256": "b93e97d95d09a71bc1706d43887646653d053cb2444d3f76d2f3d9879ea9d330"
+              },
+              {
+                "path": "src/kinds.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/kinds.f90",
+                "sha256": "25e6a21ff9b1ad285bd5084d6a9fee893674faa9a1d28a2be53d839a92399f8e"
+              },
+              {
+                "path": "src/globals.f90",
+                "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/src/globals.f90",
+                "sha256": "7e02da1d08f6e85fbbb79861e84b14d08c926020ddbeb22b85797dc3310d39b3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SHGLQ",
+                "role": "public-entry-point",
+                "summary": "Public generic subroutine returning REAL(dp) nodes and weights, with INTEGER(i4) LMAX. LMAX is one less than the number of quadrature points, not the number of points itself. Nodes are mirrored into ascending order; no callback or error estimate is accepted.",
+                "signature": "CALL SHGLQ(ZERO, W, LMAX)",
+                "declarations": [
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 35,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 93,
+                    "line_end": 95
+                  },
+                  {
+                    "path": "src/vsh.f90",
+                    "line_start": 991,
+                    "line_end": 998
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 10,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 20,
+                    "line_end": 21
+                  }
+                ],
+                "path": "src/vsh.f90",
+                "line_start": 991,
+                "line_end": 1023,
+                "module": "VSH",
+                "usage": "use KINDS, only: dp, i4\nuse VSH, only: SHGLQ\nreal(dp) :: nodes(4), weights(4), estimate\ncall SHGLQ(nodes, weights, 3_i4)\nestimate = sum(weights*nodes**6)\n! Mathematical reference: integral x**6 over [-1,1] is 2/7.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch constructs a four-point rule and forms a weighted sum; the 2/7 reference was not compared by execution. Validate LMAX and monitor finite nodes/weights and moments independently; the routine supplies no iteration/convergence status or adaptive integral error control."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "5712f2fd77e09c565f44961cba02a7e69db3c4e9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE supplies a BSD 3-Clause grant/disclaimer. This source review is limited to ordinary Legendre evaluation and Gauss-Legendre rule generation, not the full harmonic/coupling implementation.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/justinelfritz/FORTVSH/blob/5712f2fd77e09c565f44961cba02a7e69db3c4e9/LICENSE",
+              "sha256": "5c4751fb5f41e7a1647671b2ac07c412dc619a84c156dcb69109bfff4ae55e53"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13899,12 +14726,105 @@
             ],
             "notes": "The brief README identifies arbitrary-order Butterworth filtering. Boundary treatment, numerical conditioning at high order and phase behavior have not been independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a1c3",
+            "level": "source-reviewed",
+            "revision": "7ad7f7086a165e169597fad651cf2077f2a613a4",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected low-pass design prewarps the cutoff with cot(pi*f*dt), assembles first/second-order Butterworth factors and expands their polynomials into coefficient vectors. buttfilt applies a causal recursive linear difference equation with input numerator coefficients b and feedback denominator coefficients a, overwriting samples 0:nt after zero-state initialization. L10a1c3 records this autoregressive-linear filtering path, not statistical AR-model parameter estimation. The forward routine omits division by a(0), so it requires a(0)=1; the separate filtfilt implementation divides by a(0) and uses forward/reverse zero-state passes, which is not an equivalent endpoint-transient policy to every other library filtfilt. Positive order/dt and cutoff below Nyquist are caller checks; only near-zero cutoff is rejected in buttlp. High-order direct-form conditioning, stability and frequency response were not measured. No signal or author driver was run.",
+            "evidence": [
+              {
+                "path": "butterworth/butter.f90",
+                "url": "https://github.com/YoushanLiu/Butterworth-Filter/blob/7ad7f7086a165e169597fad651cf2077f2a613a4/butterworth/butter.f90",
+                "sha256": "090d39c78b19b5d6340c06589332caf217fd5fd3fa0421c5bd281284803c7189"
+              },
+              {
+                "path": "butterworth/driver.f90",
+                "url": "https://github.com/YoushanLiu/Butterworth-Filter/blob/7ad7f7086a165e169597fad651cf2077f2a613a4/butterworth/driver.f90",
+                "sha256": "b656c82994468049a9e3901df9b38302b8a2815feb9765e0ff4aa3f9395ed78e"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/YoushanLiu/Butterworth-Filter/blob/7ad7f7086a165e169597fad651cf2077f2a613a4/README.md",
+                "sha256": "5d6abd99f53b67dabb3a6ba12ae42d5c43e6ff5b0efbcc748ec6725e09ab23ec"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "buttlp",
+                "role": "public-entry-point",
+                "summary": "External low-pass coefficient designer. INTEGER(4) order and REAL(8) sample spacing dt/cutoff f; a and b have bounds 0:order. Cutoff uses cycles per unit time consistent with dt. Arrays are filled through polynomial expansion; no error status is returned.",
+                "signature": "CALL buttlp(order, dt, f, a, b)",
+                "declarations": [
+                  {
+                    "path": "butterworth/butter.f90",
+                    "line_start": 264,
+                    "line_end": 272
+                  }
+                ],
+                "path": "butterworth/butter.f90",
+                "line_start": 264,
+                "line_end": 325,
+                "examples": [
+                  {
+                    "path": "butterworth/driver.f90",
+                    "line_start": 42,
+                    "line_end": 56
+                  }
+                ],
+                "usage": "integer, parameter :: order=3, last=99\nreal(8) :: a(0:order), b(0:order), signal(0:last)\ninteger :: i\nexternal :: buttlp, buttfilt\nsignal = [(sin(0.1d0*dble(i)), i=0,last)]\ncall buttlp(order, 0.01d0, 5.0d0, a, b)\n! buttfilt requires a(0)=1; normalize the coefficients explicitly.\nb = b/a(0)\na = a/a(0)\ncall buttfilt(order, last, a, b, signal)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. last is the highest zero-based sample index, so this sketch filters 100 samples. Validate nonzero a(0) and design order/dt/cutoff before normalization. Match default INTEGER/REAL kinds to the external INTEGER(4)/REAL(8) implementation. The forward filter starts with zero history and returns no streaming state; restarting it on chunks changes transients. No spectral-response or sample check was performed."
+              },
+              {
+                "procedure": "buttfilt",
+                "role": "public-entry-point",
+                "summary": "External in-place recursive filter over x(0:nt); nt is the last index. Requires normalized denominator a(0)=1, finite compatible coefficient arrays and zero-history interpretation.",
+                "signature": "CALL buttfilt(n, nt, a, b, x)",
+                "declarations": [
+                  {
+                    "path": "butterworth/butter.f90",
+                    "line_start": 717,
+                    "line_end": 726
+                  }
+                ],
+                "path": "butterworth/butter.f90",
+                "line_start": 717,
+                "line_end": 750
+              },
+              {
+                "procedure": "polyval",
+                "role": "implementation-helper",
+                "path": "butterworth/butter.f90",
+                "line_start": 579,
+                "line_end": 643
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "7ad7f7086a165e169597fad651cf2077f2a613a4",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README explicitly permits GPL version 3 or any later version and links the license. The defining source attributes Youshan Liu. No separately named license file appears in the pinned tree; this finding records the explicit README grant.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/YoushanLiu/Butterworth-Filter/blob/7ad7f7086a165e169597fad651cf2077f2a613a4/README.md",
+              "sha256": "5d6abd99f53b67dabb3a6ba12ae42d5c43e6ff5b0efbcc748ec6725e09ab23ec"
+            },
+            {
+              "path": "butterworth/butter.f90",
+              "url": "https://github.com/YoushanLiu/Butterworth-Filter/blob/7ad7f7086a165e169597fad651cf2077f2a613a4/butterworth/butter.f90",
+              "sha256": "090d39c78b19b5d6340c06589332caf217fd5fd3fa0421c5bd281284803c7189"
+            }
+          ]
         }
       },
       "imports": {}
