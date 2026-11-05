@@ -48,6 +48,18 @@
       "parent": "H2a1a",
       "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=21",
       "reviewed_on": "2026-11-04"
+    },
+    "G2e": {
+      "label": "Quadratic programming",
+      "parent": "G2",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=20",
+      "reviewed_on": "2026-11-04"
+    },
+    "G2e1": {
+      "label": "Positive definite Hessian (i.e., convex problem)",
+      "parent": "G2e",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=20",
+      "reviewed_on": "2026-11-04"
     }
   }
 }
