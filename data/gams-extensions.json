@@ -264,6 +264,30 @@
       "parent": "K6a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "G4c": {
+      "label": "Check user-supplied derivatives",
+      "parent": "G4",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2h2": {
+      "label": "Linear equality or inequality constraints",
+      "parent": "G2h",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2h2a": {
+      "label": "Smooth function",
+      "parent": "G2h2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2h2a3": {
+      "label": "User provides first and second derivatives",
+      "parent": "G2h2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -4023,12 +4023,168 @@
             ],
             "notes": "The README describes original Fortran 77 algorithms and an ongoing modernization. Sparse and dense variants have distinct required source files; compiler readiness and individual problem-class claims remain unchecked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h3b1b",
+            "level": "source-reviewed",
+            "revision": "cc0078b2206cb5d186e390eda214a3da6e19f753",
+            "reviewed_on": "2026-11-05",
+            "notes": "filterSD solves local nonlinear programming with two-sided bounds on variables and nonlinear constraint values. It maps workspace and dispatches filter_SD, whose inspected phase-one/phase-two control uses GLCPD linearized subproblems, feasibility/objective filter tests and projection/step evaluations. External functions and gradients callbacks provide objective/constraints and their first derivatives; a reduced-Hessian/limited-memory mechanism is internal, not a required user Hessian. G2h3b1b records smooth nonlinear equality/inequality constrained optimization with supplied first derivatives. Supply matching dense or sparse derivative backends, invariant sparse structure and COMMON block settings including workspace capacities. X needs N+M storage; multipliers and final violation are distinct from a success certificate. IFAIL=3 means a locally infeasible point, not proof that the original feasible set is empty. IFAIL>=7 can return before workspace is scattered into X/AL. No NLP, derivative checks or GLCPD/kernel accuracy audit was executed.",
+            "evidence": [
+              {
+                "path": "src/filterSD.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/filterSD.f90",
+                "sha256": "075771eb009d9228c6c4c4d8af41f998ebb8b136e3d3360da2a6fe00ec7d41e2"
+              },
+              {
+                "path": "src/shared.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/shared.f90",
+                "sha256": "8088a1e2455f62b337121e4598efb2e1dbfc7a308f95f157c09174d4b13ab150"
+              },
+              {
+                "path": "src/tests/driver.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/tests/driver.f90",
+                "sha256": "89561594ff384ccb89ef65ca86efd89255539aafde67343267be27bde98748c7"
+              },
+              {
+                "path": "src/tests/user.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/tests/user.f90",
+                "sha256": "b58fc9e47a108da93704829fd35166f8f5ad3feb39e16d897fdff32028d43dbc"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/README.md",
+                "sha256": "f791caf7219ef6af7a624dd9c088d032c0210dba743cb641233e34e3d7a4a609"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "filterSD",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION local NLP driver. BL/BU have N+M bounds, X/AL need N+M storage, WS/LWS are caller workspaces, V carries initial Ritz information. FUNCTIONS/GRADIENTS are linked by name, not callback arguments. Required COMMON/default blocks are part of the contract.",
+                "signature": "CALL filterSD(n,m,x,al,f,fmin,cstype,bl,bu,ws,lws,v,nv, &\n maxa,maxla,maxu,maxiu,kmax,maxg,rho,htol,rgtol,maxit,iprint,nout,ifail)",
+                "declarations": [
+                  {
+                    "path": "src/filterSD.f90",
+                    "line_start": 34,
+                    "line_end": 87
+                  },
+                  {
+                    "path": "src/filterSD.f90",
+                    "line_start": 94,
+                    "line_end": 117
+                  },
+                  {
+                    "path": "src/filterSD.f90",
+                    "line_start": 138,
+                    "line_end": 144
+                  },
+                  {
+                    "path": "src/filterSD.f90",
+                    "line_start": 148,
+                    "line_end": 168
+                  }
+                ],
+                "path": "src/filterSD.f90",
+                "line_start": 138,
+                "line_end": 283,
+                "examples": [
+                  {
+                    "path": "src/tests/driver.f90",
+                    "line_start": 70,
+                    "line_end": 96
+                  },
+                  {
+                    "path": "src/tests/driver.f90",
+                    "line_start": 111,
+                    "line_end": 117
+                  }
+                ],
+                "usage": "! Declare/initialize arrays and required COMMON settings from the pinned contract.\n! Link problem-specific FUNCTIONS and GRADIENTS, and matching dense/sparse backends.\nv(1)=1d0; nv=1\ncall filtersd(n,m,x,al,f,fmin,cstype,bl,bu,ws,lws,v,nv, &\n maxa,maxla,maxu,maxiu,kmax,maxg,rho,htol,rgtol,maxit,iprint,nout,ifail)\nif(ifail/=0) error stop \"FilterSD did not finish successfully\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Protocol fragment requiring problem callbacks, array allocation, workspace/COMMON settings and linked BLOCK DATA defaults; copying the call alone is insufficient. GRADIENTS stores the objective gradient followed by constraint-gradient columns in the chosen backend format. Constant derivative entries must be initialized in both cached copies. The cited generic driver uses CUTE data and is not a standalone sample problem. Check feasibility and stationarity independently."
+              },
+              {
+                "procedure": "filter_SD",
+                "role": "implementation-helper",
+                "path": "src/filterSD.f90",
+                "line_start": 285,
+                "line_end": 1159
+              }
+            ]
+          },
+          {
+            "code": "G4c",
+            "level": "source-reviewed",
+            "revision": "cc0078b2206cb5d186e390eda214a3da6e19f753",
+            "reviewed_on": "2026-11-05",
+            "notes": "checkd perturbs one variable at a time by caller-supplied nonzero AL increments and compares each objective/constraint forward difference quotient with the supplied derivatives at both endpoints, using backend AIJ access. G4c records a first-derivative consistency diagnostic, not numerical certification of analytic derivatives. An inconsistency is printed and causes immediate RETURN without a machine-readable status or restoring the current perturbed X(i); preserve X before calling. Normal completion restores coordinates and prints an exit message. Insufficient workspaces STOP the process. A quotient between endpoint derivatives can pass despite an incorrect derivative, and cancellation/domain violations depend on the chosen increments/tolerance. No diagnostic was run.",
+            "evidence": [
+              {
+                "path": "src/checkd.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/checkd.f90",
+                "sha256": "7dcd89b2fe0435b31a836605d74ccb29d8bd3454f4c754cc7a1c9a096aae8631"
+              },
+              {
+                "path": "src/filterSD.f90",
+                "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/filterSD.f90",
+                "sha256": "075771eb009d9228c6c4c4d8af41f998ebb8b136e3d3360da2a6fe00ec7d41e2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "checkd",
+                "role": "public-entry-point",
+                "summary": "External derivative checker using the same FUNCTIONS/GRADIENTS and dense/sparse structure as FilterSD. Here AL(1:N) means differencing increments, not Lagrange multipliers. Positive TOL controls printed inconsistency reports; no IFAIL is returned.",
+                "signature": "CALL checkd(n,m,x,al,ws,lws,maxa,maxla,maxu,maxiu,mxws,mxlws,tol)",
+                "declarations": [
+                  {
+                    "path": "src/checkd.f90",
+                    "line_start": 11,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/checkd.f90",
+                    "line_start": 48,
+                    "line_end": 48
+                  }
+                ],
+                "path": "src/checkd.f90",
+                "line_start": 11,
+                "line_end": 113,
+                "usage": "! Use a fully initialized FilterSD problem/workspace and preserve the original x.\nx_saved=x\n! Set al(1:n) to nonzero, problem-scaled increments that stay in the callback domain.\ncall checkd(n,m,x,al,ws,lws,maxa,maxla,maxu,maxiu,mxws,mxlws,1d-8)\nx=x_saved\n! Inspect printed diagnostics: no numerical status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The routine can return with X perturbed on its first inconsistency. Restore X explicitly before any subsequent solve. This interval comparison is a heuristic with step-size/cancellation limitations, not a complete Jacobian validation; callback/backend setup must match the selected problem."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "EPL-1.0",
+          "spdx_expression": "EPL-1.0",
+          "revision": "cc0078b2206cb5d186e390eda214a3da6e19f753",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root specifies Eclipse Public License version 1.0 and selected files carry matching agreement notices. CUTE test dependencies and the full linked numerical stack are outside this scoped finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/LICENSE",
+              "sha256": "11ca910b148a5a246957e09c70fc32efc1c18441532fac6cc6d6701af16a1f73"
+            },
+            {
+              "path": "src/filterSD.f90",
+              "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/filterSD.f90",
+              "sha256": "075771eb009d9228c6c4c4d8af41f998ebb8b136e3d3360da2a6fe00ec7d41e2"
+            },
+            {
+              "path": "src/checkd.f90",
+              "url": "https://github.com/jacobwilliams/FilterSD/blob/cc0078b2206cb5d186e390eda214a3da6e19f753/src/checkd.f90",
+              "sha256": "7dcd89b2fe0435b31a836605d74ccb29d8bd3454f4c754cc7a1c9a096aae8631"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8296,12 +8452,137 @@
             ],
             "notes": "The README documents MPI and Fortran/C/Python interfaces. Its performance comparisons are author statements; no benchmark comparison or statistical sampling guarantee is reproduced here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "0223f7abb3cf48d6aa648ce10eb35685a0f6e095",
+            "reviewed_on": "2026-11-05",
+            "notes": "de::diver initializes a population and RNG, applies differential mutation, binomial/exponential crossover and greedy selection, and tracks the lowest objective value. The selected ordinary continuous bounded path uses the general difference-vector mutation, binomial crossover and selector boundary handling; MPI/adaptive/discrete variants exist but are not fully audited. G2i records stochastic global minimization, not posterior sampling validity or a global-minimum certificate. Callback includes mutable parameter/derived storage, evaluation counter, quit flag, validity flag and C_PTR context. Best value is the function result, with optional bestFitParams; no termination-code output distinguishes budget, convergence or callback quit. Current convergence is smoothed fractional improvement of the population mean; the source warns about zero-minimum objectives and a zero mean can lead to division by zero. In MPI builds callbacks can be invoked for invalid vectors and must honor validvector; use sufficient population size for distinct donor selection. No search, randomness or MPI behavior was run.",
+            "evidence": [
+              {
+                "path": "src/de.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/de.f90",
+                "sha256": "c16a7de8fe86545264c861b50c80b83a4f935af4b3876bdb143618c6c3d0662e"
+              },
+              {
+                "path": "src/detypes.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/detypes.f90",
+                "sha256": "dd22e432f9c416c6a5e095c5929da2565f14f2d4836e8db630d2bc5b72a49e1b"
+              },
+              {
+                "path": "src/mutation.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/mutation.f90",
+                "sha256": "b0e8429104cb9c9cbabb6f52d7c231fbcfbfba13f3bf64c1a710b77c32dff0b7"
+              },
+              {
+                "path": "src/crossover.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/crossover.f90",
+                "sha256": "6a9b319cff210c1bc8159910a3bc47f26869c60895aaeb577879d67b03b3342e"
+              },
+              {
+                "path": "src/selection.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/selection.f90",
+                "sha256": "dabd82bab2ddb8cd68de2592298267db8098fb5b2efda3021fbd00c6c0cbaf42"
+              },
+              {
+                "path": "src/converge.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/src/converge.f90",
+                "sha256": "46bf14681862a0173b6ae777b2c3bbe01c216a80c9ba99980feae5c51c181c79"
+              },
+              {
+                "path": "example_f/example_f.f90",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/example_f/example_f.f90",
+                "sha256": "3dcaafacd4d71da45e497e1e81f7a37760fcc778049fbcac84e2cb7c08dc575d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/README.md",
+                "sha256": "736610b53b91e04a75cdd5383cbd2f1e10b0e8c05a8c4231bf1f678e3f011ce4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "diver",
+                "role": "public-entry-point",
+                "summary": "Public module REAL(dp) function with mandatory objective and equal-length lower/upper bound vectors. dp=KIND(1d0). Many optional controls include population size, generations, F(:), seed, bestFitParams and disableIO. The objective must match detypes::MinusLogLikeFunc, including the context and validity arguments.",
+                "signature": "best_value = diver(func, lowerbounds, upperbounds, &\n bestFitParams=best_x, maxgen=generations, NP=population_size, ...)",
+                "declarations": [
+                  {
+                    "path": "src/de.f90",
+                    "line_start": 24,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "src/de.f90",
+                    "line_start": 60,
+                    "line_end": 97
+                  },
+                  {
+                    "path": "src/detypes.f90",
+                    "line_start": 69,
+                    "line_end": 80
+                  }
+                ],
+                "path": "src/de.f90",
+                "line_start": 24,
+                "line_end": 399,
+                "module": "de",
+                "examples": [
+                  {
+                    "path": "example_f/example_f.f90",
+                    "line_start": 181,
+                    "line_end": 200
+                  }
+                ],
+                "usage": "use detypes, only: dp\nuse de, only: diver\nreal(dp) :: lower(2),upper(2),best_x(2),best_value\n! Supply an explicit-interface FUNC matching MinusLogLikeFunc.\n! A positive offset objective can avoid the documented zero-mean convergence problem.\nlower=-2.0_dp; upper=2.0_dp\nbest_value=diver(func,lower,upper,bestFitParams=best_x, &\n maxgen=100,NP=40,F=[0.8_dp],Cr=0.9_dp,lambda=0.0_dp, &\n jDE=.false.,lambdajDE=.false.,bndry=1,seed=12345,disableIO=.true.,verbose=0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Driver fragment until FUNC is supplied. In the callback set quit on every call, honor validvector, update fcall according to the API and preserve/handle C_PTR context. Keep objective/derived dimensions compatible. F is an array, even for a single scale. The current convergence criterion is not translation-invariant and is not an optimality bound. This sketch selects continuous ordinary mutation, brick-wall bounds and no output files; it does not verify every optional mode or seeding reproducibility."
+              },
+              {
+                "procedure": "genmutation",
+                "role": "implementation-helper",
+                "path": "src/mutation.f90",
+                "line_start": 87,
+                "line_end": 140,
+                "module": "mutation"
+              },
+              {
+                "procedure": "selector",
+                "role": "implementation-helper",
+                "path": "src/selection.f90",
+                "line_start": 19,
+                "line_end": 115,
+                "module": "selection"
+              },
+              {
+                "procedure": "check_SFIM",
+                "role": "implementation-helper",
+                "path": "src/converge.f90",
+                "line_start": 54,
+                "line_end": 85,
+                "module": "converge"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom academic-use license with citation requirement",
+          "spdx_expression": null,
+          "revision": "0223f7abb3cf48d6aa648ce10eb35685a0f6e095",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned README restricts use to academic contexts, requires specified citations and directs other uses to alternative licensing arrangements. Its redistribution clauses do not make the full notice an ordinary BSD license; preserve the complete supplied terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/diveropt/Diver/blob/0223f7abb3cf48d6aa648ce10eb35685a0f6e095/README.md",
+              "sha256": "736610b53b91e04a75cdd5383cbd2f1e10b0e8c05a8c4231bf1f678e3f011ce4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8489,12 +8770,150 @@
             ],
             "notes": "The README specifies real objectives on boxed domains and optional response-surface hybridization. Noise/failure tolerance and acceleration are documented design claims, not independently tested results.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "5ef5ab5de391cf352356fd5188ef2afbe598c3de",
+            "reviewed_on": "2026-11-05",
+            "notes": "class_optimizer initializes MPI, RNG, configuration, history, trial processing and stopping objects, then loops over trial evaluation and history selection. The inspected DE/rand/1 strategy selects three distinct non-parent members, forms base+F*difference, crosses coordinates and retries until the trial is within bounds. History accepts greater-or-equal fitness: DEPP maximizes, so minimizing an objective requires an explicit sign transformation. G2i records stochastic global search in a rectangular domain, not proof of global optimality or an audit of optional response-surface strategies. init reads configuration and run finalizes MPI itself; this is not a pure function accepting an objective callback and returning a solution array. The external fitness path writes parameter files, executes a configured program and reads a fitness file. Trial bounds and some fitness retries have no local cap; require at least four population members and a viable domain. No optimization, MPI or external fitness process was run.",
+            "evidence": [
+              {
+                "path": "src/depp_class_optimizer.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/depp_class_optimizer.f90",
+                "sha256": "48f9bbec40fa59006124523cca0b01b12d7724f7736ea4a647303c34bcc281c5"
+              },
+              {
+                "path": "src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+                "sha256": "6baccc85eee9857c2d46ad095d1ed9a2d5de8456417b3e85d35202e7788f5f1c"
+              },
+              {
+                "path": "src/depp_class_ehist.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/depp_class_ehist.f90",
+                "sha256": "89f73566d89c177b6a994bca83a636ba7f1ac7b5fbdbbe88240ae155e9740eb5"
+              },
+              {
+                "path": "src/search_strategy/depp_search_tools.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/search_strategy/depp_search_tools.f90",
+                "sha256": "39fe65319bec3b3f3a26be97da6ffcdedd3edbf702e1930433e6c038355c8b17"
+              },
+              {
+                "path": "src/search_strategy/depp_class_parallel_processed_trial_population.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/search_strategy/depp_class_parallel_processed_trial_population.f90",
+                "sha256": "92c24507c222b6c1aee8c220d46fb76f5aa388d6a85d99069a26284f9b4bf9f1"
+              },
+              {
+                "path": "src/fitness_calculator/depp_class_external_fitness_calculator.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/fitness_calculator/depp_class_external_fitness_calculator.f90",
+                "sha256": "45133f887e60065faa602ed2874bf913fd37cb6f3eca8a58c2f726ffc9c5a188"
+              },
+              {
+                "path": "src/depp_main.f90",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/depp_main.f90",
+                "sha256": "51c4b51088b0770c2f287df8e0a70002e69c0796d9ec011f331076da471d1d11"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/README.md",
+                "sha256": "4d0dbc7ef45a77f50f69df71742609408ec694850ea0268fc7ea3015ea899f86"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "run",
+                "role": "public-entry-point",
+                "summary": "Public type-bound orchestration on class_optimizer. Call init first with the program configuration available. Results are logged/saved through private history/system state; this binding has no objective, result or status arguments and finalizes MPI.",
+                "signature": "CALL optimizer%run()",
+                "declarations": [
+                  {
+                    "path": "src/depp_class_optimizer.f90",
+                    "line_start": 40,
+                    "line_end": 72
+                  },
+                  {
+                    "path": "src/depp_class_optimizer.f90",
+                    "line_start": 79,
+                    "line_end": 102
+                  },
+                  {
+                    "path": "src/depp_class_optimizer.f90",
+                    "line_start": 129,
+                    "line_end": 140
+                  }
+                ],
+                "path": "src/depp_class_optimizer.f90",
+                "line_start": 129,
+                "line_end": 215,
+                "module": "mod_class_optimizer",
+                "derived_type": "class_optimizer",
+                "examples": [
+                  {
+                    "path": "src/depp_main.f90",
+                    "line_start": 65,
+                    "line_end": 78
+                  }
+                ],
+                "usage": "use mod_class_optimizer, only: class_optimizer\ntype(class_optimizer) :: optimizer\n! Supply the documented DEPP parameter file and configured fitness implementation.\n! Choose DE/rand/1 and transform a minimization objective into a maximized fitness.\ncall optimizer%init()\ncall optimizer%run()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is an application-oriented calling sketch requiring the complete MPI build, configuration and fitness-file protocol, not a complete optimizer driver in isolation. The external fitness implementation uses a shell command and file exchange. Do not embed run in a caller expecting to retain an independently owned MPI session. Inspect logs/solutions and objective convention; no reproducibility, stopping or optimality result is certified."
+              },
+              {
+                "procedure": "get_trial",
+                "role": "public-entry-point",
+                "summary": "Public DE/rand/1 trial-generation method, requiring initialized strategy and evolution history. Optional ES is initialized to zero, not an iteration-limit/failure detector for the bounds retry loop.",
+                "signature": "CALL strategy%get_trial(ind, ehist, x [, es])",
+                "declarations": [
+                  {
+                    "path": "src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+                    "line_start": 56,
+                    "line_end": 75
+                  },
+                  {
+                    "path": "src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+                    "line_start": 101,
+                    "line_end": 107
+                  }
+                ],
+                "path": "src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+                "line_start": 101,
+                "line_end": 137,
+                "module": "mod_class_DE_RAND_1",
+                "derived_type": "class_DE_RAND_1"
+              },
+              {
+                "procedure": "select_individuals",
+                "role": "implementation-helper",
+                "path": "src/depp_class_ehist.f90",
+                "line_start": 255,
+                "line_end": 281,
+                "module": "mod_class_ehist"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "5ef5ab5de391cf352356fd5188ef2afbe598c3de",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected defining source explicitly permits GPL version 3 or any later version. Separate external fitness programs and dependencies are outside this root/source license review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/LICENSE",
+              "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+            },
+            {
+              "path": "src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+              "url": "https://github.com/gbertoldo/DEPP/blob/5ef5ab5de391cf352356fd5188ef2afbe598c3de/src/search_strategy/DE/depp_class_DE_RAND_1.f90",
+              "sha256": "6baccc85eee9857c2d46ad095d1ed9a2d5de8456417b3e85d35202e7788f5f1c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -12709,12 +13128,101 @@
             ],
             "notes": "The README identifies historical MATLAB/Python bindings and explicitly warns that MEX tricks require adaptation for 64-bit systems. No modern MATLAB or compiler compatibility is implied.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2e1",
+            "level": "source-reviewed",
+            "revision": "de858ea58ce159feccf2a9d2f7b2072ed100fc1f",
+            "reviewed_on": "2026-11-05",
+            "notes": "calcturningpoints follows active-set changes along a Markowitz quadratic-program frontier, starting with the largest-mean single component. It updates a restricted covariance inverse when a component enters/leaves, forms affine weights satisfying sum(w)=1 and stores turning-point means, standard deviations, weights and multipliers. G2e1 is scoped to the convex positive-definite covariance case with nonnegative weights and a budget equality, not a generic QP API or the separate arbitrary-bound variant. NN>=2, distinct/nondegenerate means and adequate MAX_TPS are caller assumptions; covariance definiteness and denominator/pivot safety are not checked. Helpers use unpivoted elimination and inverse updates. Some degeneracies leave a zero candidate index, and turning-point output capacity is checked only after the initial stored point. On failure N_TPS can be undefined and early-return allocation cleanup is incomplete. Check ERROR_FLAG before reading valid output prefixes, then verify feasibility/frontier conditions independently. No frontier or QP residual was run.",
+            "evidence": [
+              {
+                "path": "src/calcturningpoints.f90",
+                "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/src/calcturningpoints.f90",
+                "sha256": "a784fe1bfbe6ec95b8dc754302b49adba42c95d98fdc81654788efadd503e146"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/README.md",
+                "sha256": "adddc68664b16e384e1c4a1dceb00c6e4cea68873b88ad38d67d4da9963b3c77"
+              },
+              {
+                "path": "src/README_PYTHON.txt",
+                "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/src/README_PYTHON.txt",
+                "sha256": "7a01e227e57250e78c31c58392b1c9746ea387e8ee47e08c3ee5c537c1c2b948"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calcturningpoints",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) long-only frontier routine. MU(NN), SIGMA(NN,NN) inputs; MU_TPS/SIG_TPS/LAMBDA_TPS(MAX_TPS), WEIGHT_TPS(NN,MAX_TPS) outputs. SIG_TPS contains standard deviations, not variances. ERROR_FLAG and N_TPS must govern result use.",
+                "signature": "CALL calcturningpoints(mu,sigma,nn,mu_tps,sig_tps,weight_tps, &\n                       lambda_tps,n_tps,error_flag,max_tps)",
+                "declarations": [
+                  {
+                    "path": "src/calcturningpoints.f90",
+                    "line_start": 6,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/calcturningpoints.f90",
+                "line_start": 6,
+                "line_end": 787,
+                "usage": "integer,parameter :: n=2,max_tps=20\ninteger :: n_tps,error_flag\nreal(8) :: mu(n),sigma(n,n),means(max_tps),risks(max_tps),weights(n,max_tps),lambda(max_tps)\nmu=[0.1d0,0.2d0]; sigma=0d0; sigma(1,1)=0.04d0; sigma(2,2)=0.09d0\ncall calcturningpoints(mu,sigma,n,means,risks,weights,lambda,n_tps,error_flag,max_tps)\nif(error_flag/=0) error stop \"critical-line calculation failed\"\n! Validate weights(:,1:n_tps), budget/nonnegativity and corresponding means/risks.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Pure mathematical interface sketch, not a tested frontier example. Supply a well-scaled symmetric positive-definite covariance and distinct mean entries; validate the recorded candidate-index/denominator edge paths before production use. Read only returned prefixes after a successful status and plausible count. The legacy MATLAB bridge has separate 32-bit assumptions and is not required for this direct Fortran call."
+              },
+              {
+                "procedure": "turning",
+                "role": "implementation-helper",
+                "path": "src/calcturningpoints.f90",
+                "line_start": 95,
+                "line_end": 257
+              },
+              {
+                "procedure": "extend_Ainv",
+                "role": "implementation-helper",
+                "path": "src/calcturningpoints.f90",
+                "line_start": 478,
+                "line_end": 508
+              },
+              {
+                "procedure": "get_weight1",
+                "role": "implementation-helper",
+                "path": "src/calcturningpoints.f90",
+                "line_start": 671,
+                "line_end": 715
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "de858ea58ce159feccf2a9d2f7b2072ed100fc1f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed source/README/interface instructions identify the method and authors but no explicit reuse grant. The pinned tree has no separately named LICENSE/COPYING; published source or bundled binaries alone are not recorded as a license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/README.md",
+              "sha256": "adddc68664b16e384e1c4a1dceb00c6e4cea68873b88ad38d67d4da9963b3c77"
+            },
+            {
+              "path": "src/README_PYTHON.txt",
+              "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/src/README_PYTHON.txt",
+              "sha256": "7a01e227e57250e78c31c58392b1c9746ea387e8ee47e08c3ee5c537c1c2b948"
+            },
+            {
+              "path": "src/calcturningpoints.f90",
+              "url": "https://github.com/afniedermayer/fast_critical_line_algorithm/blob/de858ea58ce159feccf2a9d2f7b2072ed100fc1f/src/calcturningpoints.f90",
+              "sha256": "a784fe1bfbe6ec95b8dc754302b49adba42c95d98fdc81654788efadd503e146"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19487,12 +19995,141 @@
             ],
             "notes": "The README lists Algencan, HSL MA48/MA57, MeTIS and supporting module/source requirements. Inclusion does not imply that those dependencies are supplied or that the solver builds without additional setup.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h2a3",
+            "level": "source-reviewed",
+            "revision": "09d3e4764ec133d9dbb5ee048f8b21cdbb376430",
+            "reviewed_on": "2026-11-05",
+            "notes": "The current lcmin module exposes typed setup and lcmin_optimize. It copies sparse linear equalities/bounds, installs objective/gradient/Hessian callbacks into global procedure pointers, preprocesses fixed/dependent constraints and dispatches a primal-dual interior-point barrier solver. The inspected barrier driver updates the barrier parameter and calls Newton/KKT, line-search and objective-derivative routines. G2h2a3 records smooth optimization with linear constraints and supplied first/second derivatives, scoped to A*x=b plus simple bounds; generic linear inequalities need a suitable reformulation rather than an invented inequality-row API. Coordinate A arrays and sparse Hessian callbacks are caller-supplied. Globals, unconditional output files and external HSL/ALGENCAN dependencies prevent treating this as a standalone or reentrant routine. The old f90wrapper calls an obsolete external lcmin signature; use the reviewed module API. Several multiplier-copy blocks are commented out, so do not assume every vars dual field is populated. No KKT, feasibility, dependency build or optimization test was run.",
+            "evidence": [
+              {
+                "path": "sources/solver/lcmin.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/lcmin.f90",
+                "sha256": "32979ef4274730236d44a5278f8d1f8db90ff7075e48cfa48d7e2db536d4487f"
+              },
+              {
+                "path": "sources/solver/lcmin_solver.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/lcmin_solver.f90",
+                "sha256": "a5cab301c8c7591c4f0fa0ec69d45dc3e47865634523fd34e3ed0a6454b4c3a4"
+              },
+              {
+                "path": "sources/solver/user_subs.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/user_subs.f90",
+                "sha256": "bd0a9aac9fbc480e384f316dfe6ac3acd0195aefd26cb46de73602165d53e930"
+              },
+              {
+                "path": "sources/solver/constraints.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/constraints.f90",
+                "sha256": "e076f1af52f8fc013292d1bd8171d2384724aab4e48ece4ecbda345ee1a67460"
+              },
+              {
+                "path": "sources/solver/constants.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/constants.f90",
+                "sha256": "b1e2103dd2dfaef75f8b9090b5f2fb5f54d38f06a3837aee4909fcede9f0b978"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/README.md",
+                "sha256": "0a65898c767fff1d243f24708a6c35e3558a6fb00901b6f5e1ee5782cd2a870d"
+              },
+              {
+                "path": "sources/interfaces/f90/f90wrapper.f90",
+                "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/interfaces/f90/f90wrapper.f90",
+                "sha256": "0e45ed77a8c44d533df84e3c0d4e52482d3e6ff06d62bd9b4e097c59b6a61009"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lcmin_optimize",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine using lcmin_params, lcmin_constraints and lcmin_variables. Initialize parameters via lcmin_load; allocate/populate constraints and primal X before calling. Objective, gradient and coordinate-Hessian procedure arguments must match user_subs interfaces. FLAG distinguishes optimal, acceptable-feasible, infeasible and failure outcomes.",
+                "signature": "CALL lcmin_optimize(n,m,param,cons,vars,uevalf,uevalg,uevalh,flag)",
+                "declarations": [
+                  {
+                    "path": "sources/solver/lcmin.f90",
+                    "line_start": 1,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "sources/solver/lcmin.f90",
+                    "line_start": 74,
+                    "line_end": 90
+                  },
+                  {
+                    "path": "sources/solver/lcmin.f90",
+                    "line_start": 154,
+                    "line_end": 179
+                  },
+                  {
+                    "path": "sources/solver/user_subs.f90",
+                    "line_start": 8,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "sources/solver/constants.f90",
+                    "line_start": 11,
+                    "line_end": 12
+                  }
+                ],
+                "path": "sources/solver/lcmin.f90",
+                "line_start": 154,
+                "line_end": 711,
+                "module": "lcmin",
+                "usage": "use lcmin, only: lcmin_params,lcmin_constraints,lcmin_variables,lcmin_load,lcmin_optimize\ntype(lcmin_params) :: param\ntype(lcmin_constraints) :: cons\ntype(lcmin_variables) :: vars\ninteger :: flag\ncall lcmin_load(param)\n! Allocate/populate cons%arow/acol/aval, cons%b/l/u and vars%x for N,M.\n! Implement explicit-interface EVALF, EVALG and EVALH callbacks.\ncall lcmin_optimize(n,m,param,cons,vars,evalf,evalg,evalh,flag)\nif(flag/=0) error stop \"LCMIN did not report KKT convergence\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Setup fragment, not a complete optimization driver. The row relation is A*x=b, with variable lower/upper bounds. Build the current modules and separately obtain compatible HSL MA48/MA57, ALGENCAN and other documented dependencies. FLAG=1 is an acceptable feasible return rather than the FLAG=0 KKT-tolerance result; FLAG=2 is infeasible. Set capacities/scaling deliberately and independently verify primal feasibility and returned solution. Full dual return coverage and concurrency are not certified."
+              },
+              {
+                "procedure": "lcmin_load",
+                "role": "public-entry-point",
+                "summary": "Public default-parameter initializer; it does not allocate problem arrays or initialize a starting point.",
+                "signature": "CALL lcmin_load(param)",
+                "declarations": [
+                  {
+                    "path": "sources/solver/lcmin.f90",
+                    "line_start": 93,
+                    "line_end": 101
+                  }
+                ],
+                "path": "sources/solver/lcmin.f90",
+                "line_start": 93,
+                "line_end": 150,
+                "module": "lcmin"
+              },
+              {
+                "procedure": "lcmin_solve",
+                "role": "implementation-helper",
+                "path": "sources/solver/lcmin_solver.f90",
+                "line_start": 11,
+                "line_end": 308,
+                "module": "lcmin_solver"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "09d3e4764ec133d9dbb5ee048f8b21cdbb376430",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit project reuse grant was identified in the reviewed README and defining solver module, and the pinned tree has no separately named license file. External HSL/ALGENCAN/MeTiS prerequisites retain their own terms; their availability does not determine the solver license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/README.md",
+              "sha256": "0a65898c767fff1d243f24708a6c35e3558a6fb00901b6f5e1ee5782cd2a870d"
+            },
+            {
+              "path": "sources/solver/lcmin.f90",
+              "url": "https://github.com/johngardenghi/lcmin/blob/09d3e4764ec133d9dbb5ee048f8b21cdbb376430/sources/solver/lcmin.f90",
+              "sha256": "32979ef4274730236d44a5278f8d1f8db90ff7075e48cfa48d7e2db536d4487f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19579,12 +20216,151 @@
             ],
             "notes": "The Evolution source header and interfaces identify genetic optimization, generations and a user fitness callback, with companion module dependencies. The documentation section files inspected were empty; numerical behavior and build setup remain unverified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9",
+            "reviewed_on": "2026-11-05",
+            "notes": "Evolution::Next_Generation sorts fitness values for minimization, transforms them into selection weights, retains elites, permutes selected organisms, crosses pairs and mutates non-elites. Changed organisms alone have fitness recomputed through the externally linked Feval callback. G2i records genetic global-search generation steps, scoped to the inspected real-valued genotype path rather than a complete stopping-controlled optimizer or all complex/integer/string variants. Caller must initialize/evaluate every member and drive the generations. Equal fitness gives FSUM=0 before MOD-based selection and needs caller/source handling. Real mutation multiplies genes by 1+normal, so an exactly zero real gene is unchanged by that mutation; no box-bound enforcement is present. Crossover lengths use the first organism twice in MIN, so use compatible genotype lengths. Public mutation/elite/crossover parameters are module-global. Required NumTypes/Statistics/etc. come from an external f90 utility library. No generations or fitness/selection properties were tested by execution.",
+            "evidence": [
+              {
+                "path": "src/evolution.f90",
+                "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/src/evolution.f90",
+                "sha256": "43d32088cc7bd207bcccec4dcb29eea491b5bea11c3aed9c2fff8948678610a0"
+              },
+              {
+                "path": "src/genetics.f90",
+                "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/src/genetics.f90",
+                "sha256": "983851d30b0a4c00ab8aabb0b6d0c62cef1cc2de04ed8fa4e055ee059f386635"
+              },
+              {
+                "path": "test/ga2d.f90",
+                "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/test/ga2d.f90",
+                "sha256": "bcf4c816b5145bf203631ae8d8398e5029cbd8a2c184cf91dc9665d26411155c"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/Makefile",
+                "sha256": "a7631285437c3c2f37c1098918709e2a4bdde7bbacebb059d9a8e330dd83e807"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Next_Generation",
+                "role": "public-entry-point",
+                "summary": "Public module function accepting an evaluated Generation and returning the next Generation. Member(:) contains Genetics::Organism with genotype arrays and a scalar fitness; smaller fitness is favored. FEVAL is externally linked with an INOUT Organism, not passed as an argument.",
+                "signature": "next = Next_Generation(current)",
+                "declarations": [
+                  {
+                    "path": "src/evolution.f90",
+                    "line_start": 26,
+                    "line_end": 53
+                  },
+                  {
+                    "path": "src/evolution.f90",
+                    "line_start": 60,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "src/evolution.f90",
+                    "line_start": 122,
+                    "line_end": 133
+                  },
+                  {
+                    "path": "src/genetics.f90",
+                    "line_start": 36,
+                    "line_end": 47
+                  }
+                ],
+                "path": "src/evolution.f90",
+                "line_start": 122,
+                "line_end": 202,
+                "module": "Evolution",
+                "examples": [
+                  {
+                    "path": "test/ga2d.f90",
+                    "line_start": 21,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "test/ga2d.f90",
+                    "line_start": 62,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "test/ga2d.f90",
+                    "line_start": 70,
+                    "line_end": 84
+                  }
+                ],
+                "usage": "use NumTypes, only: dp\nuse Genetics\nuse Evolution\ntype(Generation) :: current,next\ninteger :: i\ncall Init_Generation(current,20)\ndo i=1,20\n  call Init_Organism(current%Member(i),[0,2,0,0],.true.)\n  call Feval(current%Member(i))\nend do\n! Guard equal/invalid fitness and ensure a suitable initialized population.\nnext=Next_Generation(current)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply the matching external FEVAL and build the external f90 utility modules required by Makefile. This performs one generation and has no convergence/status output. Keep all members structurally compatible and avoid equal-fitness division/modulo degeneracy; the sketch does not repair that source path. Bounds, reproducible seeding, stopping budgets and final-best extraction belong to the caller. Only the real-gene path is selected."
+              },
+              {
+                "procedure": "Init_Generation",
+                "role": "public-entry-point",
+                "summary": "Public allocator for generation member storage; it does not initialize each genotype or compute fitness.",
+                "signature": "CALL Init_Generation(gen, number_of_members)",
+                "declarations": [
+                  {
+                    "path": "src/evolution.f90",
+                    "line_start": 89,
+                    "line_end": 95
+                  }
+                ],
+                "path": "src/evolution.f90",
+                "line_start": 89,
+                "line_end": 118,
+                "module": "Evolution"
+              },
+              {
+                "procedure": "Mutate",
+                "role": "implementation-helper",
+                "path": "src/genetics.f90",
+                "line_start": 289,
+                "line_end": 348,
+                "module": "Genetics"
+              },
+              {
+                "procedure": "Crossover",
+                "role": "implementation-helper",
+                "path": "src/genetics.f90",
+                "line_start": 352,
+                "line_end": 428,
+                "module": "Genetics"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected sources explicitly permit GPL version 2 or any later version, with GPL v2 text at the root. Documentation and the external f90 utility library have separate provenance/terms not fully audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/LICENSE",
+              "sha256": "dcc100d4161cc0b7177545ab6e47216f84857cda3843847c792a25289852dcaa"
+            },
+            {
+              "path": "src/evolution.f90",
+              "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/src/evolution.f90",
+              "sha256": "43d32088cc7bd207bcccec4dcb29eea491b5bea11c3aed9c2fff8948678610a0"
+            },
+            {
+              "path": "src/genetics.f90",
+              "url": "https://github.com/ramos/libga/blob/1fbd3cc8922d16bd6cf408f5f4f345f70fda20c9/src/genetics.f90",
+              "sha256": "983851d30b0a4c00ab8aabb0b6d0c62cef1cc2de04ed8fa4e055ee059f386635"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25560,12 +26336,116 @@
             ],
             "notes": "The README describes three public optimizer types and user-supplied state and objective definitions. Annealing schedules and results depend on problem-specific configuration; global optimality is not certified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "a610da59dd38dd4687b8275af358b061eb620901",
+            "reviewed_on": "2026-11-05",
+            "notes": "The continuous sa_cont_type path initializes energies/state, clips uniform neighbor perturbations to one shared scalar bound interval, accepts moves using a Boltzmann probability, cools and returns the best state found. G2i records simulated-annealing global search, scoped to the continuous path with linear-additive cooling and monotonic temperature. It does not establish global optimality, a stationary sampling distribution or the discrete/combinatorial paths. state_curr is a pointer to caller-owned writable target storage and energy is a required associated type-bound callback. Bounds/damping defaults depend on the initial state and can collapse exploration; set them explicitly. max_step counts accepted moves plus a 1 percent random increment for rejected moves, while total_steps counts trials, so max_step is not an evaluation budget. prog_bar uses a MOD divisor rounded from max_step/91, which can be zero for small limits; the sketch disables it. No optimization or acceptance/cooling test was run.",
+            "evidence": [
+              {
+                "path": "src/OpenFSAM.f90",
+                "url": "https://github.com/nfherrin/OpenFSAM/blob/a610da59dd38dd4687b8275af358b061eb620901/src/OpenFSAM.f90",
+                "sha256": "65f3c0c0966869c952af45865c588002d343a631e84a8ad15f525736401903b6"
+              },
+              {
+                "path": "examples/continuous_test/main.f90",
+                "url": "https://github.com/nfherrin/OpenFSAM/blob/a610da59dd38dd4687b8275af358b061eb620901/examples/continuous_test/main.f90",
+                "sha256": "58bab7fd6e2baeecd2cf96738be76a485619669741b960c14390311956c77526"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/nfherrin/OpenFSAM/blob/a610da59dd38dd4687b8275af358b061eb620901/README.md",
+                "sha256": "4410035425dacc16500bc52d22cabba22c0f812ed4080e77d1046ffb0b22a932"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "optimize",
+                "role": "public-entry-point",
+                "summary": "Inherited public type-bound method on OpenFSAM::sa_cont_type. REAL(8) state_curr pointer, state_best allocatable array and e_best/total_steps expose results. energy callback takes CLASS(sa_cont_type),INTENT(INOUT) and REAL(8) state(:), returns REAL(8). No status output.",
+                "signature": "CALL solver%optimize()",
+                "declarations": [
+                  {
+                    "path": "src/OpenFSAM.f90",
+                    "line_start": 13,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "src/OpenFSAM.f90",
+                    "line_start": 60,
+                    "line_end": 81
+                  },
+                  {
+                    "path": "src/OpenFSAM.f90",
+                    "line_start": 114,
+                    "line_end": 119
+                  },
+                  {
+                    "path": "src/OpenFSAM.f90",
+                    "line_start": 150,
+                    "line_end": 154
+                  }
+                ],
+                "path": "src/OpenFSAM.f90",
+                "line_start": 150,
+                "line_end": 304,
+                "module": "OpenFSAM",
+                "derived_type": "sa_cont_type",
+                "usage": "use OpenFSAM, only: sa_cont_type\ntype(sa_cont_type) :: solver\nreal(8),target :: x(2)=[1d0,-1d0]\n! Supply a matching explicit-interface ENERGY(thisSA,state_val) function.\nsolver%state_curr=>x\nsolver%energy=>energy\nsolver%smin=-2d0; solver%smax=2d0; solver%damping=0.5d0\nsolver%t_max=10d0; solver%t_min=0.01d0; solver%max_step=100\nsolver%cool_opt=\"LinAdd\"; solver%mon_cool=.true.; solver%prog_bar=.false.\ncall solver%optimize()\n! x is overwritten by the best state; inspect solver%e_best and total_steps.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment requiring ENERGY; keep its target state alive and associated for the entire call. The same scalar interval bounds every coordinate, rather than separate bounds per parameter. Use nonempty state, positive damping and t_max>t_min>0 for this sketch. max_step does not bound objective calls or wall time; repeated rejected trials can take longer. No seeded repeatability or convergence certificate follows from these settings."
+              },
+              {
+                "procedure": "get_neigh_cont",
+                "role": "implementation-helper",
+                "path": "src/OpenFSAM.f90",
+                "line_start": 369,
+                "line_end": 443,
+                "module": "OpenFSAM"
+              },
+              {
+                "procedure": "accept_prob",
+                "role": "implementation-helper",
+                "path": "src/OpenFSAM.f90",
+                "line_start": 312,
+                "line_end": 327,
+                "module": "OpenFSAM"
+              },
+              {
+                "procedure": "lin_add_cool",
+                "role": "implementation-helper",
+                "path": "src/OpenFSAM.f90",
+                "line_start": 628,
+                "line_end": 638,
+                "module": "OpenFSAM"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "a610da59dd38dd4687b8275af358b061eb620901",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and selected defining module identify MIT terms. This review does not audit optional example dependencies or infer a numerical-method guarantee from the license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/nfherrin/OpenFSAM/blob/a610da59dd38dd4687b8275af358b061eb620901/LICENSE",
+              "sha256": "a6d71830119f9272e578a3d98524cf699cdb96346139055460b9f912203248ca"
+            },
+            {
+              "path": "src/OpenFSAM.f90",
+              "url": "https://github.com/nfherrin/OpenFSAM/blob/a610da59dd38dd4687b8275af358b061eb620901/src/OpenFSAM.f90",
+              "sha256": "65f3c0c0966869c952af45865c588002d343a631e84a8ad15f525736401903b6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -34782,12 +35662,98 @@
             ],
             "notes": "The README identifies ACM Algorithm 897, checkpointing and serial/distributed implementations. Performance studies and the word global do not certify that a finite run attains the exact global minimum of an arbitrary objective.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "52d5c8ca86481b3af36df74bb2260a098dbb5826",
+            "reviewed_on": "2026-11-05",
+            "notes": "VTdirect normalizes the finite box, samples its center, selects potentially optimal rectangles by size/value (or the aggressive option), samples displaced centers on longest dimensions and dispatches thirds-based subdivision. The inspected serial driver scales final X back and returns the best sampled value. G2i records deterministic derivative-free global box search, not a finite-budget proof of the global minimum or an audit of parallel/checkpoint modes. OBJ_FUNC returns a value and IFLAG; undefined samples become HUGE rather than a validated feasible solution. R8=SELECTED_REAL_KIND(13), N>=2, strict finite L<U and valid callback values are required. MAX_ITER/MAX_EVL are mutable controls/results; evaluation limits are checked after a batch/iteration and can be exceeded by that batch. Normal statuses are 1..4 stopping rules, not a conventional STATUS=0 success check. Shared global box bookkeeping prevents assuming reentrancy. No DIRECT search, regression or stopping-limit behavior was executed.",
+            "evidence": [
+              {
+                "path": "src/VTdirect.f90",
+                "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/src/VTdirect.f90",
+                "sha256": "3974413bd07f4dd9ed773f9a300843a5d66bdc033f34f0efe9260dd4059a2f88"
+              },
+              {
+                "path": "src/shared_modules.f90",
+                "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/src/shared_modules.f90",
+                "sha256": "2dfc8b0b651e38c7f3ed6ac7580a9551f02bb014c86d70832d9169c84fdc85ee"
+              },
+              {
+                "path": "src/simple_main.f90",
+                "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/src/simple_main.f90",
+                "sha256": "fb115d9d3c35f390bbd6f9ab44c08b109085607e40918886f69249ca00e9b7fd"
+              },
+              {
+                "path": "src/objfunc.f90",
+                "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/src/objfunc.f90",
+                "sha256": "d123c1643ffe619ca8433dcd6db0bbb23ed0d204ce8f367573775bcab42a9f25"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/README.md",
+                "sha256": "ae7e97211693ec5e3b5e17cd1efae0586e485556bbe903b52b88a7d49054c38b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "VTdirect",
+                "role": "public-entry-point",
+                "summary": "Public VTdirect_MOD routine with assumed-shape R8 bounds/result vectors and an explicit objective interface. STATUS encodes stopping rule/error class. Optional MAX_ITER/MAX_EVL/MIN_DIA are INOUT, so use variables. The selected sketch omits checkpointing and optional multiple-box output.",
+                "signature": "CALL VTdirect(n,l,u,obj_func,x,fmin,status [, max_iter, max_evl, ...])",
+                "declarations": [
+                  {
+                    "path": "src/VTdirect.f90",
+                    "line_start": 14,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/VTdirect.f90",
+                    "line_start": 190,
+                    "line_end": 214
+                  },
+                  {
+                    "path": "src/shared_modules.f90",
+                    "line_start": 9,
+                    "line_end": 12
+                  }
+                ],
+                "path": "src/VTdirect.f90",
+                "line_start": 14,
+                "line_end": 2081,
+                "module": "VTdirect_MOD",
+                "examples": [
+                  {
+                    "path": "src/simple_main.f90",
+                    "line_start": 91,
+                    "line_end": 105
+                  }
+                ],
+                "usage": "use REAL_PRECISION, only: r8\nuse VTdirect_MOD, only: VTdirect\nreal(r8) :: lower(2),upper(2),x(2),fmin\ninteger :: status,iterations,evaluations\n! Supply explicit-interface OBJ_FUNC(C,IFLAG) returning REAL(r8).\nlower=-2.0_r8; upper=2.0_r8; iterations=100; evaluations=1000\ncall VTdirect(2,lower,upper,obj_func,x,fmin,status, &\n MAX_ITER=iterations,MAX_EVL=evaluations)\nif(status<1 .or. status>4) error stop \"DIRECT error\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback/setup fragment using the serial implementation and complete shared modules. Set IFLAG on every objective call and return finite values in the valid domain. A normal budget/diameter/improvement stop is not a global-optimality certificate, and a best value of HUGE does not demonstrate feasibility. Optional counts are overwritten; do not pass integer literals for INOUT limits. Evaluation limits are batch-level checks. No serial/parallel comparison or numerical search was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "ACM Software License Agreement",
+          "spdx_expression": null,
+          "revision": "52d5c8ca86481b3af36df74bb2260a098dbb5826",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides the ACM agreement with noncommercial-use conditions and a separate commercial-use route. This records those supplied terms without substituting a permissive SPDX identifier or auditing every bundled component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/vtopt/vtdirect95/blob/52d5c8ca86481b3af36df74bb2260a098dbb5826/LICENSE",
+              "sha256": "f05b4643d9abe1e4e66c1da7fa5781b500514b51278b935cd25f728912c27efd"
+            }
+          ]
         }
       },
       "imports": {}

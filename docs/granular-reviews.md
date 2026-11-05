@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 188 repositories now have 232 source-reviewed
+Reviewed on 2026-11-05. 196 repositories now have 241 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-181 repository cards now identify public routines and link their usage lines
+189 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 188 independently source-reviewed repositories now have an
+separately. All 196 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -212,6 +212,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | curvefit | `linear_interp%interpolate`; scalar `linear_least_squares` | GNU GPL v3 text; version choice unresolved |
 | gcvspline | External `GCVSPL`, `SPLDER` | Woltring restricted-use kernel; GPL v3 wrapper text |
 | vector_fit | External `calculate_residues`, `calculate_fit_function` | Selected code GPL-3.0-or-later; EISPACK separately labeled LGPL |
+| FilterSD | External `filterSD`, `checkd`; problem callbacks, COMMON blocks and matching dense/sparse backends required | EPL-1.0 |
+| DEPP | `mod_class_optimizer::class_optimizer%init/%run`; `mod_class_DE_RAND_1::class_DE_RAND_1%get_trial` | GPL-3.0-or-later |
+| Diver | `de::diver` with `MinusLogLikeFunc` objective callback | Custom academic-use license with citation requirement |
+| libga | `Evolution::Init_Generation`, `Evolution::Next_Generation`; linked `Feval` | GPL-2.0-or-later; external utility library separate |
+| OpenFSAM | `OpenFSAM::sa_cont_type%optimize` and energy callback | MIT |
+| LCMIN | `lcmin::lcmin_load`, `lcmin::lcmin_optimize`; objective, gradient and Hessian callbacks | No license grant identified in reviewed material |
+| Fast critical-line algorithm | External `calcturningpoints` | No license grant identified in reviewed material |
+| VTdirect95 | `VTdirect_MOD::VTdirect` and objective callback | ACM Software License Agreement |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -419,6 +427,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [curvefit](https://github.com/jchristopherson/curvefit) | E1a; K1a1a2 | Piecewise-linear interpolation and through-origin degree-one least-squares dispatch | Initialize interpolation successfully before lookup; wrapper does not guard every error path. Scalar regression has no intercept and delegates polynomial solve to nonlin. |
 | [gcvspline](https://github.com/charlesll/gcvspline) | K5; K6a2 | Natural B-spline smoothing and fitted-spline derivative evaluation | Half-order M gives degree 2*M-1. Preserve setup/work for negative-MD reuse; derivative quality depends on smoothing, and no new samples were checked. |
 | [vector_fit](https://github.com/chrissmartt/vector_fit) | K1a1a3; K6a1 | Fixed-pole residue least squares and rational-response evaluation | Pole relocation excluded. Normal equations/default solve lack returned status; NEW_A/C_HAT unassigned. Avoid sample/pole coincidences. |
+| [FilterSD](https://github.com/jacobwilliams/filtersd) | G2h3b1b; G4c | Smooth nonlinear constrained minimization with first derivatives; derivative consistency diagnostic | Shared state and backend setup required. `checkd` can leave X perturbed and has no numerical status. |
+| [DEPP](https://github.com/gbertoldo/depp) | G2i | Configuration-driven MPI differential evolution, scoped to DE/rand/1 | Maximizes fitness; negate a minimization objective. Coordinator finalizes MPI; external fitness execution and uncapped retries require operational care. |
+| [Diver](https://github.com/diveropt/diver) | G2i | Continuous ordinary differential evolution with objective callback | Mean-improvement stopping is offset-dependent and not an error bound. Academic-use license; no returned termination reason. |
+| [libga](https://github.com/ramos/libga) | G2i | Real-genotype genetic-algorithm generation update | Caller evaluates initial fitness and drives iterations. Equal fitness gives zero selection sum; compatible genotype sizes required. |
+| [OpenFSAM](https://github.com/nfherrin/openfsam) | G2i | Continuous simulated annealing with monotonic linear-additive cooling | Caller owns target-state lifetime. `max_step` is not an objective-evaluation cap; bounds are shared scalar limits. |
+| [LCMIN](https://github.com/johngardenghi/lcmin) | G2h2a3 | Smooth minimization with linear equalities, bounds and supplied first/second derivatives | Current module interface differs from old wrapper. External numerical prerequisites, file output and module globals; dual assignments are commented out. |
+| [Fast critical-line algorithm](https://github.com/afniedermayer/fast_critical_line_algorithm) | G2e1 | Long-only mean/variance frontier with positive-definite covariance | Not an arbitrary quadratic-programming interface. Degenerate inputs and capacity/error paths need caller care; SIG_TPS is standard deviation. |
+| [VTdirect95](https://github.com/vtopt/vtdirect95) | G2i | Serial DIRECT box-constrained global search | Budget checks follow batches; normal stopping statuses are 1-4. Neither stopping nor a finite returned value certifies a global optimum. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -798,3 +814,19 @@ requires its fork-specific controls/callbacks, explicit real defaults and an
 independent residual check even after small-step termination. These reviews
 identify implemented paths and calling contracts; none of the new sketches or
 upstream numerical programs was compiled or run.
+
+## Optimization state, fitness conventions and stopping rules
+
+The FilterSD, DEPP, Diver, libga, OpenFSAM, LCMIN, critical-line and
+VTdirect95 reviews pin the selected source and separate public entry points
+from internal helpers. Their cards record callback declarations, state ownership,
+workspace or configuration requirements and scoped license findings.
+DEPP maximizes fitness, whereas the selected Diver and libga paths minimize it.
+OpenFSAM's accepted-step counter and DIRECT's batch limits are not interchangeable
+with a strict objective-evaluation budget. A stopping condition does not establish
+global optimality. The derivative checker is a consistency heuristic and can
+return with a perturbed input vector.
+
+All new calling sketches remain uncompiled and unrun. The source review does
+not audit the full GLCPD, HSL or other dependency stacks, parallel execution,
+or numerical accuracy. Root license findings do not replace dependency terms.
