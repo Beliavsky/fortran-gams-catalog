@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 268 repositories now have 344 source-reviewed
+Reviewed on 2026-11-05. 276 repositories now have 356 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-261 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
+268 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Eight further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT and TREAT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 268 independently source-reviewed repositories now have an
+separately. All 276 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -292,6 +292,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | tweedie | `GaussAdaptive`, `GaussQuadrature` | GPL-2.0-or-later (package declaration) |
 | spam | `rowmeans`, `csrmsr` | Mixed package/component license declarations |
 | MCMC F90 | `mcmcrand::random_normal`, `mcmcrand::random_gamma` | MIT |
+| DFL | `sd_box` | GNU GPL version 3 text |
+| BGW | `drglg` | GPL-3.0-only with ACM provenance statement |
+| mknapsack | `mt1`, `mtp` | MIT root; historical routine provenance separate |
+| gausscov | `fstepwise`, `lsqqr`, `qrdecom` | GPL-3.0-only (package declaration) |
+| mclust | `me1e`, `dmvnorm` | GPL-2.0-or-later (package declaration) |
+| TREAT | `treat` | GNU GPL version 3 text |
+| GPKDE | `GridProjectedKDEModule::GridProjectedKDEType%ComputeDensity`, `GridProjectedKDEModule::GridProjectedKDEType%Initialize` | MIT |
+| qap | `qaph4` | GPL-3.0-only (package declaration) |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -579,6 +587,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [tweedie](https://github.com/PeterKDunn/tweedie) | H2a2 | Fixed/adaptive finite quadrature for built-in inversion integrands | Requires initialized distribution globals; not a user-callback integrator or complete density audit. |
 | [spam](https://github.com/cran/spam) | L1a1a; D1b9 | Sparse-row arithmetic means and CSR-to-MSR conversion | Initialize output means; validate pointers and unique diagonals; mixed component terms. |
 | [MCMC F90](https://github.com/mjlaine/mcmcf90) | L6a14; L6a7 | Polar normal and Marsaglia-Tsang gamma variates | Gamma B is scale; cached normal state complicates reseeding/concurrency; no statistical test. |
+| [DFL](https://github.com/DerivativeFreeLibrary/DFL) | G2c7; G2h1b | Mixed-integer and all-continuous bounded coordinate line-search paths | Separate main from solver for reuse; linked FUNCT objective; initialized counters; budgets can be exceeded. |
+| [BGW](https://github.com/cran/bgw) | G1b1b | Reverse-communication first-derivative negative-log-probability minimization | This revision links a specific RHO objective; VALUE lengths require an explicit BIND(C) interface. |
+| [mknapsack](https://github.com/jmyrberg/mknapsack) | G2c3; G2c2 | Binary knapsack branch-and-bound and bin-packing driver | Sorted admissible inputs, sentinel/work arrays and integer range matter; finite packing budget can be heuristic. |
+| [gausscov](https://github.com/cran/gausscov) | L8c1a1; L8c1b1 | Gaussian-covariate forward selection and full-rank QR coefficients | Degenerate candidate/probability branches need checks; inverse path disabled by RSOLV early RETURN. |
+| [mclust](https://github.com/cran/mclust) | L14a1b; L5b1n | Common-variance univariate Gaussian-mixture EM and multivariate Gaussian log density | Fixed component count/local likelihood; check sentinels; covariance overwritten; HOOD unchanged on success. |
+| [TREAT](https://github.com/plopezrios/treat) | L4a1a6 | CLI tail-regression analysis and bootstrap/analytic-tail-moment dispatch | Internal routines are not public APIs; known-tail/model assumptions, independence, MPI and LAPACK required. |
+| [GPKDE](https://github.com/upc-ghs/gpkde) | L4c1b | Grid-projected multivariate Gaussian-kernel density reconstruction | Initialized grids and shared module state; option-dependent scaling; not a normalization or boundary audit. |
+| [qap](https://github.com/mhahsler/qap) | G2b | Simulated-annealing permutation assignment heuristic | Symmetric matrices required by swap delta; R RNG/interrupt runtime; no optimality guarantee. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1107,3 +1123,12 @@ initialization, gamma scale differs from rate, and Tweedie quadrature requires
 prepared distribution state. ACEPACK periodic and terminal-tie indexing concerns
 are recorded as source findings, with strictly increasing nonperiodic data in the
 calling sketch. None of these new sketches was compiled or run.
+
+Optimization and statistical cards retain the selected implementation scope.
+QAP uses a symmetric-matrix swap formula and R runtime services; finite-budget
+packing is not necessarily optimal. Gaussian-covariate selection has degenerate
+candidate/probability branches to validate, and its optional inverse-related
+triangular helper returns before solving. MCLUST log-density output is distinct
+from its unassigned-on-success HOOD scalar. TREAT remains a program entry point
+with internal analysis helpers. These are source reviews; no new calling sketch
+was compiled or run.

@@ -462,6 +462,84 @@
       "parent": "L6a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "G2c": {
+      "label": "Integer programming",
+      "parent": "G2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2c7": {
+      "label": "Mixed integer programming",
+      "parent": "G2c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2h1b": {
+      "label": "General function (no smoothness assumed)",
+      "parent": "G2h1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2c3": {
+      "label": "Knapsack problems",
+      "parent": "G2c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2c2": {
+      "label": "Covering and packing problems",
+      "parent": "G2c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c1a": {
+      "label": "Variable selection",
+      "parent": "L8c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c1a1": {
+      "label": "Using raw data",
+      "parent": "L8c1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L14a": {
+      "label": "One-way",
+      "parent": "L14",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L14a1": {
+      "label": "Unconstrained",
+      "parent": "L14a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L14a1b": {
+      "label": "Non-nested (e.g., K means)",
+      "parent": "L14a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1a6": {
+      "label": "Tail and outlier analysis",
+      "parent": "L4a1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4c1b": {
+      "label": "Nonparametric analysis",
+      "parent": "L4c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2b": {
+      "label": "Transportation and assignments problem",
+      "parent": "G2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

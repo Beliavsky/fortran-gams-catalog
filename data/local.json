@@ -9467,12 +9467,161 @@
             ],
             "notes": "The README documents objective callbacks, bounds and integer-variable selection for MINLP. Specific constraint classes and global-convergence guarantees are not inferred from this broad interface description.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2c7",
+            "level": "source-reviewed",
+            "revision": "d5a282bbe05a34c9a89167e6c21c85dfcef3235f",
+            "reviewed_on": "2026-11-05",
+            "notes": "SD_BOX alternates bounded continuous and discrete coordinate line searches according to INDEX_INT, accepts objective reductions and updates directional step lengths. This mapping selects mixed continuous/integer coordinates with unit lattice spacing on the second coordinate. The external FUNCT(N,X,F) symbol is linked at build time, not passed as a callback argument. Initial points must already satisfy bounds and the chosen lattice; positive SCALE_INT is required on discrete coordinates. NF and NI are input/output counters and must be initialized. ISTOP=1 means directional stopping tests, 2 evaluation budget exceeded, 3 iteration budget exceeded; budget tests use > and happen after line searches, so NF_MAX is not a strict maximum objective-call count. No nonlinear-constraint handling, integer/global-optimality certificate or nonsmooth convergence proof was established by this source review. The supplied main shares the same source file and must be separated when supplying another main.",
+            "evidence": [
+              {
+                "path": "main_box.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/main_box.f90",
+                "sha256": "b0f39b1ebdeab15f87a59dfee5a60680e2cfccbd8349245b06d9fcf8bfdcb960"
+              },
+              {
+                "path": "wrap_mixed.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/wrap_mixed.f90",
+                "sha256": "141d79b6a8d32e01cf5c3fdbfb110174bb4b7d375f7edcbfe5709385ab8f5096"
+              },
+              {
+                "path": "README.txt",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/README.txt",
+                "sha256": "6b543840a3b816e85f57892a89ecdd0d7ef62a9252039991b1c42c74692ad424"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sd_box",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 derivative-free box/lattice search. This fragment requires extracting the routines from the supplied main and providing a matching external objective.",
+                "signature": "CALL sd_box(N,INDEX_INT,SCALE_INT,X,F,BL,BU,ALFA_STOP, &\n     NF_MAX,NI,NF,IPRINT,ISTOP)",
+                "declarations": [
+                  {
+                    "path": "main_box.f90",
+                    "line_start": 229,
+                    "line_end": 245
+                  }
+                ],
+                "path": "main_box.f90",
+                "line_start": 229,
+                "line_end": 400,
+                "usage": "integer :: index_int(2),ni,nf,istop\ndouble precision :: scale_int(2),x(2),f,bl(2),bu(2)\nexternal :: sd_box\n! Link a user FUNCT(N,X,F); the supplied four-variable example is different.\nindex_int=[0,1]; scale_int=[0.0d0,1.0d0]\nbl=0.0d0; bu=10.0d0; x=[2.0d0,3.0d0]; ni=0; nf=0\ncall sd_box(2,index_int,scale_int,x,f,bl,bu,1.0d-4,1000,ni,nf,-1,istop)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide a finite compatible objective and feasible starting point. This is local coordinate-search structure, not a verified global solver demonstration. The sketch uses mixed continuous/integer coordinates with unit lattice spacing on the second coordinate. Preserve matching REAL*8/default-integer ABI. Neither convergence nor budget behavior was exercised."
+              },
+              {
+                "procedure": "linesearchbox_cont",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 495,
+                "line_end": 718
+              },
+              {
+                "procedure": "linesearchbox_discr",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 720,
+                "line_end": 970
+              },
+              {
+                "procedure": "stop",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 406,
+                "line_end": 483
+              }
+            ]
+          },
+          {
+            "code": "G2h1b",
+            "level": "source-reviewed",
+            "revision": "d5a282bbe05a34c9a89167e6c21c85dfcef3235f",
+            "reviewed_on": "2026-11-05",
+            "notes": "SD_BOX alternates bounded continuous and discrete coordinate line searches according to INDEX_INT, accepts objective reductions and updates directional step lengths. This mapping selects all-continuous box-constrained derivative-free coordinate search. The external FUNCT(N,X,F) symbol is linked at build time, not passed as a callback argument. Initial points must already satisfy bounds and the chosen lattice; positive SCALE_INT is required on discrete coordinates. NF and NI are input/output counters and must be initialized. ISTOP=1 means directional stopping tests, 2 evaluation budget exceeded, 3 iteration budget exceeded; budget tests use > and happen after line searches, so NF_MAX is not a strict maximum objective-call count. No nonlinear-constraint handling, integer/global-optimality certificate or nonsmooth convergence proof was established by this source review. The supplied main shares the same source file and must be separated when supplying another main.",
+            "evidence": [
+              {
+                "path": "main_box.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/main_box.f90",
+                "sha256": "b0f39b1ebdeab15f87a59dfee5a60680e2cfccbd8349245b06d9fcf8bfdcb960"
+              },
+              {
+                "path": "wrap_mixed.f90",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/wrap_mixed.f90",
+                "sha256": "141d79b6a8d32e01cf5c3fdbfb110174bb4b7d375f7edcbfe5709385ab8f5096"
+              },
+              {
+                "path": "README.txt",
+                "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/README.txt",
+                "sha256": "6b543840a3b816e85f57892a89ecdd0d7ef62a9252039991b1c42c74692ad424"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sd_box",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 derivative-free box/lattice search. This fragment requires extracting the routines from the supplied main and providing a matching external objective.",
+                "signature": "CALL sd_box(N,INDEX_INT,SCALE_INT,X,F,BL,BU,ALFA_STOP, &\n     NF_MAX,NI,NF,IPRINT,ISTOP)",
+                "declarations": [
+                  {
+                    "path": "main_box.f90",
+                    "line_start": 229,
+                    "line_end": 245
+                  }
+                ],
+                "path": "main_box.f90",
+                "line_start": 229,
+                "line_end": 400,
+                "usage": "integer :: index_int(2),ni,nf,istop\ndouble precision :: scale_int(2),x(2),f,bl(2),bu(2)\nexternal :: sd_box\n! Link a user FUNCT(N,X,F); the supplied four-variable example is different.\nindex_int=[0,0]; scale_int=[0.0d0,0.0d0]\nbl=0.0d0; bu=10.0d0; x=[2.0d0,3.0d0]; ni=0; nf=0\ncall sd_box(2,index_int,scale_int,x,f,bl,bu,1.0d-4,1000,ni,nf,-1,istop)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide a finite compatible objective and feasible starting point. This is local coordinate-search structure, not a verified global solver demonstration. The sketch uses all-continuous box-constrained derivative-free coordinate search. Preserve matching REAL*8/default-integer ABI. Neither convergence nor budget behavior was exercised."
+              },
+              {
+                "procedure": "linesearchbox_cont",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 495,
+                "line_end": 718
+              },
+              {
+                "procedure": "linesearchbox_discr",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 720,
+                "line_end": 970
+              },
+              {
+                "procedure": "stop",
+                "role": "implementation-helper",
+                "path": "main_box.f90",
+                "line_start": 406,
+                "line_end": 483
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text",
+          "spdx_expression": null,
+          "revision": "d5a282bbe05a34c9a89167e6c21c85dfcef3235f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GPL version 3 text. No separate reviewed statement establishes an or-later option; this finding does not infer one or audit all historical algorithm/publication rights.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.txt",
+              "url": "https://github.com/DerivativeFreeLibrary/DFL/blob/d5a282bbe05a34c9a89167e6c21c85dfcef3235f/README.txt",
+              "sha256": "6b543840a3b816e85f57892a89ecdd0d7ef62a9252039991b1c42c74692ad424"
+            }
+          ]
         }
       },
       "imports": {}
@@ -20044,12 +20193,89 @@
             ],
             "notes": "DESCRIPTION documents current maximum-likelihood estimation and a statistical-structure-aware trust-region approach. Nonlinear least squares and generalized method-of-moments are described as possible extensions, not assumed current R interfaces.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "436a85eb7fc31fb49a5f4fbe5e489ff33bddba6f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected DRGLG entry performs unconstrained NL2SOL-like iterations for an objective composed from model values R and their first derivatives DR, dispatching to DG7LIT_M and QR/curvature-update machinery. In this R-package revision the linked RHO is specifically weighted/unweighted negative log probability, with derivatives -1/R and 1/R**2; it is not a freely supplied RHO callback argument or arbitrary least-squares objective by default. The caller supplies model values/Jacobians at reverse-communication requests and must interpret IV(1) according to the package protocol, including diagnostic requests. Require positive finite model probabilities and valid initialized work/state arrays. The BIND(C) interface passes LRHOI/LRHOR by VALUE while most scalars are by reference: an explicit matching interface is essential. This is driver dispatch/source structure, not a full audit of all trust-region, covariance or diagnostic kernels or a maximum-likelihood accuracy check.",
+            "evidence": [
+              {
+                "path": "src/drglg_c_entry.f90",
+                "url": "https://github.com/cran/bgw/blob/436a85eb7fc31fb49a5f4fbe5e489ff33bddba6f/src/drglg_c_entry.f90",
+                "sha256": "08b5491a5f58d0cbdbd3df423a91d25cf99379e5e18eac2da1ac6777717def8c"
+              },
+              {
+                "path": "src/dglfg_bgw.f90",
+                "url": "https://github.com/cran/bgw/blob/436a85eb7fc31fb49a5f4fbe5e489ff33bddba6f/src/dglfg_bgw.f90",
+                "sha256": "c1c02d207c44c5b4aa6ab9de33412009a698c86201aa0f0f91334d101063d8ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "drglg",
+                "role": "public-entry-point",
+                "summary": "External BIND(C) reverse-communication model-estimation driver; the commented-out module is not an actual module API. Declaration links include VALUE lengths and all state arrays.",
+                "signature": "CALL drglg(D,DR,IV,LIV,LV,N,ND,NN,P,PS,LRHOI,LRHOR, &\n     R,RD,V,X,RHOI,RHOR,I_ITSUM)",
+                "declarations": [
+                  {
+                    "path": "src/drglg_c_entry.f90",
+                    "line_start": 15,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/drglg_c_entry.f90",
+                    "line_start": 28,
+                    "line_end": 56
+                  },
+                  {
+                    "path": "src/drglg_c_entry.f90",
+                    "line_start": 63,
+                    "line_end": 89
+                  }
+                ],
+                "path": "src/drglg_c_entry.f90",
+                "line_start": 15,
+                "line_end": 835,
+                "usage": "! Interface fragment after importing/providing the exact pinned BIND(C) interface.\n! LRHOI and LRHOR are VALUE arguments; do not use an implicit external interface.\n! Initialize work/control arrays and service each requested R/DR evaluation.\ncall drglg(d,dr,iv,liv,lv,n,nd,nn,p,ps,lrhoi,lrhor, &\n     r,rd,v,x,rhoi,rhor,i_itsum)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is one reverse-communication call, not a complete minimization loop. Follow the package R coordinator for state transitions and storage layout; routine dimension comments alone are insufficient setup. RHO reads XN(1) even though its objective does not use nuisance parameters, so supply a valid actual storage extent. No fit, convergence or ABI test was run."
+              },
+              {
+                "procedure": "dg7lit_m",
+                "role": "implementation-helper",
+                "path": "src/drglg_c_entry.f90",
+                "line_start": 976,
+                "line_end": 1841
+              },
+              {
+                "procedure": "RHO",
+                "role": "implementation-helper",
+                "path": "src/drglg_c_entry.f90",
+                "line_start": 2172,
+                "line_end": 2333
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only with ACM provenance statement",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "436a85eb7fc31fb49a5f4fbe5e489ff33bddba6f",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL-3 and states that author Bunch modified the Fortran under author rights clarified with ACM, requiring citation of the original publication. This records the package declaration and provenance statement without independently resolving ACM rights or optional numerical dependencies.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/bgw/blob/436a85eb7fc31fb49a5f4fbe5e489ff33bddba6f/DESCRIPTION",
+              "sha256": "e83060a607f79ef989c4ac1adec0ddcadf160d8084f6db1b803da9e65c832492"
+            }
+          ]
         }
       },
       "imports": {}
@@ -26768,12 +26994,121 @@
             ],
             "notes": "The README lists distinct Martello-Toth algorithms and problem variants. Python wrapper availability does not establish uniform exactness, supported bounds or numerical behavior for every variant.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2c3",
+            "level": "source-reviewed",
+            "revision": "c1cb90365881dbfa699c070d0d9953fad98591ed",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external MT1 routine solves a binary single-capacity profit-maximizing knapsack through greedy initialization, integer upper bounds, branching and backtracking. CHMT1 checks selected admissibility conditions when JCK=1: at least two items, positive integer profits/weights/capacity, every weight <= capacity, total weight > capacity and nonincreasing profit/weight ratios. It is not a wrapper that sorts arbitrary inputs or handles the all-items-fit case. All eight arrays need N+1 elements; sentinel slots P(N+1),W(N+1) are overwritten despite a blanket unchanged-input comment. Integer products/sums and default-REAL ratio/bound arithmetic can overflow or lose precision; no large-instance robustness or optimality experiment was run. This mapping is the selected MT1 path, not every MT2/generalized/multiple knapsack algorithm.",
+            "evidence": [
+              {
+                "path": "mknapsack/_algos.f",
+                "url": "https://github.com/jmyrberg/mknapsack/blob/c1cb90365881dbfa699c070d0d9953fad98591ed/mknapsack/_algos.f",
+                "sha256": "7fe74411d87a5cecefead93c4cc04380e6b6f932af6f8040ff5cdd4a808aab3a"
+              },
+              {
+                "path": "mknapsack/_single.py",
+                "url": "https://github.com/jmyrberg/mknapsack/blob/c1cb90365881dbfa699c070d0d9953fad98591ed/mknapsack/_single.py",
+                "sha256": "70fd8f11f83f462eb148a66e28561a9ff65ec1422f327d0dc49b9157702e671e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mt1",
+                "role": "public-entry-point",
+                "summary": "External default-integer binary knapsack driver with five work arrays and one extra sentinel slot in every array. Check Z before interpreting X(1:N).",
+                "signature": "CALL mt1(N,P,W,C,Z,X,JDIM,JCK,XX,MIN,PSIGN,WSIGN,ZSIGN)",
+                "declarations": [
+                  {
+                    "path": "mknapsack/_algos.f",
+                    "line_start": 5453,
+                    "line_end": 5453
+                  },
+                  {
+                    "path": "mknapsack/_algos.f",
+                    "line_start": 5529,
+                    "line_end": 5535
+                  }
+                ],
+                "path": "mknapsack/_algos.f",
+                "line_start": 5453,
+                "line_end": 5738,
+                "usage": "integer :: p(4),w(4),x(4),z,xx(4),minwork(4),psign(4),wsign(4),zsign(4)\nexternal :: mt1\np=[6,5,4,0]; w=[2,3,4,0]\ncall mt1(3,p,w,5,z,x,4,1,xx,minwork,psign,wsign,zsign)\nif(z<0) error stop \"MT1 input condition rejected\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The first three items are sorted by decreasing profit/weight and meet the nontrivial-capacity conditions. Only X(1:3) is a solution vector; extra slots are workspace/sentinels. No profit/capacity/optimality check or large-integer test was run."
+              },
+              {
+                "procedure": "chmt1",
+                "role": "implementation-helper",
+                "path": "mknapsack/_algos.f",
+                "line_start": 151,
+                "line_end": 207
+              }
+            ]
+          },
+          {
+            "code": "G2c2",
+            "level": "source-reviewed",
+            "revision": "c1cb90365881dbfa699c070d0d9953fad98591ed",
+            "reviewed_on": "2026-11-05",
+            "notes": "MTP minimizes the number of equal-capacity bins through a packing heuristic, lower bounds, reduction and ENUMER branch-and-bound, then reconstructs original item assignments. Require positive integer weights <= C sorted nonincreasingly and N>=2; JCK=1 enables the source checker. BACK=-1 requests unrestricted enumeration while nonnegative values bound backtracking and may return a heuristic solution. Z is the achieved bin count, LB a lower bound, XSTAR the item-to-bin assignment; compare bounds before claiming optimality. BACK is overwritten by actual work despite the Python f2py input annotation. This review covers dispatcher, checks and reconstruction, not all fourteen subordinate packing/reduction kernels or a new exactness/timing experiment.",
+            "evidence": [
+              {
+                "path": "mknapsack/_algos.f",
+                "url": "https://github.com/jmyrberg/mknapsack/blob/c1cb90365881dbfa699c070d0d9953fad98591ed/mknapsack/_algos.f",
+                "sha256": "7fe74411d87a5cecefead93c4cc04380e6b6f932af6f8040ff5cdd4a808aab3a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mtp",
+                "role": "public-entry-point",
+                "summary": "External integer bin-packing coordinator with 17 arrays of length JDIM. Z<0 reports a checked input error.",
+                "signature": "CALL mtp(N,W,C,Z,XSTAR,JDIM,BACK,JCK,LB,WR,XSTARR,DUM, &\n     RES,REL,X,R,WA,WB,KFIX,FIXIT,XRED,LS,LSB,XHEU)",
+                "declarations": [
+                  {
+                    "path": "mknapsack/_algos.f",
+                    "line_start": 8436,
+                    "line_end": 8438
+                  },
+                  {
+                    "path": "mknapsack/_algos.f",
+                    "line_start": 8543,
+                    "line_end": 8548
+                  }
+                ],
+                "path": "mknapsack/_algos.f",
+                "line_start": 8436,
+                "line_end": 8651,
+                "usage": "integer,parameter :: n=4\ninteger :: w(n),xstar(n),z,back,lb\ninteger :: wr(n),xstarr(n),dum(n),res(n),rel(n),x(n),r(n),wa(n),wb(n)\ninteger :: kfix(n),fixit(n),xred(n),ls(n),lsb(n),xheu(n)\nexternal :: mtp\nw=[6,5,4,3]; back=1000\ncall mtp(n,w,10,z,xstar,n,back,1,lb,wr,xstarr,dum, &\n     res,rel,x,r,wa,wb,kfix,fixit,xred,ls,lsb,xheu)\nif(z<0) error stop \"MTP input condition rejected\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This uses a finite backtracking budget and does not promise optimality. Validate assignments/capacities and compare LB with Z in a checked driver. Integer overflow and the complete lower-level enumeration stack were not tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; historical routine provenance separate",
+          "spdx_expression": null,
+          "revision": "c1cb90365881dbfa699c070d0d9953fad98591ed",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant names Jesse Myrberg. The selected Fortran routines separately attribute Martello/Toth and the 1990 book, with later modification dates, but do not reproduce an operative historical permission grant locally. The root notice is recorded without asserting it resolves all upstream numerical-source rights.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jmyrberg/mknapsack/blob/c1cb90365881dbfa699c070d0d9953fad98591ed/LICENSE",
+              "sha256": "bcf911a14286350cd3c58458e7d063fd8008d2558c4175562ddc9e47daf29f3d"
+            },
+            {
+              "path": "mknapsack/_algos.f",
+              "url": "https://github.com/jmyrberg/mknapsack/blob/c1cb90365881dbfa699c070d0d9953fad98591ed/mknapsack/_algos.f",
+              "sha256": "7fe74411d87a5cecefead93c4cc04380e6b6f932af6f8040ff5cdd4a808aab3a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31036,12 +31371,143 @@
             ],
             "notes": "DESCRIPTION describes forward/all-subset selection and Gaussian P-values. Its broad claims of exactness and superiority are author claims, not independent findings of this catalog; applicable definitions and assumptions require review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8c1a1",
+            "level": "source-reviewed",
+            "revision": "ecb48f9d64502780a36347bce46554988c43c583",
+            "reviewed_on": "2026-11-05",
+            "notes": "FSTEPWISE selects raw covariates by minimum residual sum-of-squares, transforms that improvement through incomplete-beta Gaussian-covariate probabilities and orthogonalizes remaining columns after accepting a variable. IA marks excluded/used columns; IA(K)=1 is the special intercept convention used by the R wrapper, so a last-column exclusion must not be mistaken for an intercept flag. X is overwritten; PP stores selected indices as doubles and probabilities, KMX is also output. Require finite nondegenerate data, valid exclusion indices, enough residual degrees of freedom and safe output extents (the source declares MINSS(N) while using selection-count indices). The no-candidate-improvement path can leave IC undefined, and the intercept probability branch caps its ratio with DMIN1(...,1e-10); these need separate validation rather than interpreting all outputs as calibrated probabilities. This review covers the forward path and its dispatch, not every robust/all-subsets postprocessing wrapper.",
+            "evidence": [
+              {
+                "path": "src/gaucov.f",
+                "url": "https://github.com/cran/gausscov/blob/ecb48f9d64502780a36347bce46554988c43c583/src/gaucov.f",
+                "sha256": "ab597d2a9f3dc08e52353e9e4ae1d8b1231891d98731871486445f054b730b30"
+              },
+              {
+                "path": "R/f1st.R",
+                "url": "https://github.com/cran/gausscov/blob/ecb48f9d64502780a36347bce46554988c43c583/R/f1st.R",
+                "sha256": "b30cfdaae6e2c792b9c484b3bf15f6b7835338f9d05daf3715c3080599a7b66b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fstepwise",
+                "role": "public-entry-point",
+                "summary": "External in-place Gaussian-covariate forward selection core. It does not return ordinary fitted coefficients; the R wrapper performs additional fit/postselection work.",
+                "signature": "CALL fstepwise(Y,X,N,K,X2,RES,IA,ALPHA,KMX,PP,KEX, &\n     MINSS,SS01,QQ,KMN,LKX)",
+                "declarations": [
+                  {
+                    "path": "src/gaucov.f",
+                    "line_start": 5,
+                    "line_end": 16
+                  }
+                ],
+                "path": "src/gaucov.f",
+                "line_start": 5,
+                "line_end": 195,
+                "usage": "! Interface fragment: use initialized finite, nondegenerate raw data.\n! Follow R/f1st.R for intercept/exclusion and workspace conventions.\ncall fstepwise(y,x,n,k,x2,res,ia,alpha,kmx,pp,kex, &\n     minss,ss01,qq,kmn,lkx)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Guard degeneracy and no-candidate-improvement cases before relying on IC-dependent output. Preserve raw X for any subsequent fit. A larger package API does not turn these source findings into verified probability calibration; no selected model or p-value was calculated."
+              },
+              {
+                "procedure": "betai",
+                "role": "implementation-helper",
+                "path": "src/gaucov.f",
+                "line_start": 728,
+                "line_end": 754
+              },
+              {
+                "procedure": "betacf",
+                "role": "implementation-helper",
+                "path": "src/gaucov.f",
+                "line_start": 756,
+                "line_end": 800
+              }
+            ]
+          },
+          {
+            "code": "L8c1b1",
+            "level": "source-reviewed",
+            "revision": "ecb48f9d64502780a36347bce46554988c43c583",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected QRDECOM -> LSQQR pipeline fits a full-column-rank unweighted raw design matrix using scaled Householder transformations and triangular back substitution through QRSOLV. X and Y are overwritten, intercepts must be explicit columns, and QRDECOM only flags an exactly zero column scale rather than providing pivoted numerical rank revelation. The INV=.FALSE. branch is selected: the optional inverse-related path calls RSOLV, which immediately RETURNs before its triangular solve, so inverse-related outputs cannot be trusted from this revision. No residual, conditioning or covariance guarantee follows from SING=.FALSE. This mapping is the selected fit pipeline, separate from forward-selection probability calibration.",
+            "evidence": [
+              {
+                "path": "src/gaucov.f",
+                "url": "https://github.com/cran/gausscov/blob/ecb48f9d64502780a36347bce46554988c43c583/src/gaucov.f",
+                "sha256": "ab597d2a9f3dc08e52353e9e4ae1d8b1231891d98731871486445f054b730b30"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lsqqr",
+                "role": "public-entry-point",
+                "summary": "External double-precision coefficient recovery after QRDECOM. Use INV=.FALSE. to avoid the disabled RSOLV inverse path.",
+                "signature": "CALL lsqqr(X,Y,N,K,D,R,BETA,X2INV,INV)",
+                "declarations": [
+                  {
+                    "path": "src/gaucov.f",
+                    "line_start": 588,
+                    "line_end": 591
+                  }
+                ],
+                "path": "src/gaucov.f",
+                "line_start": 588,
+                "line_end": 625,
+                "usage": "integer,parameter :: n=4,k=2\ndouble precision :: x(n,k),y(n),d(k),r(k),beta(k),unused_inverse(k,k)\nlogical :: singular\nexternal :: qrdecom,lsqqr\nx(:,1)=1.0d0; x(:,2)=[0.0d0,1.0d0,2.0d0,3.0d0]\ny=[1.0d0,2.0d0,2.0d0,4.0d0]\ncall qrdecom(x,n,k,d,r,singular)\nif(singular) error stop \"Exactly singular design\"\ncall lsqqr(x,y,n,k,d,r,beta,unused_inverse,.false.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply N>=K>=1 and a well-scaled full-rank design; SING is not a condition estimate. UNUSED_INVERSE is not produced in this selected branch. No fit, residual or rank-deficiency case was run."
+              },
+              {
+                "procedure": "qrdecom",
+                "role": "public-entry-point",
+                "summary": "External in-place Householder reduction, returning diagonal/reflection factors and an exact-zero-column flag.",
+                "signature": "CALL qrdecom(X,M,N,D,R,SING)",
+                "declarations": [
+                  {
+                    "path": "src/gaucov.f",
+                    "line_start": 632,
+                    "line_end": 637
+                  }
+                ],
+                "path": "src/gaucov.f",
+                "line_start": 632,
+                "line_end": 673
+              },
+              {
+                "procedure": "qrsolv",
+                "role": "implementation-helper",
+                "path": "src/gaucov.f",
+                "line_start": 680,
+                "line_end": 697
+              },
+              {
+                "procedure": "rsolv",
+                "role": "implementation-helper",
+                "path": "src/gaucov.f",
+                "line_start": 702,
+                "line_end": 721
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only (package declaration)",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "ecb48f9d64502780a36347bce46554988c43c583",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL-3. No complete audit of historical special-function/QR helper provenance is implied by this package-level declaration.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/gausscov/blob/ecb48f9d64502780a36347bce46554988c43c583/DESCRIPTION",
+              "sha256": "3137f43865f789cc01eb592da0492079d39463b6afdfa4d58db6ac73cf65ce6e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37454,12 +37920,111 @@
             ],
             "notes": "DESCRIPTION documents EM fitting, Bayesian regularization, visualization and resampling inference. The repository contains compiled Fortran components, but package-level functions may combine R and Fortran; model-selection and classification performance are not independently established.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L14a1b",
+            "level": "source-reviewed",
+            "revision": "7eb32e4d370b270ef699ba5db81903b2bd3ae697",
+            "reviewed_on": "2026-11-05",
+            "notes": "ME1E alternates Gaussian-mixture M and E steps for one-dimensional observations with a variance shared by all G components. It begins from caller membership weights Z, computes means/variance/proportions, forms log densities, normalizes posterior weights with a log-sum-exp style shift and stops on relative log-likelihood change or iteration budget. VINv<=0 selects no uniform noise component; EQPRO=.FALSE. estimates component proportions. Z, MAXI, TOL and EPS are input/output: normal return writes iterations, achieved change and log likelihood; exceptional EPS sentinels represent insufficient membership or collapsed variance. This is one fixed-component mixture fit, not automated model-number/covariance-model selection, supervised classification or a guarantee of global likelihood maximum. BLAS is required and default LOGICAL/integer/double ABI must match.",
+            "evidence": [
+              {
+                "path": "src/mclust.f",
+                "url": "https://github.com/cran/mclust/blob/7eb32e4d370b270ef699ba5db81903b2bd3ae697/src/mclust.f",
+                "sha256": "d45f2b0aaa2d3353117c70f3e8a3ad3ed8054d3b37cd100797ab084d885bc96c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "me1e",
+                "role": "public-entry-point",
+                "summary": "External common-variance univariate Gaussian-mixture EM core. Initialize nonnegative row-normalized memberships with nonempty components.",
+                "signature": "CALL me1e(EQPRO,X,N,G,VINV,Z,MAXI,TOL,EPS,MU,SIGSQ,PRO)",
+                "declarations": [
+                  {
+                    "path": "src/mclust.f",
+                    "line_start": 1412,
+                    "line_end": 1429
+                  }
+                ],
+                "path": "src/mclust.f",
+                "line_start": 1412,
+                "line_end": 1603,
+                "usage": "double precision :: x(6),z(6,2),tol,eps,mu(2),sigsq,pro(2)\ninteger :: iterations\nexternal :: me1e\nx=[-2.0d0,-1.8d0,-1.5d0,1.5d0,1.8d0,2.0d0]\nz=0.0d0; z(1:3,1)=1.0d0; z(4:6,2)=1.0d0\niterations=100; tol=1.0d-6; eps=1.0d-10\ncall me1e(.false.,x,6,2,0.0d0,z,iterations,tol,eps,mu,sigsq,pro)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch selects two common-variance components, no noise and estimated proportions. Interpret returned EPS sentinels/TOL/MAXI before accepting a fit; iteration exhaustion is not convergence. No likelihood, partition or label-stability comparison was run."
+              }
+            ]
+          },
+          {
+            "code": "L5b1n",
+            "level": "source-reviewed",
+            "revision": "7eb32e4d370b270ef699ba5db81903b2bd3ae697",
+            "reviewed_on": "2026-11-05",
+            "notes": "DMVNORM evaluates multivariate Gaussian LOG densities by upper Cholesky factorization of Sigma, triangular solves of centered data and a squared-norm/log-determinant formula. Sigma is overwritten by its factor. The interface name does not imply exponentiated density or CDF output. W(P) is scratch; W(1) receives factorization INFO on failure, but range-rejection sets W(1)=0 and HOOD=FLMAX too, so W(1)=0 alone is insufficient. HOOD is not assigned on successful completion and is not a joint log likelihood: initialize it to a nonsentinel before calling and check the failure sentinel before reading LOGDENS. This source review covers the driver and selected helper, not all linked BLAS/LAPACK kernels or an independent distribution test.",
+            "evidence": [
+              {
+                "path": "src/util.f",
+                "url": "https://github.com/cran/mclust/blob/7eb32e4d370b270ef699ba5db81903b2bd3ae697/src/util.f",
+                "sha256": "c913888a7584a4ee1f21ac3fcb104bb9fd72cb54f4c8c1e05e06464c97db2861"
+              },
+              {
+                "path": "src/mclust.f",
+                "url": "https://github.com/cran/mclust/blob/7eb32e4d370b270ef699ba5db81903b2bd3ae697/src/mclust.f",
+                "sha256": "d45f2b0aaa2d3353117c70f3e8a3ad3ed8054d3b37cd100797ab084d885bc96c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dmvnorm",
+                "role": "public-entry-point",
+                "summary": "External double-precision Gaussian log-density driver. X has observations in rows; Sigma is overwritten, LOGDENS is undefined on early failure.",
+                "signature": "CALL dmvnorm(X,MU,SIGMA,N,P,W,HOOD,LOGDENS)",
+                "declarations": [
+                  {
+                    "path": "src/util.f",
+                    "line_start": 2,
+                    "line_end": 17
+                  }
+                ],
+                "path": "src/util.f",
+                "line_start": 2,
+                "line_end": 81,
+                "usage": "double precision :: x(2,2),mu(2),sigma(2,2),w(2),hood,logdens(2)\nexternal :: dmvnorm\nx(1,:)=[0.0d0,0.0d0]; x(2,:)=[1.0d0,1.0d0]\nmu=0.0d0; sigma=reshape([1.0d0,0.0d0,0.0d0,1.0d0],[2,2])\nhood=0.0d0\ncall dmvnorm(x,mu,sigma,2,2,w,hood,logdens)\nif(w(1)/=0.0d0.or.hood==huge(1.0d0)) error stop \"Density failure\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite observations and a symmetric positive-definite covariance with a compatible LAPACK/BLAS ABI. HOOD remains its initialized value on success. Only LOGDENS holds the per-observation results; no density integration or Mahalanobis residual was checked."
+              },
+              {
+                "procedure": "absrng",
+                "role": "implementation-helper",
+                "path": "src/mclust.f",
+                "line_start": 371,
+                "line_end": 411
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later (package declaration)",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "7eb32e4d370b270ef699ba5db81903b2bd3ae697",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>=2). Selected legacy headers refer to an external historical MCLUST license URL. This records the current package declaration and those retained references without independently reconciling every historical component notice.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/mclust/blob/7eb32e4d370b270ef699ba5db81903b2bd3ae697/DESCRIPTION",
+              "sha256": "14640522a8101bbcfb8eaa1acc14e8403b675ba53b8484c64b7f604c83bf5043"
+            },
+            {
+              "path": "src/mclust.f",
+              "url": "https://github.com/cran/mclust/blob/7eb32e4d370b270ef699ba5db81903b2bd3ae697/src/mclust.f",
+              "sha256": "d45f2b0aaa2d3353117c70f3e8a3ad3ed8054d3b37cd100797ab084d885bc96c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38640,12 +39205,96 @@
             ],
             "notes": "The README explicitly assumes known tail indices and documents an MPI/LAPACK standalone utility, diagnostics and configurable fits. General applicability to unknown-tail or dependent data and reported uncertainty quality require further review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4a1a6",
+            "level": "source-reviewed",
+            "revision": "b29635438bc9d8c3c38aac4e52c4217c39da7dac",
+            "reviewed_on": "2026-11-05",
+            "notes": "The program command dispatcher exposes tail-index assessment, anchor/order selection and evaluation of tail-regression estimates for samples with power-law tails. EVALUATE_TRE calls BOOTSTRAP_FIT, combines empirical central and analytically integrated fitted-tail moments and reports normalization/mean estimates and bootstrap uncertainties. INTEGRATE_FIT tests exponent/coefficient compatibility for moment existence/cancellation and analytically integrates fitted inverse-power contributions; it is not general numerical quadrature. This mapping is tail/outlier analysis and the inspected command/evaluation path, not proof of estimator bias/coverage, full automatic tail identification or a public library callback. Tail exponent assumptions, independence, fitting range/order and moment definition are material. The source is a standalone PROGRAM with internal procedures, plus MPI and LAPACK dependencies.",
+            "evidence": [
+              {
+                "path": "treat.f90",
+                "url": "https://github.com/plopezrios/treat/blob/b29635438bc9d8c3c38aac4e52c4217c39da7dac/treat.f90",
+                "sha256": "8a6a3b342b2b56ec7b0b7762bf89ea65406664450f02f6b3eba5a8966fd91dc1"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/plopezrios/treat/blob/b29635438bc9d8c3c38aac4e52c4217c39da7dac/README.md",
+                "sha256": "f1172ae7e09b5da3de769932d3409ad4af0a97ad0e5316c291ebf96b4d553f6d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "treat",
+                "role": "program-entry-point",
+                "summary": "Standalone MPI command-line tail-regression analysis utility. Its CONTAINS procedures are internal implementation helpers, not a linkable public module API.",
+                "signature": "./treat < input > output",
+                "declarations": [
+                  {
+                    "path": "README.md",
+                    "line_start": 9,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "README.md",
+                    "line_start": 36,
+                    "line_end": 62
+                  }
+                ],
+                "path": "treat.f90",
+                "line_start": 1,
+                "line_end": 134,
+                "usage": "mpif90 -o treat treat.f90 -llapack\n# Prepare a command deck/data, following the pinned README example.\n# It generates known-tail-index data, assesses the fit, then evaluates TRE.\n./treat < input > output",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Shell invocation only, not a new checked driver. Use the author README command deck or supply independent finite data and justified tail indices/anchors. Fit/mean existence and bootstrap uncertainty depend on assumptions and tuning; plots are written as data files. No analysis, MPI execution, confidence-interval coverage or comparison was run."
+              },
+              {
+                "procedure": "evaluate_TRE",
+                "role": "implementation-helper",
+                "path": "treat.f90",
+                "line_start": 2848,
+                "line_end": 3279
+              },
+              {
+                "procedure": "bootstrap_fit",
+                "role": "implementation-helper",
+                "path": "treat.f90",
+                "line_start": 3285,
+                "line_end": 3800
+              },
+              {
+                "procedure": "integrate_fit",
+                "role": "implementation-helper",
+                "path": "treat.f90",
+                "line_start": 4643,
+                "line_end": 4744
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text",
+          "spdx_expression": null,
+          "revision": "b29635438bc9d8c3c38aac4e52c4217c39da7dac",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GPL version 3 text; the reviewed README identifies the author method and MPI/LAPACK requirements but no separate reviewed grant establishes an or-later option. External numerical/runtime components retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/plopezrios/treat/blob/b29635438bc9d8c3c38aac4e52c4217c39da7dac/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/plopezrios/treat/blob/b29635438bc9d8c3c38aac4e52c4217c39da7dac/README.md",
+              "sha256": "f1172ae7e09b5da3de769932d3409ad4af0a97ad0e5316c291ebf96b4d553f6d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38832,12 +39481,124 @@
             ],
             "notes": "The README documents data/grid configuration, bandwidth optimization, OpenMP and single/double precision options. Compiler compatibility and density-reconstruction quality are upstream reports; a visualization is not an independent density-accuracy check.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4c1b",
+            "level": "source-reviewed",
+            "revision": "78ce65441776e35d98a754f09b4633ea0729e6d9",
+            "reviewed_on": "2026-11-05",
+            "notes": "GridProjectedKDEType%ComputeDensity bins point coordinates, constructs active-cell lists and dispatches adaptive Gaussian-kernel reconstruction through ComputeDensityOptimization. Kernel cell weights use products of erf differences, reflection/unfolding and normalization over truncated support. The optimization combines density/roughness estimates and local bandwidth/shape updates. This mapping covers the multidimensional nonparametric density coordinator and inspected accumulation/kernel paths, not all histogram, boundary, sliced or weighted variants. DATAPOINTS stores observations in rows with three coordinate columns even for compressed lower dimensions. Module-owned density/roughness arrays and dimension state are shared across objects, so pointers are not independent persistent snapshots and concurrent estimators need state isolation. Output scaling can mean counts, mass or density depending options: no automatic probability-normalization claim is made.",
+            "evidence": [
+              {
+                "path": "src/GridProjectedKDE.F90",
+                "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/src/GridProjectedKDE.F90",
+                "sha256": "3cce4c403a1e549e4feb4dd6b818b62af90e9d3eab188fa510f1fb6ae3313954"
+              },
+              {
+                "path": "src/KernelMultiGaussian.f90",
+                "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/src/KernelMultiGaussian.f90",
+                "sha256": "76c388e725fd6430bd704c0bb3365b2717aafd2432b62559eaf006a387d33122"
+              },
+              {
+                "path": "src/Precision.F90",
+                "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/src/Precision.F90",
+                "sha256": "c52b982652ed4c65b93d9cb8335aa57a2dfc570b2b1fb222fb511ece903ce959"
+              },
+              {
+                "path": "src/Constants.f90",
+                "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/src/Constants.f90",
+                "sha256": "9a1f3f8a6a26b375b21c5cb51cae0dd7829d5fc04fe874f04b8db223010fb4c0"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/README.md",
+                "sha256": "e58f30deac495cc4004d2f47e2f39c1ff2bafc35e48d4893bcbdd3a06b6c8413"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ComputeDensity",
+                "role": "public-entry-point",
+                "summary": "Public type-bound multidimensional KDE coordinator. Initialize grid/domain state first. The full keyword interface is available in the pinned declarations.",
+                "signature": "CALL estimate%ComputeDensity(DATAPOINTS, &\n     NOPTIMIZATIONLOOPS=...,OUTPUTFILENAME=..., ...)",
+                "declarations": [
+                  {
+                    "path": "src/GridProjectedKDE.F90",
+                    "line_start": 3601,
+                    "line_end": 3648
+                  },
+                  {
+                    "path": "src/GridProjectedKDE.F90",
+                    "line_start": 207,
+                    "line_end": 225
+                  }
+                ],
+                "path": "src/GridProjectedKDE.F90",
+                "line_start": 3601,
+                "line_end": 4395,
+                "module": "GridProjectedKDEModule",
+                "derived_type": "GridProjectedKDEType",
+                "usage": "use PrecisionModule, only: fp\nuse GridProjectedKDEModule, only: GridProjectedKDEType\ntype(GridProjectedKDEType) :: estimate\n! Initialize finite points(n,3) and estimator grid/domain settings first.\n! Positive grid sizes/bin widths in active dimensions, zeros in compressed ones.\ncall estimate%ComputeDensity(points,outputFileName=\"density.out\")\n! Inspect estimate%densityEstimateGrid before Reset or another reconstruction.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment assumes the potentially large grid/kernel configuration has been prepared with Initialize. Review scaling options and integrate the returned grid independently before calling it a normalized probability density. Build the complete preprocessing/dependency stack with consistent fp. No density/bandwidth/mass or concurrency test was performed."
+              },
+              {
+                "procedure": "Initialize",
+                "role": "public-entry-point",
+                "summary": "Public type-bound setup of grid/domain, dimensionality and algorithm parameters. Defaults and optional keywords are defined in source.",
+                "signature": "CALL estimate%Initialize(DOMAINSIZE=...,BINSIZE=..., &\n     DOMAINORIGIN=..., ...)",
+                "declarations": [
+                  {
+                    "path": "src/GridProjectedKDE.F90",
+                    "line_start": 355,
+                    "line_end": 419
+                  },
+                  {
+                    "path": "src/GridProjectedKDE.F90",
+                    "line_start": 207,
+                    "line_end": 218
+                  }
+                ],
+                "path": "src/GridProjectedKDE.F90",
+                "line_start": 355,
+                "line_end": 999,
+                "module": "GridProjectedKDEModule",
+                "derived_type": "GridProjectedKDEType"
+              },
+              {
+                "procedure": "prComputeDensityOptimization",
+                "role": "implementation-helper",
+                "path": "src/GridProjectedKDE.F90",
+                "line_start": 4399,
+                "line_end": 5163
+              },
+              {
+                "procedure": "prComputeKernelWMatrix",
+                "role": "implementation-helper",
+                "path": "src/KernelMultiGaussian.f90",
+                "line_start": 720,
+                "line_end": 790
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "78ce65441776e35d98a754f09b4633ea0729e6d9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names the Hydrogeology Group at Universitat Politecnica de Catalunya. This records the project grant, not a complete audit of bundled utility sources or external runtime libraries.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/upc-ghs/gpkde/blob/78ce65441776e35d98a754f09b4633ea0729e6d9/LICENSE.md",
+              "sha256": "170452256cfab829e9a39008bc0aaad841b77af6de6ee69ba6f2fc7289792e5b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40143,12 +40904,75 @@
             ],
             "notes": "The README identifies a simulated-annealing heuristic and QAPLIB examples. Known solutions supplied for benchmarks do not imply that the heuristic always returns a global optimum; individual Fortran procedures need later review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2b",
+            "level": "source-reviewed",
+            "revision": "9544b77a8631c71ec1abff1f7aff434d2d112ce3",
+            "reviewed_on": "2026-11-05",
+            "notes": "QAPH4 searches permutations to minimize SUM(A(i,j)*B(perm(i),perm(j))) using random transpositions, a Metropolis acceptance probability and a decreasing temperature with increasing trials per stage. The O(N) swap delta explicitly assumes symmetric A and B; it is not a general asymmetric QAP implementation or a continuous quadratic-programming solver. The R wrapper validates symmetric nonnegative matrices and schedules independent restarts. The Fortran core has no equivalent validation and calls R RNG/interrupt services via a C wrapper; it is not standalone Fortran. Require N>=2, valid permutation, positive trial count, FITER>=1 and 0<FT<1, finite well-scaled data and representable iteration counts. OPE/OL are best-found heuristic output, not a proof of global optimality.",
+            "evidence": [
+              {
+                "path": "src/qapsim.f",
+                "url": "https://github.com/mhahsler/qap/blob/9544b77a8631c71ec1abff1f7aff434d2d112ce3/src/qapsim.f",
+                "sha256": "898a23afec465096e6d35823c5dd54fb23d925d9d0f6706532d34ee8abe2fb79"
+              },
+              {
+                "path": "src/RNG_wrapper.c",
+                "url": "https://github.com/mhahsler/qap/blob/9544b77a8631c71ec1abff1f7aff434d2d112ce3/src/RNG_wrapper.c",
+                "sha256": "aa7db2aa986af55dd9716c2b0039f47c8513cb85d9c1340471dfb6e55fdf0722"
+              },
+              {
+                "path": "R/qapSA.R",
+                "url": "https://github.com/mhahsler/qap/blob/9544b77a8631c71ec1abff1f7aff434d2d112ce3/R/qapSA.R",
+                "sha256": "c9b902804ef32b52a01c105b07888595c7fef8e09fe96558ab38b74085433db7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "qaph4",
+                "role": "public-entry-point",
+                "summary": "External double-precision/integer QAP heuristic embedded in R. Use the R package interface for runtime setup and matrix validation.",
+                "signature": "CALL qaph4(N,A,B,MITER,FITER,FT,OPE,OL,PERM,MAXSTEPS)",
+                "declarations": [
+                  {
+                    "path": "src/qapsim.f",
+                    "line_start": 23,
+                    "line_end": 33
+                  }
+                ],
+                "path": "src/qapsim.f",
+                "line_start": 23,
+                "line_end": 153,
+                "usage": "! Interface fragment inside a correctly initialized R-linked caller.\n! Supply symmetric finite nonnegative A/B and a valid initial permutation.\n! Use qap::qapSA(A,B) in R for the supported validation/restart wrapper.\ncall qaph4(n,a,b,miter,fiter,ft,ope,ol,perm,maxsteps)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The fragment requires the R runtime, RNG wrapper and interrupt support; an ordinary standalone link is insufficient. PERM is overwritten. A zero/degenerate temperature, integer trial growth and failed input assumptions need explicit handling/verification. No QAPLIB case or optimality gap was computed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only (package declaration)",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "9544b77a8631c71ec1abff1f7aff434d2d112ce3",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL-3 and the root supplies GPL version 3 text. The Fortran header credits Rendl and Hahsler; no full provenance audit of bundled QAPLIB data or every historical source is implied.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/mhahsler/qap/blob/9544b77a8631c71ec1abff1f7aff434d2d112ce3/DESCRIPTION",
+              "sha256": "e2997c70ad6e0a233cc631acb4b297db8245b89febd6b67e2570fe24ebd4522f"
+            },
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/mhahsler/qap/blob/9544b77a8631c71ec1abff1f7aff434d2d112ce3/LICENSE",
+              "sha256": "d62f065830aa3739cc031156b9690805c7b2e811b4a178c8b4acd8725d561c94"
+            }
+          ]
         }
       },
       "imports": {}
