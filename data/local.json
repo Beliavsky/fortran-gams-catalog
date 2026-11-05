@@ -82,12 +82,65 @@
             ],
             "notes": "Documents exp(t*A), exp(t*A)v and phi-function actions for dense and sparse matrices. Linear algebra is supported; a more specific matrix-function mapping awaits procedure review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D8",
+            "level": "source-reviewed",
+            "revision": "db906c01150025eec83654b42feb66c5f09960a9",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected real dense DGPADM routine scales t*H, evaluates the diagonal Pade rational approximation using matrix products and a linear solve, then repeatedly squares the result. It returns the full exp(t*H) through an offset into caller workspace. D8 follows the published NAG GAMS convention grouping matrix functions with other matrix equations (the NAG D8 index lists real matrix exponentials); this is not a claim of a general Sylvester-equation solver. Only this dense real path is reviewed: sparse Krylov exponential actions, complex variants and phi-functions are not certified here. Invalid sizes, zero norm of t*H (including t=0 or H=0), and linear-solve failure STOP rather than returning a recoverable error. The caller must handle identity cases and provide valid positive dimensions and workspace. No matrix exponential, conditioning or scaling-extreme test was run.",
+            "evidence": [
+              {
+                "path": "fortran/dgpadm.f",
+                "url": "https://github.com/rasmusgo/expokit/blob/db906c01150025eec83654b42feb66c5f09960a9/fortran/dgpadm.f",
+                "sha256": "f5c2879d93626538e985e692478b438d7ba4346918e839d1c1f08eb9671cf530"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DGPADM",
+                "role": "public-entry-point",
+                "summary": "External double-precision dense matrix exponential. Use positive m, ldh >= m, recommended ideg=6, ipiv(m) and wsp length >= 4*m*m+ideg+1. exp(t*H) occupies wsp(iexph:iexph+m*m-1) in column-major order; iexph is one-based relative to the passed workspace. ns reports squarings. Handle t=0 or H=0 outside the routine because its zero-norm branch STOPs. Link compatible BLAS/LAPACK.",
+                "signature": "CALL DGPADM(ideg, m, t, H, ldh, wsp, lwsp, ipiv, iexph, ns, iflag)",
+                "declarations": [
+                  {
+                    "path": "fortran/dgpadm.f",
+                    "line_start": 4,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "fortran/dgpadm.f",
+                    "line_start": 26,
+                    "line_end": 40
+                  }
+                ],
+                "path": "fortran/dgpadm.f",
+                "line_start": 2,
+                "line_end": 169,
+                "usage": "external :: dgpadm\ninteger, parameter :: m=2, ideg=6, lwsp=4*m*m+ideg+1\ninteger :: ipiv(m), iexph, ns, iflag\ndouble precision :: h(m,m), work(lwsp), exponential(m,m)\nh = 0.0d0\nh(1,1) = 0.1d0\nh(2,2) = 0.2d0\ncall dgpadm(ideg,m,1.0d0,h,m,work,lwsp,ipiv,iexph,ns,iflag)\nif (iflag /= 0) error stop \"matrix exponential failed\"\nexponential = reshape(work(iexph:iexph+m*m-1),[m,m])",
+                "usage_notes": "Uncompiled calling sketch. The analytic reference is diag(exp(0.1),exp(0.2)), but no comparison was run. The result is the full matrix exponential, not entrywise exponentiation or just its action on a vector. Link ABI-compatible BLAS/LAPACK; some failures terminate inside DGPADM before the iflag check can run. The chosen nonzero matrix/time avoids its identity-case STOP."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom EXPOKIT noncommercial terms",
+          "spdx_expression": null,
+          "revision": "db906c01150025eec83654b42feb66c5f09960a9",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned copyright file permits use, copying, modification and distribution for noncommercial purposes with notice preservation, and requires approval for commercial purposes. No standard permissive SPDX expression is asserted. This records EXPOKIT terms; support routines and their upstream licenses were not comprehensively audited.",
+          "evidence": [
+            {
+              "path": "copyright",
+              "url": "https://github.com/rasmusgo/expokit/blob/db906c01150025eec83654b42feb66c5f09960a9/copyright",
+              "sha256": "7bb2510b327f42ce279a29f0c39cf69fe930201b29fbaaf9e72c5aef8cbc4c9a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3564,12 +3617,148 @@
             ],
             "notes": "The brief README identifies multidimensional B-spline interpolation and cites its mathematical reference. Boundary conditions, supported dimensions and derivative interfaces require further review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "c4b80d48764199708196b89ba046d50526bf2a9d",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected spline object constructs tensor-product B-spline coefficients on Cartesian-product axes by solving one-dimensional basis systems successively, then evaluates target grids via basis matrices and BLAS products. Cox-de Boor recursion implements the basis, and the author 2D example concatenates x/y axes and flattens f(i,j) in Fortran order. This establishes gridded multivariate interpolation E2a, not scattered-data fitting. The basis order k means degree k-1 (k=4 is cubic). Supply valid strictly increasing axes and compatible sizes/orders. DGESV info is ignored in set_coefs_1d, so singular/invalid interpolation systems are not reported to the caller. Extrapolation is a saved module-wide flag shared across objects, not an object-specific setting; omitted init arguments retain its previous value. Reinitialization requires cleanup, and fin assumes initialized allocations. This review excludes skip_solve-only workflows and does not establish interpolation accuracy, extrapolation safety or derivative APIs. No author test was run.",
+            "evidence": [
+              {
+                "path": "src/NdSpline.F90",
+                "url": "https://github.com/Takayuki-Miyagi/NdSpline/blob/c4b80d48764199708196b89ba046d50526bf2a9d/src/NdSpline.F90",
+                "sha256": "b404cfa86b77f6bbaf7506c689760bd3bba9c11b5f395384835d1eac079ce00c"
+              },
+              {
+                "path": "main/test.F90",
+                "url": "https://github.com/Takayuki-Miyagi/NdSpline/blob/c4b80d48764199708196b89ba046d50526bf2a9d/main/test.F90",
+                "sha256": "3ed0132ec82952d4d9dfdf89250bfd10c2eebeec4c044d02394b824cb28ec79e"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/Takayuki-Miyagi/NdSpline/blob/c4b80d48764199708196b89ba046d50526bf2a9d/Makefile",
+                "sha256": "28253b4e8e72464480b085ee0bf08f4cbe316286b31d6baf1f3da481827fba1f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Public type-bound generic initializer for type(spline). ks(:) gives B-spline orders and ns(:) gives axis sizes; xs concatenates axes with length SUM(ns), and fs flattens the source grid with length PRODUCT(ns), first axis varying fastest. Use real64 arrays, at least two axes for this mapped scope, 1 <= ks <= ns, and valid distinct increasing axis coordinates. Set extrapolation explicitly; keep skip_solve false when evaluating data. Failures may STOP and no status is returned.",
+                "signature": "CALL sp%init(ks, ns, xs, fs, extrapolation, skip_solve)",
+                "declarations": [
+                  {
+                    "path": "src/NdSpline.F90",
+                    "line_start": 126,
+                    "line_end": 130
+                  },
+                  {
+                    "path": "src/NdSpline.F90",
+                    "line_start": 59,
+                    "line_end": 74
+                  }
+                ],
+                "path": "src/NdSpline.F90",
+                "line_start": 111,
+                "line_end": 173,
+                "module": "NdSpline",
+                "derived_type": "spline",
+                "examples": [
+                  {
+                    "path": "main/test.F90",
+                    "line_start": 86,
+                    "line_end": 104
+                  }
+                ]
+              },
+              {
+                "procedure": "interpolate",
+                "role": "public-entry-point",
+                "summary": "Public type binding for a Cartesian-product query grid. ns(:) gives target axis sizes and xs concatenates target axes. Results are stored as the flat allocatable component sp%fs, not returned as an argument; reshape to the target shape in Fortran order. Read/copy sp%fs before fin. Use an initialized, fully solved object and queries inside the source domain; shape mismatches are not a recoverable status interface.",
+                "signature": "CALL sp%interpolate(ns, xs)",
+                "declarations": [
+                  {
+                    "path": "src/NdSpline.F90",
+                    "line_start": 181,
+                    "line_end": 183
+                  }
+                ],
+                "path": "src/NdSpline.F90",
+                "line_start": 175,
+                "line_end": 217,
+                "module": "NdSpline",
+                "derived_type": "spline",
+                "examples": [
+                  {
+                    "path": "main/test.F90",
+                    "line_start": 108,
+                    "line_end": 119
+                  }
+                ],
+                "usage": "use NdSpline, only: spline, dp\ntype(spline) :: sp\nreal(dp) :: axis(3), values(3,3), result(1,1)\ninteger :: i,j\naxis = [0.0_dp,1.0_dp,2.0_dp]\ndo j=1,3\n  do i=1,3\n    values(i,j) = axis(i)+axis(j)\n  end do\nend do\ncall sp%init([2,2],[3,3],[axis,axis],reshape(values,[9]), &\n             extrapolation=.false.)\ncall sp%interpolate([1,1],[0.5_dp,1.5_dp])\nresult = reshape(sp%fs,[1,1])\ncall sp%fin()",
+                "usage_notes": "Uncompiled 2D calling sketch, using order-two (piecewise-linear) bases. The analytic reference at (0.5,1.5) is two, but this was not checked. Compile NdSpline.F90 with preprocessing and link compatible BLAS/LAPACK; the author build also enables OpenMP. Source and query values are Cartesian-product grids. The shared extrapolation flag and unchecked solve status remain limitations."
+              },
+              {
+                "procedure": "fin",
+                "role": "public-entry-point",
+                "summary": "Public type-bound generic cleanup. Call once after successful initialization and after copying any needed sp%fs output. Do not call on an uninitialized object or twice without reinitializing: deallocation is not guarded for all components.",
+                "signature": "CALL sp%fin()",
+                "declarations": [
+                  {
+                    "path": "src/NdSpline.F90",
+                    "line_start": 100,
+                    "line_end": 108
+                  },
+                  {
+                    "path": "src/NdSpline.F90",
+                    "line_start": 66,
+                    "line_end": 73
+                  }
+                ],
+                "path": "src/NdSpline.F90",
+                "line_start": 100,
+                "line_end": 109,
+                "module": "NdSpline",
+                "derived_type": "spline"
+              },
+              {
+                "procedure": "set_coefs_1d",
+                "module": "NdSpline",
+                "role": "implementation-helper",
+                "path": "src/NdSpline.F90",
+                "line_start": 305,
+                "line_end": 331
+              },
+              {
+                "procedure": "basis_function_rec",
+                "module": "NdSpline",
+                "role": "implementation-helper",
+                "path": "src/NdSpline.F90",
+                "line_start": 471,
+                "line_end": 499
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause",
+          "spdx_expression": "BSD-2-Clause",
+          "revision": "c4b80d48764199708196b89ba046d50526bf2a9d",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned root LICENSE provides the two-clause BSD notice for Takayuki-Miyagi. Linked BLAS/LAPACK and build dependencies retain their own license terms; those dependencies are not audited by this finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Takayuki-Miyagi/NdSpline/blob/c4b80d48764199708196b89ba046d50526bf2a9d/LICENSE",
+              "sha256": "61e90d57c617d2708ddeb5bbb8894a957ee335f7b05fb0615222290208970373"
+            }
+          ]
         }
       },
       "imports": {}
@@ -6059,12 +6248,119 @@
             ],
             "notes": "The README documents arbitrary data points and an auxiliary grid-to-grid interpolation routine. An error indicator is not described as a rigorously certified error bound.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "5147f4797ce8f7278bcc34e8b1147f45e5283357",
+            "reviewed_on": "2026-11-04",
+            "notes": "poly_interp implements a Neville-style Lagrange correction recurrence for the polynomial through n+1 distinct samples, also propagating derivative corrections. It evaluates at zero, so callers shift their abscissae by the desired query. This is a single polynomial (E1b), distinct from the local moving-stencil grid wrapper. Output y(0) is the value and y(k) is derivative k, not divided Taylor coefficients. dy is the last signed interpolation correction, not a certified error bound. There is no input-validation/status interface; duplicate nodes divide by zero. Restrict this reviewed use to n >= 1 and 0 <= nd <= n: for n=0 or derivative orders beyond n, some dy entries need not be assigned. Accuracy, conditioning and behavior on closely spaced nodes were not checked by execution.",
+            "evidence": [
+              {
+                "path": "poly_interp.f90",
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/poly_interp.f90",
+                "sha256": "09d2599c213ce8251fd9eb821e21c2d7396014d8201d33d4f40b7645b8fa9945"
+              },
+              {
+                "path": "test_poly.f90",
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/test_poly.f90",
+                "sha256": "4241abda9bdbb59b8e60e9ff707bd4dd2bfb51f894aada3e9ccf8121c8c1e808"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poly_interp",
+                "role": "public-entry-point",
+                "summary": "External routine using selected_real_kind(12), named REAL64 locally. Pass xin(0:n), yin(0:n), output y(0:nd), dy(0:nd), degree n >= 1 and derivative limit 0 <= nd <= n. xin must contain distinct offsets from the target point, not absolute nodes unless querying zero. No error status is returned. dy entries are signed corrections, not guaranteed absolute errors.",
+                "signature": "CALL poly_interp(y, dy, xin, yin, n, nd)",
+                "declarations": [
+                  {
+                    "path": "poly_interp.f90",
+                    "line_start": 15,
+                    "line_end": 27
+                  }
+                ],
+                "path": "poly_interp.f90",
+                "line_start": 11,
+                "line_end": 113,
+                "usage": "external :: poly_interp\ninteger, parameter :: rk=selected_real_kind(12)\nreal(rk) :: nodes(0:2), values(0:2), offsets(0:2), y(0:1), correction(0:1)\nnodes = [0.0_rk,1.0_rk,2.0_rk]\nvalues = nodes**2\noffsets = nodes-0.5_rk\ncall poly_interp(y,correction,offsets,values,2,1)",
+                "usage_notes": "Uncompiled calling sketch. The analytic value/first derivative at 0.5 are 0.25 and 1, but no comparison was run. Match selected_real_kind(12) consistently with the external routine. A small final correction does not certify interpolation error, and duplicate or nearly coincident input abscissae need independent validation."
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "5147f4797ce8f7278bcc34e8b1147f45e5283357",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected ordered-grid branch of grid_interp selects a local n+1-point stencil for each target, shifts its abscissae to that target and calls poly_interp. Stencil changes produce a piecewise-polynomial interpolation scheme (E1a), without an established spline smoothness condition at transitions. Both values and requested derivatives are copied into the target matrix. The wrapper checks some sizes and rejects extrapolation outside a scale-dependent tolerance. The unordered-grid sorting path is present but outside this source review. Its reported dymax is updated as a maximum of signed dy values starting from zero, rather than absolute corrections, so negative corrections can be hidden; it is not an absolute error estimate. Use distinct strictly ordered samples, in-range ordered targets and 0 <= nd <= n. No grid interpolation or derivative error check was executed.",
+            "evidence": [
+              {
+                "path": "grid_interp.f90",
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/grid_interp.f90",
+                "sha256": "dba3f7a96047feedbc512aaed8f6c23c9a7e38d8644c2c3606c695039d791595"
+              },
+              {
+                "path": "poly_interp.f90",
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/poly_interp.f90",
+                "sha256": "09d2599c213ce8251fd9eb821e21c2d7396014d8201d33d4f40b7645b8fa9945"
+              },
+              {
+                "path": "test_grid_interp.f90",
+                "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/test_grid_interp.f90",
+                "sha256": "0ab8a30dd0ef439f70002ca62982a6145bb7e033ec7ff9a177bb058e68771f4b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "grid_interp",
+                "role": "public-entry-point",
+                "summary": "External ordered-grid interpolation wrapper. n is local polynomial degree, nin >= n+1, nd is derivative limit, nout <= mxdout. xin(nin), fin(nin), xout(mxdout), fout(mxdout,0:nd), dymax(0:nd) use selected_real_kind(12). fout(:,0) stores values and later columns derivatives. Check ifail before using outputs; dymax has the signed-correction limitation. Link poly_interp, and also sort for the compiled unordered branch even when not used.",
+                "signature": "CALL grid_interp(n, nd, nin, xin, fin, nout, xout, fout, dymax, ifail, mxdout)",
+                "declarations": [
+                  {
+                    "path": "grid_interp.f90",
+                    "line_start": 18,
+                    "line_end": 40
+                  }
+                ],
+                "path": "grid_interp.f90",
+                "line_start": 13,
+                "line_end": 327,
+                "usage": "external :: grid_interp\ninteger, parameter :: rk=selected_real_kind(12)\ninteger :: ifail\nreal(rk) :: nodes(4), values(4), queries(2), result(2,0:1), indicator(0:1)\nnodes = [0.0_rk,1.0_rk,2.0_rk,3.0_rk]\nvalues = nodes**2\nqueries = [0.5_rk,1.5_rk]\ncall grid_interp(2,1,4,nodes,values,2,queries,result,indicator,ifail,2)\nif (ifail /= 0) error stop \"grid interpolation failed\"",
+                "usage_notes": "Uncompiled fragment for ordered input/target grids. Expected value columns are 0.25 and 2.25 and derivative columns 1 and 3, but no comparison was performed. Link grid_interp, poly_interp and sort with matching kinds. This does not verify the unordered path, extrapolation, transition smoothness or the quality of dymax."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "5147f4797ce8f7278bcc34e8b1147f45e5283357",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE is GNU GPL version 3 and both reviewed Fortran headers state GNU Public License v3. No inspected project-specific version-only versus or-later notice resolves that distinction, so no SPDX expression is asserted. Algorithm references in the headers are attribution, not a separate reviewed license grant.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "poly_interp.f90",
+              "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/poly_interp.f90",
+              "sha256": "09d2599c213ce8251fd9eb821e21c2d7396014d8201d33d4f40b7645b8fa9945"
+            },
+            {
+              "path": "grid_interp.f90",
+              "url": "https://github.com/jlm785/polynomial_interpolation/blob/5147f4797ce8f7278bcc34e8b1147f45e5283357/grid_interp.f90",
+              "sha256": "dba3f7a96047feedbc512aaed8f6c23c9a7e38d8644c2c3606c695039d791595"
+            }
+          ]
         }
       },
       "imports": {}

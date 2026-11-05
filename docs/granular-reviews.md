@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Thirty-nine repositories now have fifty-three source-reviewed
+Reviewed on 2026-11-04. Forty-two repositories now have fifty-seven source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Thirty-eight repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A thirty-ninth, DDFSA, identifies the supplied
+Forty-one repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A forty-second, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All thirty-nine independently source-reviewed repositories now have an
+separately. All forty-two independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -62,6 +62,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fortran-rbf | `rbf_mod::rbf_type%build` (stencil matrices, not data-value evaluation) | No license identified in reviewed material |
 | PPR | `ppr_1d::rcon1d`, `::rmap1d` (reviewed PCM path) | Custom research/noncommercial terms |
 | newspline | `newsplinemod::newspline` (reviewed unbounded path) | Root GPL v3; Numerical Recipes utility terms unresolved |
+| Expokit | External `DGPADM` (dense real full matrix exponential) | Custom noncommercial terms |
+| NdSpline | `NdSpline::spline%init`, `%interpolate`, `%fin` | BSD-2-Clause |
+| polynomial_interpolation | External `poly_interp`, `grid_interp` | GNU GPL version 3; version scope unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -120,6 +123,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fortran-rbf](https://github.com/dongli/fortran-rbf) | E3 | Local RBF matrix/inverse construction and stored derivative matrices | No fitted-value API, y unused. LAPACK build required; polynomial B initialization, node-ten debug output and Gaussian second derivative need correction/checking. |
 | [PPR](https://github.com/dengwirda/PPR) | E1a | Piecewise-constant reconstruction, overlap integration and conservation-defect correction | Reviewed PCM with one mean per cell only. Matching domains/valid edge grids, initialized options and workspace required. Higher-order methods not fully reviewed. |
 | [newspline](https://github.com/ARVE-Research/newspline) | E1a | Interval-mean control construction and unbounded cubic Hermite sampling | Requires >= 2 intervals and positive subdivision counts. Continuous constraints do not prove exact discrete sample means; optional bounded branches unverified. |
+| [Expokit](https://github.com/rasmusgo/expokit) | D8 | Dense real Pade scaling-and-squaring and workspace result offset | Only DGPADM reviewed. Zero matrix/time and several failures STOP; caller handles identity cases. Sparse/complex/action variants remain unreviewed. |
+| [NdSpline](https://github.com/Takayuki-Miyagi/NdSpline) | E2a | Tensor-product B-spline coefficient solves and target-grid basis products | Gridded data only. Solve info ignored; extrapolation flag shared across objects. k is order, so k=4 is cubic. Cleanup/reinitialization require care. |
+| [polynomial_interpolation](https://github.com/jlm785/polynomial_interpolation) | E1b; E1a | Single shifted Lagrange polynomial and ordered-grid local stencils | Core evaluates at zero. Duplicate nodes invalid, high derivative correction entries may be unassigned, and grid dymax ignores negative signed corrections. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -257,3 +263,17 @@ The fortran-rbf entry is scoped to E3 interpolation services: it exposes stencil
 matrices, not a complete data-fitting or arbitrary-query value API. Its source
 findings preclude presenting all advertised derivative/polynomial paths as
 checked algorithms. No upstream code or calling sketch was compiled or run.
+
+## Matrix exponentials and polynomial/spline representations
+
+The Expokit review covers the dense real full-matrix exponential routine only.
+D8 follows the matrix-function convention in the published
+[NAG GAMS D8 index](https://www.afs.enea.it/software/libnag/nagdoc_fl24/pdf/INDEXES/GAMS/d8.html),
+which lists matrix exponentials alongside other matrix equations. This does not
+classify Expokit as a general Sylvester solver or verify its sparse actions.
+
+The polynomial_interpolation mappings distinguish a single degree-n polynomial
+(E1b) from changing local stencils (E1a). NdSpline instead builds a tensor-product
+B-spline on a Cartesian-product grid (E2a). Flattening, query shifting, basis
+order and result layouts are recorded with calling fragments. No upstream
+program or numerical reference comparison was compiled or run in this batch.
