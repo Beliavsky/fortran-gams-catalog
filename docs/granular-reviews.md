@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 316 repositories now have 416 source-reviewed
+Reviewed on 2026-11-05. 324 repositories now have 428 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-306 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Ten further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT, TREAT, main_Gaussian and LHSDRV) identify supplied program entry points and keep their internal/benchmark
+313 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Eleven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV and TiktakGlobalSearch) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 316 independently source-reviewed repositories now have an
+separately. All 324 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -340,6 +340,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | dae4py | `DDASKR` | BSD-style wrapper and UC/LLNL DASKR notices |
 | faiNumber Fortran | `fnDecimalUtil::decToInt32`, `fnInt32Util::int32ToBinaryAsU`, `fnNumberStringUtil::isInteger` | MIT |
 | Matran | `RmatSVD_m::SVD`, `RmatQR_m::QR` | Custom Stewart license; unmodified distribution restriction |
+| cdaSQR / SQR | `quantilelassoNET1` | GPL-2.0-only |
+| FEconv | `module_cuthill_mckee_fcnv::cuthill_mckee` | GPL-3.0 root; LGPL ordering-source notice |
+| PSFUN | `psfun_d_krylov_mod::psfun_d_arnoldi` | BSD-3-Clause root notice |
+| Zolo SVD | `ZOLOPD`, `ZoloEig` | No standalone license identified |
+| NScluster | `simThom` | GPL-2.0-or-later package; MT19937 component notice |
+| TikTak | `TiktakGlobalSearch` | MIT root; bundled numerical provenance requires review |
+| SLATEC Modern | `special_functions::DDAWS`, `special_functions::DBETA`, `special_functions::DGAMI`, `special_functions::DBETAI` | Apache-2.0 root and original SLATEC disclaimer |
+| BiCGSTAB and GMRES solver examples | `SOLVERS_base` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -675,6 +683,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [dae4py](https://github.com/jonasbreuling/dae4py) | I1a2 | Vendored implicit DASKR BDF integration | Residual includes CJ; consistent initial conditions, option-specific workspaces and IDID recovery are required. |
 | [faiNumber Fortran](https://github.com/kevinhng86/fainumber-fortran) | A6b; R2 | Decimal parsing, binary formatting and numeric-string syntax validation | ASCII/32-bit assumptions; syntax validity does not imply representable range; inspect conversion error flags. |
 | [Matran](https://github.com/beliavsky/matran) | D6; D5 | Real matrix-type SVD and QR interfaces | SVD padding/success-INFO/query-cleanup findings; QR sliced-array BLAS contracts and pointer lifecycle need validation. |
+| [cdaSQR / SQR](https://github.com/karimoualkacha/cdasqr) | L8c | Smoothed penalized multiple-linear quantile regression | Median sketch; mutable predictors, compressed active coefficients and initialized JERR required. |
+| [FEconv](https://github.com/victorsndvg/feconv) | D2e | Reverse Cuthill-McKee graph/matrix reordering | Private graph kernel; public mesh wrapper needs coordinate INTENT/permutation repairs before use. |
+| [PSFUN](https://github.com/cirdans-home/psfun) | D | Sparse Krylov matrix-function actions | PSBLAS setup; zero-norm/happy-breakdown guards and projected dimensions need validation. |
+| [Zolo SVD](https://github.com/shengguolsg/zolo-svd) | D; D4a1 | Distributed polar decomposition and partial symmetric eigensolving | Inspected ZOLOPD is QDWH; prototype eigensolver omits selected-rank output. |
+| [NScluster](https://github.com/cran/nscluster) | L6b | Thomas clustered spatial point-pattern sampling | Periodic rectangle; mutable density, global RNG and finite parent/offspring capacities. |
+| [TikTak](https://github.com/serdarozkan/tiktak) | G2i | Configuration-driven heuristic multistart global search | Program interface; objective/configuration adaptation and isolated filesystem state required. |
+| [SLATEC Modern](https://github.com/zaneham/slatec) | C8c; C7b; C7e; C7f | Dawson, complete beta and incomplete gamma/beta functions | Modern module includes; normalized versus unnormalized definitions, domain termination and intermediate overflow matter. |
+| [BiCGSTAB and GMRES solver examples](https://github.com/jnsresearcher/solvers_bcgstab_gmres) | D2a4 | CSR BiCGSTAB and unrestarted GMRES | Breakdown guards and exhausted-iteration slices need correction; ITER is not a success certificate. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1252,3 +1268,11 @@ program use, CUTEst evaluation services and sparse/distributed solver setup.
 Matran padding/status/cleanup limitations, EigenExa mode-specific cleanup and
 invalid-metric collective behavior, and legacy workspace/kind/encoding assumptions
 remain explicit; no numerical results or complete API audit are implied.
+
+PSFUN, SOLVERS, FEconv, NScluster, CDASQR, Zolo-SVD, TikTak and the SLATEC
+modernization now have pinned source interfaces and calling sketches. The sketches
+were not compiled or run. Broad classes are retained for matrix-function/polar
+operations and smoothed penalized quantile regression where narrower leaves
+would overstate the inspected algorithms. The review distinguishes program
+entry points from routines, documents prototype solver breakdown/status/rank
+limitations, and keeps component license notices separate from root declarations.

@@ -33882,12 +33882,77 @@
             ],
             "notes": "DESCRIPTION identifies the solution path of penalized quantile regression and compiled code. Particular penalties, smoothing choices and numerical path accuracy require more detailed source and example review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "0b2946cc1759deffabbde6321bd639d0d8eb09de",
+            "reviewed_on": "2026-11-05",
+            "notes": "QUANTILELASSONET1 computes a penalized smooth quantile-regression coefficient path by generalized coordinate descent. At TAUX=0.5 the loss is a smoothed median/L1-regression surrogate; this is not an exact linear-programming LAD fit. C controls smoothing and LAM2 adds a quadratic penalty alongside the lasso path. The wrapper excludes constant/JD-listed columns, centers/scales X in place, clips PF/PF2, calls the path routine and restores coefficient/intercept scale. JD(1) counts excluded indices; IBETA and NBETA encode compressed active coefficients, not a dense NVAR-by-NLAM output. Initialize JERR=0 before entry because allocation statuses are added to it. Positive and negative JERR require inspecting completed NALAM and the path failure convention. Review covers this lasso/median branch, not every SCAD/MCP variant, a statistical selection guarantee or nonsmoothed quantile accuracy. The broad multiple-linear-regression class is retained because a smoothed penalized quantile loss is not an exact unpenalized Lp solver.",
+            "evidence": [
+              {
+                "path": "src/SQR.f90",
+                "url": "https://github.com/KarimOualkacha/cdaSQR/blob/0b2946cc1759deffabbde6321bd639d0d8eb09de/src/SQR.f90",
+                "sha256": "cc19a40dfa2ed4c6ccb424e92939a50513891ba722d80d645c8688cb3f431e80"
+              },
+              {
+                "path": "R/qgcdpathlasso1.R",
+                "url": "https://github.com/KarimOualkacha/cdaSQR/blob/0b2946cc1759deffabbde6321bd639d0d8eb09de/R/qgcdpathlasso1.R",
+                "sha256": "9652c6dac4984965d17570108a2d53c00d31e3726746d5c4013e9549a7dc7967"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/KarimOualkacha/cdaSQR/blob/0b2946cc1759deffabbde6321bd639d0d8eb09de/DESCRIPTION",
+                "sha256": "ef2800cc755bb7c0c64a2c3cb194d33f653eb4e49ed34bed094bf82123133175"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "quantilelassoNET1",
+                "role": "public-entry-point",
+                "summary": "External double-precision smoothed penalized regression-path routine with mutable predictors and penalty factors.",
+                "signature": "CALL quantilelassoNET1(C,TAUX,LAM2,NOBS,NVARS,X,Y,JD,PF,PF2,DFMAX, &\n     PMAX,NLAM,FLMIN,ULAM,EPS,ISD,MAXIT,NALAM,B0,BETA,IBETA,NBETA,ALAM,NPASS,JERR)",
+                "declarations": [
+                  {
+                    "path": "src/SQR.f90",
+                    "line_start": 2021,
+                    "line_end": 2053
+                  }
+                ],
+                "path": "src/SQR.f90",
+                "line_start": 2021,
+                "line_end": 2111,
+                "usage": "! Prepare X(NOBS,NVARS), Y(NOBS), PF/PF2(NVARS), JD(*) with JD(1)=0.\n! Outputs: BETA(PMAX,NLAM), B0/ALAM(NLAM), IBETA(PMAX), NBETA(NLAM).\n! Use nonconstant columns, positive PF/PF2, PMAX=NVARS, DFMAX=NVARS.\n! FLMIN=1 selects the supplied positive descending ULAM(NLAM) values.\njerr=0\ncall quantilelassoNET1(0.1d0,0.5d0,0d0,nobs,nvars,x,y,jd,pf,pf2,dfmax, &\n     pmax,nlam,1d0,ulam,1d-8,1,10000,nalam,b0,beta,ibeta,nbeta,alam,npass,jerr)\n! Check JERR/NALAM, then expand BETA(1:NBETA(L),L) through IBETA.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a post-allocation fragment with the full external argument list, not a standalone fit. Preserve X and penalty inputs, supply compatible double/default-integer arrays, and independently check the smoothed objective and coefficient expansion. No fitted path, convergence or regularization choice was validated."
+              },
+              {
+                "procedure": "quantilelassoNETpath1",
+                "role": "implementation-helper",
+                "path": "src/SQR.f90",
+                "line_start": 1719,
+                "line_end": 2018
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-only",
+          "spdx_expression": "GPL-2.0-only",
+          "revision": "0b2946cc1759deffabbde6321bd639d0d8eb09de",
+          "reviewed_on": "2026-11-05",
+          "notes": "The package DESCRIPTION explicitly declares GPL-2. This scoped declaration does not establish the terms of unrelated linked R or BLAS components.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/KarimOualkacha/cdaSQR/blob/0b2946cc1759deffabbde6321bd639d0d8eb09de/DESCRIPTION",
+              "sha256": "ef2800cc755bb7c0c64a2c3cb194d33f653eb4e49ed34bed094bf82123133175"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35881,12 +35946,106 @@
             ],
             "notes": "The README documents standalone/library Makefiles and several format/element transformations. Conversion and bandwidth operations do not establish a finite-element PDE solver, and exact format coverage needs the detailed help.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2e",
+            "level": "source-reviewed",
+            "revision": "482ff096a86a08975bd1d2770a7ade4eb98fc3e8",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public CUTHILL_MCKEE wrapper dispatches supported tetrahedral mesh connectivity to a private reverse Cuthill-McKee bandwidth-reduction path. GENRCM is explicitly PRIVATE, so it is implementation evidence rather than a callable public graph interface. GENRCM visits connected components, chooses pseudo-peripheral roots through ROOT_FIND and reverses degree-ordered breadth-first traversals through RCM. The wrapper overwrites NN or MM connectivity depending on mesh type; the private reduction builds one-based adjacency and applies an inverse permutation. This is heuristic sparse-matrix reordering, not finite-element solution or guaranteed minimal bandwidth. A source-interface defect remains: CUTHILL_MCKEE_REDUCE declares ZN INTENT(IN) but passes it to R8COL_PERMUTE, whose A dummy has no INTENT and is modified in place; the public wrapper also declares Z input-only. Coordinate permutation/discard behavior and intent contracts need correction before use. Review records this implemented path and public interface without certifying a usable mesh-conversion build. For the higher-order/edge/face paths, the local ZNOD scratch array is passed without initialization; its role and coordinate consistency require investigation.",
+            "evidence": [
+              {
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "url": "https://github.com/victorsndvg/FEconv/blob/482ff096a86a08975bd1d2770a7ade4eb98fc3e8/source/cuthill_mckee/module_cuthill_mckee.f90",
+                "sha256": "e59bbe427ac79dafd98d4e6458b0187f553ac253487a9f388704f509ea68fa95"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cuthill_mckee",
+                "role": "public-entry-point",
+                "module": "module_cuthill_mckee_fcnv",
+                "summary": "Public tetrahedral-connectivity reordering wrapper; the documented coordinate intent/permutation defect needs correction before use.",
+                "signature": "CALL cuthill_mckee(NEL,NNOD,NVER,DIM,LNN,LNV,LNE,LNF,NN,MM,Z)",
+                "declarations": [
+                  {
+                    "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                    "line_start": 65,
+                    "line_end": 78
+                  },
+                  {
+                    "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                    "line_start": 101,
+                    "line_end": 107
+                  }
+                ],
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 101,
+                "line_end": 141,
+                "usage": "use module_cuthill_mckee_fcnv, only: cuthill_mckee\n! After resolving the recorded coordinate INTENT/permutation contracts,\n! prepare a supported tetrahedral mesh and matching FEconv element counts.\n! NN/MM are mutable connectivity arrays; Z contains REAL(real64) coordinates.\ncall cuthill_mckee(nel,nnod,nver,dim,lnn,lnv,lne,lnf,nn,mm,z)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. A post-repair interface illustration, not a ready-to-run graph-ordering example. The supplied GENRCM kernel is private and cannot be imported directly. Build the defining module with basicmod and module_vtu_fcnv dependencies; resolve coordinate INTENT conflicts and verify connectivity/coordinate consistency before interpreting reordered data. No mesh, permutation or bandwidth result was checked."
+              },
+              {
+                "procedure": "cuthill_mckee_reduce",
+                "role": "implementation-helper",
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 146,
+                "line_end": 179
+              },
+              {
+                "procedure": "genrcm",
+                "role": "implementation-helper",
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 1013,
+                "line_end": 1119
+              },
+              {
+                "procedure": "rcm",
+                "role": "implementation-helper",
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 3213,
+                "line_end": 3403
+              },
+              {
+                "procedure": "root_find",
+                "role": "implementation-helper",
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 3405,
+                "line_end": 3604
+              },
+              {
+                "procedure": "r8col_permute",
+                "role": "implementation-helper",
+                "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+                "line_start": 2759,
+                "line_end": 2883
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 root; LGPL ordering-source notice",
+          "spdx_expression": null,
+          "revision": "482ff096a86a08975bd1d2770a7ade4eb98fc3e8",
+          "reviewed_on": "2026-11-05",
+          "notes": "The project root carries GPL version 3, while the inspected Burkardt/George/Liu ordering routines explicitly state GNU LGPL without a version. Keep this mixed component provenance; the ordering-source notice is not replaced by an invented single SPDX expression.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/victorsndvg/FEconv/blob/482ff096a86a08975bd1d2770a7ade4eb98fc3e8/LICENSE",
+              "sha256": "95877d7801ef6982ce90ad9e067a4ca60afe04d111a3c92f278a6ce9465c24df"
+            },
+            {
+              "path": "source/cuthill_mckee/module_cuthill_mckee.f90",
+              "url": "https://github.com/victorsndvg/FEconv/blob/482ff096a86a08975bd1d2770a7ade4eb98fc3e8/source/cuthill_mckee/module_cuthill_mckee.f90",
+              "sha256": "e59bbe427ac79dafd98d4e6458b0187f553ac253487a9f388704f509ea68fa95"
+            }
+          ]
         }
       },
       "imports": {}
@@ -39934,12 +40093,76 @@
             ],
             "notes": "The README describes products f(A)x for large sparse matrices and explicitly warns that the library is under active development with no releases. Individual supported functions, algorithms and numerical behavior need further review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "source-reviewed",
+            "revision": "4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a",
+            "reviewed_on": "2026-11-05",
+            "notes": "PSFUN_D_ARNOLDI approximates a distributed sparse matrix-function action y=f(alpha*A)*x by building an Arnoldi Krylov basis, evaluating the small Hessenberg matrix function through PSFUN_D_SERIAL, and projecting back. The default serial function object selects EXP/EXPOKIT. This is broader matrix-function linear algebra, not merely ordinary matrix-vector multiplication or an explicitly supplied matrix polynomial; the retained class D avoids an unsupported narrower leaf. EPS/ISTOP select estimated stopping behavior, not a certified normwise error bound. The implementation normalizes by the input norm and Arnoldi subdiagonal without a visible zero-input/happy-breakdown guard; projected dimensions and final accumulation require numerical validation. The routine temporarily changes FUN scaling and has a shared error-handler path. Review covers the Arnoldi path, public interface and serial dispatch, not every serial function or rational/Lanczos variant.",
+            "evidence": [
+              {
+                "path": "krylov/polynomial/psfun_d_arnoldi.f90",
+                "url": "https://github.com/Cirdans-Home/psfun/blob/4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a/krylov/polynomial/psfun_d_arnoldi.f90",
+                "sha256": "0a6e7eb17bf3d0e543343050c6ba347db8b1694ababff490f4919b2ba9696c5e"
+              },
+              {
+                "path": "krylov/psfun_d_krylov_mod.F90",
+                "url": "https://github.com/Cirdans-Home/psfun/blob/4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a/krylov/psfun_d_krylov_mod.F90",
+                "sha256": "601c32c6d5cf398d3efe7dcc7d007c213d6ba91806e2304bc01fd7a4c294003f"
+              },
+              {
+                "path": "serial/psfun_d_serial_mod.F90",
+                "url": "https://github.com/Cirdans-Home/psfun/blob/4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a/serial/psfun_d_serial_mod.F90",
+                "sha256": "96c743ce32c9d430970be4b10ac0e6acd49327dbe272a6fbd2b7b133a860772b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "psfun_d_arnoldi",
+                "role": "public-entry-point",
+                "summary": "Public module Arnoldi matrix-function action with PSBLAS sparse matrix/vector/descriptor objects.",
+                "signature": "CALL psfun_d_arnoldi(FUN,A,DESC_A,Y,X,EPS,INFO,ITMAX,ITRACE,ISTOP,ITER,ERR,RES)",
+                "declarations": [
+                  {
+                    "path": "krylov/psfun_d_krylov_mod.F90",
+                    "line_start": 70,
+                    "line_end": 95
+                  },
+                  {
+                    "path": "serial/psfun_d_serial_mod.F90",
+                    "line_start": 43,
+                    "line_end": 61
+                  }
+                ],
+                "path": "krylov/polynomial/psfun_d_arnoldi.f90",
+                "line_start": 37,
+                "line_end": 66,
+                "module": "psfun_d_krylov_mod",
+                "usage": "use psb_base_mod\nuse psfun_d_serial_mod, only: psfun_d_serial\nuse psfun_d_krylov_mod, only: psfun_d_arnoldi\ntype(psfun_d_serial) :: fun\n! Initialize PSBLAS context, descriptor, assembled sparse A and vectors X/Y.\n! X must be nonzero; select a problem without immediate Arnoldi breakdown.\ncall psfun_d_arnoldi(fun,a,desc_a,y,x,eps,info,itmax=20,iter=iterations,err=estimate)\n! Check INFO and compare Y with an independent matrix-exponential action.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-assembly fragment using the default EXP/EXPOKIT object and PSBLAS kinds for EPS/INFO/ITERATIONS/ESTIMATE. Link the configured PSFUN and PSBLAS dependencies. Investigate zero norm, happy breakdown, projected dimensions and scaling restoration before relying on results. No matrix-function accuracy or parallel layout was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root notice",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root gives the three-condition BSD grant and credits Fabio Durastante. Included EXPOKIT, PSBLAS and other optional numerical dependencies need their own notices; this is a scoped root-license finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Cirdans-Home/psfun/blob/4610be8c010de4c9240f9a6c7a88ac02b2bd6d7a/LICENSE",
+              "sha256": "5daba8b1ccc8efb18d88e93e64620f65dbefd8f2b5ccc96ceef4e7c3b3d1d3fd"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41038,12 +41261,126 @@
             ],
             "notes": "The README identifies QDWH-PD/QDWH-SVD and Zolo-PD/Zolo-SVD and an ELPA 2016 dependency, plus modified ScaLAPACK QR routines. Its comparative performance claim and compatibility with newer ELPA releases were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D",
+            "level": "source-reviewed",
+            "revision": "510c03c88b0634ae2b991b1ec3f3577732104afa",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external routine named ZOLOPD in zolopd.f90 actually implements QR-based dynamically weighted Halley polar iteration, with a Cholesky/positive solve branch once the iterate is sufficiently conditioned. It is distinct from PZOLOPD1, which dispatches Zolotarev coefficients and communicator-split rational work. This mapping records matrix polar decomposition under broad linear algebra D, not QR as an end product or a singular-value decomposition inferred from the repository name. Although the header permits M>=N, important operations use N-by-N dimensions, so the sketch is deliberately square. POLAR=T additionally forms the symmetrized Q-transpose*A factor in WORK2. Descriptor layouts, local leading dimensions, two workspace buffers and BLACS/MPI initialization are prerequisites. Error state is overwritten across dependency calls and the main loop has no visible hard iteration cap. Source review is not a polar residual or distributed convergence check.",
+            "evidence": [
+              {
+                "path": "zolopd.f90",
+                "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/zolopd.f90",
+                "sha256": "1c42663d4f00f39de5889f72dc7a3723d6d5812684cdd208a50aa595395f7933"
+              },
+              {
+                "path": "hfunc.f90",
+                "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/hfunc.f90",
+                "sha256": "add90b397f257a85c9150e2f881f47419af3da2b8bfd84dc07de5522ceebb27d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/README.md",
+                "sha256": "e49247bb74e1495f6612a3b5fec055bef99f0f4e211a4f2e960c59e794ce6511"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZOLOPD",
+                "role": "public-entry-point",
+                "summary": "External distributed real square polar-factor driver in this inspected QDWH implementation.",
+                "signature": "CALL ZOLOPD(M,N,SIGMA,A,IA,JA,DESCA,Q,IQ,JQ,DESCQ,WORK,LWORK,DESCW,TAU,WORK2,LWORK2,INFO,POLAR)",
+                "declarations": [
+                  {
+                    "path": "zolopd.f90",
+                    "line_start": 2,
+                    "line_end": 19
+                  }
+                ],
+                "path": "zolopd.f90",
+                "line_start": 2,
+                "line_end": 19,
+                "usage": "external :: ZOLOPD\n! Initialize MPI/BLACS, square full-rank real A, Q and compatible descriptors.\n! Allocate/query both workspaces and TAU according to the defining routine.\n! DESCW describes the stacked 2*N-by-N QR workspace.\ncall ZOLOPD(n,n,0d0,a,1,1,desca,q,1,1,descq,work,lwork,descw,tau,work2,lwork2,info,\"T\")\n! Inspect INFO and independently check A_original-Q*H and Q-transpose*Q.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup collective-call fragment with zero shift and square storage. H is in WORK2 on the POLAR=T path; workspace-query semantics and all descriptors need validation against this prototype. No distributed factorization, iteration or accuracy was tested."
+              }
+            ]
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "510c03c88b0634ae2b991b1ec3f3577732104afa",
+            "reviewed_on": "2026-11-05",
+            "notes": "ZOLOEIG computes a partial real symmetric eigendecomposition given a polar factor of A-sigma*I. PQDWHSUBIT subtracts I and halves Q, estimates the projector rank from its squared Frobenius norm, forms a randomized invariant subspace and compressed matrix, then ZOLOEIG calls PDSYEVD and back-transforms selected vectors. The executable projector is (Q-I)/2 despite a nearby comment saying (Q+I)/2, so do not infer a selected side from the comment alone. The computed RK is local and printed rather than returned by ZOLOEIG; callers cannot safely infer the number of valid returned eigenpairs from INFO alone. Q/AS/work buffers are overwritten. Subspace iteration has a two-step limit, and downstream INFO overwrites require review. This is prototype subset-symmetric functionality, not full-spectrum, nonsymmetric or generalized eigensolving.",
+            "evidence": [
+              {
+                "path": "ZoloEig.f90",
+                "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/ZoloEig.f90",
+                "sha256": "92d36a200ef11304e46755c609fef25f221e9d9f44d8e1efe0ae07e25271b3e6"
+              },
+              {
+                "path": "pqdwhsubit.f90",
+                "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/pqdwhsubit.f90",
+                "sha256": "6b1fe8461a534bcc1a4e846306f3c95a6fe10f39aa0cdde00850b50333cdd0ed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZoloEig",
+                "role": "public-entry-point",
+                "summary": "External distributed partial symmetric eigensolver requiring an already computed polar factor.",
+                "signature": "CALL ZoloEig(N,NBLK,Q,AS,CONTXT,MPI_NEWCOMM,WORK,LWORK,WORK2,LWORK2,TAU,INFO)",
+                "declarations": [
+                  {
+                    "path": "ZoloEig.f90",
+                    "line_start": 2,
+                    "line_end": 9
+                  }
+                ],
+                "path": "ZoloEig.f90",
+                "line_start": 2,
+                "line_end": 110,
+                "usage": "external :: ZoloEig\n! MPI/BLACS setup, matching block-cyclic AS and its shifted polar Q prepared.\n! WORK/WORK2/TAU and local dimensions satisfy the implementation workspace contract.\ncall ZoloEig(n,nblk,q,a,context,comm,work,lwork,work2,lwork2,tau,info)\n! Adapt the interface to return RK before interpreting TAU and WORK eigenpairs.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface illustration only: the absent RK output needs resolution before writing a safe consumer. Preserve the original matrix for independent residuals and resolve the projector-side/comment discrepancy. No rank, subspace, eigenpair or MPI-grid case was tested."
+              },
+              {
+                "procedure": "PQDWHSUBIT",
+                "role": "implementation-helper",
+                "path": "pqdwhsubit.f90",
+                "line_start": 2,
+                "line_end": 316
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No standalone license identified",
+          "spdx_expression": null,
+          "revision": "510c03c88b0634ae2b991b1ec3f3577732104afa",
+          "reviewed_on": "2026-11-05",
+          "notes": "No standalone LICENSE/COPYING file appears in the pinned tree and no redistribution grant was identified in these reviewed files. Algorithm descriptions and institutional source headers are not themselves a license; third-party ScaLAPACK/MPI components have separate notices.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/README.md",
+              "sha256": "e49247bb74e1495f6612a3b5fec055bef99f0f4e211a4f2e960c59e794ce6511"
+            },
+            {
+              "path": "zolopd.f90",
+              "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/zolopd.f90",
+              "sha256": "1c42663d4f00f39de5889f72dc7a3723d6d5812684cdd208a50aa595395f7933"
+            },
+            {
+              "path": "ZoloEig.f90",
+              "url": "https://github.com/shengguolsg/Zolo-SVD/blob/510c03c88b0634ae2b991b1ec3f3577732104afa/ZoloEig.f90",
+              "sha256": "92d36a200ef11304e46755c609fef25f221e9d9f44d8e1efe0ae07e25271b3e6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41546,12 +41883,85 @@
             ],
             "notes": "DESCRIPTION identifies model extensions and optional OpenMP computation for simplex parameter estimation. This is statistical point-process clustering, not a general-purpose geometric mesh clusterer; particular likelihood and inference properties remain unchecked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6b",
+            "level": "source-reviewed",
+            "revision": "a32b98e885569bab1536544af81a22709e92a474",
+            "reviewed_on": "2026-11-05",
+            "notes": "SIMTHOM simulates a Thomas/Neyman-Scott clustered spatial point pattern: Poisson parent count, uniform parents in a width-one/height-TY rectangle, Poisson offspring counts, and Box-Muller Gaussian offspring offsets. Offspring coordinates are wrapped periodically into the rectangle. The class records joint spatial sampling rather than independent univariate draws or an unbounded-window model. AMU is overwritten by AMU*TY; use a fresh density value on each call. NPTS counts parents, and NCL(i) counts offspring of parent i. IER=-1 reports parent-capacity overflow; IER=-2 reports an offspring row exceeding NMAX, leaving only partial outputs. Only initialized rows/columns are meaningful. The external RNG INIT/RANDOM and POIS support are required. Review covers the simulation path, not parameter estimation, reproducibility across R builds or goodness of fit.",
+            "evidence": [
+              {
+                "path": "src/Simulate-Thomasf.f",
+                "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/src/Simulate-Thomasf.f",
+                "sha256": "76f04c9de0f5747030fde858762a49eee93ee422e6fbd3a1442a87e98f896ae9"
+              },
+              {
+                "path": "src/comsub.f",
+                "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/src/comsub.f",
+                "sha256": "99aa754ca998b38d8cf10adf6badbbc503d8ae79a9e01be4241c201ecd27cf4e"
+              },
+              {
+                "path": "src/mt19937-64.c",
+                "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/src/mt19937-64.c",
+                "sha256": "f52a570423d5a9ae9d6167addb2e4f7bf76bd459f44d635e573b9c4ed5ef643b"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/DESCRIPTION",
+                "sha256": "7ab9c79193d590096c64b06bff2d419664d2be21a273f97ac1c536381b93b97e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "simThom",
+                "role": "public-entry-point",
+                "summary": "External double-precision clustered spatial sampler with bounded-capacity two-dimensional offspring arrays.",
+                "signature": "CALL simThom(IX,TY,AMU,ANU,SIG,NPTS,NCL,X,Y,XCL,YCL,MMAX,NMAX,IER)",
+                "declarations": [
+                  {
+                    "path": "src/Simulate-Thomasf.f",
+                    "line_start": 2,
+                    "line_end": 18
+                  }
+                ],
+                "path": "src/Simulate-Thomasf.f",
+                "line_start": 2,
+                "line_end": 103,
+                "usage": "integer,parameter :: mmax=100,nmax=100\ninteger :: seed,nparents,nchild(mmax),ier\ndouble precision :: height,density,meanchild,sigma\ndouble precision :: x(mmax),y(mmax),xc(mmax,nmax),yc(mmax,nmax)\nseed=12345; height=1d0; density=10d0; meanchild=3d0; sigma=0.05d0\ncall simThom(seed,height,density,meanchild,sigma,nparents,nchild,x,y,xc,yc,mmax,nmax,ier)\nif(ier/=0) error stop \"simulation capacity exceeded\"\n! Offspring of parent I occupy XC(I,1:NCHILD(I)), YC(I,1:NCHILD(I)).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the package Poisson and C MT19937 support with the expected Fortran symbol/seed ABI. Positive height and nonnegative distribution parameters are caller prerequisites. Capacity is probabilistic, AMU is mutable, and the routine seeds global RNG state. No sample distribution, boundary case or reproducibility was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later package; MT19937 component notice",
+          "spdx_expression": null,
+          "revision": "a32b98e885569bab1536544af81a22709e92a474",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>= 2), COPYRIGHTS names the statistical-code authors, and the C RNG retains a separate redistribution notice. Preserve component notices rather than implying a single original author or blanket license audit.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/DESCRIPTION",
+              "sha256": "7ab9c79193d590096c64b06bff2d419664d2be21a273f97ac1c536381b93b97e"
+            },
+            {
+              "path": "src/mt19937-64.c",
+              "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/src/mt19937-64.c",
+              "sha256": "f52a570423d5a9ae9d6167addb2e4f7bf76bd459f44d635e573b9c4ed5ef643b"
+            },
+            {
+              "path": "inst/COPYRIGHTS",
+              "url": "https://github.com/cran/NScluster/blob/a32b98e885569bab1536544af81a22709e92a474/inst/COPYRIGHTS",
+              "sha256": "32b4ebeb40dcac6b5841b25e713fadddc5748f4675d7a05a30c13d1e76e28d8e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45183,12 +45593,104 @@
             ],
             "notes": "The README describes restart searches and file-coordinated parallel instances and acknowledges concurrent-file-access hazards. Strong scaling and reliability claims are upstream reports; global optimality and cross-machine coordination were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "16ac0d961450bbd4e1c87634a02af4481b75ac7a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied TikTak program performs heuristic multistart global minimization: evaluate/rank Sobol starts, blend later starts with a best or rank-weighted lottery point, run a selected local method, and coordinate progress through filesystem state/checkpoints. It is a program/configuration-file workflow, not a public TIKTAK subroutine. The selected a mode uses scalar OBJFUNC with AMOEBA; the default b mode instead requires residual callback DFOVEC, and d uses a gradient-based local optimizer. The blending weight is clipped between 0.10 and 0.95. Cold and warm starts have different command-line layouts. Isolate working directories because state/control files coordinate workers; no MPI or OpenMP API is required by that orchestration. Neither finite multistart coverage nor a local convergence message proves a global minimum. Review covers program control, start modification and AMOEBA dispatch, not all local kernels or synchronization correctness.",
+            "evidence": [
+              {
+                "path": "TiktakGlobalSearch.f90",
+                "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/TiktakGlobalSearch.f90",
+                "sha256": "4346d0a7776b4881eb996aa7764d32aaecf85bfdfe0623c683d420c34cd9c25c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/README.md",
+                "sha256": "2775b78e5c15b76adde96d743b66cb82570bff43382ec2f2a5694a029e2141e8"
+              },
+              {
+                "path": "minimize.f90",
+                "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/minimize.f90",
+                "sha256": "cd04a73c47e1b89f684719c79dd74b985bd7d9540a68928a113be6d675301bc1"
+              },
+              {
+                "path": "genericParams.f90",
+                "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/genericParams.f90",
+                "sha256": "72ef5a312d5ce6cd63a670eea2961958a1d9c1a3f1c30c0bca91fcd471dfd6f4"
+              },
+              {
+                "path": "config.txt",
+                "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/config.txt",
+                "sha256": "31efb2754b22081cc874c0c0a0183f1bba898779d4cff15dfd63a5434dacd559"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TiktakGlobalSearch",
+                "role": "program-entry-point",
+                "summary": "Supplied configuration-driven global-search executable; source contains internal helper procedures.",
+                "signature": "TiktakGlobalSearch 0 CONFIGFILE a\nTiktakGlobalSearch 1 a",
+                "declarations": [
+                  {
+                    "path": "TiktakGlobalSearch.f90",
+                    "line_start": 1150,
+                    "line_end": 1190
+                  },
+                  {
+                    "path": "README.md",
+                    "line_start": 75,
+                    "line_end": 84
+                  }
+                ],
+                "path": "TiktakGlobalSearch.f90",
+                "line_start": 1,
+                "line_end": 35,
+                "usage": "# After linking your scalar OBJFUNC and matching dimensions/bounds in CONFIGFILE,\n# run the cold start in an isolated working directory:\n./TiktakGlobalSearch 0 config.txt a\n# Additional workers use the existing state and warm-start layout:\n# ./TiktakGlobalSearch 1 a",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Shell invocation sketch only. Adapt the author configuration and objective, link all required modules, and preserve state files for intended restarts. This is not a callable library interface or a checked optimizer benchmark. No search, objective value or parallel restart was run."
+              },
+              {
+                "procedure": "getModifiedParam",
+                "role": "implementation-helper",
+                "path": "TiktakGlobalSearch.f90",
+                "line_start": 683,
+                "line_end": 720
+              },
+              {
+                "procedure": "runAmoeba",
+                "role": "implementation-helper",
+                "path": "TiktakGlobalSearch.f90",
+                "line_start": 602,
+                "line_end": 633
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; bundled numerical provenance requires review",
+          "spdx_expression": null,
+          "revision": "16ac0d961450bbd4e1c87634a02af4481b75ac7a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root gives MIT terms for the TikTak project. The bundled local-optimizer file uses legacy Numerical-Recipes-style interfaces and additional solver code; this scoped root finding is not a complete clearance of every copied local routine or linked dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/LICENSE",
+              "sha256": "806c3f3e39de556588754ec0874f7bdd99d8272fe3021163b76666142a6126ac"
+            },
+            {
+              "path": "minimize.f90",
+              "url": "https://github.com/serdarozkan/TikTak/blob/16ac0d961450bbd4e1c87634a02af4481b75ac7a/minimize.f90",
+              "sha256": "cd04a73c47e1b89f684719c79dd74b985bd7d9540a68928a113be6d675301bc1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -47844,12 +48346,216 @@
             ],
             "notes": "The README explicitly lists these top-level GAMS divisions. Its comprehensive-modernization, historical-compiler and numerical-correctness claims have not been independently reproduced; accelerator work is not treated as completed coverage.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C8c",
+            "level": "source-reviewed",
+            "revision": "c4cfb44c9d122e3478731f07343abf76e9d93339",
+            "reviewed_on": "2026-11-05",
+            "notes": "Piecewise Chebyshev expansions and large-argument asymptotics implement the real Dawson integral. The routine returns zero beyond its large representable-argument threshold and has no user tolerance or recoverable status output. This is the modernized special_functions module implementation with service-module DP kinds and include files, not a numerical revalidation of the original SLATEC release. Invalid domains use ERROR STOP in the checked beta/gamma branches rather than a recoverable INFO argument. Review covers the selected function and visible dispatch; no complete dependency, rounding-error or cross-compiler audit was performed.",
+            "evidence": [
+              {
+                "path": "src/modern/special_functions/ddaws.inc",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/ddaws.inc",
+                "sha256": "0089bf6e5ea051f8a08ecea48e1b2119d5f4216c701ebc97d5a27b6e79140f2b"
+              },
+              {
+                "path": "src/modern/special_functions/special_functions.f90",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/special_functions.f90",
+                "sha256": "5ccf50271f24d67ee09d96f8538db974ee72659c56953ae1275c94652bb42bff"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DDAWS",
+                "role": "public-entry-point",
+                "summary": "Dawson integral exp(-x*x)*integral(0,x,exp(t*t)dt). Public elemental REAL(DP) module function.",
+                "signature": "VALUE = DDAWS(X)",
+                "declarations": [
+                  {
+                    "path": "src/modern/special_functions/ddaws.inc",
+                    "line_start": 2,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "src/modern/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/modern/special_functions/ddaws.inc",
+                "line_start": 2,
+                "line_end": 152,
+                "module": "special_functions",
+                "usage": "use service, only: DP\nuse special_functions, only: DDAWS\nreal(DP) :: value\nvalue=ddaws(1.0_DP)\n! Compare against an independent reference before using sensitive tail values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete modern module with its include files and matching service kinds; extracting this include alone is insufficient. Domain errors may terminate the process. No sample value, asymptotic limit or error estimate was checked."
+              }
+            ]
+          },
+          {
+            "code": "C7b",
+            "level": "source-reviewed",
+            "revision": "c4cfb44c9d122e3478731f07343abf76e9d93339",
+            "reviewed_on": "2026-11-05",
+            "notes": "Positive arguments are required. The implementation uses intrinsic GAMMA products for moderate A+B and a DLBETA logarithmic branch for larger sums, returning zero on the explicit underflow branch. Intermediate overflow at extreme unbalanced arguments still needs investigation. This is the modernized special_functions module implementation with service-module DP kinds and include files, not a numerical revalidation of the original SLATEC release. Invalid domains use ERROR STOP in the checked beta/gamma branches rather than a recoverable INFO argument. Review covers the selected function and visible dispatch; no complete dependency, rounding-error or cross-compiler audit was performed.",
+            "evidence": [
+              {
+                "path": "src/modern/special_functions/dbeta.inc",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/dbeta.inc",
+                "sha256": "ff568c63f8f0d58be64ad2b9c7993c98ceb724bb3a8135b7cd0ef856db671310"
+              },
+              {
+                "path": "src/modern/special_functions/special_functions.f90",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/special_functions.f90",
+                "sha256": "5ccf50271f24d67ee09d96f8538db974ee72659c56953ae1275c94652bb42bff"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DBETA",
+                "role": "public-entry-point",
+                "summary": "Complete beta function for positive real arguments. Public elemental REAL(DP) module function.",
+                "signature": "VALUE = DBETA(A,B)",
+                "declarations": [
+                  {
+                    "path": "src/modern/special_functions/dbeta.inc",
+                    "line_start": 2,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "src/modern/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/modern/special_functions/dbeta.inc",
+                "line_start": 2,
+                "line_end": 55,
+                "module": "special_functions",
+                "usage": "use service, only: DP\nuse special_functions, only: DBETA\nreal(DP) :: value\nvalue=dbeta(2.0_DP,3.0_DP)\n! Compare against an independent reference before using sensitive tail values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete modern module with its include files and matching service kinds; extracting this include alone is insufficient. Domain errors may terminate the process. No sample value, asymptotic limit or error estimate was checked."
+              }
+            ]
+          },
+          {
+            "code": "C7e",
+            "level": "source-reviewed",
+            "revision": "c4cfb44c9d122e3478731f07343abf76e9d93339",
+            "reviewed_on": "2026-11-05",
+            "notes": "This is the unregularized lower integral from zero to X, not the regularized P(a,x) or upper complement. A must be positive and X nonnegative. It multiplies DGAMIT by EXP(LOG_GAMMA(A)+A*LOG(X)); that intermediate factor can overflow even when cancellation/scaling would produce a representable result. This is the modernized special_functions module implementation with service-module DP kinds and include files, not a numerical revalidation of the original SLATEC release. Invalid domains use ERROR STOP in the checked beta/gamma branches rather than a recoverable INFO argument. Review covers the selected function and visible dispatch; no complete dependency, rounding-error or cross-compiler audit was performed.",
+            "evidence": [
+              {
+                "path": "src/modern/special_functions/dgami.inc",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/dgami.inc",
+                "sha256": "0996edf333b7288ebe6d6ada2f6d481cbce57eefcfcaabbbb35c38383056e6ef"
+              },
+              {
+                "path": "src/modern/special_functions/special_functions.f90",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/special_functions.f90",
+                "sha256": "5ccf50271f24d67ee09d96f8538db974ee72659c56953ae1275c94652bb42bff"
+              },
+              {
+                "path": "src/modern/special_functions/dgamit.inc",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/dgamit.inc",
+                "sha256": "9b5d970c0e203fff01e83791efaaaa3fa72c4dddac287a5bc25efd0c7a80509c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DGAMI",
+                "role": "public-entry-point",
+                "summary": "Unregularized lower incomplete gamma integral. Public elemental REAL(DP) module function.",
+                "signature": "VALUE = DGAMI(A,X)",
+                "declarations": [
+                  {
+                    "path": "src/modern/special_functions/dgami.inc",
+                    "line_start": 2,
+                    "line_end": 52
+                  },
+                  {
+                    "path": "src/modern/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/modern/special_functions/dgami.inc",
+                "line_start": 2,
+                "line_end": 52,
+                "module": "special_functions",
+                "usage": "use service, only: DP\nuse special_functions, only: DGAMI\nreal(DP) :: value\nvalue=dgami(2.0_DP,1.0_DP)\n! Compare against an independent reference before using sensitive tail values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete modern module with its include files and matching service kinds; extracting this include alone is insufficient. Domain errors may terminate the process. No sample value, asymptotic limit or error estimate was checked."
+              }
+            ]
+          },
+          {
+            "code": "C7f",
+            "level": "source-reviewed",
+            "revision": "c4cfb44c9d122e3478731f07343abf76e9d93339",
+            "reviewed_on": "2026-11-05",
+            "notes": "The function is the normalized incomplete beta ratio for X in [0,1] and positive shape parameters. It swaps tails where indicated, uses infinite/finite sums and DLBETA scaling, then clips the ordinary branch to [0,1]. Clipping does not certify tail-relative accuracy. This is the modernized special_functions module implementation with service-module DP kinds and include files, not a numerical revalidation of the original SLATEC release. Invalid domains use ERROR STOP in the checked beta/gamma branches rather than a recoverable INFO argument. Review covers the selected function and visible dispatch; no complete dependency, rounding-error or cross-compiler audit was performed.",
+            "evidence": [
+              {
+                "path": "src/modern/special_functions/dbetai.inc",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/dbetai.inc",
+                "sha256": "72c9817eac53aaf37b3816bfcfa4aed06810450da78c321430c71c09af470168"
+              },
+              {
+                "path": "src/modern/special_functions/special_functions.f90",
+                "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/src/modern/special_functions/special_functions.f90",
+                "sha256": "5ccf50271f24d67ee09d96f8538db974ee72659c56953ae1275c94652bb42bff"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DBETAI",
+                "role": "public-entry-point",
+                "summary": "Regularized incomplete beta ratio. Public elemental REAL(DP) module function.",
+                "signature": "VALUE = DBETAI(X,PIN,QIN)",
+                "declarations": [
+                  {
+                    "path": "src/modern/special_functions/dbetai.inc",
+                    "line_start": 2,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "src/modern/special_functions/special_functions.f90",
+                    "line_start": 4,
+                    "line_end": 6
+                  }
+                ],
+                "path": "src/modern/special_functions/dbetai.inc",
+                "line_start": 2,
+                "line_end": 129,
+                "module": "special_functions",
+                "usage": "use service, only: DP\nuse special_functions, only: DBETAI\nreal(DP) :: value\nvalue=dbetai(0.5_DP,2.0_DP,3.0_DP)\n! Compare against an independent reference before using sensitive tail values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete modern module with its include files and matching service kinds; extracting this include alone is insufficient. Domain errors may terminate the process. No sample value, asymptotic limit or error estimate was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0 root and original SLATEC disclaimer",
+          "spdx_expression": null,
+          "revision": "c4cfb44c9d122e3478731f07343abf76e9d93339",
+          "reviewed_on": "2026-11-05",
+          "notes": "The modernized repository root contains Apache License 2.0, while DISCLAIMER preserves the original government/SLATEC no-warranty and use-at-own-risk notice. Record both rather than implying the modernization license establishes one authorship or verifies every inherited algorithm.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/LICENSE",
+              "sha256": "bb202ce9bb8f66145b9b24156fc1583c39187238c6ac842ead4297353d570340"
+            },
+            {
+              "path": "DISCLAIMER",
+              "url": "https://github.com/Zaneham/SLATEC/blob/c4cfb44c9d122e3478731f07343abf76e9d93339/DISCLAIMER",
+              "sha256": "f2421afdb3cd3dcfdf03901dc4ec58971647ad996cef6ecad93566cd154da349"
+            }
+          ]
         }
       },
       "imports": {}
@@ -49474,12 +50180,79 @@
             ],
             "notes": "The README distinguishes basic sparse Ax=B solvers from three-dimensional field examples using Laplace and curl-curl operators. General PDE boundary-condition coverage or convergence for arbitrary matrices is not established by this overview.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "cfa05dadbfc671503833e4cba12770d7ee0607ae",
+            "reviewed_on": "2026-11-05",
+            "notes": "SOLVERS_BASE dispatches real sparse square linear systems in one-based CSR storage to BCGSTAB or unrestarted GMRES. ITOL=1 compares relative residual to the RHS norm, while ITOL=2 uses an absolute norm. X is both the starting guess and returned approximation; ITER is not a comprehensive success status. The BCGSTAB path has no visible denominator/breakdown or early-small-S safeguard. GMRES divides by the initial residual and Arnoldi subdiagonal without happy-breakdown handling, forms a Hessenberg inverse rather than a triangular backsolve, and can use ITER=ITMAX+1 in array slices after loop exhaustion. These limitations prevent treating the calling sketch as a checked solver example. Review covers both iteration branches and CSR matvec/inverse helpers, not reliability or convergence for arbitrary matrices.",
+            "evidence": [
+              {
+                "path": "SOLVERS/src/SOLVERS_base.f90",
+                "url": "https://github.com/JNSresearcher/SOLVERS_BCGSTAB_GMRES/blob/cfa05dadbfc671503833e4cba12770d7ee0607ae/SOLVERS/src/SOLVERS_base.f90",
+                "sha256": "b473b9c1686b5eee0f4a96c0b35879bf1b3297dd9b329c9efa0a5ffd17f3ae37"
+              },
+              {
+                "path": "SOLVERS/src/utilites.f90",
+                "url": "https://github.com/JNSresearcher/SOLVERS_BCGSTAB_GMRES/blob/cfa05dadbfc671503833e4cba12770d7ee0607ae/SOLVERS/src/utilites.f90",
+                "sha256": "3d09cbe8edda264d1aa4c6d37dfc4717d1fdb4b019e52deb3d3dbe7dd87406ea"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SOLVERS_base",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) CSR iterative solver with a case-sensitive method selector.",
+                "signature": "CALL SOLVERS_base(VALA,IROW,JCOL,N,X,B,SOLV,TOLERANCE,ITOL,ITMAX,ITER)",
+                "declarations": [
+                  {
+                    "path": "SOLVERS/src/SOLVERS_base.f90",
+                    "line_start": 16,
+                    "line_end": 39
+                  }
+                ],
+                "path": "SOLVERS/src/SOLVERS_base.f90",
+                "line_start": 1,
+                "line_end": 39,
+                "usage": "external :: SOLVERS_base\n! One-based CSR: IROW(N+1), JCOL(NNZ), REAL(8) VALA(NNZ).\n! Initialize REAL(8) X(N), B(N), with nonzero B and a nontrivial initial residual.\ncall SOLVERS_base(vala,irow,jcol,n,x,b,\"BCGSTAB\",1d-8,1,100,iterations)\n! Independently recompute B-A*X; ITER alone is not a convergence certificate.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link SOLVERS_base and the utility routines. This storage/call fragment intentionally does not promise a convergent test case. Review/fix the recorded breakdown and iteration-exhaustion paths before production use. Neither BCGSTAB nor GMRES was executed."
+              },
+              {
+                "procedure": "sprsAx",
+                "role": "implementation-helper",
+                "path": "SOLVERS/src/utilites.f90",
+                "line_start": 26,
+                "line_end": 40
+              },
+              {
+                "procedure": "invers",
+                "role": "implementation-helper",
+                "path": "SOLVERS/src/utilites.f90",
+                "line_start": 43,
+                "line_end": 67
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "cfa05dadbfc671503833e4cba12770d7ee0607ae",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root LICENSE grants MIT terms; linked or separately supplied numerical libraries retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JNSresearcher/SOLVERS_BCGSTAB_GMRES/blob/cfa05dadbfc671503833e4cba12770d7ee0607ae/LICENSE",
+              "sha256": "16aa4699f1b79fb3ac27173bb2519e6586608feb89cabdca109b834c83c1e426"
+            }
+          ]
         }
       },
       "imports": {}

@@ -582,6 +582,12 @@
       "parent": "A6",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "D2e": {
+      "label": "Associated operations (e.g., matrix reorderings)",
+      "parent": "D2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
