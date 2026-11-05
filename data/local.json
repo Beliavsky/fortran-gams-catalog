@@ -8858,12 +8858,170 @@
             ],
             "notes": "The mpfun90.f90 documentation identifies the multiple-precision package. The README explicitly recommends a newer MPFUN version; this entry records the legacy snapshot without presenting it as the preferred current release.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "A3c",
+            "level": "source-reviewed",
+            "revision": "137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MP_REAL type and overloaded real addition use multiword mantissas with an active precision set by MPINIT. The real-plus-real specific dispatches MPADD, which aligns exponents, combines signed mantissa words and calls MPNORM. The fixed type capacity is derived from MPIPL=2005 decimal digits; MPINIT(N_MPIPL) selects an active precision no greater than that capacity and prepares constants/state. Use MPMODULE for the user-facing generics rather than private MP_ADDQQ. This selected addition mapping establishes extended real arithmetic support, not interval bounds, correct rounding of all operations or a complete arbitrary-precision API audit. Global precision/error state and legacy REAL*4/REAL*8 storage assumptions affect build compatibility; avoid default-kind promotion flags.",
+            "evidence": [
+              {
+                "path": "mpmod90.f90",
+                "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/mpmod90.f90",
+                "sha256": "b6bf98388bbb4e00a4f8f71c45c1e6cff939d31b775e4cb9a27eb16d65d3cfcd"
+              },
+              {
+                "path": "mpfun90.f90",
+                "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/mpfun90.f90",
+                "sha256": "ffab5216354e39cb2ce2136a5704867138c962723d52ea96f849fc1c836ef4ed"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/Makefile",
+                "sha256": "86f970efa1a3303c15a66e8d7cdc399a271c19db33354d5e0f93076f9b2cd901"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "operator(+)",
+                "role": "public-entry-point",
+                "summary": "Public overloaded operator; the inspected signature is MP_REAL plus MP_REAL returning MP_REAL. Import through MPMODULE or MPREALMOD.",
+                "signature": "C = A + B ! A,B,C are TYPE(MP_REAL)",
+                "declarations": [
+                  {
+                    "path": "mpmod90.f90",
+                    "line_start": 59,
+                    "line_end": 62
+                  },
+                  {
+                    "path": "mpmod90.f90",
+                    "line_start": 3280,
+                    "line_end": 3288
+                  }
+                ],
+                "path": "mpmod90.f90",
+                "line_start": 3024,
+                "line_end": 3034,
+                "module": "mprealmod",
+                "usage": "use mpmodule\ntype(mp_real) :: a,b,c\ncall mpinit(100)\na=\"0.1\"; b=\"0.2\"\nc=a+b\ncall mpwrite(6,c)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Initialize before using constants or arithmetic. Decimal strings avoid first rounding the inputs to ordinary binary floating point. Compile the MPFUN modules in dependency order without globally promoting their internal default REAL storage. The source has shared error/precision state and can stop on errors. No decimal digits or rounding bound was verified."
+              },
+              {
+                "procedure": "mpinit",
+                "role": "public-entry-point",
+                "summary": "Public initialization of active precision and constants; optional digit count is limited by fixed MPIPL capacity.",
+                "signature": "CALL mpinit(N_MPIPL)",
+                "declarations": [
+                  {
+                    "path": "mpmod90.f90",
+                    "line_start": 72,
+                    "line_end": 83
+                  }
+                ],
+                "path": "mpmod90.f90",
+                "line_start": 72,
+                "line_end": 131,
+                "module": "mpdefmod"
+              },
+              {
+                "procedure": "mp_addqq",
+                "role": "implementation-helper",
+                "path": "mpmod90.f90",
+                "line_start": 3280,
+                "line_end": 3289,
+                "module": "mprealmod"
+              },
+              {
+                "procedure": "mpadd",
+                "role": "implementation-helper",
+                "path": "mpfun90.f90",
+                "line_start": 456,
+                "line_end": 612,
+                "module": "mpfunmod"
+              }
+            ]
+          },
+          {
+            "code": "C4b",
+            "level": "source-reviewed",
+            "revision": "137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public EXP generic selects a TYPE(MP_REAL) adapter which calls MPEXP with precomputed log(2) and active precision. The inspected core reduces by log(2), evaluates a Taylor series at the scaled argument, repeatedly squares and restores the binary exponent. It checks shared error state, argument magnitude and iteration count; documentation warns that the last result word is unreliable. C4b records the extended-precision real exponential subset, not every logarithmic or complex branch. MPINIT is required before use and errors may invoke the configured abort policy. No correctly rounded result or high-precision reference comparison was run.",
+            "evidence": [
+              {
+                "path": "mpmod90.f90",
+                "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/mpmod90.f90",
+                "sha256": "b6bf98388bbb4e00a4f8f71c45c1e6cff939d31b775e4cb9a27eb16d65d3cfcd"
+              },
+              {
+                "path": "mpfun90.f90",
+                "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/mpfun90.f90",
+                "sha256": "ffab5216354e39cb2ce2136a5704867138c962723d52ea96f849fc1c836ef4ed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "exp",
+                "role": "public-entry-point",
+                "summary": "Public intrinsic extension for a multiprecision real argument; implementation MP_EXP is private.",
+                "signature": "Y = exp(X) ! X,Y are TYPE(MP_REAL)",
+                "declarations": [
+                  {
+                    "path": "mpmod90.f90",
+                    "line_start": 5785,
+                    "line_end": 5788
+                  },
+                  {
+                    "path": "mpmod90.f90",
+                    "line_start": 6211,
+                    "line_end": 6218
+                  }
+                ],
+                "path": "mpmod90.f90",
+                "line_start": 5785,
+                "line_end": 5788,
+                "module": "mpgenmod",
+                "usage": "use mpmodule\ntype(mp_real) :: x,y\ncall mpinit(100)\nx=\"1.0\"\ny=exp(x)\ncall mpwrite(6,y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a consistently built MPFUN library and inspect its error handling for out-of-range inputs. This selects the ordinary real exponential adapter, not all extra-high-precision or complex implementations. No digits, range boundary or runtime behavior was checked."
+              },
+              {
+                "procedure": "mp_exp",
+                "role": "implementation-helper",
+                "path": "mpmod90.f90",
+                "line_start": 6211,
+                "line_end": 6220,
+                "module": "mpgenmod"
+              },
+              {
+                "procedure": "mpexp",
+                "role": "implementation-helper",
+                "path": "mpfun90.f90",
+                "line_start": 3522,
+                "line_end": 3685,
+                "module": "mpfunmod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Bailey limited BSD license with contribution clause",
+          "spdx_expression": null,
+          "revision": "137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root permits source/binary redistribution with the three BSD-like notice/endorsement conditions and adds a nonexclusive perpetual author license for voluntarily supplied/public modifications absent a separate written agreement. That extra contribution clause is retained; no unqualified BSD-3-Clause SPDX expression is assigned.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/APN-Pucky/mpfun90/blob/137f46e31d09d9cb4ebfab7dcc5436cedbc5f28e/LICENSE",
+              "sha256": "edb250ecf63a58d6786abd32a87ef5be5fc9d8c220f2655d06df0ad9d891be46"
+            }
+          ]
         }
       },
       "imports": {}
@@ -48695,12 +48853,152 @@
             ],
             "notes": "The README describes a Fortran module using a trapezoidal integration helper and MINPACK-derived nonlinear solution. Example exact/reconstructed output files do not prove uniqueness or stable recovery for every moment sequence.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "4b79563a2706612579bdcc51b518f3bb27413a5d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The array overload of INTEGRATE_TRAP sums adjacent trapezoids using caller-supplied nonuniform abscissae and sampled values. It provides a nonadaptive finite-interval grid quadrature with no error estimate or automatic refinement; N<2 returns zero. Ordered, finite samples and matching dimensions are caller responsibilities. The callback overload is deliberately not covered: its loop begins at I=2 after evaluating XMIN and omits the first intermediate sample. The selected array path avoids that discrepancy. The repository Makefile promotes default REAL to 8 bytes while preserving double at 8 bytes; use consistent kinds/flags across producer and caller. No quadrature accuracy was verified.",
+            "evidence": [
+              {
+                "path": "integrate.f90",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/integrate.f90",
+                "sha256": "cfd370d9c0d813fa3c8bcda7d0d4cd9f1f014751ad70b78159d6a3c5662e91e7"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/Makefile",
+                "sha256": "ac283b6fb004bda86b042513517651ef5615af16a97ff7187b7be1cd648a7774"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "integrate_trap",
+                "role": "public-entry-point",
+                "summary": "Public generic; this sketch selects its sampled-array overload returning default REAL.",
+                "signature": "AREA = integrate_trap(N,X,F)",
+                "declarations": [
+                  {
+                    "path": "integrate.f90",
+                    "line_start": 17,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "integrate.f90",
+                    "line_start": 51,
+                    "line_end": 54
+                  }
+                ],
+                "path": "integrate.f90",
+                "line_start": 17,
+                "line_end": 19,
+                "module": "integrate",
+                "usage": "use integrate, only: integrate_trap\nreal :: x(3),f(3),area\nx=[0.,0.5,1.]; f=x*x\narea=integrate_trap(size(x),x,f)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the module and caller with matching default real kinds. This is the array branch, not the callback branch with its recorded sampling-index discrepancy. Preserve enough precision in the data and compare against a refined grid independently. No integral or error estimate was checked."
+              },
+              {
+                "procedure": "integrate_trap_array",
+                "role": "implementation-helper",
+                "path": "integrate.f90",
+                "line_start": 51,
+                "line_end": 61,
+                "module": "integrate"
+              }
+            ]
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "4b79563a2706612579bdcc51b518f3bb27413a5d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The module FSOLVE wrapper seeks a zero of N nonlinear equations in N variables through its HYBRD implementation: finite-difference Jacobian, QR model, dogleg trust-region step and rank-one updates. Callback FCN(N,X,FVEC) uses explicit-shape double-kind arrays and has no IFLAG dummy in this adaptation. FSOLVE fixes unit scaling, dense bandwidth and MAXFEV=200*(N+1), remapping HYBRD status 5 to 4. INFO=1 is a relative-step convergence estimate; check FVEC independently. This is a local root search, not a certified enumeration of roots or a successful moment-reconstruction result. The parent reconstruction source uses X**(K/3.) despite the introductory integer-moment formula, and mixes default REAL with the explicit double callback kind; its Makefile default-real promotion aligns those kinds. Those model/build details must not be mistaken for a verified reconstruction algorithm.",
+            "evidence": [
+              {
+                "path": "fsolve.f90",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/fsolve.f90",
+                "sha256": "4bba2820720d47e514de18b275e557586035ed864f4fd7a163141717cf01e51c"
+              },
+              {
+                "path": "reconstruct_moments_maxent.f90",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/reconstruct_moments_maxent.f90",
+                "sha256": "601fdfb81d083e145e9e87813cce7f7c5cfe682473f00058f356259a4da0abaf"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/Makefile",
+                "sha256": "ac283b6fb004bda86b042513517651ef5615af16a97ff7187b7be1cd648a7774"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/README.md",
+                "sha256": "863a1ea36023be667c8697f4430c720d0e63f2bae075b1283efc589966428f21"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fsolve",
+                "role": "public-entry-point",
+                "summary": "Public square nonlinear-system wrapper. The simplified callback has exactly N,X,FVEC arguments.",
+                "signature": "CALL fsolve(FCN,N,X,FVEC,TOL,INFO)",
+                "declarations": [
+                  {
+                    "path": "fsolve.f90",
+                    "line_start": 573,
+                    "line_end": 586
+                  },
+                  {
+                    "path": "fsolve.f90",
+                    "line_start": 603,
+                    "line_end": 627
+                  }
+                ],
+                "path": "fsolve.f90",
+                "line_start": 536,
+                "line_end": 663,
+                "module": "fsolve_mod",
+                "usage": "use fsolve_mod, only: fsolve\ninteger :: info\ndouble precision :: x(2),residual(2)\nx=[1d0,1d0]\n! Supply SYSTEM(N,X,FVEC) with explicit-shape double-precision arrays.\ncall fsolve(system,2,x,residual,1d-8,info)\n! Require suitable INFO and independently small residuals.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The callback body is omitted. A step convergence code is not an independent root residual bound. If using the reconstruction modules, follow the consistent -fdefault-real-8 -fdefault-double-8 build and review the fractional-moment definition. No root or reconstructed distribution was computed."
+              },
+              {
+                "procedure": "hybrd",
+                "role": "implementation-helper",
+                "path": "fsolve.f90",
+                "line_start": 664,
+                "line_end": 1151,
+                "module": "fsolve_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL numerical solver; reconstruction grant not identified",
+          "spdx_expression": null,
+          "revision": "4b79563a2706612579bdcc51b518f3bb27413a5d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README and FSOLVE routine identify GNU LGPL distribution for the More/Garbow/Hillstrom/Burkardt solver, without selecting a version. No separate grant for the reconstruction and integration modules was identified in the inspected files or pinned tree; the solver notice is not assumed to cover them.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/README.md",
+              "sha256": "863a1ea36023be667c8697f4430c720d0e63f2bae075b1283efc589966428f21"
+            },
+            {
+              "path": "fsolve.f90",
+              "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/fsolve.f90",
+              "sha256": "4bba2820720d47e514de18b275e557586035ed864f4fd7a163141717cf01e51c"
+            },
+            {
+              "path": "reconstruct_moments_maxent.f90",
+              "url": "https://github.com/danieljprice/get_moments/blob/4b79563a2706612579bdcc51b518f3bb27413a5d/reconstruct_moments_maxent.f90",
+              "sha256": "601fdfb81d083e145e9e87813cce7f7c5cfe682473f00058f356259a4da0abaf"
+            }
+          ]
         }
       },
       "imports": {}
@@ -49475,12 +49773,154 @@
             ],
             "notes": "The README lists intrinsic-seed supplements, generator state interfaces, shuffling and random scalar/string utilities. Generator quality, independence of streams and platform reproducibility need later review; none is presented as cryptographically validated.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "7215a6d0468dd948731959af1d4dbb425c7068d5",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public Mersenne-Twister real adapters turn a masked 32-bit pseudorandom word stored in INT64 into a REAL(SELECTED_REAL_KIND(15,307)) uniform variate. REAL2 scales by 2^-32 for [0,1), while REAL3 adds one half before scaling for (0,1). MT state is explicit and advances on each draw. The core twist/temper recurrence was inspected, but the name RAND64 refers to storage kind, not 64 independent random bits. Initialize state explicitly with an INT32 seed. This is pseudorandom sampling, not a cryptographic generator, a statistical test result or a guarantee of independent streams.",
+            "evidence": [
+              {
+                "path": "src/M_random.f90",
+                "url": "https://github.com/urbanjost/M_random/blob/7215a6d0468dd948731959af1d4dbb425c7068d5/src/M_random.f90",
+                "sha256": "344d02279d90f338f0c5144c63b8293fadd1fc10f3c319d19d19a68a2adcd5ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mtprng_rand_real2",
+                "role": "public-entry-point",
+                "summary": "Public half-open uniform adapter taking mutable explicit generator state.",
+                "signature": "U = mtprng_rand_real2(STATE)",
+                "declarations": [
+                  {
+                    "path": "src/M_random.f90",
+                    "line_start": 1272,
+                    "line_end": 1279
+                  },
+                  {
+                    "path": "src/M_random.f90",
+                    "line_start": 79,
+                    "line_end": 89
+                  }
+                ],
+                "path": "src/M_random.f90",
+                "line_start": 1272,
+                "line_end": 1281,
+                "module": "M_random",
+                "usage": "use iso_fortran_env, only: int32,real64\nuse M_random, only: mtprng_state,mtprng_init,mtprng_rand_real2\ntype(mtprng_state) :: state\nreal(real64) :: u\ncall mtprng_init(12345_int32,state)\nu=mtprng_rand_real2(state)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. REAL64 matches the selected IEEE64 kind on conventional supported builds; confirm that kind on a new platform. Use the REAL3 adapter when both endpoints must be excluded. No sequence, interval histogram or stream independence test was run."
+              },
+              {
+                "procedure": "mtprng_rand64",
+                "role": "implementation-helper",
+                "path": "src/M_random.f90",
+                "line_start": 993,
+                "line_end": 1053,
+                "module": "M_random"
+              }
+            ]
+          },
+          {
+            "code": "L6a16",
+            "level": "source-reviewed",
+            "revision": "7215a6d0468dd948731959af1d4dbb425c7068d5",
+            "reviewed_on": "2026-11-05",
+            "notes": "SCRAMBLE allocates integers 1 through N and permutes them by two full sweeps of random swaps, choosing each partner over the entire array using intrinsic RANDOM_NUMBER. The result preserves a permutation structurally, but this is not a Fisher-Yates shuffle and does not generally give every permutation equal probability. L6a16 records the permutations subset, not Poisson/Pareto/Pascal generation. Its RNG is the Fortran intrinsic state, separate from explicit Mersenne-Twister state. Use nonnegative N and validate allocation/large-size behavior independently. The mapping records the implemented permutation generator with an explicit distribution limitation.",
+            "evidence": [
+              {
+                "path": "src/M_random.f90",
+                "url": "https://github.com/urbanjost/M_random/blob/7215a6d0468dd948731959af1d4dbb425c7068d5/src/M_random.f90",
+                "sha256": "344d02279d90f338f0c5144c63b8293fadd1fc10f3c319d19d19a68a2adcd5ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "scramble",
+                "role": "public-entry-point",
+                "summary": "Public function returning an allocatable default-integer permutation; no RNG-state argument.",
+                "signature": "ORDER = scramble(NUMBER_OF_VALUES)",
+                "declarations": [
+                  {
+                    "path": "src/M_random.f90",
+                    "line_start": 369,
+                    "line_end": 377
+                  }
+                ],
+                "path": "src/M_random.f90",
+                "line_start": 369,
+                "line_end": 406,
+                "module": "M_random",
+                "usage": "use M_random, only: scramble\ninteger,allocatable :: order(:)\n! Seed the intrinsic generator separately when reproducibility is required.\norder=scramble(10)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Do not use this two-sweep shuffle as evidence of uniform random permutations. MTPRNG_INIT does not seed the intrinsic RANDOM_NUMBER stream used here. No permutation-frequency or empty-input test was run."
+              }
+            ]
+          },
+          {
+            "code": "L6c",
+            "level": "source-reviewed",
+            "revision": "7215a6d0468dd948731959af1d4dbb425c7068d5",
+            "reviewed_on": "2026-11-05",
+            "notes": "MTPRNG_INIT initializes the explicit 624-word MT state from an INT32 seed using a masked Knuth-style recurrence and sets the position to request a twist on the next draw. It does not seed the Fortran intrinsic generator or the separate KISS generator. The API can keep several state objects, but distinct seeds alone do not certify disjoint or independent streams. This mapping is a seeding/state service, without a new period, portability or statistical-quality verification.",
+            "evidence": [
+              {
+                "path": "src/M_random.f90",
+                "url": "https://github.com/urbanjost/M_random/blob/7215a6d0468dd948731959af1d4dbb425c7068d5/src/M_random.f90",
+                "sha256": "344d02279d90f338f0c5144c63b8293fadd1fc10f3c319d19d19a68a2adcd5ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mtprng_init",
+                "role": "public-entry-point",
+                "summary": "Public state initializer with INT32 seed and output MTPRNG_STATE.",
+                "signature": "CALL mtprng_init(SEED,STATE)",
+                "declarations": [
+                  {
+                    "path": "src/M_random.f90",
+                    "line_start": 836,
+                    "line_end": 842
+                  },
+                  {
+                    "path": "src/M_random.f90",
+                    "line_start": 83,
+                    "line_end": 89
+                  }
+                ],
+                "path": "src/M_random.f90",
+                "line_start": 836,
+                "line_end": 856,
+                "module": "M_random",
+                "usage": "use iso_fortran_env, only: int32\nuse M_random, only: mtprng_state,mtprng_init\ntype(mtprng_state) :: state\ncall mtprng_init(12345_int32,state)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Preserve the complete state if resuming a sequence. An explicitly chosen seed aids reproducibility but does not establish cross-build bit identity or independent parallel streams. No seed or restart experiment was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT manifest; custom MT notices and unlicensed KISS component",
+          "spdx_expression": null,
+          "revision": "7215a6d0468dd948731959af1d4dbb425c7068d5",
+          "reviewed_on": "2026-11-05",
+          "notes": "The manifest says MIT and several local routines label MIT. The selected MT section retains Matsumoto/Nishimura attribution and the Scott Ladd origin/alteration/notice restrictions. The KISS section explicitly says no license was specified. A single repository-wide MIT SPDX expression would conceal these component findings.",
+          "evidence": [
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/urbanjost/M_random/blob/7215a6d0468dd948731959af1d4dbb425c7068d5/fpm.toml",
+              "sha256": "ec364ae20456c390c759dc7c7caa7274ca40aaa4cd2fb797fe5b41345b9f0a04"
+            },
+            {
+              "path": "src/M_random.f90",
+              "url": "https://github.com/urbanjost/M_random/blob/7215a6d0468dd948731959af1d4dbb425c7068d5/src/M_random.f90",
+              "sha256": "344d02279d90f338f0c5144c63b8293fadd1fc10f3c319d19d19a68a2adcd5ba"
+            }
+          ]
         }
       },
       "imports": {}
@@ -50121,12 +50561,106 @@
             ],
             "notes": "The README documents independent walks and custom misfit routines and notes the aging implementation. Claims about negligible burn-in, low correlations or overcoming separated modes are not treated as universal sampling guarantees; no convergence study was performed here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6b",
+            "level": "source-reviewed",
+            "revision": "bc6621dea5be45fd1caa9822064be2c49e131213",
+            "reviewed_on": "2026-11-05",
+            "notes": "SLICE_WALKS generates bounded multivariate samples by coordinate-wise slice updates, drawing an exponential height above a negative log density, stepping out within parameter bounds and shrinking rejected intervals. The forward model is linked through FWD_MOD rather than a procedure dummy; the supplied FORWARD computes a weighted Gaussian line-fit negative log likelihood. Parameters, model data and RNG are shared module state and must be initialized. Independent walks start from random bounded points, with NBURN sweeps discarded. Samples are correlated and neither burn-in nor returned rows establish equilibrium or effective sample size; separated modes can mix poorly. The output assignment REAL(POINT(J)) rounds to default real before storing in kind=8 arrays. Use positive WIDTH, nonempty dimensions/counts and valid ordered bounds; the rejection loops have no explicit evaluation cap. The inspected source is serial, without an MPI convergence or statistical validation claim.",
+            "evidence": [
+              {
+                "path": "src/slice_mod.f90",
+                "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/slice_mod.f90",
+                "sha256": "481304bc0a55583ef41b78d18e7818dd3a6d50fe8bb61e1b2acc715b9999918e"
+              },
+              {
+                "path": "src/param_mod.f90",
+                "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/param_mod.f90",
+                "sha256": "0ba8b27a6ba5fce2285f31c0e5719ff1f936097d1b33e8c7754a0a6b44cbf998"
+              },
+              {
+                "path": "src/fwd_mod.f90",
+                "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/fwd_mod.f90",
+                "sha256": "29871425a5080f06dbe22f373679dec07ad8855d4d75fdd28464c294cd1dcc65"
+              },
+              {
+                "path": "src/rand_mod.f90",
+                "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/rand_mod.f90",
+                "sha256": "7a756880f7c760d11bed783a5ee2dfbb33ed320cd8c72d71c6c26ebfc49d6d4d"
+              },
+              {
+                "path": "src/slice.f90",
+                "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/slice.f90",
+                "sha256": "2127a0861955e882a2a344b7ec0c0f4ff25fc18ac0aaddb9657cabcc19a9915e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "slice_walks",
+                "role": "public-entry-point",
+                "summary": "Module sampler using initialized PARAM_MOD and FWD_MOD state. MODELS must accommodate NWALK*NSTEPS rows and NPARAM+1 columns.",
+                "signature": "CALL slice_walks(MODELS)",
+                "declarations": [
+                  {
+                    "path": "src/slice_mod.f90",
+                    "line_start": 16,
+                    "line_end": 21
+                  },
+                  {
+                    "path": "src/param_mod.f90",
+                    "line_start": 2,
+                    "line_end": 8
+                  }
+                ],
+                "path": "src/slice_mod.f90",
+                "line_start": 16,
+                "line_end": 51,
+                "module": "slice_mod",
+                "examples": [
+                  {
+                    "path": "src/slice.f90",
+                    "line_start": 20,
+                    "line_end": 35
+                  }
+                ],
+                "usage": "use param_mod\nuse fwd_mod, only: fwd_init\nuse rand_mod, only: srand\nuse slice_mod, only: slice_walks\nreal(kind=8),allocatable :: models(:,:)\ncall read_parameters(\"slice.param\")\ncall srand(iseed)\nnforward=0\ncall fwd_init() ! also reads fwd.param and its data file\nallocate(models(nwalk*nsteps,nparam+1))\ncall slice_walks(models)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply compatible parameter/data files and compile the linked model modules. Replace the line-model evaluator for another target density; initialize its state and counters. Use a valid nondegenerate Park-Miller seed. No draws, posterior moments, mixing diagnostic or precision-loss effect was checked."
+              },
+              {
+                "procedure": "next_point",
+                "role": "implementation-helper",
+                "path": "src/slice_mod.f90",
+                "line_start": 72,
+                "line_end": 167,
+                "module": "slice_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "bc6621dea5be45fd1caa9822064be2c49e131213",
+          "reviewed_on": "2026-11-05",
+          "notes": "No grant was identified in the reviewed README or sampler, and the pinned tree has no separately named license file. Algorithm attribution and public access are not redistribution permission.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/README.md",
+              "sha256": "088c8224c7d4bf39e0a47258b8711eee4f0524ed967a8934f87cbe939f6f461e"
+            },
+            {
+              "path": "src/slice_mod.f90",
+              "url": "https://github.com/ericlindsey/slice/blob/bc6621dea5be45fd1caa9822064be2c49e131213/src/slice_mod.f90",
+              "sha256": "481304bc0a55583ef41b78d18e7818dd3a6d50fe8bb61e1b2acc715b9999918e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -52888,12 +53422,92 @@
             ],
             "notes": "The README identifies the Fortran implementation and explicitly says SciPy now supersedes this package. Historical interface availability is preserved; current Python compatibility and finite-run global optimality are not established.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "eebc43a874f6a944b23800f7579be714aef7fcaf",
+            "reviewed_on": "2026-11-05",
+            "notes": "DIRECT normalizes finite box bounds, samples rectangle centers, chooses potentially optimal rectangles and divides their longest sides into thirds. ALGMETHOD selects the original or modified selection strategy. The inspected serial evaluation path rescales coordinates before invoking FCN(N,X,F,FLAG,IIDATA,IISIZE,DDATA,IDSIZE,CDATA,ICSIZE); FLAG=0 marks a defined objective and positive values mark hidden infeasibility. No derivative or explicit Lipschitz constant is required. Global search is an algorithmic scope, not a finite-budget certificate of the global optimum. Positive IERROR values include evaluation/iteration budget and rectangle size terminations. Fixed capacities include MaxDim=64 and Maxfunc=90000; MAXF is not necessarily a strict evaluation ceiling, especially while searching for a feasible point. The COMMON control state and fixed work storage require care for simultaneous calls. This review covers driver, selection and serial callback dispatch, not every rectangle bookkeeping routine.",
+            "evidence": [
+              {
+                "path": "src/DIRect.f",
+                "url": "https://github.com/andim/scipydirect/blob/eebc43a874f6a944b23800f7579be714aef7fcaf/src/DIRect.f",
+                "sha256": "b404d1199e2d608f7865fc90b434301d64e118d3675ee8304df645b73cdad699"
+              },
+              {
+                "path": "src/DIRsubrout.f",
+                "url": "https://github.com/andim/scipydirect/blob/eebc43a874f6a944b23800f7579be714aef7fcaf/src/DIRsubrout.f",
+                "sha256": "cd390fd3cafd002b1e6d3bbc392d1c06176ad6ec719fd966b1201fb576cadbb9"
+              },
+              {
+                "path": "src/DIRserial.f",
+                "url": "https://github.com/andim/scipydirect/blob/eebc43a874f6a944b23800f7579be714aef7fcaf/src/DIRserial.f",
+                "sha256": "9d28ac12d7caad8f791a640abb3eb6813ae08e9b8377f044c6f5e79cc0829cc6"
+              },
+              {
+                "path": "src/direct.pyf",
+                "url": "https://github.com/andim/scipydirect/blob/eebc43a874f6a944b23800f7579be714aef7fcaf/src/direct.pyf",
+                "sha256": "07a0b9ad736f2b16f3f97dce01a433db2dd7b90be9ed0e3b8f9dd76633ceaba8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Direct",
+                "role": "public-entry-point",
+                "summary": "External double-precision box global-search driver. Bounds and controls are mutable arguments; user character data has element length 40.",
+                "signature": "CALL Direct(FCN,X,N,EPS,MAXF,MAXT,FMIN,L,U,ALGMETHOD,IERROR, &\n     LOGFILENAME,FGLOBAL,FGLPER,VOLPER,SIGMAPER, &\n     IIDATA,IISIZE,DDATA,IDSIZE,CDATA,ICSIZE,DISP)",
+                "declarations": [
+                  {
+                    "path": "src/DIRect.f",
+                    "line_start": 36,
+                    "line_end": 40
+                  },
+                  {
+                    "path": "src/DIRect.f",
+                    "line_start": 165,
+                    "line_end": 180
+                  },
+                  {
+                    "path": "src/DIRsubrout.f",
+                    "line_start": 1179,
+                    "line_end": 1206
+                  }
+                ],
+                "path": "src/DIRect.f",
+                "line_start": 36,
+                "line_end": 781,
+                "usage": "external :: direct, objective\ninteger :: maxf,maxt,status,idata(1)\ndouble precision :: x(2),lo(2),hi(2),eps,value,ddata(1)\ncharacter(40) :: cdata(1)\nlo=-2d0; hi=2d0; eps=1d-4; maxf=1000; maxt=100\nidata=0; ddata=0d0; cdata=\"\"\n! Supply OBJECTIVE with the exact ten-argument callback contract.\ncall direct(objective,x,2,eps,maxf,maxt,value,lo,hi,0,status, &\n     \"\",-1d100,0d0,0d0,0d0,idata,1,ddata,1,cdata,1,0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link DIRect.f, DIRserial.f and DIRsubrout.f consistently. Inspect IERROR rather than treating every positive code as accuracy success. Preserve bounds and budget inputs if needed after the call. The fragment omits the callback body; no optimum, hidden-constraint behavior or budget bound was verified."
+              },
+              {
+                "procedure": "DIRinfcn",
+                "role": "implementation-helper",
+                "path": "src/DIRsubrout.f",
+                "line_start": 1179,
+                "line_end": 1216
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "eebc43a874f6a944b23800f7579be714aef7fcaf",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root MIT notice explicitly credits Mayer, Aides and the Gablonsky/North Carolina State University implementation. This is the repository notice, not a license audit of external Python dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/andim/scipydirect/blob/eebc43a874f6a944b23800f7579be714aef7fcaf/LICENSE",
+              "sha256": "5d7649ffb13369b3476ce05ccf1a8b2994d93900d1efc29e2bf593de306f8b28"
+            }
+          ]
         }
       },
       "imports": {}
@@ -54084,12 +54698,114 @@
             ],
             "notes": "The README identifies ACM TOMS 531; regular-grid routine comments document uniform Cartesian spacing and repeated endpoints for closed contours. Closed-contour orientation is unspecified, and topology/degenerate-level behavior was not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "Q",
+            "level": "source-reviewed",
+            "revision": "d63f4882ff6a78a62021150bdcf4f231bcf17d6f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The regular-grid wrapper traces an isoline at a specified level through rectangular scalar samples using GCONTR, collects callback vertices into allocated polylines, then maps fractional grid indices to physical coordinates CORNER+(INDEX-1)*STEP. Closed contours repeat the starting point, with no guaranteed orientation. POLYLINE stores N_POINTS, CLOSED and POINTS(2,N_POINTS). This is contour extraction for plotting, not a complete rendering backend, an arbitrary unstructured mesh algorithm or certified topology at saddle/degenerate values. ZMAX excludes values above a threshold; NaNs need separate handling. Scratch arrays and contour counters are shared saved state, so simultaneous calls need serialization. Source dispatch, crossing tracing, collection and coordinate conversion were inspected; no contour image or topology test was executed.",
+            "evidence": [
+              {
+                "path": "find_contours_reg_grid.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/find_contours_reg_grid.f90",
+                "sha256": "4149b09306406e5c1c54ad01b6456319e070b893938692f1b6684f86bcc60f5c"
+              },
+              {
+                "path": "gcontr.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/gcontr.f90",
+                "sha256": "e90fc3bfab9b12337eb9ded5abdd63ef8ca207259389f0d110a6e8e1735e9d82"
+              },
+              {
+                "path": "find_contours_no_coord.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/find_contours_no_coord.f90",
+                "sha256": "b58bd814c4269c2b87efbe8606c1f72a272486e8c5716e27a533f4237ea2befa"
+              },
+              {
+                "path": "draw_to_scratch.F90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/draw_to_scratch.F90",
+                "sha256": "e204ff2bd5b0a7aafdde4e6442546769b9ea6373bece56f8fd99f97c3258fdd4"
+              },
+              {
+                "path": "convert_to_reg_coord.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/convert_to_reg_coord.f90",
+                "sha256": "9f8d751e4649c82bb4a4f3a78a39bb8ce95700e6085df986e7355610990adece"
+              },
+              {
+                "path": "polyline.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/polyline.f90",
+                "sha256": "a4aaedae53905c5e4024dcdcc9b4831d831984bc397b7abdf076765f9bdcb97f"
+              },
+              {
+                "path": "contour_531.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/contour_531.f90",
+                "sha256": "2ab09acedf334f1ffae8304b0e3a35651a99bad1a0ec7327a94c9450e0c69ba8"
+              },
+              {
+                "path": "Tests/test_find_contours.f90",
+                "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/Tests/test_find_contours.f90",
+                "sha256": "e388c8171c2980c636e15f1569ea1f8cd6ae4253b76144e2e98d5bee3cc87730"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "find_contours_reg_grid",
+                "role": "public-entry-point",
+                "summary": "Module subroutine returning allocated polylines for one level on a regular grid. CORNER and STEP have two elements; all coordinates/scalars use default REAL.",
+                "signature": "CALL find_contours_reg_grid(CORNER,Z,LEVEL,CONTOURS,ZMAX,STEP)",
+                "declarations": [
+                  {
+                    "path": "find_contours_reg_grid.f90",
+                    "line_start": 20,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "polyline.f90",
+                    "line_start": 5,
+                    "line_end": 13
+                  }
+                ],
+                "path": "find_contours_reg_grid.f90",
+                "line_start": 7,
+                "line_end": 39,
+                "module": "find_contours_reg_grid_m",
+                "usage": "use find_contours_reg_grid_m, only: find_contours_reg_grid\nuse polyline_m, only: polyline\ntype(polyline),allocatable :: lines(:)\nreal :: z(3,3)\nz(:,1)=[0.,1.,2.]; z(:,2)=[1.,2.,3.]; z(:,3)=[2.,3.,4.]\ncall find_contours_reg_grid([0.,0.],z,1.5,lines,step=[1.,1.])\n! Read lines(i)%points(:,1:lines(i)%n_points) and lines(i)%closed.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide at least a meaningful two-by-two cell grid and finite samples. STEP defaults to unit spacing. The collector returns geometry; use a separate plotting tool to display it. No degeneracy, exclusion mask or closure/orientation case was checked."
+              },
+              {
+                "procedure": "GCONTR",
+                "role": "implementation-helper",
+                "path": "gcontr.f90",
+                "line_start": 6,
+                "line_end": 340,
+                "module": "gcontr_m"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only (root text)",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "d63f4882ff6a78a62021150bdcf4f231bcf17d6f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GNU GPL version 3 text. GCONTR carries historical algorithm documentation without a separate license-version election in the inspected header. This finding records the root terms and selected source, not every historical upstream grant or build dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "gcontr.f90",
+              "url": "https://github.com/lguez/Contour_531/blob/d63f4882ff6a78a62021150bdcf4f231bcf17d6f/gcontr.f90",
+              "sha256": "e90fc3bfab9b12337eb9ded5abdd63ef8ca207259389f0d110a6e8e1735e9d82"
+            }
+          ]
         }
       },
       "imports": {}
@@ -54482,12 +55198,108 @@
             ],
             "notes": "The short Rust-binding README is supplemented by the bundled Fortran example guide, which documents dense/banded Pfaffians and skew-symmetric decompositions. The build tag records the documented Make-based Fortran examples, not a verified Rust packaging workflow; this is a binding/distribution of PFAPACK rather than a separate algorithm.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "a237bd39c4daf4f4b4765260e99530274c8d660e",
+            "reviewed_on": "2026-11-05",
+            "notes": "DSKTRF computes a pivoted Parlett-Reid congruence factorization of a real skew-symmetric matrix, P*A*P^T=L*T*L^T or U*T*U^T. D2a1 is used only for this related factorization in the real nonsymmetric general-storage branch; it does not assert a solver for every nonsymmetric matrix. MODE=N fully tridiagonalizes, while MODE=P performs the partial even-order reduction used for Pfaffians. The driver chooses blocked DLASKTRF or unblocked DSKTF2 panels, propagates zero-pivot INFO and adjusts permutations. It overwrites the selected triangle with tridiagonal entries and multipliers. DSKPFA is also annotated as the public Pfaffian consumer of this reduction; it returns a Pfaffian, not a determinant, and reports zero for odd order. No new QR/SVD classification is inferred from this congruence reduction. BLAS/LAPACK-compatible support and the remaining PFAPACK kernels are required; this review inspects dispatch and Pfaffian accumulation, not all panel arithmetic.",
+            "evidence": [
+              {
+                "path": "fortran/dsktrf.f",
+                "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/fortran/dsktrf.f",
+                "sha256": "aeda208bcacdbda11ee2a184a840ee3719e576607a0a5bc25d04ff20e96aa5c9"
+              },
+              {
+                "path": "fortran/dskpfa.f",
+                "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/fortran/dskpfa.f",
+                "sha256": "77c6fe01d770d0243f8b6f5ae3c09fd4e78049e7c45198a1c39144e03f7fa50d"
+              },
+              {
+                "path": "fortran/EXAMPLES/example1.f",
+                "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/fortran/EXAMPLES/example1.f",
+                "sha256": "f5d22a9ef7833a5b07d227014d865337fae42dc32af230f392e4070adf6e7130"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DSKTRF",
+                "role": "public-entry-point",
+                "summary": "External double-precision skew-symmetric factorization with workspace query and pivot array.",
+                "signature": "CALL DSKTRF(UPLO,MODE,N,A,LDA,IPIV,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "fortran/dsktrf.f",
+                    "line_start": 1,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "fortran/dsktrf.f",
+                    "line_start": 31,
+                    "line_end": 84
+                  }
+                ],
+                "path": "fortran/dsktrf.f",
+                "line_start": 1,
+                "line_end": 356,
+                "usage": "external :: dsktrf\ndouble precision :: a(4,4),query(1)\ndouble precision,allocatable :: work(:)\ninteger :: piv(4),info,lwork\na=0d0; a(2,1)=-1d0; a(3,1)=-2d0; a(4,1)=-3d0\na(3,2)=-4d0; a(4,2)=-5d0; a(4,3)=-6d0\ncall dsktrf(\"L\",\"N\",4,a,4,piv,query,-1,info)\nif(info/=0) error stop \"workspace query failed\"\nlwork=max(1,ceiling(query(1))); allocate(work(lwork))\ncall dsktrf(\"L\",\"N\",4,a,4,piv,work,lwork,info)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Only the lower triangle is supplied; the full mathematical matrix is skew-symmetric. Interpret INFO and the documented packed multipliers/pivots before further operations. Preserve the original matrix to check the congruence residual. Match BLAS/LAPACK real/integer ABI. No factorization residual or Pfaffian was tested."
+              },
+              {
+                "procedure": "DSKPFA",
+                "role": "public-entry-point",
+                "summary": "External Pfaffian driver using Parlett-Reid (P) or Householder (H) reduction; A is overwritten for even order.",
+                "signature": "CALL DSKPFA(UPLO,MTHD,N,A,LDA,PFAFF,IWORK,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "fortran/dskpfa.f",
+                    "line_start": 1,
+                    "line_end": 14
+                  }
+                ],
+                "path": "fortran/dskpfa.f",
+                "line_start": 1,
+                "line_end": 228,
+                "examples": [
+                  {
+                    "path": "fortran/EXAMPLES/example1.f",
+                    "line_start": 23,
+                    "line_end": 45
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LAPACK-derived notice; PFAPACK grant not separately identified",
+          "spdx_expression": null,
+          "revision": "a237bd39c4daf4f4b4765260e99530274c8d660e",
+          "reviewed_on": "2026-11-05",
+          "notes": "LapackLicense explicitly applies to the parts derived from reference LAPACK/BLAS. The Rust README credits Michael Wimmer and the numerical source does not add a grant. No separate license for the whole vendored PFAPACK implementation was identified in these reviewed files; the LAPACK notice is not extended to all code by assumption.",
+          "evidence": [
+            {
+              "path": "LapackLicense",
+              "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/LapackLicense",
+              "sha256": "4f3bc1db8a8539b30417c4d6baadd2dc6c6e8134bb2770f0deafcf7b262d0502"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/README.md",
+              "sha256": "5618961ebde4d1f59bdb1b9c275d3efd6adff15997aaa9043ee8d685bed9f286"
+            },
+            {
+              "path": "fortran/dsktrf.f",
+              "url": "https://github.com/Duumbo/pfapack-sys-rs/blob/a237bd39c4daf4f4b4765260e99530274c8d660e/fortran/dsktrf.f",
+              "sha256": "aeda208bcacdbda11ee2a184a840ee3719e576607a0a5bc25d04ff20e96aa5c9"
+            }
+          ]
         }
       },
       "imports": {}
@@ -67439,12 +68251,89 @@
             ],
             "notes": "The README frames this repository as a class(*) interface-efficiency experiment and discusses allocatable derived-type storage. It is cataloged as experimental software-testing support rather than a validated general minimization package. Timing conclusions and example correctness were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1a1a",
+            "level": "source-reviewed",
+            "revision": "3c965b5fa9a7cf6e5e58361d30d343384e720115",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public GSS generic implements derivative-free golden-section interval reduction for a scalar objective, with optional CLASS(*) data forwarded to OBJ(X,FUNC_DATA). This selected smooth-unimodal problem class requires an ordered finite interval, positive tolerance and suitable iteration budget. FINDMAX defaults true, so a minimization caller must explicitly pass FINDMAX=.FALSE. Width-based termination and max-iteration exits have no separate status output, and the ITER<=MAXITER condition can permit an extra iteration. The returned point is the most recently generated trial, not a certified optimum or a reported final bracket. With a skipped loop Z/FVAL can remain undefined, so pathological tolerance/budget inputs require guards. This educational routine does not establish global optimality for multimodal objectives or convergence at a chosen test function.",
+            "evidence": [
+              {
+                "path": "src/goldenSectionSearch.f90",
+                "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/src/goldenSectionSearch.f90",
+                "sha256": "eba2f47a08969e95638d484cf5e4b2621dc88dbd3bd3ab350de25c50123ba541"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/README.md",
+                "sha256": "ddbcbbf5badc2b90003a289de846aaaf45baa21cb60051dd3d621650fc310159"
+              },
+              {
+                "path": "app/main.f90",
+                "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/app/main.f90",
+                "sha256": "34a89fadcca1ea5ff032840ee310e9e200377e993e2a49abf3d81837160a9a19"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gss",
+                "role": "public-entry-point",
+                "summary": "Public scalar-search generic with REAL64 bounds/results, INT32 optional budget, and optional polymorphic callback data.",
+                "signature": "CALL gss(FOUT,XOUT,OBJ,LB,UB,TOL,MAXITER,FINDMAX,SHOW,FUNC_DATA)",
+                "declarations": [
+                  {
+                    "path": "src/goldenSectionSearch.f90",
+                    "line_start": 16,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/goldenSectionSearch.f90",
+                "line_start": 10,
+                "line_end": 12,
+                "module": "goldenSectionSearch",
+                "usage": "use iso_fortran_env, only: real64,int32\nuse goldenSectionSearch, only: gss\nreal(real64) :: value,x\n! Supply OBJ(X,FUNC_DATA), including its optional CLASS(*) data dummy.\ncall gss(value,x,objective,-2.0_real64,2.0_real64, &\n     tol=1e-8_real64,maxiter=200_int32,findmax=.false.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a callback fragment with no objective body. Explicit minimization overrides the default maximization. Check objective values independently and do not infer a convergence status from returned scalars alone. No search result, boundary case or iteration count was tested."
+              },
+              {
+                "procedure": "gss_1d",
+                "role": "implementation-helper",
+                "path": "src/goldenSectionSearch.f90",
+                "line_start": 16,
+                "line_end": 104,
+                "module": "goldenSectionSearch"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "3c965b5fa9a7cf6e5e58361d30d343384e720115",
+          "reviewed_on": "2026-11-05",
+          "notes": "The manifest license value is the placeholder string \"license\", not an identified grant. No separate LICENSE file or permission statement was identified in the reviewed tree/README/module. Copyright and public examples do not supply redistribution permission.",
+          "evidence": [
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/fpm.toml",
+              "sha256": "532239aed79b6b78b1c9855406c68f6faae82f6e472d00336a15776957c6d6a1"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/README.md",
+              "sha256": "ddbcbbf5badc2b90003a289de846aaaf45baa21cb60051dd3d621650fc310159"
+            },
+            {
+              "path": "src/goldenSectionSearch.f90",
+              "url": "https://github.com/HuijunChen9260/gssFortran/blob/3c965b5fa9a7cf6e5e58361d30d343384e720115/src/goldenSectionSearch.f90",
+              "sha256": "eba2f47a08969e95638d484cf5e4b2621dc88dbd3bd3ab350de25c50123ba541"
+            }
+          ]
         }
       },
       "imports": {}

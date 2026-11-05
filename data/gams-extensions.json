@@ -558,6 +558,12 @@
       "parent": "G2h3b1",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L6a16": {
+      "label": "Pareto, Pascal, permutations, Poisson",
+      "parent": "L6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

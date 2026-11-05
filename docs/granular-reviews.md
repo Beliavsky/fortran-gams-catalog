@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 292 repositories now have 380 source-reviewed
+Reviewed on 2026-11-05. 300 repositories now have 392 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-283 repository cards now identify public routines and link their usage lines
+291 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Nine further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT and main_Gaussian) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 292 independently source-reviewed repositories now have an
+separately. All 300 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -316,6 +316,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | PRIMA | `bobyqa_mod::bobyqa`, `lincoa_mod::lincoa`, `cobyla_mod::cobyla` | BSD-3-Clause |
 | PyDQED | `dqed` | MIT wrapper notice; legacy DQED provenance separate |
 | pyoptgra | `OGEXEC`, `OGINIT`, `OGDERI` | GPL-3 or ESCL 2.4 Weak Copyleft (author choice) |
+| MPFUN90 | `mprealmod::operator(+)`, `mpdefmod::mpinit`, `mpgenmod::exp` | Bailey limited BSD license with contribution clause |
+| Get Moments reconstruction | `integrate::integrate_trap`, `fsolve_mod::fsolve` | LGPL numerical solver; reconstruction grant not identified |
+| M_random | `M_random::mtprng_rand_real2`, `M_random::scramble`, `M_random::mtprng_init` | MIT manifest; custom MT notices and unlicensed KISS component |
+| SLICE sampler | `slice_mod::slice_walks` | No license identified |
+| ScipyDIRECT | `Direct` | MIT |
+| Contour 531 | `find_contours_reg_grid_m::find_contours_reg_grid` | GPL-3.0-only (root text) |
+| PFAPACK Rust bindings | `DSKTRF`, `DSKPFA` | LAPACK-derived notice; PFAPACK grant not separately identified |
+| Golden-section callback experiment | `goldenSectionSearch::gss` | No license identified |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -627,6 +635,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [PRIMA](https://github.com/libprima/prima) | G2h1a1; G2h2a1; G2h3b1a | Derivative-free bound, linear and nonlinear-inequality constrained trust-region optimization | Modern nonlinear constraint sign is <=0; callback kinds/counts and termination reasons need interpretation. |
 | [PyDQED](https://github.com/reactionmechanismgenerator/pydqed) | K1b2a | Bounded nonlinear least squares with linear constraints | Caller workspace and Jacobian/value callback required; saved state is not reentrant. |
 | [pyoptgra](https://github.com/esa/pyoptgra) | G2h3b1b | Gradient-based constrained optimization | Initialize/configure shared state; CALVAL has a third status argument and derivative mode has two controls. |
+| [MPFUN90](https://github.com/apn-pucky/mpfun90) | A3c; C4b | Multiword real addition and extended-precision real exponential | Initialize precision/constants; fixed capacity and shared error state; avoid default-kind promotion. |
+| [Get Moments reconstruction](https://github.com/danieljprice/get_moments) | H2a1b2; F2 | Sampled-array trapezoidal quadrature and local square nonlinear-system solver | Callback quadrature has an indexing discrepancy; reconstruction uses fractional moments and consistent real-kind flags. |
+| [M_random](https://github.com/urbanjost/m_random) | L6a21; L6a16; L6c | MT uniform variates, state initialization and random permutations | Explicit MT state differs from intrinsic RNG state; SCRAMBLE is not a uniform Fisher-Yates shuffle. |
+| [SLICE sampler](https://github.com/ericlindsey/slice) | L6b | Bounded coordinate slice sampling | Linked negative-log-density model and initialized shared state; correlated samples and default-real output rounding. |
+| [ScipyDIRECT](https://github.com/andim/scipydirect) | G2i | DIRECT box partitioning for derivative-free global search | Finite budget is not a global certificate; callback feasibility flags and fixed workspace capacities matter. |
+| [Contour 531](https://github.com/lguez/contour_531) | Q | Regular-grid scalar isolines as polylines | Saved scratch state, unspecified orientation and default-real coordinates; geometry needs a separate renderer. |
+| [PFAPACK Rust bindings](https://github.com/duumbo/pfapack-sys-rs) | D2a1 | Pivoted real skew-symmetric congruence reduction and Pfaffian consumer | D2a1 covers only the related factorization subset; preserve input, query workspace and link numerical dependencies. |
+| [Golden-section callback experiment](https://github.com/huijunchen9260/gssfortran) | G1a1a | Derivative-free scalar golden-section search | Defaults to maximization; callback includes optional polymorphic data; no separate convergence status. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1180,3 +1196,11 @@ sketches were not compiled or run. Their scoped findings distinguish callback an
 workspace contracts, convergence from API status, and supplied programs from
 reusable routines. No new checked hosted drivers or numerical certifications are
 claimed. License findings retain separate wrapper and legacy-core qualifications.
+
+The DIRECT, slice sampling, M_random, contour extraction, PFAPACK, MPFUN90,
+get_moments and GSSFortran cards identify pinned interfaces and calling sketches.
+The sketches were not compiled or run. Distribution and convergence claims are
+limited to inspected paths: random permutation probabilities, finite optimization
+budgets, moment definitions, real-kind build choices and shared state require
+particular care. The PFAPACK mapping covers a skew-symmetric related factorization,
+not a generic solver or QR decomposition.
