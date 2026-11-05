@@ -539,12 +539,121 @@
             ],
             "notes": "The short README states the fourth-derivative scope and a Make-based test command. Supported operators and numerical behavior await source review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "a594392a9a2f6820a2b217547620dc36af46e35b",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected src/avd.f90 implementation propagates derivatives through overloaded products and elementary-function composition. The avd_d4 inheritance chain stores a value and first through fourth raw derivatives with respect to one scalar parameter; the product and Q4_f chain rules contain the corresponding binomial/composition coefficients. This is forward differentiation, not finite differencing or symbolic expression manipulation. CALL init() must populate the module function-pointer table before elementary functions are used. H1 is the differentiation leaf; there is no finer automatic-differentiation child in this taxonomy. The review covers the fourth-order product/exponential path, not every overload or the older root autodiff.f90 implementation. Source requests an eight-byte default REAL build; module and caller settings must agree. No author tests or derivative comparisons were executed.",
+            "evidence": [
+              {
+                "path": "src/avd.f90",
+                "url": "https://github.com/sgeard/autodiff/blob/a594392a9a2f6820a2b217547620dc36af46e35b/src/avd.f90",
+                "sha256": "5af76366d0df352c059e0bb6860291c0264b2c50c51bbcea29cd2a187895587f"
+              },
+              {
+                "path": "test/av_utest.f90",
+                "url": "https://github.com/sgeard/autodiff/blob/a594392a9a2f6820a2b217547620dc36af46e35b/test/av_utest.f90",
+                "sha256": "85afb2961e32daa041e97a76e147b19ebd5dddc94426c30f260e8a3618fcffc8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Public no-argument generic that initializes the shared elementary-function derivative table. Call before exp and other table-based elementary functions.",
+                "signature": "CALL init()",
+                "declarations": [
+                  {
+                    "path": "src/avd.f90",
+                    "line_start": 294,
+                    "line_end": 299
+                  },
+                  {
+                    "path": "src/avd.f90",
+                    "line_start": 74,
+                    "line_end": 76
+                  }
+                ],
+                "path": "src/avd.f90",
+                "line_start": 294,
+                "line_end": 356,
+                "module": "AVD"
+              },
+              {
+                "procedure": "exp",
+                "role": "public-entry-point",
+                "summary": "Public exponential generic, scoped here to the avd_d4 overload. Input/output contain v and d1..d4 in REAL(8). Seed an independent scalar with d1=1 and higher derivatives zero; extract the same fields from the result. These are raw derivatives, not factorial-scaled Taylor coefficients.",
+                "signature": "y = exp(x)",
+                "declarations": [
+                  {
+                    "path": "src/avd.f90",
+                    "line_start": 1026,
+                    "line_end": 1030
+                  },
+                  {
+                    "path": "src/avd.f90",
+                    "line_start": 33,
+                    "line_end": 72
+                  },
+                  {
+                    "path": "src/avd.f90",
+                    "line_start": 279,
+                    "line_end": 281
+                  }
+                ],
+                "path": "src/avd.f90",
+                "line_start": 1026,
+                "line_end": 1030,
+                "module": "AVD",
+                "examples": [
+                  {
+                    "path": "test/av_utest.f90",
+                    "line_start": 87,
+                    "line_end": 107
+                  }
+                ],
+                "usage": "use AVD, only: avd_d4, init, exp\ntype(avd_d4) :: x, y\ncall init()\nx%v=0.5d0\nx%d1=1.0d0\nx%d2=0.0d0\nx%d3=0.0d0\nx%d4=0.0d0\ny=exp(x)\n! Read y%v and y%d1 through y%d4.",
+                "usage_notes": "Uncompiled fragment for the src/ implementation. Build module and caller with consistent eight-byte default REAL options as requested by the source. Initialization is shared module state; no concurrent-initialization behavior was checked. The linked author test exercises fourth-order arithmetic/trigonometric expressions, not this particular exponential fragment."
+              },
+              {
+                "procedure": "d4_times_d4",
+                "module": "AVD",
+                "role": "implementation-evidence",
+                "path": "src/avd.f90",
+                "line_start": 376,
+                "line_end": 410
+              },
+              {
+                "procedure": "Q4_f",
+                "module": "AVD",
+                "role": "implementation-evidence",
+                "path": "src/avd.f90",
+                "line_start": 732,
+                "line_end": 790
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "a594392a9a2f6820a2b217547620dc36af46e35b",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned root LICENSE contains the MIT grant, copyright retention condition and warranty disclaimer. No complete dependency/license audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sgeard/autodiff/blob/a594392a9a2f6820a2b217547620dc36af46e35b/LICENSE",
+              "sha256": "46b313b4cfeab1b60d94f3b9c142948048e14cef352152f2d9d981d5d69d9bc5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -582,12 +691,95 @@
             ],
             "notes": "Classification uses the documentation and quick-start guide embedded in dnad.F90. This is a review of that documentation, not a verification of every overloaded operation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "ca93275a845137cf082bdff1d5a05a4b39de129e",
+            "reviewed_on": "2026-11-04",
+            "notes": "The dnadmod dual type carries a default-REAL value x and a derivative vector dx(ndv). Reviewed real assignment zeroes the vector, dual multiplication applies the product rule, and exp_d multiplies the seed vector by exp(x). The public entry is the exp generic; exp_d and mult_dd are private specifics. This is first-order forward automatic differentiation, with the derivative-vector length chosen at preprocessing time by ndv (default one), not a higher-order derivative or finite-difference implementation. Seed every derivative component explicitly for independent inputs and compile callers against the matching module. The header notes default single precision unless consistent compiler options promote default REAL. No derivative result was checked by execution.",
+            "evidence": [
+              {
+                "path": "dnad.F90",
+                "url": "https://github.com/joddlehod/dnad/blob/ca93275a845137cf082bdff1d5a05a4b39de129e/dnad.F90",
+                "sha256": "1c5c4e30eaa1b8b0c2f1a63110964a6420f2743225fd5e3cd4ffba887a81a440"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "exp",
+                "role": "public-entry-point",
+                "summary": "Public elemental exponential generic for type(dual). Read result%x for the value and result%dx for seeded first derivatives. Build dnad.F90 with preprocessing; -Dndv=N selects the number of stored directions. REAL assignment resets all derivative seeds to zero.",
+                "signature": "y = exp(x)",
+                "declarations": [
+                  {
+                    "path": "dnad.F90",
+                    "line_start": 1418,
+                    "line_end": 1428
+                  },
+                  {
+                    "path": "dnad.F90",
+                    "line_start": 110,
+                    "line_end": 118
+                  },
+                  {
+                    "path": "dnad.F90",
+                    "line_start": 98,
+                    "line_end": 101
+                  }
+                ],
+                "path": "dnad.F90",
+                "line_start": 278,
+                "line_end": 281,
+                "module": "dnadmod",
+                "usage": "use dnadmod, only: dual, assignment(=), operator(*), exp\ntype(dual) :: x, y\nx=0.5\nx%dx=0.0\nx%dx(1)=1.0\ny=exp(x*x)\n! Read y%x and y%dx(1).",
+                "usage_notes": "Uncompiled fragment valid for ndv>=1. Compile the module with preprocessing and use matching default REAL settings in the caller. Other directions remain zero here. The derivative vector must be initialized; the type components have no default initialization. This is a different fork/interface from nickbrady/Fortran_DNAD."
+              },
+              {
+                "procedure": "assign_dr",
+                "module": "dnadmod",
+                "role": "implementation-helper",
+                "path": "dnad.F90",
+                "line_start": 411,
+                "line_end": 418
+              },
+              {
+                "procedure": "mult_dd",
+                "module": "dnadmod",
+                "role": "implementation-helper",
+                "path": "dnad.F90",
+                "line_start": 630,
+                "line_end": 637
+              },
+              {
+                "procedure": "exp_d",
+                "module": "dnadmod",
+                "role": "implementation-helper",
+                "path": "dnad.F90",
+                "line_start": 1418,
+                "line_end": 1428
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom DNAD copying/modification notices",
+          "spdx_expression": null,
+          "revision": "ca93275a845137cf082bdff1d5a05a4b39de129e",
+          "reviewed_on": "2026-11-04",
+          "notes": "The source header has Joshua Hodson and Wenbin Yu notices permitting copying, modification and translation, with citation requests later in the header. These are recorded as custom terms, not inferred to be MIT or another standardized SPDX license. No separately named license file was present in the inspected tree.",
+          "evidence": [
+            {
+              "path": "dnad.F90",
+              "url": "https://github.com/joddlehod/dnad/blob/ca93275a845137cf082bdff1d5a05a4b39de129e/dnad.F90",
+              "sha256": "1c5c4e30eaa1b8b0c2f1a63110964a6420f2743225fd5e3cd4ffba887a81a440"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4731,12 +4923,236 @@
             ],
             "notes": "The alpha-status README distinguishes implemented formulas from unchecked plans. Planned multidimensional Monte Carlo and acceleration methods are not classified as existing functionality.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1a2",
+            "level": "source-reviewed",
+            "revision": "8205e064eae8e95fcc2254584061182e29590490",
+            "reviewed_on": "2026-11-04",
+            "notes": "The reviewed Newton-Cotes method evaluates a concrete integrand object at n+1 equally spaced nodes on a finite interval. init selects closed-rule weights for degrees 1..10, and integrate_1D performs a single fixed weighted sum without a tolerance or error estimate, supporting the nonautomatic callback quadrature leaf H2a1a2. Source finding: weights use the usual h=(b-a)/n normalization but the final multiplication uses (b-a)*k without dividing by n. Thus degrees above one appear scaled by n; the calling sketch is restricted to n=1 (trapezoidal rule). Unsupported degrees are not rejected and leave zero weights; no success status is returned. The inherited adaptive_integrate reads an INTENT(OUT) accumulator before defining it and is excluded from the calling sketch. 2D/3D bindings are empty result-returning stubs and receive no mapping. No quadrature output was run or checked.",
+            "evidence": [
+              {
+                "path": "src/lib/forbid_integrator_newton_cotes.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_integrator_newton_cotes.f90",
+                "sha256": "908e8226f6a723ce044d4b777d489a19347e643f10d0c4594f3ea935f222d3c6"
+              },
+              {
+                "path": "src/lib/forbid_adt_integrand.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_adt_integrand.f90",
+                "sha256": "6dedee7f3e67153537bcf8b37a117454a2c4e41fa4c995785afb35054644a9ce"
+              },
+              {
+                "path": "src/lib/forbid_adt_integrator.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_adt_integrator.f90",
+                "sha256": "9350686802bf9beca5935f6c582e07c8ac68ec2db3c0149171425ec690deb39d"
+              },
+              {
+                "path": "src/lib/forbid_kinds.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_kinds.f90",
+                "sha256": "55e1a00117dca7ddd17d5631cb307ac4921e2ad2beabc58a08a87e3d77894595"
+              },
+              {
+                "path": "src/tests/cos/type_cos.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/tests/cos/type_cos.f90",
+                "sha256": "1d8cff5f070b54e64d2013227cd4c271fdbbd9fe18bf6ae4008276bf4a8671c3"
+              },
+              {
+                "path": "src/lib/forbid.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid.f90",
+                "sha256": "1b70f335a486ed02e7d38711bde9a92f7e750bcb67dcb63f6ae23d68065e2e99"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Public type-bound initialization: n is INTEGER(I_P), the degree of the single closed Newton-Cotes rule. Weights are stored in the object. Only n=1 is used in the sketch because the source has a scaling discrepancy for higher degrees.",
+                "signature": "CALL quad%init(n)",
+                "declarations": [
+                  {
+                    "path": "src/lib/forbid_integrator_newton_cotes.f90",
+                    "line_start": 130,
+                    "line_end": 138
+                  }
+                ],
+                "path": "src/lib/forbid_integrator_newton_cotes.f90",
+                "line_start": 130,
+                "line_end": 206,
+                "module": "FORbID_integrator_newton_cotes",
+                "derived_type": "newton_cotes_integrator"
+              },
+              {
+                "procedure": "integrate_1D",
+                "role": "public-entry-point",
+                "summary": "Public type-bound fixed-rule function, also reachable through the inherited integrate generic. Pass a concrete extension of integrand, REAL(R_P) endpoints and an initialized quadrature object. Returns a REAL(R_P) scalar; no status or error estimate.",
+                "signature": "value = quad%integrate_1D(f, a, b)",
+                "declarations": [
+                  {
+                    "path": "src/lib/forbid_integrator_newton_cotes.f90",
+                    "line_start": 208,
+                    "line_end": 216
+                  },
+                  {
+                    "path": "src/lib/forbid_adt_integrand.f90",
+                    "line_start": 27,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/lib/forbid_kinds.f90",
+                    "line_start": 21,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/lib/forbid_integrator_newton_cotes.f90",
+                "line_start": 208,
+                "line_end": 228,
+                "module": "FORbID_integrator_newton_cotes",
+                "derived_type": "newton_cotes_integrator",
+                "examples": [
+                  {
+                    "path": "src/tests/cos/type_cos.f90",
+                    "line_start": 19,
+                    "line_end": 61
+                  }
+                ],
+                "usage": "use FORbID_kinds, only: R_P, I_P\nuse FORbID_integrator_newton_cotes, only: newton_cotes_integrator\nuse type_cos, only: cosf\ntype(newton_cotes_integrator) :: quad\ntype(cosf) :: f\nreal(R_P) :: value\ncall f%init(1.0_R_P)\ncall quad%init(1_I_P)\nvalue=quad%integrate_1D(f,0.0_R_P,1.0_R_P)",
+                "usage_notes": "Uncompiled fragment using the author-supplied type_cos test module, which must be built with the library. This uses one trapezoidal panel, so it is not an accuracy demonstration. It deliberately avoids the higher-degree scaling issue and the separate adaptive_integrate path. There is no returned convergence status."
+              },
+              {
+                "procedure": "integrand%f",
+                "module": "FORbID_adt_integrand",
+                "role": "callback",
+                "summary": "Extend integrand and override f(self,x,y,z), retaining optional y/z arguments even for a one-dimensional function. The author cosf extension provides one example.",
+                "path": "src/lib/forbid_adt_integrand.f90",
+                "line_start": 27,
+                "line_end": 38
+              }
+            ]
+          },
+          {
+            "code": "H2a1a1",
+            "level": "source-reviewed",
+            "revision": "8205e064eae8e95fcc2254584061182e29590490",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected 1D Romberg path starts with the endpoint trapezoidal rule, halves the mesh, evaluates newly introduced odd nodes, and builds Richardson extrapolation columns using 4**k. It stops when the absolute difference between the last two columns meets tol, within an n-level budget, supporting automatic finite-interval callback quadrature H2a1a1. This is global refinement, not local adaptive subdivision or a proven error bound. Important source finding: if the loop exhausts its budget without EXIT, i becomes n+1 and the returned R(i,i) is outside the allocated 0:n table. Nonpositive budgets/tolerances are not validated and no failure status is returned. Resolve this exhaustion path before relying on the routine. The 2D/3D methods are unimplemented stubs and are not mapped. No integration or failure case was reproduced by execution.",
+            "evidence": [
+              {
+                "path": "src/lib/forbid_integrator_romberg.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_integrator_romberg.f90",
+                "sha256": "46e5cfb4676cc7ed35d3ec765014aebf2916d379efa7623a2c9062f74e59db65"
+              },
+              {
+                "path": "src/lib/forbid_adt_integrand.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_adt_integrand.f90",
+                "sha256": "6dedee7f3e67153537bcf8b37a117454a2c4e41fa4c995785afb35054644a9ce"
+              },
+              {
+                "path": "src/lib/forbid_adt_integrator.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_adt_integrator.f90",
+                "sha256": "9350686802bf9beca5935f6c582e07c8ac68ec2db3c0149171425ec690deb39d"
+              },
+              {
+                "path": "src/lib/forbid_kinds.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid_kinds.f90",
+                "sha256": "55e1a00117dca7ddd17d5631cb307ac4921e2ad2beabc58a08a87e3d77894595"
+              },
+              {
+                "path": "src/tests/cos/type_cos.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/tests/cos/type_cos.f90",
+                "sha256": "1d8cff5f070b54e64d2013227cd4c271fdbbd9fe18bf6ae4008276bf4a8671c3"
+              },
+              {
+                "path": "src/lib/forbid.f90",
+                "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/src/lib/forbid.f90",
+                "sha256": "1b70f335a486ed02e7d38711bde9a92f7e750bcb67dcb63f6ae23d68065e2e99"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Public type-bound initialization storing INTEGER(I_P) extrapolation budget n and REAL(R_P) absolute stopping tolerance tol. There is no input validation; positive values do not by themselves guard the exhaustion defect.",
+                "signature": "CALL quad%init(n, tol)",
+                "declarations": [
+                  {
+                    "path": "src/lib/forbid_integrator_romberg.f90",
+                    "line_start": 48,
+                    "line_end": 57
+                  }
+                ],
+                "path": "src/lib/forbid_integrator_romberg.f90",
+                "line_start": 48,
+                "line_end": 57,
+                "module": "FORbID_integrator_romberg",
+                "derived_type": "romberg_integrator"
+              },
+              {
+                "procedure": "integrate_1D",
+                "role": "public-entry-point",
+                "summary": "Public type-bound Romberg function over finite REAL(R_P) endpoints using an integrand extension. Returns one scalar, with no status or error-estimate output. The exhausted-budget indexing defect must be addressed before production use.",
+                "signature": "value = quad%integrate_1D(f, a, b)",
+                "declarations": [
+                  {
+                    "path": "src/lib/forbid_integrator_romberg.f90",
+                    "line_start": 59,
+                    "line_end": 71
+                  },
+                  {
+                    "path": "src/lib/forbid_adt_integrand.f90",
+                    "line_start": 27,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/lib/forbid_kinds.f90",
+                    "line_start": 21,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/lib/forbid_integrator_romberg.f90",
+                "line_start": 59,
+                "line_end": 93,
+                "module": "FORbID_integrator_romberg",
+                "derived_type": "romberg_integrator",
+                "examples": [
+                  {
+                    "path": "src/tests/cos/type_cos.f90",
+                    "line_start": 19,
+                    "line_end": 61
+                  }
+                ],
+                "usage": "use FORbID_kinds, only: R_P, I_P\nuse FORbID_integrator_romberg, only: romberg_integrator\nuse type_cos, only: cosf\ntype(romberg_integrator) :: quad\ntype(cosf) :: f\nreal(R_P) :: value\ncall f%init(1.0_R_P)\ncall quad%init(10_I_P,1.0e-8_R_P)\nvalue=quad%integrate_1D(f,0.0_R_P,1.0_R_P)",
+                "usage_notes": "Interface illustration only, not a checked or recommended driver until the exhaustion path is fixed. Build the author type_cos example module as well as the library. A larger n increases work/storage and does not fix the missing safe failure return. Neither this fragment nor an expected cosine integral was executed."
+              },
+              {
+                "procedure": "integrand%f",
+                "module": "FORbID_adt_integrand",
+                "role": "callback",
+                "summary": "Extend integrand and override f(self,x,y,z), retaining optional y/z arguments even for a one-dimensional function. The author cosf extension provides one example.",
+                "path": "src/lib/forbid_adt_integrand.f90",
+                "line_start": 27,
+                "line_end": 38
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "README conditional GPL/BSD/MIT licensing notice",
+          "spdx_expression": null,
+          "revision": "8205e064eae8e95fcc2254584061182e29590490",
+          "reviewed_on": "2026-11-04",
+          "notes": "README lines 94..107 specify GPL v3 for FOSS projects and BSD-2-Clause, BSD-3-Clause or MIT for closed-source/commercial projects, followed by license-choice language and a wiki link. The reviewed tree has no separate LICENSE/COPYING file. Preserve those stated conditions rather than asserting an unrestricted SPDX OR expression; project-wide license interpretation is unresolved.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/giacrossi/FORbID/blob/8205e064eae8e95fcc2254584061182e29590490/README.md",
+              "sha256": "e4907036f04d2a363c1438f05a1a6ff33814a1b1e10c4eaa8431c3616ddc7428"
+            }
+          ]
         }
       },
       "imports": {}

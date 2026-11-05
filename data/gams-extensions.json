@@ -42,6 +42,12 @@
       "parent": "H2",
       "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=22",
       "reviewed_on": "2026-11-04"
+    },
+    "H2a1a2": {
+      "label": "Nonautomatic",
+      "parent": "H2a1a",
+      "source": "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir4475.pdf#page=21",
+      "reviewed_on": "2026-11-04"
     }
   }
 }
