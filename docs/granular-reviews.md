@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 172 repositories now have 209 source-reviewed
+Reviewed on 2026-11-05. 180 repositories now have 219 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-165 repository cards now identify public routines and link their usage lines
+173 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 172 independently source-reviewed repositories now have an
+separately. All 180 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -196,6 +196,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ACFbyFFT | `main` (file-based program); real FFT correlation paths | No license grant identified in reviewed material |
 | signal_subspace | `subspace::esprit_c`, `covariance::autocov_c` | MIT |
 | TOMS-Algorithm-675 | `SRCF`, `SRIF` (external square-root filtering routines) | ACM Software License Agreement per README |
+| Torrence/Compo wavelets | External `WAVELET`; daughter-spectrum helper | Root MIT; retained Fortran non-sale notice unresolved |
+| FSTPACK | `fstpack::cfst1f`, `::cfst1b`; `fftpack::cfft1_` | Root MIT; FFTPACK dependency terms separate |
+| RFNG | `rng_m::rng_t%seed`, `%uint32` | BSD-3-Clause |
+| besseleval | `besseleval::bessel_eval_init`, `::bessel_eval` | GPL-3.0-or-later |
+| HOMPACK90 | `HOMPACK90::FIXPNF`; external `F`/`FJAC` callbacks | ACM Software License Agreement |
+| EISCOR | External `d_symtrid_qr` | MIT |
+| Fazang | `fz_var::grad`, `::reset_adj`; `fz_env::reboot_chain` via `fazang` | BSD-3-Clause |
+| BLZPACK | External `DBLZDRV` in standard/generalized symmetric modes | BSD-style notice with additional enhancement grant |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -387,6 +395,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ACFbyFFT](https://github.com/lingtikong/ACFbyFFT) | L10a2a1; L10b2a | Real FFT auto/cross correlation and lag normalization | Use centered input with -nave to avoid uninitialized-tail mean calculation. Bound lag count; output is not unit-variance normalized. |
 | [signal_subspace](https://github.com/scivision/signal_subspace) | L10a3a; L10a2a1 | Complex ESPRIT frequencies and delayed-window second moments | Pivot ABI and sigma extent require repair; covariance omits a window and uses N normalization. No mean removal. |
 | [TOMS-Algorithm-675](https://github.com/ivan-pi/TOMS-Algorithm-675) | L10a2e | Square-root covariance/information pre-array updates | Mapping scoped to scalar observations; triangular factors, workspace and mutable output-request flags matter. SRCF does not update state estimates. |
+| [Torrence/Compo wavelets](https://github.com/chris-torrence/wavelets) | L10a3a | Mean removal, padded FFT/daughter-spectrum multiplication and inverse transforms | Fixed 65535 scratch bound includes padding; writable default selectors and no returned status. Significance routines unreviewed. |
+| [FSTPACK](https://github.com/thkrz/fstpack) | J; J1a2 | Gaussian-voice Stockwell construction and separately callable complex Fourier wrapper | Real-valued complex storage intended for Stockwell round trips; negative-frequency information discarded. FFT scratch INTENT mismatch recorded. |
+| [RFNG](https://github.com/jeffirwin/rfng) | L6a21 | Object-owned MT19937 seed, twist, tempering and unsigned-output masking | INT64 return carries only 32 random bits; preprocessing and signed-wrap assumptions. Array seeds/reference sequences unreviewed. |
+| [besseleval](https://github.com/jamescbremerjr/besseleval) | C10a3 | Real-order J/Y dispatch and tabulated Chebyshev phase/log reconstruction | Matching binary tables required; shared initialization and branch-dependent auxiliary outputs. Repeated init leaves DSIZE unassigned. |
+| [HOMPACK90](https://github.com/vtopt/hompack90) | F2 | Dense normal-flow homotopy driver, step/tolerance control and endpoint dispatch | External residual/Jacobian-column callbacks; saved continuation state, mutable tolerances and resumable IFLAG=2/3. Optional switch is tested by presence. |
+| [EISCOR](https://github.com/eiscor/eiscor) | D4a5 | Symmetric tridiagonal Cayley/core reduction and unitary QR dispatch | Short driver WORK section requires repair/checking; factor N=1 edge case. Complex vectors, scaling and INFO inspection required. |
+| [Fazang](https://github.com/yizhang-yiz/fazang) | H1 | Reverse-mode tape, primitive chain rules and adjoint extraction | Reset adjoints before repeat sweeps; tape reboot invalidates handles. Convenience jac uses uninitialized n; Hessian path unreviewed. |
+| [BLZPACK](https://github.com/oamarques/BLZPACK) | D4a1; D4b1 | Standard/generalized symmetric block-Lanczos reverse communication and step orchestration | Caller supplies products, shifted solves and inertia. Match storage-prefix formulas and definiteness assumptions; cited generalized example uses B=I and external MA47. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -715,3 +731,27 @@ has recorded pivot-type and output-extent problems requiring repair. TOMS 675
 coverage is scoped to scalar observations and square-root filter updates, with
 SRCF providing a covariance/gain update rather than a complete state trajectory.
 All new calling sketches are source-inspected and were not compiled or run.
+
+## Transform conventions and callback-driven numerical services
+
+Stockwell transforms remain at J because the original GAMS hierarchy supplies no
+Stockwell leaf. FSTPACK's separately callable complex FFT wrapper supports J1a2;
+its Stockwell reconstruction assumes real data carried in complex arrays. The
+Torrence/Compo wavelet routine supports time-series spectral analysis at L10a3a.
+The card records the fixed scratch limit and differing root/source license notices.
+Neither transform mapping certifies normalization, reconstruction or significance.
+
+The Bessel evaluator uses pinned binary tables as well as code. Its initialization,
+real-order range and branch-dependent phase/log outputs are recorded explicitly.
+RFNG's widened integer output contains a 32-bit payload, not 64 generated bits.
+Fazang's selected reverse-mode path requires adjoint resets and tape-lifetime care;
+its convenience jac helper has a recorded uninitialized bound and is not used in
+the calling sketch. The forward-over-reverse Hessian path remains unreviewed.
+
+HOMPACK90 requires problem-specific residual/Jacobian callbacks and preserves
+continuation state between resumable returns. BLZPACK requires callers to service
+reverse-communication requests, including shifted solves and inertia in generalized
+mode; its author example also needs a separately supplied MA47 solver. EISCOR's
+symmetric tridiagonal card records the driver/factor workspace-section mismatch
+and small-dimension edge case. These calling sketches were not compiled or run;
+recording an implemented method and its limitations is not a correctness claim.

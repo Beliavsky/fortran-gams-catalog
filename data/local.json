@@ -282,12 +282,182 @@
             ],
             "notes": "Documents both standard and generalized real sparse symmetric eigenproblems. A D4 mapping avoids implying that only the ordinary eigenproblem is supported.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c",
+            "reviewed_on": "2026-11-05",
+            "notes": "DBLZDRV standard symmetric mode requests A*U by reverse communication, then orchestrates block-Lanczos recurrence, orthogonality control and projected-eigenproblem convergence dispatch. The inspected DBLZSTP controls recurrence/reorthogonalization helper calls, stores basis/projected coefficients and schedules Ritz evaluation/restarts; this is driver/step-control review, not a complete kernel or convergence proof. D4a1 covers real symmetric ordinary problems. The interface is matrix-free and can accept sparse products, but no particular sparse storage format is claimed. Initialize control/work arrays according to documented dimensions before LFLAG=0; service every positive request with NVOPU columns and reenter with the same flag. LFLAG=0 after a call is normal completion, negative is abnormal/early; partial eigenpairs and work-array warning/error reports require inspection. Workspace sizing includes control prefixes, and low memory can create temporary files. No eigenpairs, inertia or residuals were checked by execution.",
+            "evidence": [
+              {
+                "path": "src/dblzdrv.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/src/dblzdrv.f",
+                "sha256": "3e85e9e2f045c076aae28159a4bf140bef93217437233efdfa58715d086c5f39"
+              },
+              {
+                "path": "src/dblzstp.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/src/dblzstp.f",
+                "sha256": "b828d973d4a3bcd3470b2068aad3ab4b9c96f43827e2956ab29441a541f0380a"
+              },
+              {
+                "path": "doc/basics.txt",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/doc/basics.txt",
+                "sha256": "65096a7cc5d7858244bff09fca7687245277f3d34efc9e8d734e3203848eae88"
+              },
+              {
+                "path": "tests/src/ddrvsp1.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/tests/src/ddrvsp1.f",
+                "sha256": "a4b7292b7c20e3300b2a58c69501f6b3ed1bb5a0432718b54fa804fa5a552f47"
+              },
+              {
+                "path": "tests/src/ddrvgp1.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/tests/src/ddrvgp1.f",
+                "sha256": "b48486ecb14058ae50ff77edc7986851e08b2d47b5bf7bf546133ce3d03ea680"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DBLZDRV",
+                "role": "public-entry-point",
+                "summary": "External double-precision block-Lanczos reverse-communication driver. ISTOR holds integer controls/work, RSTOR real controls/work, U/V blocks, EIG(LEIG,2) eigenvalue data and X(LNI,LEIG) vectors. SIGMA/NNEIG carry shift/inertia; LFLAG and NVOPU control caller operations.",
+                "signature": "CALL DBLZDRV(ISTOR, RSTOR, SIGMA, NNEIG, U, V, LFLAG, NVOPU, EIG, X)",
+                "declarations": [
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 1,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 29,
+                    "line_end": 107
+                  },
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 116,
+                    "line_end": 158
+                  }
+                ],
+                "path": "src/dblzdrv.f",
+                "line_start": 1,
+                "line_end": 268,
+                "examples": [
+                  {
+                    "path": "tests/src/ddrvsp1.f",
+                    "line_start": 103,
+                    "line_end": 139
+                  }
+                ],
+                "usage": "! Allocate and initialize controls/workspaces using the pinned DBLZDRV contract.\n! Select ISTOR(9)=0 for standard symmetric mode.\nlflag=0\ndo\n  call dblzdrv(istor,rstor,sigma,nneig,u,v,lflag,nvopu,eig,x)\n  if(lflag<=0) exit\n  ! Implement the requested operation for all NVOPU columns, then reenter.\n  ! Never reenter without filling V or completing the requested factorization.\nend do\nif(lflag<0) error stop \"Lanczos terminated abnormally\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Protocol fragment, not an executable driver until control initialization, allocation and request handlers are supplied. For ordinary mode without optional start requests, flag 1 supplies V=A*U. Handle flag 4 if starting vectors are requested and treat unknown flags explicitly; do not copy the empty handler comment into a runnable loop. Consult driver storage formulas rather than copying dimensions from a different version. Preserve inputs for independent residual/orthogonality checks; no matrix operations or eigensolve were executed."
+              },
+              {
+                "procedure": "DBLZSTP",
+                "role": "implementation-helper",
+                "path": "src/dblzstp.f",
+                "line_start": 1,
+                "line_end": 225
+              }
+            ]
+          },
+          {
+            "code": "D4b1",
+            "level": "source-reviewed",
+            "revision": "2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c",
+            "reviewed_on": "2026-11-05",
+            "notes": "DBLZDRV generalized symmetric mode uses reverse-communication products with B and shifted solves (A-SIGMA*B)*V=B*U, with caller factorization/inertia information on flag 3. The inspected DBLZSTP controls recurrence/reorthogonalization helper calls, stores basis/projected coefficients and schedules Ritz evaluation/restarts; this is driver/step-control review, not a complete kernel or convergence proof. D4b1 covers real symmetric generalized problems under the algorithm definiteness assumptions, not arbitrary nonsymmetric/singular pencils; the cited author driver chooses B=I and uses an external MA47 factorization dependency. Initialize control/work arrays according to documented dimensions before LFLAG=0; service every positive request with NVOPU columns and reenter with the same flag. LFLAG=0 after a call is normal completion, negative is abnormal/early; partial eigenpairs and work-array warning/error reports require inspection. Workspace sizing includes control prefixes, and low memory can create temporary files. No eigenpairs, inertia or residuals were checked by execution.",
+            "evidence": [
+              {
+                "path": "src/dblzdrv.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/src/dblzdrv.f",
+                "sha256": "3e85e9e2f045c076aae28159a4bf140bef93217437233efdfa58715d086c5f39"
+              },
+              {
+                "path": "src/dblzstp.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/src/dblzstp.f",
+                "sha256": "b828d973d4a3bcd3470b2068aad3ab4b9c96f43827e2956ab29441a541f0380a"
+              },
+              {
+                "path": "doc/basics.txt",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/doc/basics.txt",
+                "sha256": "65096a7cc5d7858244bff09fca7687245277f3d34efc9e8d734e3203848eae88"
+              },
+              {
+                "path": "tests/src/ddrvsp1.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/tests/src/ddrvsp1.f",
+                "sha256": "a4b7292b7c20e3300b2a58c69501f6b3ed1bb5a0432718b54fa804fa5a552f47"
+              },
+              {
+                "path": "tests/src/ddrvgp1.f",
+                "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/tests/src/ddrvgp1.f",
+                "sha256": "b48486ecb14058ae50ff77edc7986851e08b2d47b5bf7bf546133ce3d03ea680"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DBLZDRV",
+                "role": "public-entry-point",
+                "summary": "External double-precision block-Lanczos reverse-communication driver. ISTOR holds integer controls/work, RSTOR real controls/work, U/V blocks, EIG(LEIG,2) eigenvalue data and X(LNI,LEIG) vectors. SIGMA/NNEIG carry shift/inertia; LFLAG and NVOPU control caller operations.",
+                "signature": "CALL DBLZDRV(ISTOR, RSTOR, SIGMA, NNEIG, U, V, LFLAG, NVOPU, EIG, X)",
+                "declarations": [
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 1,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 29,
+                    "line_end": 107
+                  },
+                  {
+                    "path": "src/dblzdrv.f",
+                    "line_start": 116,
+                    "line_end": 158
+                  }
+                ],
+                "path": "src/dblzdrv.f",
+                "line_start": 1,
+                "line_end": 268,
+                "examples": [
+                  {
+                    "path": "tests/src/ddrvgp1.f",
+                    "line_start": 124,
+                    "line_end": 188
+                  }
+                ],
+                "usage": "! Allocate and initialize controls/workspaces using the pinned DBLZDRV contract.\n! Select ISTOR(9)=1 for generalized symmetric mode.\nlflag=0\ndo\n  call dblzdrv(istor,rstor,sigma,nneig,u,v,lflag,nvopu,eig,x)\n  if(lflag<=0) exit\n  ! Implement the requested operation for all NVOPU columns, then reenter.\n  ! Never reenter without filling V or completing the requested factorization.\nend do\nif(lflag<0) error stop \"Lanczos terminated abnormally\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Protocol fragment, not an executable driver until control initialization, allocation and request handlers are supplied. Service flags 1 (shifted solves), 2 (B products), 3 (factorization and inertia), and any requested starting-vector flag 4; follow BLZPACK definiteness/mode assumptions. The author example uses separately licensed MA47 and B=I, not a checked general pencil. Consult driver storage formulas rather than copying dimensions from a different version. Preserve inputs for independent residual/orthogonality checks; no matrix operations or eigensolve were executed."
+              },
+              {
+                "procedure": "DBLZSTP",
+                "role": "implementation-helper",
+                "path": "src/dblzstp.f",
+                "line_start": 1,
+                "line_end": 225
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-style notice with additional enhancement grant",
+          "spdx_expression": null,
+          "revision": "2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root has three redistribution/endorsement clauses followed by an additional license grant for enhancements made available to others/LBNL. Preserve those supplied terms rather than simplifying the whole file to a bare BSD-3-Clause identifier. MA47 and other caller-supplied solvers are separate dependencies.",
+          "evidence": [
+            {
+              "path": "license.txt",
+              "url": "https://github.com/oamarques/BLZPACK/blob/2e5aa8f725e92e27e3aeec8c025eadc5bc521b1c/license.txt",
+              "sha256": "2a931091d4e81a228150bad4fee4c28e01942d18d987382374bd83fb699d059f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -374,12 +544,94 @@
             ],
             "notes": "Documents Fortran 90 matrix eigensolvers and related unitary QR research. Build requirements and individual routine interfaces have not yet been reviewed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4a5",
+            "level": "source-reviewed",
+            "revision": "fcdc0f454d00be218225aff0dd760906d8d09175",
+            "reviewed_on": "2026-11-05",
+            "notes": "d_symtrid_qr handles a real symmetric tridiagonal ordinary eigenproblem through a Cayley transformation, core-chasing reduction to unitary Hessenberg form, a unitary QR dispatch and inverse eigenvalue transformation. The inspected d_symtrid_factor stores core rotations and optionally accumulates Schur vectors; D4a5 is explicitly scoped here to symmetric tridiagonal inputs, not general nonsymmetric tridiagonals or the whole EISCOR API. D/E are overwritten and results are not explicitly sorted. Source findings require attention: the QR driver passes WORK(1:3*(N-3)) to a factor dummy Q(3*N-3), a shorter array section; factor code accepts N=1 but accesses E(1), so use a validated N>=2 path after repairing/checking workspace association. Schur vectors are COMPLEX(8) despite real input. Scaling is recommended; nonzero INFO means factorization/QR failure, and partial back-transformed output is not a success certificate. No eigensolver, author comparison or lower-level unitary QR audit was run.",
+            "evidence": [
+              {
+                "path": "src/double/d_symtrid_qr.f90",
+                "url": "https://github.com/eiscor/eiscor/blob/fcdc0f454d00be218225aff0dd760906d8d09175/src/double/d_symtrid_qr.f90",
+                "sha256": "7ba21766350816244f8afb7828b73258b97ff17729fe37e6083b4a3d5152c153"
+              },
+              {
+                "path": "src/double/d_symtrid_factor.f90",
+                "url": "https://github.com/eiscor/eiscor/blob/fcdc0f454d00be218225aff0dd760906d8d09175/src/double/d_symtrid_factor.f90",
+                "sha256": "c3283050c9a087264cb3a16284b60afe22e2bba1d5987b13b9d32c9ff1e3379d"
+              },
+              {
+                "path": "example/double/example_d_symtrid_qr_1dlaplace.f90",
+                "url": "https://github.com/eiscor/eiscor/blob/fcdc0f454d00be218225aff0dd760906d8d09175/example/double/example_d_symtrid_qr_1dlaplace.f90",
+                "sha256": "2ae56f83cb18ef8e509219457b9053edba15d9be84083194ca0134ea6079e95b"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/eiscor/eiscor/blob/fcdc0f454d00be218225aff0dd760906d8d09175/README.md",
+                "sha256": "102ded6a223ddcd1e9715df2b3726f01be9ddbd8b8a1ca0157fa8bb4f88c987c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "d_symtrid_qr",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) diagonal D(N), subdiagonal E(N-1), WORK(5*N), INTEGER ITS(N-1), and COMPLEX(8) Z(M,N). VEC selects vectors, ID initializes Z, SCA controls scaling. Match literal kind 8 to the library build; inspect INFO.",
+                "signature": "CALL d_symtrid_qr(VEC, ID, SCA, N, D, E, WORK, M, Z, ITS, INFO)",
+                "declarations": [
+                  {
+                    "path": "src/double/d_symtrid_qr.f90",
+                    "line_start": 74,
+                    "line_end": 84
+                  },
+                  {
+                    "path": "src/double/d_symtrid_factor.f90",
+                    "line_start": 79,
+                    "line_end": 88
+                  }
+                ],
+                "path": "src/double/d_symtrid_qr.f90",
+                "line_start": 74,
+                "line_end": 145,
+                "examples": [
+                  {
+                    "path": "example/double/example_d_symtrid_qr_1dlaplace.f90",
+                    "line_start": 27,
+                    "line_end": 41
+                  }
+                ],
+                "usage": "integer, parameter :: n=4\ninteger :: its(n-1),info\nreal(8) :: d(n),e(n-1),work(5*n)\ncomplex(8) :: z(n,n)\nd=2d0; e=-1d0\n! Repair/check the recorded short WORK section before relying on this call.\ncall d_symtrid_qr(.true.,.true.,.true.,n,d,e,work,n,z,its,info)\nif(info/=0) error stop \"tridiagonal QR failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Source-repair fragment, not a checked eigensolver example. Build the complete EISCOR library with preprocessing for eiscor.h and compatible kinds. Correct the driver/factor workspace section mismatch and avoid the N=1 factor edge case. Preserve original D/E and independently check eigenpair residuals and orthogonality; no sorted order or accuracy was verified."
+              },
+              {
+                "procedure": "d_symtrid_factor",
+                "role": "implementation-helper",
+                "path": "src/double/d_symtrid_factor.f90",
+                "line_start": 79,
+                "line_end": 274
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "fcdc0f454d00be218225aff0dd760906d8d09175",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms to the named EISCOR authors. Dependency and complete-code provenance are outside this selected interface review.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/eiscor/eiscor/blob/fcdc0f454d00be218225aff0dd760906d8d09175/LICENSE.md",
+              "sha256": "b6825d0af9933f51720f9c1fc6d4de3c008f66254d6cb8d35c50b52ff22b3189"
+            }
+          ]
         }
       },
       "imports": {}
@@ -1017,12 +1269,180 @@
             ],
             "notes": "The README documents var/grad/adj and the fvar Hessian workflow. Example code is author-provided and has not been run here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "d4b861f441c4625480f3602452027a4c878c0497",
+            "reviewed_on": "2026-11-05",
+            "notes": "The current fz_var/fz_vari implementation records overloaded operations on shared byte-stack storage and per-node chain callbacks. grad(v) seeds the selected result adjoint to one and sweeps callbacks backward; primitive multiplication/addition and square/sine/exp chain rules visibly accumulate operand adjoints. H1 records reverse-mode automatic differentiation, not finite differences or validation of the advertised forward-over-reverse Hessian path. The public facade fazang reexports these interfaces. Repeated gradients require reset_adj because chain does not zero previous operand adjoints. reboot_chain reuses storage and invalidates old variable handles; module-global state is not per-thread/context. The convenience jac routine declares n but uses res(2:n) without assigning n, so the sketch avoids it. Storage exhaustion uses ERROR STOP; operation domains and alignment/kind assumptions remain caller/build concerns. No derivative, Hessian, performance test or complete operator set was compiled or run.",
+            "evidence": [
+              {
+                "path": "src/var.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/var.f90",
+                "sha256": "aef30560c2ca806d7e4e9ed6402a0ca97cd1711e5886d122e0095d05594d56c7"
+              },
+              {
+                "path": "src/vari.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/vari.f90",
+                "sha256": "984de51d4bb13e59d415985f072a105ee2763819a0e0fd7ff6a7155902460a83"
+              },
+              {
+                "path": "src/env.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/env.f90",
+                "sha256": "03ed99ed81fbda60717d4fd97667da59d27d0dd3c00052b2ef22e3ad08a24243"
+              },
+              {
+                "path": "src/vari_op.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/vari_op.f90",
+                "sha256": "b791901c48f2a2a4335d8ff878d0e0153dd0ba1cdfef98f0c425731c3caa3e53"
+              },
+              {
+                "path": "src/vari_op_inc.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/vari_op_inc.f90",
+                "sha256": "623cc13e22cc0751c9f92f7eeed9a89c959dd58bd6e2206925c1de5b4ed0bb66"
+              },
+              {
+                "path": "src/fazang.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/src/fazang.f90",
+                "sha256": "54b4150a6ecb672a9cb8f41b8b87360ffef114cfbc623fc809c8544c170a498d"
+              },
+              {
+                "path": "tests/test_perf_rosenbrock.f90",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/tests/test_perf_rosenbrock.f90",
+                "sha256": "d8811d853adc39f39518b58b3f67295f6c9a501a3f55a870d94839be13ed6458"
+              },
+              {
+                "path": "CMakeLists.txt",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/CMakeLists.txt",
+                "sha256": "d4dc14da6a3e978551f6536dc05db1ae6df8abee8945699def658b506ad3a05f"
+              },
+              {
+                "path": "readme.md",
+                "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/readme.md",
+                "sha256": "94adf5ba7b6cf62de17fd99d9d71613ba343749d365a600af914e96e4b188cb0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "grad",
+                "role": "public-entry-point",
+                "summary": "Public generic grad(v) or grad() in fz_var, reexported by fazang. v is a recorded var handle; the no-argument form starts at the last recorded node. Obtain REAL(rk) values/adjoints via val/adj, not fields on var.",
+                "signature": "CALL grad(v)",
+                "declarations": [
+                  {
+                    "path": "src/var.f90",
+                    "line_start": 74,
+                    "line_end": 81
+                  },
+                  {
+                    "path": "src/var.f90",
+                    "line_start": 115,
+                    "line_end": 123
+                  },
+                  {
+                    "path": "src/var.f90",
+                    "line_start": 253,
+                    "line_end": 274
+                  },
+                  {
+                    "path": "src/env.f90",
+                    "line_start": 13,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/fazang.f90",
+                    "line_start": 1,
+                    "line_end": 14
+                  }
+                ],
+                "path": "src/var.f90",
+                "line_start": 265,
+                "line_end": 274,
+                "module": "fz_var",
+                "examples": [
+                  {
+                    "path": "tests/test_perf_rosenbrock.f90",
+                    "line_start": 49,
+                    "line_end": 75
+                  }
+                ],
+                "usage": "use fazang\ntype(var) :: x,y\nreal(rk) :: derivative\nx=2.0_rk\ny=x*x\ncall reset_adj(y)\ncall grad(y)\nderivative=adj(x)\n! Read all values/adjoints before reclaiming tape storage.\ncall reboot_chain()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the current CMake-selected fz_env/fz_vari/fz_var implementation with preprocessing and its generated operator modules. The separately present tape.F90 belongs to another naming path and is not the reviewed runtime. Retain overloaded assignment/operators when importing with ONLY. Reset adjoints before another reverse sweep; old var handles must not be used after reboot_chain. The sketch avoids jac and makes no numerical derivative certificate."
+              },
+              {
+                "procedure": "reset_adj",
+                "role": "public-entry-point",
+                "summary": "Public generic zeroing adjoints back to the current nesting boundary, either from v or from the final recorded node; it does not free the graph.",
+                "signature": "CALL reset_adj(v)",
+                "declarations": [
+                  {
+                    "path": "src/var.f90",
+                    "line_start": 120,
+                    "line_end": 123
+                  },
+                  {
+                    "path": "src/var.f90",
+                    "line_start": 276,
+                    "line_end": 285
+                  }
+                ],
+                "path": "src/var.f90",
+                "line_start": 276,
+                "line_end": 285,
+                "module": "fz_var"
+              },
+              {
+                "procedure": "reboot_chain",
+                "role": "public-entry-point",
+                "summary": "Public global tape reset reexported by fazang; invalidates recorded variable handles by resetting stack location/node count.",
+                "signature": "CALL reboot_chain()",
+                "declarations": [
+                  {
+                    "path": "src/env.f90",
+                    "line_start": 134,
+                    "line_end": 147
+                  },
+                  {
+                    "path": "src/fazang.f90",
+                    "line_start": 1,
+                    "line_end": 3
+                  }
+                ],
+                "path": "src/env.f90",
+                "line_start": 144,
+                "line_end": 147,
+                "module": "fz_env"
+              },
+              {
+                "procedure": "chain",
+                "role": "implementation-helper",
+                "path": "src/vari.f90",
+                "line_start": 420,
+                "line_end": 430,
+                "module": "fz_vari"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "d4b861f441c4625480f3602452027a4c878c0497",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies BSD three-clause terms attributed to Yi Zhang. This does not establish every included statistical routine attribution or optional solver dependency license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/yizhang-yiz/fazang/blob/d4b861f441c4625480f3602452027a4c878c0497/LICENSE",
+              "sha256": "c7b931077bd5950cce41181b3796502ccb6fd797c9eff5d8e41eff6009d72ed1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -2380,12 +2800,112 @@
             ],
             "notes": "The README documents dense and sparse Jacobian variants and ODE-based, normal-flow and augmented-Jacobian algorithms. Fixed-point and tracking support is recorded in the scope rather than asserting all specialized GAMS leaves.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1",
+            "reviewed_on": "2026-11-05",
+            "notes": "HOMPACK90::FIXPNF initializes a homotopy path and controls dense normal-flow continuation with STEPNF, switching tolerances on curvature and dispatching ROOTNF when lambda reaches 1. With IFLAG=-1 it targets F(X)=0, using externally linked F and Jacobian-column FJAC callbacks specified by HOMOTOPY; IFLAG=0 instead solves a fixed-point problem and -2 selects a supplied homotopy. F2 is the nonlinear-system leaf in this taxonomy, not a newly invented homotopy child. Source-visible input checks, adaptive tolerance updates, 1000-step continuation returns and cleanup are reviewed at driver level. IFLAG=1 is normal termination; 2/3 are resumable with saved state, and 4..8 record failures. Saved path arrays/scalars make interleaved solves unsafe without separate contexts. POLY_SWITCH is tested by presence, not logical value, so omit it for ordinary zero finding. No global-convergence guarantee, complete STEPNF/ROOTNF/kernel audit or numerical solve was established.",
+            "evidence": [
+              {
+                "path": "src/HOMPACK90.f",
+                "url": "https://github.com/vtopt/hompack90/blob/c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1/src/HOMPACK90.f",
+                "sha256": "5efcaf3d4dbf4fae7d2111fdb7c9ebc3e5eeae536ac2861b3e685c734dea29b4"
+              },
+              {
+                "path": "src/MAINF.f",
+                "url": "https://github.com/vtopt/hompack90/blob/c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1/src/MAINF.f",
+                "sha256": "98fa55cd2caec7e6ccc0a9f387fd0347006be5637191a2a36c049df1de2e40c1"
+              },
+              {
+                "path": "src/template.f",
+                "url": "https://github.com/vtopt/hompack90/blob/c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1/src/template.f",
+                "sha256": "277409cb469d870c12e44cde73899693ac65786d356bc54ccc6296f71f96a6ed"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/vtopt/hompack90/blob/c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1/README.md",
+                "sha256": "2f60d6a2eb4fcdb1d4a10f4d565ad29da1dada4bea9e4d4bda66781b167f574d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "FIXPNF",
+                "role": "public-entry-point",
+                "summary": "Public module dense homotopy driver. REAL_PRECISION::R8=SELECTED_REAL_KIND(13); Y(N+1) stores lambda then X, A(N) is initialized from starting X for zero/fixed-point modes, and SSPAR(8) supplies/defaults step controls. Tolerances and IFLAG are mutable; NFE/ARCLEN report work/path length.",
+                "signature": "CALL FIXPNF(N, Y, IFLAG, ARCRE, ARCAE, ANSRE, ANSAE, TRACE, &\n            A, SSPAR, NFE, ARCLEN [, POLY_SWITCH])",
+                "declarations": [
+                  {
+                    "path": "src/HOMPACK90.f",
+                    "line_start": 1,
+                    "line_end": 4
+                  },
+                  {
+                    "path": "src/HOMPACK90.f",
+                    "line_start": 1161,
+                    "line_end": 1162
+                  },
+                  {
+                    "path": "src/HOMPACK90.f",
+                    "line_start": 1355,
+                    "line_end": 1363
+                  },
+                  {
+                    "path": "src/HOMPACK90.f",
+                    "line_start": 22,
+                    "line_end": 39
+                  }
+                ],
+                "path": "src/HOMPACK90.f",
+                "line_start": 1161,
+                "line_end": 1587,
+                "module": "HOMPACK90",
+                "examples": [
+                  {
+                    "path": "src/MAINF.f",
+                    "line_start": 96,
+                    "line_end": 121
+                  }
+                ],
+                "usage": "use real_precision, only: r8\nuse hompack90, only: fixpnf\ninteger, parameter :: n=2\ninteger :: iflag,nfe\nreal(r8) :: y(n+1),a(n),sspar(8),arcre,arcae,ansre,ansae,arclen\ny=0.0_r8; a=0.0_r8; sspar=0.0_r8\narcre=5.e-5_r8; arcae=5.e-5_r8\nansre=1.e-10_r8; ansae=1.e-10_r8; iflag=-1\n! Link matching external F(X,V) and FJAC(X,V,K) for the chosen problem.\ncall fixpnf(n,y,iflag,arcre,arcae,ansre,ansae,0,a,sspar,nfe,arclen)\nif(iflag/=1) error stop \"homotopy solve did not finish normally\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a driver fragment until problem callbacks are implemented and linked with compatible BLAS/LAPACK support. Template F/FJAC bodies are placeholders, not ready evaluators. For deliberate continuation on IFLAG=2/3 preserve all state and heed modified tolerances; the fragment simply stops. Do not interleave independent solves through saved driver state. Check residuals independently even after IFLAG=1."
+              },
+              {
+                "procedure": "F",
+                "role": "callback",
+                "path": "src/HOMPACK90.f",
+                "line_start": 24,
+                "line_end": 28
+              },
+              {
+                "procedure": "FJAC",
+                "role": "callback",
+                "path": "src/HOMPACK90.f",
+                "line_start": 34,
+                "line_end": 39
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "ACM Software License Agreement",
+          "spdx_expression": null,
+          "revision": "c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides the ACM agreement with noncommercial-use conditions and a separate commercial-use permission route. Do not substitute an MIT/BSD identifier or assume linked BLAS/LAPACK components share these terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/vtopt/hompack90/blob/c9701c43fdd4c5c2d8a7c1ea743ec74dd7d2c6e1/LICENSE",
+              "sha256": "d12e071a298aef8ae6aadf3b41fe96511d0acd08a138eca5f092de20fd7b71e7"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3837,12 +4357,109 @@
             ],
             "notes": "The README restricts orders to nonnegative real values and arguments to positive reals, with phase/logarithmic variants. Required precomputed tables are documented; timing and accuracy statements have not been independently reproduced.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C10a3",
+            "level": "source-reviewed",
+            "revision": "409728a84a983bb3246561baa825f96cdad26536",
+            "reviewed_on": "2026-11-05",
+            "notes": "bessel_eval accepts nonnegative real order up to 1e9 and positive real argument, dispatching J_nu/Y_nu evaluation among tabulated expansions, small-argument series and asymptotic routines. In the inspected table path, bivariate Chebyshev coefficients represent phase/phase derivative in the oscillatory region or log magnitudes in the nonoscillatory region; values are recovered by trigonometric/exponential formulas. C10a3 is the real-argument, real-order cylindrical Bessel scope, not complex-argument or modified Bessel functions. Call bessel_eval_init first; it reads fixed relative binary filenames into shared module state using unit 20. Repeated init returns without assigning DSIZE. Missing tables or invalid parameter ranges STOP rather than return an error; binary layout, real-kind promotion and endianness must match. Auxiliary phase/log outputs are branch-dependent and initially zero, not universally valid derivatives/logarithms. No accuracy, binary-portability or advertised timing result was tested; series/asymptotic coefficient derivations were not fully audited.",
+            "evidence": [
+              {
+                "path": "bessel_eval.f90",
+                "url": "https://github.com/JamesCBremerJr/BesselEval/blob/409728a84a983bb3246561baa825f96cdad26536/bessel_eval.f90",
+                "sha256": "b683bd53648794d638b58e09030320125f6aa24a640fd7a2680669d4fc3fc073"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/JamesCBremerJr/BesselEval/blob/409728a84a983bb3246561baa825f96cdad26536/README.md",
+                "sha256": "f17ff706630fe909e586f2705b3a628c23605b33b1bd21acd0d4c955c1c94dfd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bessel_eval",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine returning DOUBLE PRECISION J/Y and branch-dependent phase/log outputs. DNU and T are input scalars. Shared coefficient tables must be loaded before any evaluation.",
+                "signature": "CALL bessel_eval(dnu, t, alpha, alphader, vallogj, vallogy, valj, valy)",
+                "declarations": [
+                  {
+                    "path": "bessel_eval.f90",
+                    "line_start": 82,
+                    "line_end": 106
+                  },
+                  {
+                    "path": "bessel_eval.f90",
+                    "line_start": 123,
+                    "line_end": 126
+                  }
+                ],
+                "path": "bessel_eval.f90",
+                "line_start": 123,
+                "line_end": 266,
+                "module": "besseleval",
+                "usage": "use besseleval, only: bessel_eval_init,bessel_eval\ndouble precision :: size_mb,alpha,ap,lj,ly,j,y\ncall bessel_eval_init(size_mb)\ncall bessel_eval(2.5d0,3d0,alpha,ap,lj,ly,j,y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Run in a directory containing the matching bessel_data.bin (ordinary DOUBLE PRECISION) or bessel_data16.bin (promoted precision). Keep build precision and table representation compatible. The sketch uses the tabulated oscillatory region; do not treat zero-initialized inactive outputs as valid log values. No reference-function comparison or error bound was computed."
+              },
+              {
+                "procedure": "bessel_eval_init",
+                "role": "public-entry-point",
+                "summary": "Public one-time binary-table loader. DSIZE estimates table memory, but is not assigned when tables are already marked loaded. File errors terminate the process; no filename or IOSTAT argument.",
+                "signature": "CALL bessel_eval_init(dsize)",
+                "declarations": [
+                  {
+                    "path": "bessel_eval.f90",
+                    "line_start": 1603,
+                    "line_end": 1627
+                  }
+                ],
+                "path": "bessel_eval.f90",
+                "line_start": 1603,
+                "line_end": 1662,
+                "module": "besseleval"
+              },
+              {
+                "procedure": "bessel_expeval",
+                "role": "implementation-helper",
+                "path": "bessel_eval.f90",
+                "line_start": 269,
+                "line_end": 340,
+                "module": "besseleval"
+              },
+              {
+                "procedure": "bessel_tensor_eval",
+                "role": "implementation-helper",
+                "path": "bessel_eval.f90",
+                "line_start": 1469,
+                "line_end": 1515,
+                "module": "besseleval"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "409728a84a983bb3246561baa825f96cdad26536",
+          "reviewed_on": "2026-11-05",
+          "notes": "The source header explicitly allows GPL version 3 or any later version, alongside the root GPL v3 text. This finding does not separately audit binary-table provenance.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JamesCBremerJr/BesselEval/blob/409728a84a983bb3246561baa825f96cdad26536/LICENSE",
+              "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+            },
+            {
+              "path": "bessel_eval.f90",
+              "url": "https://github.com/JamesCBremerJr/BesselEval/blob/409728a84a983bb3246561baa825f96cdad26536/bessel_eval.f90",
+              "sha256": "b683bd53648794d638b58e09030320125f6aa24a640fd7a2680669d4fc3fc073"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4290,12 +4907,89 @@
             ],
             "notes": "The README links the wavelet analysis guide and describes significance tests and cross-wavelet/coherency applications. Kept at time-series analysis; individual transform APIs and statistical tests await procedure review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a3a",
+            "level": "source-reviewed",
+            "revision": "e345f33a61becfb6c4850317d31c75b0da10d9e9",
+            "reviewed_on": "2026-11-05",
+            "notes": "WAVELET removes the sample mean, optionally zero-pads, computes the series FFT, multiplies it by scale-dependent daughter spectra and inverse-transforms each scale. The inspected Morlet path uses a positive-frequency Gaussian; Paul and derivative-of-Gaussian branches are also visible. L10a3a records time-series spectral analysis using a continuous-wavelet transform, not a newly invented GAMS wavelet leaf or a significance-test certification. Returned WAVE holds complex coefficients, not powers; ABS(WAVE)**2 forms power. Require 1<=N<=NPAD<=65535, positive DT/S0, sensible DJ/JTOT and compatible storage. Only NPAD<N is explicitly rejected, with a printed message and unassigned outputs; MOTHER and negative PARAM can be modified to defaults. FFT/significance dependency kernels and edge-effect accuracy are not fully audited. No transform or author example was run.",
+            "evidence": [
+              {
+                "path": "wave_fortran/wavelet.f",
+                "url": "https://github.com/chris-torrence/wavelets/blob/e345f33a61becfb6c4850317d31c75b0da10d9e9/wave_fortran/wavelet.f",
+                "sha256": "ffa61d657c643679a9a49cadc868604835648faa071aa2556c949e6069a1cb3e"
+              },
+              {
+                "path": "wave_fortran/wavetest.f",
+                "url": "https://github.com/chris-torrence/wavelets/blob/e345f33a61becfb6c4850317d31c75b0da10d9e9/wave_fortran/wavetest.f",
+                "sha256": "10e988043355480ee22d2612fcc3003a2cb211f71bb1ff1f8dfb876afcbf3578"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/chris-torrence/wavelets/blob/e345f33a61becfb6c4850317d31c75b0da10d9e9/README.md",
+                "sha256": "910e8edf9e826ae3376208146b2dedef951363b617aab6b087bd5ebb6b1bd075"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "WAVELET",
+                "role": "public-entry-point",
+                "summary": "External double-precision sampled time-series transform. WAVE(N,JTOT) is DOUBLE COMPLEX; SCALE/PERIOD(JTOT) and COI(N) are double precision. No status result. Supply writable MOTHER/PARAM variables because default handling can change them.",
+                "signature": "CALL WAVELET(N, Y, DT, MOTHER, PARAM, S0, DJ, JTOT, NPAD, &\n             WAVE, SCALE, PERIOD, COI)",
+                "declarations": [
+                  {
+                    "path": "wave_fortran/wavelet.f",
+                    "line_start": 119,
+                    "line_end": 134
+                  }
+                ],
+                "path": "wave_fortran/wavelet.f",
+                "line_start": 119,
+                "line_end": 205,
+                "examples": [
+                  {
+                    "path": "wave_fortran/wavetest.f",
+                    "line_start": 61,
+                    "line_end": 68
+                  }
+                ],
+                "usage": "integer, parameter :: n=8,jtot=3,npad=8\ninteger :: mother\ndouble precision :: y(n),dt,param,s0,dj,scale(jtot),period(jtot),coi(n)\ndouble complex :: wave(n,jtot)\ny=[0d0,1d0,0d0,-1d0,0d0,1d0,0d0,-1d0]\ndt=1d0; s0=2d0; dj=0.25d0; mother=0; param=6d0\ncall wavelet(n,y,dt,mother,param,s0,dj,jtot,npad,wave,scale,period,coi)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the supplied compatible double-precision CFFTPACK, plus the required support routines for the linked source object. Respect the fixed 65535 scratch bound, including zero padding. No reconstructed signal, cone-of-influence interpretation, confidence level or spectral normalization was numerically checked. The upstream repository currently redirects to ct6502/wavelets; the catalog retains its existing repository identity."
+              },
+              {
+                "procedure": "WAVE_FUNCTION",
+                "role": "implementation-helper",
+                "path": "wave_fortran/wavelet.f",
+                "line_start": 258,
+                "line_end": 319
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Root MIT; retained Fortran non-sale notice unresolved",
+          "spdx_expression": null,
+          "revision": "e345f33a61becfb6c4850317d31c75b0da10d9e9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root has MIT terms, but wavelet.f retains an older permission notice requiring that the software not be sold, plus attribution wording. Record both rather than resolving precedence into a single SPDX expression. CFFTPACK/CHISQR dependency terms were not completely audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/chris-torrence/wavelets/blob/e345f33a61becfb6c4850317d31c75b0da10d9e9/LICENSE",
+              "sha256": "956d7ec38d1f1034bf83c58298005fb81b05502aa5bff2de8b59ff23f4bfeae9"
+            },
+            {
+              "path": "wave_fortran/wavelet.f",
+              "url": "https://github.com/chris-torrence/wavelets/blob/e345f33a61becfb6c4850317d31c75b0da10d9e9/wave_fortran/wavelet.f",
+              "sha256": "ffa61d657c643679a9a49cadc868604835648faa071aa2556c949e6069a1cb3e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4876,12 +5570,211 @@
             ],
             "notes": "The README documents Fortran/Python interfaces and inverse transforms. It cautions that independent negative-frequency content of complex input is not preserved; a generic complex FFT claim is not made.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "4dd9aa1946041d95d7e7fca73e487a7c7cada957",
+            "reviewed_on": "2026-11-05",
+            "notes": "cfst1f Fourier-transforms the input, doubles positive frequencies and clears negative bins through cht1f, then inverse-transforms Gaussian-weighted circularly shifted spectra into frequency voices. cfst1b sums the voices, restores conjugate negative-frequency content and transforms back. J records the one-dimensional Stockwell integral-transform service because this taxonomy has no Stockwell leaf; it is not classified as a plain Fourier transform merely because FFTs implement it. Default-kind COMPLEX input/output, allocated forward bounds (0:N/2,0:N-1), DC voice SUM(H)/N, and inverse voice/time layout are source-visible. Intended round trips assume real-valued data represented as complex; independent negative-frequency information is discarded. Require nonempty input and a correctly shaped inverse array; failures use ERROR STOP, not returned status. The 2D DOST and voice-extraction paths are outside the selected usage review. No transform/round trip was executed.",
+            "evidence": [
+              {
+                "path": "src/fstpack.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fstpack.f90",
+                "sha256": "6bcc9d634b61588feddd421ba07026854ad32b630929d0c9ec5a51161aeca54f"
+              },
+              {
+                "path": "src/hilbrt.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/hilbrt.f90",
+                "sha256": "62d56ece62397299721e57f4f4e93622f495281455ed559581eb12fa20fd63cd"
+              },
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack.f90",
+                "sha256": "54690dd723a876c206e24eb47d11e7fa86684898173bad5aac2966de280d52e1"
+              },
+              {
+                "path": "src/mutl.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/mutl.f90",
+                "sha256": "9e9feff68fd2ee7f468f15d93bf43c1e2115c6fcb378f61ff1c4089e6b563b90"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/README.md",
+                "sha256": "791c2f6aab36a87f724ad36a6c6baa3da508510328204b6197e3e61bc438a1c6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cfst1f",
+                "role": "public-entry-point",
+                "summary": "Public pure module function returning allocatable default-kind COMPLEX voices. First dimension is frequency, second time; input is unchanged. Input lower bound is rebased to zero inside the routine.",
+                "signature": "s = cfst1f(h)",
+                "declarations": [
+                  {
+                    "path": "src/fstpack.f90",
+                    "line_start": 1,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "src/fstpack.f90",
+                    "line_start": 128,
+                    "line_end": 145
+                  }
+                ],
+                "path": "src/fstpack.f90",
+                "line_start": 128,
+                "line_end": 161,
+                "module": "fstpack",
+                "usage": "use fstpack, only: cfst1f,cfst1b\ncomplex :: h(8)\ncomplex, allocatable :: s(:,:),restored(:)\nh=cmplx([0.,1.,0.,-1.,0.,1.,0.,-1.],0.)\ns=cfst1f(h)\nrestored=cfst1b(s)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build mutl, the FFTPACK interface/backend and hilbrt before fstpack. This sketch uses real-valued samples stored as default COMPLEX; it does not establish invertibility for arbitrary complex signals. The lower bounds of an allocatable assignment result need not retain the function internal bounds, so use LBOUND/UBOUND when accessing coefficients. No round-trip error or scaling identity was tested."
+              },
+              {
+                "procedure": "cfst1b",
+                "role": "public-entry-point",
+                "summary": "Public inverse-like reconstruction function. Supply shape (N/2+1,N); returns allocated H(1:N). No shape validation or status output.",
+                "signature": "h = cfst1b(s)",
+                "declarations": [
+                  {
+                    "path": "src/fstpack.f90",
+                    "line_start": 109,
+                    "line_end": 125
+                  }
+                ],
+                "path": "src/fstpack.f90",
+                "line_start": 109,
+                "line_end": 126,
+                "module": "fstpack"
+              },
+              {
+                "procedure": "cht1f",
+                "role": "implementation-helper",
+                "path": "src/hilbrt.f90",
+                "line_start": 21,
+                "line_end": 30,
+                "module": "hilbrt"
+              },
+              {
+                "procedure": "cht1b",
+                "role": "implementation-helper",
+                "path": "src/hilbrt.f90",
+                "line_start": 8,
+                "line_end": 19,
+                "module": "hilbrt"
+              },
+              {
+                "procedure": "gauss",
+                "role": "implementation-helper",
+                "path": "src/fstpack.f90",
+                "line_start": 241,
+                "line_end": 246,
+                "module": "fstpack"
+              }
+            ]
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "4dd9aa1946041d95d7e7fca73e487a7c7cada957",
+            "reviewed_on": "2026-11-05",
+            "notes": "The separately public FFTPACK::cfft1_ wrapper allocates save/work arrays, initializes FFTPACK 5.1 tables and dispatches CFFT1F or CFFT1B on an in-place default-COMPLEX vector. Backend drivers dispatch mixed-radix passes. J1a2 covers this callable one-dimensional complex Fourier-transform interface, distinct from the Stockwell construction. DIR is exactly lowercase f or b; invalid direction returns ERR=1. Empty input reaches ILOG2(0) and is unsupported. Workspace/tables are rebuilt each call. Wrapper backend interfaces declare WORK INTENT(IN) although the linked FFT uses it as scratch, an interface-contract inconsistency needing correction. Review covers wrapper and dispatch, not all butterfly kernels, normalization proofs or compiler purity checks; no FFT was run.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack.f90",
+                "sha256": "54690dd723a876c206e24eb47d11e7fa86684898173bad5aac2966de280d52e1"
+              },
+              {
+                "path": "src/mutl.f90",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/mutl.f90",
+                "sha256": "9e9feff68fd2ee7f468f15d93bf43c1e2115c6fcb378f61ff1c4089e6b563b90"
+              },
+              {
+                "path": "src/fftpack/cfft1f.f",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack/cfft1f.f",
+                "sha256": "5d1c27af687dfe7c87802f48df8663d3cdc5a838cbc8e78759588f82ff08968d"
+              },
+              {
+                "path": "src/fftpack/cfft1b.f",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack/cfft1b.f",
+                "sha256": "d1e9c8ea76bbdb48a237d7114534adef74ef3f51fc27af6f94181d365b270f16"
+              },
+              {
+                "path": "src/fftpack/c1fm1f.f",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack/c1fm1f.f",
+                "sha256": "e130d157aa2a300a1591697014263468d950c77360e19e322be2eb2772126123"
+              },
+              {
+                "path": "src/fftpack/c1fm1b.f",
+                "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack/c1fm1b.f",
+                "sha256": "6dddcac79f28229fab5ffa1a5793d5542dc37ba0eaa51772620c1d8d10377045"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cfft1_",
+                "role": "public-entry-point",
+                "summary": "Public pure module wrapper, lowercase direction character, in-place default-kind COMPLEX vector and default INTEGER ERR. ERR is returned from initialization/backend, or 1 for an unknown direction.",
+                "signature": "CALL cfft1_(dir, c, err)",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 1,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 55,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 55,
+                "line_end": 78,
+                "module": "fftpack",
+                "usage": "use fftpack, only: cfft1_\ncomplex :: c(8)\ninteger :: err\nc=cmplx([1.,0.,0.,0.,0.,0.,0.,0.],0.)\ncall cfft1_(\"f\",c,err)\nif(err/=0) error stop \"FFT failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use matching default REAL/COMPLEX kinds throughout the wrapper and bundled FFTPACK backend, and correct the recorded scratch INTENT interface mismatch. N must be positive. ERR=0 is not a residual, round-trip or accuracy check; scaling conventions were not independently validated."
+              },
+              {
+                "procedure": "CFFT1F",
+                "role": "implementation-helper",
+                "path": "src/fftpack/cfft1f.f",
+                "line_start": 31,
+                "line_end": 56
+              },
+              {
+                "procedure": "C1FM1F",
+                "role": "implementation-helper",
+                "path": "src/fftpack/c1fm1f.f",
+                "line_start": 31,
+                "line_end": 75
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice; FFTPACK dependency terms separate",
+          "spdx_expression": null,
+          "revision": "4dd9aa1946041d95d7e7fca73e487a7c7cada957",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies MIT terms for FSTPACK; the bundled FFTPACK entry file carries a separate UCAR 2011 copyright/all-rights-reserved notice. The inspected material does not by itself establish complete dependency redistribution terms, so no aggregate SPDX expression is assigned.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/LICENSE",
+              "sha256": "b989cc3101805a079a395191fd3895ccf5c2c65b88207725431be5c81b4e373a"
+            },
+            {
+              "path": "src/fftpack/cfft1f.f",
+              "url": "https://github.com/thkrz/fstpack/blob/4dd9aa1946041d95d7e7fca73e487a7c7cada957/src/fftpack/cfft1f.f",
+              "sha256": "5d1c27af687dfe7c87802f48df8663d3cdc5a838cbc8e78759588f82ff08968d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -39536,12 +40429,111 @@
             ],
             "notes": "The brief README supports random generation and C++ interoperability. Individual generator families, seeding, stream properties and statistical quality need source-level review; no specific generator is inferred from the older discovery description.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "1682a2ee1f18ff1a40d17790d5bbdb79ebc6ccd1",
+            "reviewed_on": "2026-11-05",
+            "notes": "rng_m provides object-owned MT19937 state with 624 INT32 words, single-seed expansion, a twist recurrence and bitwise tempering. The selected uint32 binding masks signed INT32 output into a nonnegative INT64 result, carrying a 32-bit integer payload rather than generating 64 random bits or a real-valued variate. L6a21 records intended discrete uniform pseudorandom output. An unseeded state falls back to seed 5489; explicitly seeding is shown. Seed multiplication and the lower-mask expression rely on signed wrap behavior not guaranteed by standard Fortran. C array-seeding code explicitly differs from reference initialization and is excluded. Source inspection does not establish period, bitwise agreement or statistical quality; no generator was run.",
+            "evidence": [
+              {
+                "path": "rfng.f90",
+                "url": "https://github.com/JeffIrwin/rfng/blob/1682a2ee1f18ff1a40d17790d5bbdb79ebc6ccd1/rfng.f90",
+                "sha256": "a05233f6951e5df2e94b1394ef39c8110d35b7d09307abeaa35122fbc0165d73"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/JeffIrwin/rfng/blob/1682a2ee1f18ff1a40d17790d5bbdb79ebc6ccd1/README.md",
+                "sha256": "d5b608755af9892452937dd02e62355c2319710d019d39e1f1750cf1a4d65350"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "uint32",
+                "role": "public-entry-point",
+                "summary": "Public type-bound INT64 function on rng_m::rng_t, representing unsigned 32-bit output in 0..2^32-1. Updates the object state; use an INT32 scalar seed through the seed binding.",
+                "signature": "value = rng%uint32()",
+                "declarations": [
+                  {
+                    "path": "rfng.f90",
+                    "line_start": 17,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "rfng.f90",
+                    "line_start": 210,
+                    "line_end": 223
+                  }
+                ],
+                "path": "rfng.f90",
+                "line_start": 210,
+                "line_end": 223,
+                "module": "rng_m",
+                "derived_type": "rng_t",
+                "usage": "use iso_fortran_env, only: int32,int64\nuse rng_m, only: rng_t\ntype(rng_t) :: rng\ninteger(int64) :: value\ncall rng%seed(12345_int32)\nvalue=rng%uint32()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. rfng.f90 contains preprocessor macros and must be compiled with preprocessing enabled and intended integer wrap behavior. Do not confuse the widened INT64 container with a 64-bit generator. Reference outputs, independent streams and endpoint frequencies were not checked."
+              },
+              {
+                "procedure": "seed",
+                "role": "public-entry-point",
+                "summary": "Public type-bound single-INT32 seed initializer; fills rng%s through the private interoperable seed function.",
+                "signature": "CALL rng%seed(seed_value)",
+                "declarations": [
+                  {
+                    "path": "rfng.f90",
+                    "line_start": 48,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "rfng.f90",
+                    "line_start": 131,
+                    "line_end": 138
+                  }
+                ],
+                "path": "rfng.f90",
+                "line_start": 131,
+                "line_end": 140,
+                "module": "rng_m",
+                "derived_type": "rng_t"
+              },
+              {
+                "procedure": "get_int32",
+                "role": "implementation-helper",
+                "path": "rfng.f90",
+                "line_start": 144,
+                "line_end": 176,
+                "module": "rng_m"
+              },
+              {
+                "procedure": "twist_mt19937",
+                "role": "implementation-helper",
+                "path": "rfng.f90",
+                "line_start": 227,
+                "line_end": 262,
+                "module": "rng_m"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "1682a2ee1f18ff1a40d17790d5bbdb79ebc6ccd1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies BSD three-clause terms for Jeff Irwin. Algorithm provenance/reference-equivalence and C++ dependency scope were not completely audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JeffIrwin/rfng/blob/1682a2ee1f18ff1a40d17790d5bbdb79ebc6ccd1/LICENSE",
+              "sha256": "b4b06d578308cbcf67a881e9059a845cbfe744468ee93563418939af704de19b"
+            }
+          ]
         }
       },
       "imports": {}
