@@ -288,6 +288,18 @@
       "parent": "G2h2a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "N5b": {
+      "label": "Insertion position",
+      "parent": "N5",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "E3c": {
+      "label": "Manipulation of basis functions (e.g., evaluation, change of basis)",
+      "parent": "E3",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

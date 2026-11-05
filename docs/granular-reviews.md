@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 196 repositories now have 241 source-reviewed
+Reviewed on 2026-11-05. 204 repositories now have 250 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-189 repository cards now identify public routines and link their usage lines
+197 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 196 independently source-reviewed repositories now have an
+separately. All 204 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -220,6 +220,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | LCMIN | `lcmin::lcmin_load`, `lcmin::lcmin_optimize`; objective, gradient and Hessian callbacks | No license grant identified in reviewed material |
 | Fast critical-line algorithm | External `calcturningpoints` | No license grant identified in reviewed material |
 | VTdirect95 | `VTdirect_MOD::VTdirect` and objective callback | ACM Software License Agreement |
+| gf_int_node | `mod_int_node::sub_int_node` scalar/vector overloads | MIT-style notice with citation request |
+| ToolboxFortran | `mod_numerical::linint`, `mod_numerical::locate` | Root MIT notice; attributed-source scope unresolved |
+| fortnum | `fortnum_quadrature::gauss_legendre`, `gauss_legendre_ab`, `gauss_lobatto_legendre` | MIT |
+| NumericalHUB | `Lagrange_interpolation::Lagrange_polynomials` | No license grant identified in reviewed material |
+| Fortran Numerical Methods | `numerical_integration::trapezoidal_method`, `romberg_method` | MIT |
+| FOODIE | `foodie_integrator_runge_kutta_ssp::integrator_runge_kutta_ssp%initialize/%integrate` | Multi-license README; MIT option supplied |
+| WenOOF | `wenoof::wenoof_create`; `wenoof_interpolator_js::interpolator_js%interpolate` | Multi-license options described in README |
+| RALFit | `ral_nlls_double::nlls_solve` | BSD-3-Clause |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -435,6 +443,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [LCMIN](https://github.com/johngardenghi/lcmin) | G2h2a3 | Smooth minimization with linear equalities, bounds and supplied first/second derivatives | Current module interface differs from old wrapper. External numerical prerequisites, file output and module globals; dual assignments are commented out. |
 | [Fast critical-line algorithm](https://github.com/afniedermayer/fast_critical_line_algorithm) | G2e1 | Long-only mean/variance frontier with positive-definite covariance | Not an arbitrary quadratic-programming interface. Degenerate inputs and capacity/error paths need caller care; SIG_TPS is standard deviation. |
 | [VTdirect95](https://github.com/vtopt/vtdirect95) | G2i | Serial DIRECT box-constrained global search | Budget checks follow batches; normal stopping statuses are 1-4. Neither stopping nor a finite returned value certifies a global optimum. |
+| [gf_int_node](https://github.com/gfell/gf_int_node) | N5b | Ordered interpolation-node searches, with clamped endpoint conventions | Does not evaluate an interpolant. Nonempty sorted queries required for vector path; exact-knot conventions differ between overloads. |
+| [ToolboxFortran](https://github.com/aledinola/ToolboxFortran) | E1a; N5b | Piecewise-linear interpolation/extrapolation and ascending-grid binary search | Caller validates distinct ascending coordinates; search sentinels need checking. Legacy PAUSE and attributed-source provenance require care. |
+| [fortnum](https://github.com/lazy-fortran/fortnum) | H2c | Gauss-Legendre and Legendre-Lobatto quadrature nodes/weights | Newton/recurrence implementation, not the header's eigenvalue-method wording. Fixed iteration cap without convergence status; no adaptive integrator claimed. |
+| [NumericalHUB](https://github.com/jahrWork/NumericalHUB) | E3c | Lagrange cardinal-basis values and derivative recurrence | Preserve result bounds; distinct nodes required. Integral row has a source-selected lower limit; default REAL and conditioning limits apply. |
+| [Fortran Numerical Methods](https://github.com/c4rlosr4ul/Fortran-Numerical-Methods) | H2a1a2 | Composite trapezoids and fixed-depth Romberg quadrature of a callback | Trapezoids require ascending limits; N means panels versus levels. No error estimates; the problematic Simpson one-third path is excluded. |
+| [FOODIE](https://github.com/Fortran-FOSS-Programmers/FOODIE) | I1a1a | Standard three-stage third-order SSP Runge-Kutta stepping | Concrete integrand bindings and initialization required. Caller selects DT and advances T; NEW_DT is unchanged, not adaptive. |
+| [WenOOF](https://github.com/Fortran-FOSS-Programmers/WenOOF) | E1 | Nonlinear Jiang-Shu interpolation from uniform point stencils | Scoped to S=3 standard rank-one interface interpolation. Debug SI is unassigned; rank-two reconstruction belongs to another concrete path. |
+| [RALFit](https://github.com/ralna/RALFit) | K1b1a2 | Unconstrained smooth nonlinear least squares with analytic Jacobian | Explicit MODEL=1 overrides hybrid default; mandatory Hessian dummy is suitable only for that selected model. Status/stop flags do not certify global optimality. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -830,3 +846,19 @@ return with a perturbed input vector.
 All new calling sketches remain uncompiled and unrun. The source review does
 not audit the full GLCPD, HSL or other dependency stacks, parallel execution,
 or numerical accuracy. Root license findings do not replace dependency terms.
+
+## Numerical services and caller-controlled accuracy
+
+These reviews distinguish finding interpolation intervals from evaluating a
+curve, basis evaluation from fitting data, and quadrature-rule generation from
+an automatic integrator. The cards retain actual array bounds, precision kinds,
+callback declarations and endpoint conventions. Their evidence links identify
+the source paths used for the scoped claims.
+
+The selected FOODIE method leaves time-step selection and time advancement to
+the caller. The selected RALFit usage explicitly requests its first-order model
+instead of inheriting the hybrid default. WenOOF's selected standard rank-one
+path is kept separate from debug outputs and reconstruction overloads.
+All new sketches are uncompiled and unrun; author examples are linked as
+references, not presented as checked hosted drivers. License findings preserve
+modified notices, multi-license context and unresolved upstream provenance.
