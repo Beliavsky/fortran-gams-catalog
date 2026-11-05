@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 204 repositories now have 250 source-reviewed
+Reviewed on 2026-11-05. 212 repositories now have 260 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-197 repository cards now identify public routines and link their usage lines
+205 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 204 independently source-reviewed repositories now have an
+separately. All 212 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -228,6 +228,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FOODIE | `foodie_integrator_runge_kutta_ssp::integrator_runge_kutta_ssp%initialize/%integrate` | Multi-license README; MIT option supplied |
 | WenOOF | `wenoof::wenoof_create`; `wenoof_interpolator_js::interpolator_js%interpolate` | Multi-license options described in README |
 | RALFit | `ral_nlls_double::nlls_solve` | BSD-3-Clause |
+| NumLib | `rungekutta_explicit::rk4_explicit_step` scalar/vector overloads, implemented in a submodule | GNU GPL v3 text; version scope unresolved |
+| Brito numerical methods | External `CG`; `bisec_code` standalone cubic-root demonstration | No license grant identified in reviewed material |
+| Planelles numerical methods | `module_no_linear_equations::newton_raphson`, `fixPoint` | GNU GPL v2 text; version scope unresolved |
+| Fortran Toolkit | `toolkit::brent` | MIT root notice; additional source instructions |
+| SPRAL | `spral_lsmr::lsmr_solve`, `lsmr_free` | BSD-3-Clause root; BSD-2-Clause LSMR header |
+| scivision L-BFGS-B | `solver_lbfgsb::setulb` | Apache-2.0 root; upstream component provenance separate |
+| Bessel-Hankel | `Hankel_Transform::HankelJ0Transform`, `HankelJ1Transform` and Fast variants | MIT link in README; component scope not audited |
+| rpact.as251 | External `MVNPRD`, `ALNORM` | LGPL-3 package declaration; legacy algorithm scope unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -451,6 +459,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FOODIE](https://github.com/Fortran-FOSS-Programmers/FOODIE) | I1a1a | Standard three-stage third-order SSP Runge-Kutta stepping | Concrete integrand bindings and initialization required. Caller selects DT and advances T; NEW_DT is unchanged, not adaptive. |
 | [WenOOF](https://github.com/Fortran-FOSS-Programmers/WenOOF) | E1 | Nonlinear Jiang-Shu interpolation from uniform point stencils | Scoped to S=3 standard rank-one interface interpolation. Debug SI is unassigned; rank-two reconstruction belongs to another concrete path. |
 | [RALFit](https://github.com/ralna/RALFit) | K1b1a2 | Unconstrained smooth nonlinear least squares with analytic Jacobian | Explicit MODEL=1 overrides hybrid default; mandatory Hessian dummy is suitable only for that selected model. Status/stop flags do not certify global optimality. |
+| [NumLib](https://github.com/ebrooker/NumLib) | I1a1a | Classical four-stage RK4, scalar/vector one-step interfaces | Compile parent plus implementation submodule. Caller advances time and chooses H; INOUT H is unchanged, with no adaptive error estimate. |
+| [Brito numerical methods](https://github.com/brito-leonardo/numerical_methods) | D2b1b; F1a1 | Dense SPD conjugate gradient and a standalone fixed cubic bisection example | Separate external CG from demonstration MAIN before linking. No CG cap/breakdown check; exact initial residual can divide by zero. Bisection stops on residual alone. |
+| [Planelles numerical methods](https://github.com/planelles20/Numerical-Methods-Fortran) | F2 | Newton/Jacobian and vector fixed-point iteration | Step-size stopping is not a residual check. Positive iteration limit required; unpivoted LU has no breakdown status. |
+| [Fortran Toolkit](https://github.com/borjapetit/fortran_toolkit) | F1b | General scalar root search using inverse-quadratic/secant trials | Inspect safeguards rather than inferring standard Brent behavior from the name. Oriented sign bracket and status-dependent output handling required. |
+| [SPRAL](https://github.com/ralna/spral) | D9a1 | Reverse-communication LSMR linear least squares | Add matrix products into U/V; do not overwrite recurrence terms. ACTION=0 includes failures; inspect INFORM%FLAG and recompute residuals. |
+| [scivision L-BFGS-B](https://github.com/scivision/L-BFGS-B) | G2h1a2 | Limited-memory smooth box-constrained optimization with caller gradients | Pin-specific v2.3 workspace. Handle FG/NEW_X/terminal TASK states and distinguish projected-gradient from small objective-reduction stopping. |
+| [Bessel-Hankel](https://github.com/TcheL/Bessel-Hankel) | J | Order-zero/one Hankel digital filters | Kernel callback takes a string and abscissa; the integral has d(lambda), without an extra lambda measure. Fixed tables have no error estimate. |
+| [rpact.as251](https://github.com/rpact-com/rpact.as251) | L5b1n; C8a | Product-correlation normal rectangular probabilities and AS 66 univariate tails | N<=50 and default REAL/float kernel. Not arbitrary covariance support; inspect IFAULT, and account for hard-coded tail clipping. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -862,3 +878,24 @@ path is kept separate from debug outputs and reconstruction overloads.
 All new sketches are uncompiled and unrun; author examples are linked as
 references, not presented as checked hosted drivers. License findings preserve
 modified notices, multi-license context and unresolved upstream provenance.
+
+## Reverse communication, stopping tests and transform conventions
+
+SPRAL's selected LSMR path asks for accumulated matrix products, while the
+selected L-BFGS-B interface asks for objective/gradient values through TASK.
+Their cards preserve state/workspace requirements and distinguish terminal
+returns from successful convergence. NumLib's fixed RK4 step and Planelles'
+step-size tests similarly need caller-side accuracy or residual checks.
+
+The scalar Toolkit root routine is described by its inspected interpolation
+steps and failure paths; its name alone is not evidence of a standard Brent
+safeguard. Brito's external CG routine is separate from the MAIN in the same
+file. Its cubic bisection example is explicitly a program, not a generic API.
+The Hankel mapping remains at J because the original taxonomy has no dedicated
+Hankel child. The card gives the exact transform measure and kernel signature.
+The normal-probability mapping records the product-correlation restriction and
+single-precision ABI, separately from the AS 66 tail helper.
+
+All new sketches remain uncompiled and unrun. The reviews identify implemented
+paths and contracts, not numerical certification or complete dependency/license
+audits. Pinned line links, hashes and author examples remain in the ledger.

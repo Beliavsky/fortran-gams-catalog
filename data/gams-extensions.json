@@ -300,6 +300,18 @@
       "parent": "E3",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "C8a": {
+      "label": "Error functions, their inverses, integrals, including the normal distribution function",
+      "parent": "C8",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "F1a1": {
+      "label": "Real coefficients",
+      "parent": "F1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

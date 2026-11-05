@@ -26600,12 +26600,109 @@
             ],
             "notes": "The top-level README documents CMake; the bundled original Readme describes version 2.3, objective/gradient callbacks and reverse communication. The repository title modernized is not taken to establish equivalence to current L-BFGS-B releases.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h1a2",
+            "level": "source-reviewed",
+            "revision": "82ecd6d5b7ea918f9f6f8888ddfec307cacb2221",
+            "reviewed_on": "2026-11-05",
+            "notes": "solver_lbfgsb::setulb partitions workspaces and dispatches mainlb, whose selected path computes a generalized Cauchy point, limited-memory bound-subspace steps and a line search using caller-provided objective/gradient evaluations. G2h1a2 records smooth box-constrained optimization with first derivatives, not unconstrained-only optimization or global minimization. This distribution exposes the version-2.3 implementation through a module; its workspace formula and argument list must not be replaced with those from newer forks. TASK is a reverse-communication protocol: START first, FG requests F/G at returned X, NEW_X marks an accepted iterate, and terminal text distinguishes convergence, abnormal termination and input errors. Stopping uses projected-gradient norm or relative objective reduction scaled by FACTR*machine precision; small objective reduction need not imply small gradient. Caller controls evaluation/iteration limits. No optimization, line-search or bounds test was executed.",
+            "evidence": [
+              {
+                "path": "src/src.f",
+                "url": "https://github.com/scivision/L-BFGS-B/blob/82ecd6d5b7ea918f9f6f8888ddfec307cacb2221/src/src.f",
+                "sha256": "4d490cbf895054131f80bb0f491db78ca7b281231fc67c9f8040c363c616012a"
+              },
+              {
+                "path": "examples/driver1.f",
+                "url": "https://github.com/scivision/L-BFGS-B/blob/82ecd6d5b7ea918f9f6f8888ddfec307cacb2221/examples/driver1.f",
+                "sha256": "2f30e8629f11cb7ae0c7a36f9ce18a719d19b29834b69ebcb5f0246aabe130e1"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/scivision/L-BFGS-B/blob/82ecd6d5b7ea918f9f6f8888ddfec307cacb2221/README.md",
+                "sha256": "2d495df8f20ccfef66aa08ce32ea03d301e3a172b2cfb408468406f8553b48cf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setulb",
+                "role": "public-entry-point",
+                "summary": "Public solver_lbfgsb module subroutine. DOUBLE PRECISION X/L/U/G(N), default-INTEGER NBD(N), IWA(3*N), ISAVE(44), LOGICAL LSAVE(4), CHARACTER(60) TASK/CSAVE and DSAVE(29). WA length is 2*M*N+4*N+11*M*M+8*M for this pin. Preserve work/state arrays across calls.",
+                "signature": "CALL setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa, &\n            task,iprint,csave,lsave,isave,dsave)",
+                "declarations": [
+                  {
+                    "path": "src/src.f",
+                    "line_start": 1,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "src/src.f",
+                    "line_start": 57,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "examples/driver1.f",
+                    "line_start": 260,
+                    "line_end": 282
+                  }
+                ],
+                "path": "src/src.f",
+                "line_start": 17,
+                "line_end": 249,
+                "module": "solver_lbfgsb",
+                "examples": [
+                  {
+                    "path": "examples/driver1.f",
+                    "line_start": 128,
+                    "line_end": 177
+                  }
+                ],
+                "usage": "use solver_lbfgsb, only: setulb\ninteger,parameter :: n=2,m=5\ninteger :: nbd(n),iwa(3*n),isave(44),request\nlogical :: lsave(4)\ncharacter(60) :: task,csave\nreal(8) :: x(n),l(n),u(n),f,g(n),wa(2*m*n+4*n+11*m*m+8*m),dsave(29)\nx=[1d0,-1d0]; l=-2d0; u=2d0; nbd=2; f=0d0; g=0d0; task=\"START\"\ndo request=1,1000\n call setulb(n,m,x,l,u,nbd,f,g,1d7,1d-6,wa,iwa,task,-1,csave,lsave,isave,dsave)\n if(task(1:2)==\"FG\") then\n  f=sum(x*x); g=2d0*x\n else if(task(1:5)==\"NEW_X\") then\n  cycle\n else\n  exit\n end if\nend do\nif(task(1:4)/=\"CONV\") error stop \"L-BFGS-B did not report convergence\"\n! Independently verify projected gradient, bounds and objective.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Illustrative bounded quadratic using this pin-specific workspace. The loop caps reverse-communication requests, not accepted iterations. Read full terminal TASK, not just the absence of FG. Nonnegative FACTR/PGTOL select distinct stopping tests. Build the fixed-form module with the distribution support files; preserve input copies if independent checks need them."
+              },
+              {
+                "procedure": "mainlb",
+                "role": "implementation-helper",
+                "path": "src/src.f",
+                "line_start": 252,
+                "line_end": 962,
+                "module": "solver_lbfgsb"
+              },
+              {
+                "procedure": "projgr",
+                "role": "implementation-helper",
+                "path": "src/src.f",
+                "line_start": 2853,
+                "line_end": 2896,
+                "module": "solver_lbfgsb"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0 root; upstream component provenance separate",
+          "spdx_expression": null,
+          "revision": "82ecd6d5b7ea918f9f6f8888ddfec307cacb2221",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENSE supplies Apache 2.0 text. The selected solver retains NEOS/Argonne/Northwestern method and authorship notices; this finding records the distribution root and does not settle all upstream solver, BLAS or LINPACK component terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/scivision/L-BFGS-B/blob/82ecd6d5b7ea918f9f6f8888ddfec307cacb2221/LICENSE",
+              "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+            },
+            {
+              "path": "src/src.f",
+              "url": "https://github.com/scivision/L-BFGS-B/blob/82ecd6d5b7ea918f9f6f8888ddfec307cacb2221/src/src.f",
+              "sha256": "4d490cbf895054131f80bb0f491db78ca7b281231fc67c9f8040c363c616012a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -28818,12 +28915,81 @@
             ],
             "notes": "The pinned index lists multidimensional linear interpolation, golden search, Brent roots, Nelder-Mead and statistical utilities. It says documentation is under construction and algorithm efficiency is not guaranteed; no checked drivers or detailed procedure validation are claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "7eb273a73fdcd596a6fa5f3c2660c38e8213f30b",
+            "reviewed_on": "2026-11-05",
+            "notes": "toolkit::brent accepts a real scalar callback, checks a specifically oriented sign bracket, and uses inverse quadratic interpolation or a secant formula to generate trials and replace bracket endpoints. F1b records its general scalar-equation interface, not minimization despite copied maximizing/minimizing comments. This scoped source finding does not certify equivalence to a fully safeguarded Brent-Dekker method: there is no inspected trial-acceptance test forcing a fallback bisection when interpolation leaves the interval. The implementation requires F(x0)<=0 and F(x1)>=0 even though it later contains a bracket-reordering branch. IND=10/11 are endpoint-root returns; 20/21 reject the sign orientation. X and IY can be unassigned on early failures and IY counts only selected trial evaluations, excluding endpoints and repeated F(xc). TOL is used for both residual and interval tests. No root or safeguard test was executed.",
+            "evidence": [
+              {
+                "path": "toolkit.f90",
+                "url": "https://github.com/borjapetit/fortran_toolkit/blob/7eb273a73fdcd596a6fa5f3c2660c38e8213f30b/toolkit.f90",
+                "sha256": "53057c040f43da5e8dfba651881a87ee2258dd4638eba8791a90333f668f7905"
+              },
+              {
+                "path": "docs/brent.md",
+                "url": "https://github.com/borjapetit/fortran_toolkit/blob/7eb273a73fdcd596a6fa5f3c2660c38e8213f30b/docs/brent.md",
+                "sha256": "01ede3523dff5101e7ee2568aac0707b899505af12f0ca9d7921c8678fbb39f1"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/borjapetit/fortran_toolkit/blob/7eb273a73fdcd596a6fa5f3c2660c38e8213f30b/README.md",
+                "sha256": "ef105f64068e9eb79d9e49f58717c6625006e0ed1c518d90050ecd5240502c06"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "brent",
+                "role": "public-entry-point",
+                "summary": "Public module root subroutine. REAL(dp) outputs X, integer IY/IND, REAL(dp) X0/X1 and optional TOL, ITERMAX, IPRINT. Callback interface explicitly uses REAL(kind=8), so verify that it agrees with dp=KIND(1d0) on the compiler.",
+                "signature": "CALL brent(func,x,iy,ind,x0,x1 [, itermax,tol,iprint])",
+                "declarations": [
+                  {
+                    "path": "toolkit.f90",
+                    "line_start": 71,
+                    "line_end": 83
+                  },
+                  {
+                    "path": "toolkit.f90",
+                    "line_start": 1700,
+                    "line_end": 1722
+                  }
+                ],
+                "path": "toolkit.f90",
+                "line_start": 1671,
+                "line_end": 1824,
+                "module": "toolkit",
+                "usage": "use toolkit, only: dp,brent\nreal(dp) :: root\ninteger :: evaluations,code\n! Supply a matching callback with residual(0)<0 and residual(2)>0.\ncall brent(residual,root,evaluations,code,0._dp,2._dp,itermax=100,tol=1.e-8_dp,iprint=0)\nif(code/=0 .and. code/=10 .and. code/=11) error stop \"root search failed\"\n! Check residual(root); do not read evaluations on an early endpoint return.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment. Preserve the sign orientation, require finite continuous callback values and validate the final residual/bracket independently. Do not infer a standard Brent safeguard from the routine name. The evaluation counter is partial and early exits need status-dependent output handling."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice; additional source instructions",
+          "spdx_expression": null,
+          "revision": "7eb273a73fdcd596a6fa5f3c2660c38e8213f30b",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENSE supplies MIT terms. The module also asks users to acknowledge the source and identify modifications, author and date. Preserve those accompanying instructions; this review does not audit the provenance of every other optimizer in the large module.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/borjapetit/fortran_toolkit/blob/7eb273a73fdcd596a6fa5f3c2660c38e8213f30b/LICENSE",
+              "sha256": "a77665be2b2e5648fcc30a0398ecf4d452ec9974d11759841c753bbec26fe0bb"
+            },
+            {
+              "path": "toolkit.f90",
+              "url": "https://github.com/borjapetit/fortran_toolkit/blob/7eb273a73fdcd596a6fa5f3c2660c38e8213f30b/toolkit.f90",
+              "sha256": "53057c040f43da5e8dfba651881a87ee2258dd4638eba8791a90333f668f7905"
+            }
+          ]
         }
       },
       "imports": {}
@@ -32895,12 +33061,115 @@
             ],
             "notes": "The README identifies SSIDS, SSMFE and LSMR along with scaling, random-matrix and I/O utilities. It documents METIS/hwloc requirements and SSIDS OpenMP environment settings; the catalog does not validate these configurations or imply coverage of proprietary HSL routines.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "3d96a48ad337e765d455355cac4f50fa5a5078f3",
+            "reviewed_on": "2026-11-05",
+            "notes": "spral_lsmr::lsmr_solve performs Golub-Kahan bidiagonalization through reverse-communication A and transpose-A products, applies plane rotations and updates the least-squares iterate and norm/conditioning estimates. D9a1 records unconstrained real L2 linear least squares, scoped to no preconditioner and no damping. The caller supplies matrix actions, so dense/sparse/matrix-free storage is a caller choice, not a mandatory stored matrix input. Initialize ACTION=0 and U=B. ACTION=1 requires V=V+TRANSPOSE(A)*U; ACTION=2 requires U=U+A*V, preserving the other vector. Overwriting with a bare product loses the recurrence contribution. ACTION=0 means termination, including errors; inspect INFORM%FLAG and independently verify residual/normal residual. Default CTEST=3 uses built-in stopping; custom tests/preconditioning/damping require their documented protocols. No solve, numerical monotonicity or dependency build was run.",
+            "evidence": [
+              {
+                "path": "src/lsmr.f90",
+                "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/src/lsmr.f90",
+                "sha256": "5c8e84f52a152f96a62a9a1c7f09dfebf6a8462e76740233ce6966ee00ae864f"
+              },
+              {
+                "path": "examples/Fortran/lsmr.f90",
+                "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/examples/Fortran/lsmr.f90",
+                "sha256": "b7c01c9083c9436a3f48f511678984ec7b930e8bbc10b123729acdd3782ae97c"
+              },
+              {
+                "path": "docs/Fortran/lsmr.rst",
+                "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/docs/Fortran/lsmr.rst",
+                "sha256": "5ae17af059ed2d7e71d4d6a30671b6e91e1a2ffc74dab6b64f32fcd33710dbda"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/README.md",
+                "sha256": "e914892c30a86897ed8258278ea4e4a4fcce8a9a22c07fbc1532cabdeb0311a1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lsmr_solve",
+                "role": "public-entry-point",
+                "summary": "Public generic for the double implementation, with default-INTEGER dimensions/actions and DOUBLE PRECISION U(M),V(N),Y(N). KEEP preserves private state; OPTIONS and INFORM are mutable derived types. Without preconditioning Y is X. Preserve all state across calls.",
+                "signature": "CALL lsmr_solve(action,m,n,u,v,y,keep,options,inform [, damp])",
+                "declarations": [
+                  {
+                    "path": "src/lsmr.f90",
+                    "line_start": 81,
+                    "line_end": 114
+                  },
+                  {
+                    "path": "src/lsmr.f90",
+                    "line_start": 441,
+                    "line_end": 508
+                  },
+                  {
+                    "path": "src/lsmr.f90",
+                    "line_start": 284,
+                    "line_end": 302
+                  }
+                ],
+                "path": "src/lsmr.f90",
+                "line_start": 441,
+                "line_end": 1196,
+                "module": "spral_lsmr",
+                "examples": [
+                  {
+                    "path": "examples/Fortran/lsmr.f90",
+                    "line_start": 23,
+                    "line_end": 62
+                  }
+                ],
+                "usage": "use spral_lsmr, only: lsmr_keep,lsmr_options,lsmr_inform,lsmr_solve,lsmr_free\ntype(lsmr_keep) :: keep\ntype(lsmr_options) :: options\ntype(lsmr_inform) :: inform\nreal(8) :: a(3,2),b(3),u(3),v(2),x(2)\ninteger :: action,stat\na=reshape([1d0,0d0,1d0,0d0,1d0,1d0],[3,2]); b=1d0\noptions%ctest=3; options%unit_diagnostics=-1\naction=0; u=b\ndo\n call lsmr_solve(action,3,2,u,v,x,keep,options,inform)\n if(action==0) exit\n select case(action)\n case(1)\n  v=v+matmul(transpose(a),u)\n case(2)\n  u=u+matmul(a,v)\n case default\n  error stop \"unexpected LSMR action\"\n end select\nend do\ncall lsmr_free(keep,stat)\n! Inspect inform%flag, cleanup stat and independently check A*x-b.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No-preconditioning, no-damping reverse-communication sketch. ACTION=0 is not a success code; flags distinguish compatibility, least-squares accuracy, conditioning, iteration and allocation failures. Keep U/V accumulation exactly as documented. Caller must interpret and check final norms, and check cleanup status. Link the SPRAL build and its configured BLAS/dependencies."
+              },
+              {
+                "procedure": "lsmr_free",
+                "role": "public-entry-point",
+                "summary": "Public generic cleanup subroutine freeing private KEEP allocations; STAT reports deallocation status.",
+                "signature": "CALL lsmr_free(keep, stat)",
+                "declarations": [
+                  {
+                    "path": "src/lsmr.f90",
+                    "line_start": 1200,
+                    "line_end": 1211
+                  }
+                ],
+                "path": "src/lsmr.f90",
+                "line_start": 1200,
+                "line_end": 1229,
+                "module": "spral_lsmr"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root; BSD-2-Clause LSMR header",
+          "spdx_expression": null,
+          "revision": "3d96a48ad337e765d455355cac4f50fa5a5078f3",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENCE provides three-clause STFC BSD terms; the selected LSMR source has a two-condition BSD notice and credits the upstream Fong/Saunders implementation. Retain the component notice separately rather than flattening the library into one SPDX claim or auditing unrelated SPRAL components.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/LICENCE",
+              "sha256": "a6b488e6f0e2052048b09b0955535c574347461e5f4695683c0abc1e61c6d2b2"
+            },
+            {
+              "path": "src/lsmr.f90",
+              "url": "https://github.com/ralna/spral/blob/3d96a48ad337e765d455355cac4f50fa5a5078f3/src/lsmr.f90",
+              "sha256": "5c8e84f52a152f96a62a9a1c7f09dfebf6a8462e76740233ce6966ee00ae864f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40953,12 +41222,148 @@
             ],
             "notes": "The README identifies AS 251 and explicitly discusses single-precision REAL/C++ float conversions. This is a specialized correlation structure and arithmetic interface, not an arbitrary covariance-matrix probability evaluator.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L5b1n",
+            "level": "source-reviewed",
+            "revision": "8cbb70f910fd24d40861ee27e57c24e4a2fd0c72",
+            "reviewed_on": "2026-11-05",
+            "notes": "MVNPRD computes a standardized multivariate-normal rectangular probability for off-diagonal correlations rho(i,j)=BPD(i)*BPD(j), using independent-coordinate factors and one-dimensional adaptive Simpson integration of products of conditional normal probabilities. L5b1n records normal multivariate probabilities, restricted to this product-correlation family rather than arbitrary covariance matrices. N is limited to 1..50 and ABS(BPD)<1. A contains upper and B lower limits; INF=0/1/2 select lower-to-infinity, minus-infinity-to-upper and finite intervals. IERC selects derivative-based or interval-halving error control, and HINC<=0 is replaced by 0.24. IFAULT distinguishes input, integration/evaluation-limit and requested-bound failures; do not treat the header accuracy claim as a verified rigorous bound. The defining Fortran uses default REAL and the C++ wrapper converts to float, so R double inputs do not give a double-precision integration kernel. The Student-t path is excluded. No probability or error-bound test was run.",
+            "evidence": [
+              {
+                "path": "src/f_as251_fortran.f",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/src/f_as251_fortran.f",
+                "sha256": "a7c66931edb674a7c13809b585ca00eee4103a6028bed9c2e796354ff1f170a4"
+              },
+              {
+                "path": "man/mvnprd.Rd",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/man/mvnprd.Rd",
+                "sha256": "37102cf3dc5b26b33b426b9eb603c93ab9e6c78e702eae9b349ac6208a5b7636"
+              },
+              {
+                "path": "src/f_as251.cpp",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/src/f_as251.cpp",
+                "sha256": "08b883f0aed9d34aee6e43b8dd54734c4937caf1d92410a44e1c3529eea062d5"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/DESCRIPTION",
+                "sha256": "3ebe87954310b2f0ea3baf411ed13ad4c4f5dbfa9aa057c677c9aa8ebb12424a"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/README.md",
+                "sha256": "1000e37bf3c76b00a393f3d60866dc52881b0c31027d0c24946b5179beabc673"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "MVNPRD",
+                "role": "public-entry-point",
+                "summary": "External default-REAL AS 251 routine. A/B/BPD are arrays of N, INF an INTEGER array, EPS/HINC REAL scalars and PROB/BOUND outputs; N/IERC/IFAULT are default INTEGER. HINC can be changed by the routine. Use matching default-real ABI, not an assumed DOUBLE PRECISION interface.",
+                "signature": "CALL MVNPRD(A,B,BPD,EPS,N,INF,IERC,HINC,PROB,BOUND,IFAULT)",
+                "declarations": [
+                  {
+                    "path": "src/f_as251_fortran.f",
+                    "line_start": 4,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "man/mvnprd.Rd",
+                    "line_start": 13,
+                    "line_end": 30
+                  },
+                  {
+                    "path": "src/f_as251.cpp",
+                    "line_start": 7,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/f_as251_fortran.f",
+                "line_start": 4,
+                "line_end": 251,
+                "usage": "external :: mvnprd\nreal :: upper(2),lower(2),bpd(2),eps,hinc,prob,bound\ninteger :: inf(2),ifault\nupper=0.; lower=0.; bpd=[0.4,0.6]; inf=1\neps=1.e-5; hinc=0.\ncall mvnprd(upper,lower,bpd,eps,2,inf,1,hinc,prob,bound,ifault)\nif(ifault/=0) error stop \"normal probability integration failed\"\n! Inspect BOUND and validate against an independent probability calculation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Two standardized upper integration limits at zero, using INF=1 lower-tail CDFs, with product off-diagonal correlation 0.24. LOWER values are ignored for this INF. Preserve the default REAL ABI when calling this original file; promoting all reals changes its C++ interface and needs a coordinated build. Small EPS cannot overcome single-precision arithmetic or establish an independently checked error bound."
+              },
+              {
+                "procedure": "PFUNC",
+                "role": "implementation-helper",
+                "path": "src/f_as251_fortran.f",
+                "line_start": 252,
+                "line_end": 495
+              },
+              {
+                "procedure": "WMAX",
+                "role": "implementation-helper",
+                "path": "src/f_as251_fortran.f",
+                "line_start": 497,
+                "line_end": 531
+              }
+            ]
+          },
+          {
+            "code": "C8a",
+            "level": "source-reviewed",
+            "revision": "8cbb70f910fd24d40861ee27e57c24e4a2fd0c72",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external ALNORM helper evaluates lower or upper standard-normal tail probabilities using symmetry and separate rational approximations, with an exponential factor in the larger-argument branch. C8a records normal-distribution/error-function evaluation, not an inverse distribution or random generator. UPPER=.TRUE. requests the right tail and .FALSE. the lower CDF. Default REAL arithmetic and hard-coded LTONE=7/UTZERO=18.66 determine clipping/complement behavior; extreme tails can become exactly zero/one and no log-tail output or status is returned. This is the bundled AS 66 approximation, not an intrinsic ERF wrapper. No tail accuracy or clipping boundary was tested.",
+            "evidence": [
+              {
+                "path": "src/f_as251_fortran.f",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/src/f_as251_fortran.f",
+                "sha256": "a7c66931edb674a7c13809b585ca00eee4103a6028bed9c2e796354ff1f170a4"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/DESCRIPTION",
+                "sha256": "3ebe87954310b2f0ea3baf411ed13ad4c4f5dbfa9aa057c677c9aa8ebb12424a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ALNORM",
+                "role": "public-entry-point",
+                "summary": "External default-REAL function with default-REAL X and LOGICAL UPPER. Declare its result type explicitly in callers using IMPLICIT NONE. Returns a probability, with no error/status argument.",
+                "signature": "probability = ALNORM(x, upper)",
+                "declarations": [
+                  {
+                    "path": "src/f_as251_fortran.f",
+                    "line_start": 532,
+                    "line_end": 548
+                  }
+                ],
+                "path": "src/f_as251_fortran.f",
+                "line_start": 532,
+                "line_end": 587,
+                "usage": "real,external :: alnorm\nreal :: lower,upper\nlower=alnorm(1.,.false.)\nupper=alnorm(1.,.true.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default-REAL AS 66 tail sketch. Request the upper tail directly when needed, rather than subtracting a rounded lower CDF from one. Hard-coded thresholds still clip extreme tails; this interface has no log-probability, precision selection or error estimate."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3 package declaration; legacy algorithm scope unresolved",
+          "spdx_expression": null,
+          "revision": "8cbb70f910fd24d40861ee27e57c24e4a2fd0c72",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares LGPL-3. The defining Fortran attributes AS 251, AS 66 and related legacy algorithms but does not restate a per-routine reuse grant. This records the package declaration without resolving historical component rights or converting an R license declaration into a complete source provenance audit.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/DESCRIPTION",
+              "sha256": "3ebe87954310b2f0ea3baf411ed13ad4c4f5dbfa9aa057c677c9aa8ebb12424a"
+            },
+            {
+              "path": "src/f_as251_fortran.f",
+              "url": "https://github.com/rpact-com/rpact.as251/blob/8cbb70f910fd24d40861ee27e57c24e4a2fd0c72/src/f_as251_fortran.f",
+              "sha256": "a7c66931edb674a7c13809b585ca00eee4103a6028bed9c2e796354ff1f170a4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41949,12 +42354,101 @@
             ],
             "notes": "The README separates supported methods from those in development and notes the project is not yet compiled into a reusable library. Proposed decomposition variants and stochastic controlled-random search are not counted as completed capabilities.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "3d6a7d6c41b3be91ef3d75b39036eead77049627",
+            "reviewed_on": "2026-11-05",
+            "notes": "The scalar and vector rk4_explicit_step overloads evaluate the classical four Runge-Kutta stages at t, t+h/2, t+h/2 and t+h, then form the 1:2:2:1 weighted update. I1a1a records an explicit one-step ODE initial-value method. The parent module declares public generics and implementations live in a submodule; compile/link both rather than assuming the interface module supplies code. H is declared INOUT but is unchanged in these implementations, and T is input-only. Caller chooses H and advances time; there is no local error estimate, rejection loop, stiffness detection or returned status. Scalar and vector callbacks use rkp=ISO_FORTRAN_ENV real64 and have distinct explicit interfaces. No ODE, convergence-order or stiffness experiment was run.",
+            "evidence": [
+              {
+                "path": "src/Integration/RungeKutta/RungeKuttaExplicit/rk4_explicit.f90",
+                "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/src/Integration/RungeKutta/RungeKuttaExplicit/rk4_explicit.f90",
+                "sha256": "5ad54137d6c86d8b108cb7c1fc883d9cbf002d064016e5f3b091e10acd383100"
+              },
+              {
+                "path": "src/Integration/RungeKutta/RungeKuttaExplicit/rungekutta_explicit.f90",
+                "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/src/Integration/RungeKutta/RungeKuttaExplicit/rungekutta_explicit.f90",
+                "sha256": "f2d2556eccccca19c5df73889e9637ed31f44b187c366d034af15ac9a78115f2"
+              },
+              {
+                "path": "src/Utils/functionInterface.f90",
+                "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/src/Utils/functionInterface.f90",
+                "sha256": "358beb652399eec6dd999882bc9a2a2fe2366d3b5717e0ebf1c684ea1bbd417d"
+              },
+              {
+                "path": "src/Utils/kindSettings.f90",
+                "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/src/Utils/kindSettings.f90",
+                "sha256": "879bd4d60a21adbfa3187b7a2fc792f5552be550bfce8f33630261a020dbbe31"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/README.md",
+                "sha256": "ffe5f5f8749091a566475896434660cfca7ba4d9528fa4ca6079928e246427df"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rk4_explicit_step",
+                "role": "public-entry-point",
+                "summary": "Public generic in rungekutta_explicit, implemented by scalar/vector module subroutines in submodule rk4_explicit. F(t,y0) returns either a scalar or SIZE(y0) vector. Y0 is input, Y output and H an INOUT variable; use distinct input/output state storage.",
+                "signature": "CALL rk4_explicit_step(f, t, y0, y, h)",
+                "declarations": [
+                  {
+                    "path": "src/Integration/RungeKutta/RungeKuttaExplicit/rungekutta_explicit.f90",
+                    "line_start": 30,
+                    "line_end": 41
+                  },
+                  {
+                    "path": "src/Integration/RungeKutta/RungeKuttaExplicit/rungekutta_explicit.f90",
+                    "line_start": 151,
+                    "line_end": 169
+                  },
+                  {
+                    "path": "src/Utils/functionInterface.f90",
+                    "line_start": 44,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "src/Utils/kindSettings.f90",
+                    "line_start": 12,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/Integration/RungeKutta/RungeKuttaExplicit/rk4_explicit.f90",
+                "line_start": 19,
+                "line_end": 58,
+                "module": "rungekutta_explicit",
+                "usage": "use kindSettings, only: rkp\nuse rungekutta_explicit, only: rk4_explicit_step\nreal(rkp) :: t,y0,y,h\n! Supply a matching real(rkp) scalar RHS(t,y0) callback.\nt=0._rkp; y0=1._rkp; h=0.01_rkp\ncall rk4_explicit_step(rhs,t,y0,y,h)\nt=t+h; y0=y",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback fragment. Build kindSettings, functionInterface and the parent module before its RK4 submodule. H must be a variable because its dummy is INOUT, although this method does not adapt it. Do not alias Y0 and Y. Accuracy and stability depend on problem and caller-selected step size."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "3d6a7d6c41b3be91ef3d75b39036eead77049627",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies GPL version 3 text. The reviewed README and RK4 files do not resolve a version-only versus or-later grant; no stronger SPDX version choice is inferred from the license text alone.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ebrooker/NumLib/blob/3d6a7d6c41b3be91ef3d75b39036eead77049627/README.md",
+              "sha256": "ffe5f5f8749091a566475896434660cfca7ba4d9528fa4ca6079928e246427df"
+            }
+          ]
         }
       },
       "imports": {}
@@ -42038,12 +42532,138 @@
             ],
             "notes": "The README table identifies methods and languages, including some Fortran-only ODE examples. It is teaching/example material; equivalence of language versions and problem-specific accuracy were not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "96dac60273953c545d659e52024322c1a4a7207f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external CG routine forms the initial residual, then applies conjugate-gradient alpha/beta recurrences with dense MATMUL and dot products, updating X until the infinity norm of the recursively updated residual is small. D2b1b records real symmetric positive-definite dense systems, not arbitrary matrices or a sparse storage API. It has no iteration cap, SPD/breakdown checks or status return; an exact initial solution still enters the loop with ERR=1 and can divide 0/0. EPS>=1 can skip all work. Recompute the true residual independently and avoid treating the recurrence as an error certificate. The same source file contains a separate fixed 2-by-2 demonstration MAIN; extract the external CG procedure before linking to another main program. No system was solved for this catalog.",
+            "evidence": [
+              {
+                "path": "CG/cg_method.f90",
+                "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/CG/cg_method.f90",
+                "sha256": "fda5964bb0595fe55b031add1e7c6566dd4a35e3d01e38ee47711a554b02799b"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/README.md",
+                "sha256": "e6b128f9be880abc5c6cdebbf013a19e8ad80d76da411720ab2248b37e3dd295"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CG",
+                "role": "public-entry-point",
+                "summary": "External default-REAL dense solver with explicit-shape A(N,N), X(N), B(N) and scalar EPSILON. X is the initial guess on entry and is overwritten. There are no INTENT declarations or returned status; the source file also defines cg_code MAIN.",
+                "signature": "CALL CG(n, a, x, b, epsilon)",
+                "declarations": [
+                  {
+                    "path": "CG/cg_method.f90",
+                    "line_start": 76,
+                    "line_end": 83
+                  }
+                ],
+                "path": "CG/cg_method.f90",
+                "line_start": 76,
+                "line_end": 102,
+                "examples": [
+                  {
+                    "path": "CG/cg_method.f90",
+                    "line_start": 19,
+                    "line_end": 57
+                  }
+                ],
+                "usage": "! Extract the external CG routine from its demonstration file before linking.\nexternal :: cg\nreal :: a(2,2),b(2),x(2)\na=reshape([4.,1.,1.,3.],[2,2]); b=[1.,2.]; x=0.\ncall cg(2,a,x,b,1.e-6)\n! Independently check maxval(abs(matmul(a,x)-b)).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default-REAL SPD example fragment, not a robust general linear-system driver. A nonzero initial residual, positive tolerance below 1, positive curvature and an external execution limit are necessary for this unguarded implementation. Separate MAIN from the callable external routine; compiling the file unchanged alongside another PROGRAM causes a duplicate-main conflict."
+              }
+            ]
+          },
+          {
+            "code": "F1a1",
+            "level": "source-reviewed",
+            "revision": "96dac60273953c545d659e52024322c1a4a7207f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The bisec_code program halves a sign-changing interval for its hardcoded real-coefficient cubic x**3-x-2 and prints one selected real root. F1a1 records that polynomial root demonstration, not a general all-roots algorithm or root isolation. The linked external function F supplies the fixed cubic; a and b are assigned in MAIN rather than user inputs. There is no initial-bracket validation for a modified problem, iteration limit, stagnation guard or returned status. Termination uses an absolute function residual of 1e-6 in default REAL, not a bound on root-location error. No program output was executed.",
+            "evidence": [
+              {
+                "path": "Bisection/bisection_method.f90",
+                "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/Bisection/bisection_method.f90",
+                "sha256": "4738a30ff12a3e7309da3fac4f30fb351f5ed5f49543ec3c714b8abcd6282c31"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/README.md",
+                "sha256": "e6b128f9be880abc5c6cdebbf013a19e8ad80d76da411720ab2248b37e3dd295"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bisec_code",
+                "role": "program-entry-point",
+                "summary": "Standalone program with a fixed cubic F(x)=x**3-x-2 and bracket [1,2], not a reusable root-solver subroutine. Uses default REAL and prints one root.",
+                "signature": "./bisec_code",
+                "declarations": [
+                  {
+                    "path": "Bisection/bisection_method.f90",
+                    "line_start": 17,
+                    "line_end": 23
+                  },
+                  {
+                    "path": "Bisection/bisection_method.f90",
+                    "line_start": 27,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "Bisection/bisection_method.f90",
+                    "line_start": 60,
+                    "line_end": 67
+                  }
+                ],
+                "path": "Bisection/bisection_method.f90",
+                "line_start": 17,
+                "line_end": 58,
+                "usage": "gfortran Bisection/bisection_method.f90 -o bisec_code\n./bisec_code",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Shell invocation of the supplied fixed problem. There is no runtime input or general callback parameter. The loop stops on |F(c)|, not bracket width, and lacks an iteration/roundoff-stagnation guard. A root exactly at the midpoint is not handled as a separate bracket case, although the residual test then terminates."
+              },
+              {
+                "procedure": "f",
+                "role": "implementation-helper",
+                "path": "Bisection/bisection_method.f90",
+                "line_start": 60,
+                "line_end": 67
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "96dac60273953c545d659e52024322c1a4a7207f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and selected source files provide descriptions, references and author credit but no explicit reuse grant; the pinned tree has no separately named LICENSE/COPYING identified. Public educational examples alone do not settle redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/README.md",
+              "sha256": "e6b128f9be880abc5c6cdebbf013a19e8ad80d76da411720ab2248b37e3dd295"
+            },
+            {
+              "path": "CG/cg_method.f90",
+              "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/CG/cg_method.f90",
+              "sha256": "fda5964bb0595fe55b031add1e7c6566dd4a35e3d01e38ee47711a554b02799b"
+            },
+            {
+              "path": "Bisection/bisection_method.f90",
+              "url": "https://github.com/brito-leonardo/Numerical_Methods/blob/96dac60273953c545d659e52024322c1a4a7207f/Bisection/bisection_method.f90",
+              "sha256": "4738a30ff12a3e7309da3fac4f30fb351f5ed5f49543ec3c714b8abcd6282c31"
+            }
+          ]
         }
       },
       "imports": {}
@@ -42141,12 +42761,131 @@
             ],
             "notes": "The README marks many algorithms TODO. The mappings exclude planned PLU/QR, Gaussian quadratures, multidimensional integration and unfinished time steppers; plotting examples require PGPLOT or DISLIN and were not run here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "adec2977efac83c3a5297d01cbeaac4ac50e3d11",
+            "reviewed_on": "2026-11-05",
+            "notes": "newton_raphson calls supplied residual/Jacobian functions, solves J(x)*dx=-F(x) using the companion unpivoted LU path, adds the step and stops on the sum of absolute coordinate changes. fixPoint repeatedly assigns G(x) and uses the same step-change test. F2 records real nonlinear systems/fixed-point iteration, not guaranteed global convergence or a singular-Jacobian-safe Newton solver. Callbacks return allocatable default-REAL vectors/matrices. ITE is both maximum iterations and successful iteration count; ITE<=0 leaves OK unassigned. EPS must be positive and meaningful for default REAL. There is no residual, contractivity, pivot or finite-value validation. The companion LU does not pivot or report breakdown, and the whole module depends on it even when only fixPoint is used. No nonlinear solve or convergence test was executed.",
+            "evidence": [
+              {
+                "path": "modules/module_no_linear_equations.f90",
+                "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/modules/module_no_linear_equations.f90",
+                "sha256": "3fd4a98a0f60b83cff9af74ceb34bf9b49915b19f1399aa707a406cbbe3e2ac2"
+              },
+              {
+                "path": "modules/module_linear_equations.f90",
+                "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/modules/module_linear_equations.f90",
+                "sha256": "c70dca3cfb4e439dae92ba7d09461e00d7cf2a46dd3c9fda87904183c289b3ab"
+              },
+              {
+                "path": "test/newton_test.f90",
+                "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/test/newton_test.f90",
+                "sha256": "337133a6f9a39b63c38e26539db471875becd7629bf4468b123ce9daf67fbcc6"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/README.md",
+                "sha256": "74d0db800743352ba39c0878e59b6df78f939754cb37b3fe67c5bc13ddff9734"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "newton_raphson",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine with mutable X(:), INOUT integer ITE, input default-REAL EPS and output logical OK. F returns allocatable REAL(:); J returns allocatable REAL(:,:). OK tests step size, not residual size.",
+                "signature": "CALL newton_raphson(F, J, x, ite, eps, ok)",
+                "declarations": [
+                  {
+                    "path": "modules/module_no_linear_equations.f90",
+                    "line_start": 10,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "modules/module_no_linear_equations.f90",
+                    "line_start": 22,
+                    "line_end": 41
+                  }
+                ],
+                "path": "modules/module_no_linear_equations.f90",
+                "line_start": 22,
+                "line_end": 67,
+                "module": "module_no_linear_equations",
+                "examples": [
+                  {
+                    "path": "test/newton_test.f90",
+                    "line_start": 8,
+                    "line_end": 31
+                  }
+                ],
+                "usage": "use module_no_linear_equations, only: newton_raphson\nreal :: x(2)=[1.,1.]\ninteger :: iterations\nlogical :: ok\n! Supply explicit-interface F and J returning allocatable default-REAL arrays.\niterations=50\ncall newton_raphson(f,j,x,iterations,1.e-5,ok)\nif(.not.ok) error stop \"Newton step test not satisfied\"\n! Independently evaluate F(x) and check its norm.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Problem-callback fragment. Use a positive iteration cap, conformable allocatable callback results and a Jacobian suitable for the unpivoted LU routine. Small steps alone do not establish a root. Preserve an external iteration limit and check finite values/residuals; the upstream example tolerance 1e-10 should not be mistaken for guaranteed default-REAL accuracy."
+              },
+              {
+                "procedure": "fixPoint",
+                "role": "public-entry-point",
+                "summary": "Public fixed-point iteration with allocatable-vector G callback, mutable X and the same iteration/step-size semantics as newton_raphson. No contraction or residual check.",
+                "signature": "CALL fixPoint(G, x, ite, eps, ok)",
+                "declarations": [
+                  {
+                    "path": "modules/module_no_linear_equations.f90",
+                    "line_start": 74,
+                    "line_end": 87
+                  }
+                ],
+                "path": "modules/module_no_linear_equations.f90",
+                "line_start": 74,
+                "line_end": 112,
+                "module": "module_no_linear_equations"
+              },
+              {
+                "procedure": "resol_lu",
+                "role": "implementation-helper",
+                "path": "modules/module_linear_equations.f90",
+                "line_start": 63,
+                "line_end": 70,
+                "module": "module_linear_equations"
+              },
+              {
+                "procedure": "lu",
+                "role": "implementation-helper",
+                "path": "modules/module_linear_equations.f90",
+                "line_start": 20,
+                "line_end": 35,
+                "module": "module_linear_equations"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 2 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "adec2977efac83c3a5297d01cbeaac4ac50e3d11",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENSE supplies GPL version 2 text; selected modules say GNU GPL without a version/or-later choice. Record the supplied text without inventing a version-only versus or-later grant. Plotting examples have separate external dependencies outside this review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/LICENSE",
+              "sha256": "db296f2f7f35bca3a174efb0eb392b3b17bd94b341851429a3dff411b1c2fc73"
+            },
+            {
+              "path": "modules/module_no_linear_equations.f90",
+              "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/modules/module_no_linear_equations.f90",
+              "sha256": "3fd4a98a0f60b83cff9af74ceb34bf9b49915b19f1399aa707a406cbbe3e2ac2"
+            },
+            {
+              "path": "modules/module_linear_equations.f90",
+              "url": "https://github.com/planelles20/numerical-methods-fortran/blob/adec2977efac83c3a5297d01cbeaac4ac50e3d11/modules/module_linear_equations.f90",
+              "sha256": "c70dca3cfb4e439dae92ba7d09461e00d7cf2a46dd3c9fda87904183c289b3ab"
+            }
+          ]
         }
       },
       "imports": {}
@@ -46835,12 +47574,154 @@
             ],
             "notes": "The README documents Bessel values, derivatives and zeros, with inherited Moreau routines or intrinsic functions selected by preprocessing. Its Guptasarma/Singh filter is restricted to first-kind orders zero and one. Examples and formulas are not independent accuracy checks or evidence of an unrestricted-order transform implementation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "a9e9846653dcc74c5771db4fba2f74928a4e6f91",
+            "reviewed_on": "2026-11-05",
+            "notes": "HankelJ0Transform/HankelJ1Transform evaluate fixed logarithmic digital-filter sums of a kernel callback at lambda_i=10**(a+(i-1)*s)/r, then divide the weighted sum by r. Fast variants use shorter tables. J records numerical Hankel integral transforms; the original GAMS J subtree has no dedicated Hankel child, so neither Fourier nor Laplace classification is invented. The exact convention is integral_0^infinity K(lambda)*J_order(r*lambda) d(lambda), without an additional lambda measure factor. Callers using the common lambda*d(lambda) convention must incorporate lambda into K. R must be positive and finite, with a kernel defined over the sampled positive range; extreme R can overflow/underflow sampling. No error estimate, convergence status or adaptive quadrature is returned. Ogata/Bessel-zero paths are not included in this digital-filter review. No transform or published example was run.",
+            "evidence": [
+              {
+                "path": "Hankel_Transform.F90",
+                "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/Hankel_Transform.F90",
+                "sha256": "166ebcb51ecf9c8b2d05bdfcede96fdf0b8d39b0529a8a22f62ff75631e800dc"
+              },
+              {
+                "path": "example_Functions.F90",
+                "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/example_Functions.F90",
+                "sha256": "9ecdee847b953b11fbcdef85cc2431bfb22e41cf2d4fef5bf05f16d08d160552"
+              },
+              {
+                "path": "Guptasarma_1997.F90",
+                "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/Guptasarma_1997.F90",
+                "sha256": "7d99b6ed2ca25e388347821768bf8613078b3f595b9fbfd3576246f4efe6031c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/README.md",
+                "sha256": "ec9ea887be02bb4e2d6a7d32c4166bdc520aaa2556285baa4ce139c6209974ad"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "HankelJ0Transform",
+                "role": "public-entry-point",
+                "summary": "Public module function returning KIND(1d0), with scalar R and a legacy implicit-interface kernel callback EXTFunc(varName,lambda). The first argument is CHARACTER(*) and is passed the literal \"lambda\"; the second is REAL(KIND(1d0)). This is not a one-argument integrand ABI. KV is private; use an independently matching kind.",
+                "signature": "value = HankelJ0Transform(extFunc, r)",
+                "declarations": [
+                  {
+                    "path": "Hankel_Transform.F90",
+                    "line_start": 5,
+                    "line_end": 20
+                  },
+                  {
+                    "path": "Hankel_Transform.F90",
+                    "line_start": 51,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "example_Functions.F90",
+                    "line_start": 12,
+                    "line_end": 28
+                  }
+                ],
+                "path": "Hankel_Transform.F90",
+                "line_start": 51,
+                "line_end": 96,
+                "module": "Hankel_Transform",
+                "examples": [
+                  {
+                    "path": "Guptasarma_1997.F90",
+                    "line_start": 46,
+                    "line_end": 71
+                  }
+                ],
+                "usage": "use Hankel_Transform, only: HankelJ0Transform\nuse example_Functions, only: exampleFunc1,myKind\nreal(myKind) :: value,reference\nvalue=HankelJ0Transform(exampleFunc1,1._myKind)\nreference=exampleFunc1(\"r\",1._myKind)\n! Independently compare value/reference; no error/status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Uses the author kernel exp(-lambda) and its analytical reference through the supplied two-argument example callback. Compile both modules in the snippet; R=1 avoids the singular R=0 interface. Do not insert an extra lambda weight unless your desired transform convention requires it. Fixed filter accuracy is kernel/range dependent, not certified by agreement between fast/full variants."
+              },
+              {
+                "procedure": "HankelJ1Transform",
+                "role": "public-entry-point",
+                "summary": "Public order-one counterpart using the same two-argument kernel convention and positive R. No error estimate/status.",
+                "signature": "value = HankelJ1Transform(extFunc, r)",
+                "declarations": [
+                  {
+                    "path": "Hankel_Transform.F90",
+                    "line_start": 127,
+                    "line_end": 134
+                  },
+                  {
+                    "path": "example_Functions.F90",
+                    "line_start": 17,
+                    "line_end": 20
+                  }
+                ],
+                "path": "Hankel_Transform.F90",
+                "line_start": 127,
+                "line_end": 177,
+                "module": "Hankel_Transform"
+              },
+              {
+                "procedure": "HankelJ0TransformFast",
+                "role": "public-entry-point",
+                "summary": "Public shorter-table order-zero filter. Same kernel ABI and transform convention as the full path.",
+                "signature": "value = HankelJ0TransformFast(extFunc, r)",
+                "declarations": [
+                  {
+                    "path": "Hankel_Transform.F90",
+                    "line_start": 17,
+                    "line_end": 24
+                  }
+                ],
+                "path": "Hankel_Transform.F90",
+                "line_start": 17,
+                "line_end": 49,
+                "module": "Hankel_Transform"
+              },
+              {
+                "procedure": "HankelJ1TransformFast",
+                "role": "public-entry-point",
+                "summary": "Public shorter-table order-one filter. Same kernel ABI and transform convention as the full path.",
+                "signature": "value = HankelJ1TransformFast(extFunc, r)",
+                "declarations": [
+                  {
+                    "path": "Hankel_Transform.F90",
+                    "line_start": 98,
+                    "line_end": 105
+                  }
+                ],
+                "path": "Hankel_Transform.F90",
+                "line_start": 98,
+                "line_end": 125,
+                "module": "Hankel_Transform"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT link in README; component scope not audited",
+          "spdx_expression": null,
+          "revision": "a9e9846653dcc74c5771db4fba2f74928a4e6f91",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned README identifies MIT by linking an external license page. No full separate license file is present in the pinned tree, and selected filter tables cite Guptasarma/Singh. Record the author statement without treating the external page or every reused table/other Bessel implementation as a completed component-license audit.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/README.md",
+              "sha256": "ec9ea887be02bb4e2d6a7d32c4166bdc520aaa2556285baa4ce139c6209974ad"
+            },
+            {
+              "path": "Hankel_Transform.F90",
+              "url": "https://github.com/TcheL/Bessel-Hankel/blob/a9e9846653dcc74c5771db4fba2f74928a4e6f91/Hankel_Transform.F90",
+              "sha256": "166ebcb51ecf9c8b2d05bdfcede96fdf0b8d39b0529a8a22f62ff75631e800dc"
+            }
+          ]
         }
       },
       "imports": {}
