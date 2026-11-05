@@ -546,6 +546,18 @@
       "parent": "K1b1a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "G2h2a1": {
+      "label": "User provides no derivatives",
+      "parent": "G2h2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2h3b1a": {
+      "label": "User provides no derivatives",
+      "parent": "G2h3b1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

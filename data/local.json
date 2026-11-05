@@ -8063,12 +8063,131 @@
             ],
             "notes": "The README documents distinct symmetric, generalized and nonsymmetric drivers with user-supplied matrix actions and preconditioners. Keeping the suite at D4 avoids extending one driver capability to every other driver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "31d53631871974e6197c52a2822cd77036d90cc2",
+            "reviewed_on": "2026-11-05",
+            "notes": "DGL_DAVIDSON_DRIVER computes a few lowest eigenpairs of a real symmetric ordinary eigenproblem using caller block matrix-vector and preconditioner routines, subspace projection, Rayleigh-Ritz extraction, residual expansion and restart/locking. This mapping selects no METVEC argument, hence identity metric. Require 1<=N_TARG<=N_MAX with 2*N_MAX<N, a truly symmetric operator, compatible configured integer kind and suitable initial guesses. It checks both RMS and maximum residual components for targeted roots. OK reports convergence, whereas DGL_INFO reports API/numerical errors: budget exhaustion can leave INFO=0 with OK false and approximate eigenpairs. This is not a dense full-spectrum solver or a new eigenpair/orthogonality validation.",
+            "evidence": [
+              {
+                "path": "src/fortran/davidson_driver.f90",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/src/fortran/davidson_driver.f90",
+                "sha256": "2a89ef99c5a3e6f77b8bcc6f937aea195d5d7800517f7da04fb250b717382fcd"
+              },
+              {
+                "path": "src/fortran/dgl_interface.f90",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/src/fortran/dgl_interface.f90",
+                "sha256": "f63cc73ad1c3d5374c8294941f0fcdb5c40049cb4416795fadc4ea5db490b563"
+              },
+              {
+                "path": "manual/pages/usage.md",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/manual/pages/usage.md",
+                "sha256": "ab14b8133443b7046263cbd7c6a6699770b4e1d546bdc8156042cbf0c55a5a69"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dgl_davidson_driver",
+                "role": "public-entry-point",
+                "summary": "Public parent-module interface implemented in a submodule. Callback blocks use REAL(DGL_REAL) X(N,M),Y(N,M); the preconditioner also receives SHIFT.",
+                "signature": "CALL dgl_davidson_driver(N,N_TARG,N_MAX,MATVEC,PRECND, &\n     EIG,EVEC,OK, ... ,DGL_INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/davidson_driver.f90",
+                    "line_start": 10,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "src/fortran/dgl_interface.f90",
+                    "line_start": 38,
+                    "line_end": 68
+                  }
+                ],
+                "path": "src/fortran/davidson_driver.f90",
+                "line_start": 10,
+                "line_end": 492,
+                "module": "dgl_interface",
+                "usage": "use dgl_interface\ninteger(dgl_int),parameter :: n=20,nmax=2\ninteger(dgl_int) :: info\nreal(dgl_real) :: eig(nmax),evec(n,nmax)\nlogical :: ok\nprocedure(dgl_matvec) :: matrix_product\nprocedure(dgl_precnd) :: precondition\nevec=0.0_dgl_real; eig=0.0_dgl_real; ok=.false.\ncall dgl_davidson_driver(n,1_dgl_int,nmax,matrix_product,precondition, &\n     eig,evec,ok,dgl_info=info)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide compatible callback definitions; the zero initial block is completed by the driver as documented. Inspect INFO first and OK separately; a successful API return alone is not convergence. No eigenpair residual or orthogonality check was run."
+              }
+            ]
+          },
+          {
+            "code": "D4b1",
+            "level": "source-reviewed",
+            "revision": "31d53631871974e6197c52a2822cd77036d90cc2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The generalized DGL_LOBPCG_DRIVER path seeks a small set of real symmetric A*x=lambda B*x eigenpairs, with B symmetric positive definite supplied through an associated METVEC procedure pointer. It builds a locally optimal subspace from eigenvector/residual/search-direction blocks, applies preconditioning and metric orthogonalization, and locks converged roots. This mapping does not assume an arbitrary indefinite metric, a nonsymmetric problem or a complete spectrum. Callbacks must implement the actual symmetric A and SPD B and a suitable preconditioner, with matching configured kinds and block dimensions. OK and DGL_INFO remain separate convergence/error outputs. Source review covers the generalized dispatch and inspected subspace/metric update paths, not every orthogonalization fallback or fresh numerical validation.",
+            "evidence": [
+              {
+                "path": "src/fortran/lobpcg_driver.f90",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/src/fortran/lobpcg_driver.f90",
+                "sha256": "8ea2b5ca0516a2e30637232abe4cd25c897c0140701ec444ef7618df0e330527"
+              },
+              {
+                "path": "src/fortran/dgl_interface.f90",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/src/fortran/dgl_interface.f90",
+                "sha256": "f63cc73ad1c3d5374c8294941f0fcdb5c40049cb4416795fadc4ea5db490b563"
+              },
+              {
+                "path": "manual/pages/usage.md",
+                "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/manual/pages/usage.md",
+                "sha256": "ab14b8133443b7046263cbd7c6a6699770b4e1d546bdc8156042cbf0c55a5a69"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dgl_lobpcg_driver",
+                "role": "public-entry-point",
+                "summary": "Public parent-module generalized LOBPCG interface. METVEC is a procedure pointer, not an ordinary passed procedure.",
+                "signature": "CALL dgl_lobpcg_driver(N,N_TARG,N_MAX,MATVEC,PRECND, &\n     EIG,EVEC,OK, ... ,METVEC=METRIC,DGL_INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/lobpcg_driver.f90",
+                    "line_start": 10,
+                    "line_end": 35
+                  },
+                  {
+                    "path": "src/fortran/dgl_interface.f90",
+                    "line_start": 38,
+                    "line_end": 68
+                  },
+                  {
+                    "path": "src/fortran/dgl_interface.f90",
+                    "line_start": 146,
+                    "line_end": 196
+                  }
+                ],
+                "path": "src/fortran/lobpcg_driver.f90",
+                "line_start": 10,
+                "line_end": 520,
+                "module": "dgl_interface",
+                "usage": "use dgl_interface\ninteger(dgl_int),parameter :: n=20,nmax=2\ninteger(dgl_int) :: info\nreal(dgl_real) :: eig(nmax),evec(n,nmax)\nlogical :: ok\nprocedure(dgl_matvec) :: matrix_product,metric_product\nprocedure(dgl_precnd) :: precondition\nprocedure(dgl_matvec),pointer :: metric=>null()\nmetric=>metric_product\nevec=0.0_dgl_real; eig=0.0_dgl_real; ok=.false.\ncall dgl_lobpcg_driver(n,1_dgl_int,nmax,matrix_product,precondition, &\n     eig,evec,ok,metvec=metric,dgl_info=info)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback definitions and an actual SPD metric are prerequisites. The three-block subspace needs dimensions appropriate to the requested roots; this fragment uses a small root count in a larger ambient dimension. No generalized eigenpair or B-orthogonality test was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MPL-2.0",
+          "spdx_expression": "MPL-2.0",
+          "revision": "31d53631871974e6197c52a2822cd77036d90cc2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies Mozilla Public License 2.0 text. This records the project terms without a complete audit of BLAS/LAPACK dependencies or every optional interface/build component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Molecolab-Pisa/diaglib/blob/31d53631871974e6197c52a2822cd77036d90cc2/LICENSE",
+              "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22104,12 +22223,99 @@
             ],
             "notes": "The README documents Gaussian and hockey-stick examples with MPFUN2020 dependencies. The demonstrated finite-term approximations do not establish coverage of arbitrary functions or independently verified error bounds.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "K4",
+            "level": "source-reviewed",
+            "revision": "f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied Gaussian program constructs exponential-sum coefficients by sampling a Laplace-transform representation, generating multipoint continued-fraction data, converting it to a rational function and extracting residues/poles, then negating the poles to obtain exponential decay parameters. The selected source has explicit_Laplace_transform false and computes transform information numerically; the placeholder Laplace_transform returning one is not the selected exact-transform path. Polynomial/rational arithmetic is multiprecision via MPFUN2020 and the resulting coefficients are converted to kind-16 complex values. This is an analytic separated approximation for exp(-x*x) on the positive axis, not a generally callable fitting API or an independently certified uniform error bound. Driver-local routines capture fixed M/p/precision settings and should not be presented as external procedures without refactoring.",
+            "evidence": [
+              {
+                "path": "main_Gaussian.f90",
+                "url": "https://github.com/Alexey-Kuznetsov-math/exponential_sum_approximations/blob/f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6/main_Gaussian.f90",
+                "sha256": "514dacee05143038784da06db38e2122aee2d17ca8caad2e6b0d1f6f7ed589a3"
+              },
+              {
+                "path": "polynomials_module.f90",
+                "url": "https://github.com/Alexey-Kuznetsov-math/exponential_sum_approximations/blob/f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6/polynomials_module.f90",
+                "sha256": "aebbe558ec4d02866b910a8d4e44991e83ae07c0643fb648089b40c1738704d4"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Alexey-Kuznetsov-math/exponential_sum_approximations/blob/f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6/README.md",
+                "sha256": "ed6df0d9828eeb7fa47112038ed2ae28bc515517aa7086c5bc4de225512a2aa4"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/Alexey-Kuznetsov-math/exponential_sum_approximations/blob/f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6/Makefile",
+                "sha256": "7ff4d7fd892e7101529956b2f516a66a85dc067fea9fe1fa17f03f4088181c0f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "main_Gaussian",
+                "role": "program-entry-point",
+                "summary": "Supplied Gaussian exponential-sum coefficient generator, not a public callback library. Requires MPFUN2020 modules and compiler support for the source REAL/COMPLEX kind 16 conventions.",
+                "signature": "./main_Gaussian",
+                "declarations": [
+                  {
+                    "path": "main_Gaussian.f90",
+                    "line_start": 1,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "Makefile",
+                    "line_start": 8,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "README.md",
+                    "line_start": 6,
+                    "line_end": 28
+                  }
+                ],
+                "path": "main_Gaussian.f90",
+                "line_start": 1,
+                "line_end": 52,
+                "usage": "# Supply/build the MPFUN2020 sources listed in the pinned README first.\nmake mp\n# Override the Makefile default, which selects the hockey-stick program.\nmake PROGRAMS=main_Gaussian\n./main_Gaussian\n# Outputs: c_24.txt and lambda_24.txt",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The selected author program fixes M=24 and f(x)=exp(-x*x). It writes complex coefficients/exponents to files rather than validating an error norm automatically. Source precision/degree limits and external MPFUN build settings must match. No coefficient generation, approximation residual or precision test was run."
+              },
+              {
+                "procedure": "compute_exp_sum_coefficients",
+                "role": "implementation-helper",
+                "path": "main_Gaussian.f90",
+                "line_start": 108,
+                "line_end": 127
+              },
+              {
+                "procedure": "partial_fraction_decomposition",
+                "role": "implementation-helper",
+                "path": "polynomials_module.f90",
+                "line_start": 415,
+                "line_end": 486
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root BSD three-clause notice names Alexey Kuznetsov. MPFUN2020 is downloaded separately and retains its own terms; those external sources were not audited as part of this finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Alexey-Kuznetsov-math/exponential_sum_approximations/blob/f4f697ab6ce1405600ddcd9ffaedfe5fd3bc0bb6/LICENSE",
+              "sha256": "9d91791ea7b0676f855219448667a4c32cb17ad66beb8af8f863d52cb8603ced"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30343,12 +30549,120 @@
             ],
             "notes": "The README limits the main interface to square complex polynomial systems and discusses BLAS/LAPACK packaging. Advertised convergence and solution-completeness properties have not been independently reproduced.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The wrapper initializes complex polynomial term coefficients/exponents and a partitioned linear-product start system, then calls POLSYS_PLP to track homotopy paths, returning candidate roots, per-path statuses and evaluation counts in module arrays. This is a square complex polynomial-system solver, not a general nonpolynomial system API or a new proof that every path succeeds. INIT_POLY expects concatenated equation terms; INIT_PARTITION defines variable groups for each equation. Always pass DENSE explicitly: the omitted-optional branch in SOLVE attempts to assign the absent dummy. The wrapper also fixes SCALE_FACTORS length at 30, so do not exceed 30 variables without correcting that bound; COMPLEX(KIND=8) coefficients must match core R8. Shared polynomial/partition/output state is not reentrant. Inspect SOLVE_STATUS/PATH_STATUS before interpreting roots; the wrapper assumes core output pointers are associated when copying them, so abnormal-error paths need additional protection. This review covers setup/driver dispatch and inspected core path tracking, not every singular/multiple/infinite-root case.",
+            "evidence": [
+              {
+                "path": "pypolsys/src/wrapper.f90",
+                "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/pypolsys/src/wrapper.f90",
+                "sha256": "c4757d17e33a821afa1025931bbcfb81387d23d9751d5fe1af60b32be03a9b1f"
+              },
+              {
+                "path": "pypolsys/801/polsys_plp.f90",
+                "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/pypolsys/801/polsys_plp.f90",
+                "sha256": "b3677dfffb319234ff735fa3bbd67e84c210d3f2f77d75e0b49581ff68c0a145"
+              },
+              {
+                "path": "pypolsys/801/README",
+                "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/pypolsys/801/README",
+                "sha256": "96e038fbafd11dc039cdfc5c56753b5e4ab9414d213afdc618be2c95c87c383b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public module polynomial-system homotopy wrapper. Initialize polynomial and partition first and pass a real DENSE variable explicitly.",
+                "signature": "CALL solve(TRACKTOL,FINALTOL,SINGTOL,DENSE,BPLP)",
+                "declarations": [
+                  {
+                    "path": "pypolsys/src/wrapper.f90",
+                    "line_start": 306,
+                    "line_end": 318
+                  },
+                  {
+                    "path": "pypolsys/src/wrapper.f90",
+                    "line_start": 64,
+                    "line_end": 77
+                  }
+                ],
+                "path": "pypolsys/src/wrapper.f90",
+                "line_start": 267,
+                "line_end": 386,
+                "module": "polsyswrap",
+                "usage": "use real_precision, only: R8\nuse polsyswrap\ninteger :: counts(2),degrees(4,2),nsets(2),nindices(2,1),indices(2,1,2),paths\ncomplex(kind=8) :: coefficients(4)\nreal(R8) :: singular_tolerance\nlogical :: dense\n! x**2-1=0 and y**2-1=0\ncounts=2; coefficients=[(1d0,0d0),(-1d0,0d0),(1d0,0d0),(-1d0,0d0)]\ndegrees=0; degrees(1,1)=2; degrees(3,2)=2\nnsets=1; nindices=2; indices(:,1,1)=1; indices(:,1,2)=2\ncall init_poly(2,counts,coefficients,degrees)\ncall init_partition(2,nsets,nindices,indices)\nsingular_tolerance=1.0e-12_R8; dense=.false.\ncall solve(1.0e-8_R8,1.0e-10_R8,singular_tolerance,dense,paths)\n! Inspect solve_status, path_status and myROOTS before using candidates.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This deliberately supplies DENSE and uses two variables, below the fixed 30-variable scale buffer. Match kind-8/R8 storage and preserve the sparse term ordering. Path statuses and independent polynomial residuals, not just path count, determine usable candidates. No roots, multiplicities or residuals were computed."
+              },
+              {
+                "procedure": "init_poly",
+                "role": "public-entry-point",
+                "summary": "Public module concatenated coefficient/exponent setup for a square polynomial system.",
+                "signature": "CALL init_poly(N,N_COEF_PER_EQ,ALL_COEF,ALL_DEG)",
+                "declarations": [
+                  {
+                    "path": "pypolsys/src/wrapper.f90",
+                    "line_start": 110,
+                    "line_end": 115
+                  }
+                ],
+                "path": "pypolsys/src/wrapper.f90",
+                "line_start": 82,
+                "line_end": 159,
+                "module": "polsyswrap"
+              },
+              {
+                "procedure": "init_partition",
+                "role": "public-entry-point",
+                "summary": "Public module variable-group partition setup.",
+                "signature": "CALL init_partition(N,NUM_SETS,NUM_INDICES,INDEX)",
+                "declarations": [
+                  {
+                    "path": "pypolsys/src/wrapper.f90",
+                    "line_start": 180,
+                    "line_end": 185
+                  }
+                ],
+                "path": "pypolsys/src/wrapper.f90",
+                "line_start": 162,
+                "line_end": 202,
+                "module": "polsyswrap"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 root; historical POLSYS provenance separate",
+          "spdx_expression": null,
+          "revision": "d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GPL version 3 text. The numerical source identifies the 1998/1999 POLSYS_PLP/HOMPACK90 authors and distribution and includes an ACM algorithm archive README, without a full component license reconciliation. No assumption is made that the wrapper root notice resolves every historical ACM/HOMPACK/BLAS permission.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/LICENSE",
+              "sha256": "3d7774f801a5183a35a8af9b4546b15b2c5b89a4c439270fb83392d4788fe867"
+            },
+            {
+              "path": "pypolsys/801/README",
+              "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/pypolsys/801/README",
+              "sha256": "96e038fbafd11dc039cdfc5c56753b5e4ab9414d213afdc618be2c95c87c383b"
+            },
+            {
+              "path": "pypolsys/801/polsys_plp.f90",
+              "url": "https://github.com/nennigb/pypolsys/blob/d85ddd09dfe0f0efbf0ff9d1a93f438c556e044b/pypolsys/801/polsys_plp.f90",
+              "sha256": "b3677dfffb319234ff735fa3bbd67e84c210d3f2f77d75e0b49581ff68c0a145"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37011,12 +37325,172 @@
             ],
             "notes": "The brief README is supplemented by the solver module interface and comments, including real/complex right-hand sides, solution vectors and method dispatch. This supports a broad linear-system mapping, not independent verification of every solver, preconditioner or accelerator path.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "3569318ce2544d52fe9273137206b8fa7b3f68f2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MONOLIS_SOLVE_R wrapper copies the RHS and initial guess into assembled matrix storage, dispatches preconditioned conjugate gradients for a real sparse symmetric positive-definite system through the configured method selector, then retrieves X and updates halo values. The inspected recurrence uses sparse products, preconditioner applications and communicator-aware inner products, with periodic explicit residual recomputation. The caller must prepare the sparse/block pattern, values, DOF layout, communication tables, preconditioner/control state and compatible vector extents. CG requires an SPD operator and appropriate SPD preconditioner; BiCGSTAB has possible recurrence breakdowns and is not a universal nonsymmetric convergence guarantee. Query the parameter error/convergence records rather than treating return of X as success. This review covers the selected real CPU algorithm path, not all accelerator, variable-block, distributed partition, factorization or complex branches.",
+            "evidence": [
+              {
+                "path": "src/solver/solver.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/solver/solver.f90",
+                "sha256": "2f47fbb0159b5216742af749af5ddbb31c7111eb5e8b666599cc203299efe221"
+              },
+              {
+                "path": "src/iterative/CG.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/iterative/CG.f90",
+                "sha256": "06c66b832445b0a2f9d0696795303b121242eb1ea8df1bf00950667a2f3dd409"
+              },
+              {
+                "path": "src/define/def_solver_prm.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_solver_prm.f90",
+                "sha256": "ffeca39e0af02f952423f22e184ebb1e791a97ada5e1ded04b990d7c3eaa83d0"
+              },
+              {
+                "path": "src/define/def_solver_prm_util.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_solver_prm_util.f90",
+                "sha256": "d83f9ed6192594601adb5410b98bfd176bca7ca9da4d5774a9d16d2dca0bdd26"
+              },
+              {
+                "path": "src/define/def_struc.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_struc.f90",
+                "sha256": "8f487e0528998f1fac0bf082df8e79fcccbbe9c41edb37a0bc4c2b95d559ef24"
+              },
+              {
+                "path": "sample/cg_diag_3d/main.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/sample/cg_diag_3d/main.f90",
+                "sha256": "a3ff3e864ace86ce376faa24615d0b7b598dbe1ba5b4b52b7932c704fcba04da"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "monolis_solve_R",
+                "role": "public-entry-point",
+                "summary": "Public module assembled sparse-system wrapper. Select CG in the parameter state before calling; X is both input guess and returned approximation.",
+                "signature": "CALL monolis_solve_R(MONOLIS,MONOCOM,B,X)",
+                "declarations": [
+                  {
+                    "path": "src/solver/solver.f90",
+                    "line_start": 33,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "src/define/def_solver_prm.f90",
+                    "line_start": 1,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/solver/solver.f90",
+                "line_start": 33,
+                "line_end": 53,
+                "module": "mod_monolis_solve",
+                "usage": "use mod_monolis_solve, only: monolis_solve_R\nuse mod_monolis_def_solver, only: monolis_iter_CG\nuse mod_monolis_def_solver_util, only: monolis_set_method,monolis_get_error_tag\n! SYSTEM/COMMUNICATION and compatible real B/X are fully initialized/assembled.\ncall monolis_set_method(system,monolis_iter_CG)\ncall monolis_solve_R(system,communication,b,x)\ncall monolis_get_error_tag(system,status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a selected-method interface fragment, not a matrix assembly or MPI setup example. Interpret the error tag, iteration count and convergence residual from the parameter helpers, then check b-A*x independently. No solve, residual, preconditioner or MPI/accelerator case was executed."
+              },
+              {
+                "procedure": "monolis_solver_CG",
+                "role": "implementation-helper",
+                "path": "src/iterative/CG.f90",
+                "line_start": 18,
+                "line_end": 114,
+                "module": "mod_monolis_solver_CG"
+              }
+            ]
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "3569318ce2544d52fe9273137206b8fa7b3f68f2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MONOLIS_SOLVE_R wrapper copies the RHS and initial guess into assembled matrix storage, dispatches preconditioned BiCGSTAB for a real sparse nonsymmetric system through the configured method selector, then retrieves X and updates halo values. The inspected recurrence uses sparse products, preconditioner applications and communicator-aware inner products, with periodic explicit residual recomputation. The caller must prepare the sparse/block pattern, values, DOF layout, communication tables, preconditioner/control state and compatible vector extents. CG requires an SPD operator and appropriate SPD preconditioner; BiCGSTAB has possible recurrence breakdowns and is not a universal nonsymmetric convergence guarantee. Query the parameter error/convergence records rather than treating return of X as success. This review covers the selected real CPU algorithm path, not all accelerator, variable-block, distributed partition, factorization or complex branches.",
+            "evidence": [
+              {
+                "path": "src/solver/solver.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/solver/solver.f90",
+                "sha256": "2f47fbb0159b5216742af749af5ddbb31c7111eb5e8b666599cc203299efe221"
+              },
+              {
+                "path": "src/iterative/BiCGSTAB.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/iterative/BiCGSTAB.f90",
+                "sha256": "cf07002c2e2d41c4cce95071c80a6665382772f4d51116865a50618e00921b15"
+              },
+              {
+                "path": "src/define/def_solver_prm.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_solver_prm.f90",
+                "sha256": "ffeca39e0af02f952423f22e184ebb1e791a97ada5e1ded04b990d7c3eaa83d0"
+              },
+              {
+                "path": "src/define/def_solver_prm_util.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_solver_prm_util.f90",
+                "sha256": "d83f9ed6192594601adb5410b98bfd176bca7ca9da4d5774a9d16d2dca0bdd26"
+              },
+              {
+                "path": "src/define/def_struc.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/src/define/def_struc.f90",
+                "sha256": "8f487e0528998f1fac0bf082df8e79fcccbbe9c41edb37a0bc4c2b95d559ef24"
+              },
+              {
+                "path": "sample/cg_diag_3d/main.f90",
+                "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/sample/cg_diag_3d/main.f90",
+                "sha256": "a3ff3e864ace86ce376faa24615d0b7b598dbe1ba5b4b52b7932c704fcba04da"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "monolis_solve_R",
+                "role": "public-entry-point",
+                "summary": "Public module assembled sparse-system wrapper. Select BiCGSTAB in the parameter state before calling; X is both input guess and returned approximation.",
+                "signature": "CALL monolis_solve_R(MONOLIS,MONOCOM,B,X)",
+                "declarations": [
+                  {
+                    "path": "src/solver/solver.f90",
+                    "line_start": 33,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "src/define/def_solver_prm.f90",
+                    "line_start": 1,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/solver/solver.f90",
+                "line_start": 33,
+                "line_end": 53,
+                "module": "mod_monolis_solve",
+                "usage": "use mod_monolis_solve, only: monolis_solve_R\nuse mod_monolis_def_solver, only: monolis_iter_BiCGSTAB\nuse mod_monolis_def_solver_util, only: monolis_set_method,monolis_get_error_tag\n! SYSTEM/COMMUNICATION and compatible real B/X are fully initialized/assembled.\ncall monolis_set_method(system,monolis_iter_BiCGSTAB)\ncall monolis_solve_R(system,communication,b,x)\ncall monolis_get_error_tag(system,status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a selected-method interface fragment, not a matrix assembly or MPI setup example. Interpret the error tag, iteration count and convergence residual from the parameter helpers, then check b-A*x independently. No solve, residual, preconditioner or MPI/accelerator case was executed."
+              },
+              {
+                "procedure": "monolis_solver_BiCGSTAB",
+                "role": "implementation-helper",
+                "path": "src/iterative/BiCGSTAB.f90",
+                "line_start": 18,
+                "line_end": 183,
+                "module": "mod_monolis_solver_BiCGSTAB"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT (README declaration)",
+          "spdx_expression": "MIT",
+          "revision": "3569318ce2544d52fe9273137206b8fa7b3f68f2",
+          "reviewed_on": "2026-11-05",
+          "notes": "README declares MIT, but no separate named license text appears in the pinned top-level tree. This records that project declaration; it does not audit the separate monolis_utils/MPI/BLAS and other submodule/runtime dependencies.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/nqomorita/monolis/blob/3569318ce2544d52fe9273137206b8fa7b3f68f2/README.md",
+              "sha256": "8e07ab82bb6b31ed1c209c1ebfedf897e1b4caec775a5d9bd77c7c26de47d055"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40964,12 +41438,82 @@
             ],
             "notes": "The README lists Fortran 77/95 Hooke-Jeeves and original Fortran Nelder-Mead alongside other-language implementations. Identical output across languages is a project goal, not an independent equivalence result of this review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "b0b85b3c0449d044ee16b3140e4d19d5a826130c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external HOOKE function carries out derivative-free coordinate exploration, pattern extrapolation after improvements and geometric step shrinkage after failed exploration. It links a named external F(X,N) rather than taking the objective as a callback dummy. The supplied file includes PROTO__ explicit interfaces, Rosenbrock (or preprocessor-selected Woods) objective and a main program: separate these appropriately to reuse the optimizer with another main/objective. Require 1<=NVARS<=250, adequately sized arrays, 0<RHO<1 and a positive stopping tolerance/budget. The return is an iteration count, not a success flag; the algorithm also writes progress and uses shared FUNEVALS. Step-size termination is not proof of stationarity or a global minimum, especially for general/nonsmooth functions. This mapping records the selected direct-search mechanics without a new convergence/accuracy claim.",
+            "evidence": [
+              {
+                "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                "url": "https://github.com/rgolubtsov/nonlinear-optimization-algorithms-multilang/blob/b0b85b3c0449d044ee16b3140e4d19d5a826130c/nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                "sha256": "9eeaad5f92636e985923fd4e6f5080fdd390aa3ccf1ab450e223a81afc779cd3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/rgolubtsov/nonlinear-optimization-algorithms-multilang/blob/b0b85b3c0449d044ee16b3140e4d19d5a826130c/README.md",
+                "sha256": "ef282e2049b7b744a7e1368643832568510ba3ce5044ba2bc82ac2f169691365"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hooke",
+                "role": "public-entry-point",
+                "summary": "External assumed-shape direct-search optimizer; import its explicit interface through PROTO__, not as a module procedure definition.",
+                "signature": "ITERATIONS = hooke(NVARS,STARTPT,ENDPT,RHO,EPSILON,ITERMAX)",
+                "declarations": [
+                  {
+                    "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                    "line_start": 69,
+                    "line_end": 77
+                  },
+                  {
+                    "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                    "line_start": 206,
+                    "line_end": 239
+                  }
+                ],
+                "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                "line_start": 206,
+                "line_end": 342,
+                "usage": "use proto__, only: DP,hooke,FUNEVALS\ninteger :: iterations\nreal(DP) :: start(2),finish(2)\n! Link PROTO__, the external optimizer/helpers and the selected F; omit supplied main.\n! The supplied default objective is the two-variable Rosenbrock function.\nstart=[-1.2_DP,1.0_DP]; FUNEVALS=0\niterations=hooke(2,start,finish,0.5_DP,1.0e-6_DP,1000)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the preprocessed source with a consistent objective selection and avoid duplicate mains/F definitions. A full custom objective needs the pinned assumed-shape interface and appropriate dimension logic. No minimizer, objective value, stationarity or iteration-budget case was verified."
+              },
+              {
+                "procedure": "best_nearby",
+                "role": "implementation-helper",
+                "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+                "line_start": 145,
+                "line_end": 202
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Unlicense",
+          "spdx_expression": "Unlicense",
+          "revision": "b0b85b3c0449d044ee16b3140e4d19d5a826130c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and selected source explicitly dedicate the software to the public domain with the Unlicense permission and warranty fallback. This records that notice, not every upstream language-port or historical algorithm attribution.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/rgolubtsov/nonlinear-optimization-algorithms-multilang/blob/b0b85b3c0449d044ee16b3140e4d19d5a826130c/LICENSE",
+              "sha256": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e"
+            },
+            {
+              "path": "nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+              "url": "https://github.com/rgolubtsov/nonlinear-optimization-algorithms-multilang/blob/b0b85b3c0449d044ee16b3140e4d19d5a826130c/nlp-unconstrained-cli/hooke-jeeves/f95/src/hooke.f95",
+              "sha256": "9eeaad5f92636e985923fd4e6f5080fdd390aa3ccf1ab450e223a81afc779cd3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41433,12 +41977,210 @@
             ],
             "notes": "The README identifies COBYLA, UOBYQA, NEWUOA, BOBYQA and LINCOA, with bindings in other languages. Broad optimization coverage is recorded without independently endorsing every performance, bug-fix or convergence claim.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h1a1",
+            "level": "source-reviewed",
+            "revision": "43863c69ccd6408dedcd782d0dfdcbaad404dcde",
+            "reviewed_on": "2026-11-05",
+            "notes": "The modern BOBYQA module driver minimizes a real objective under simple bounds without user derivatives, constructing quadratic interpolation models and bounded trust-region steps through BOBYQB. It preprocesses dimensions, bounds, radius/budget controls and optional histories before dispatch. X is both starting point and returned approximate minimizer; CALFUN has the modern assumed-shape (X,F) interface and must match configured RP. Bounds and interpolation geometry matter: this is local smooth-model optimization, not a global minimum certificate or a claim of nonsmooth convergence. INFO reports the specific termination reason, NF the evaluation count; radius and target/budget terminations have different meanings. This review covers driver/core trust-region dispatch, not all geometry/rescue/update kernels or fresh optimization results.",
+            "evidence": [
+              {
+                "path": "fortran/bobyqa/bobyqa.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/bobyqa/bobyqa.f90",
+                "sha256": "cea450a64c6d9302d318b3a2cf41eecf663cc89bc8126c5c1d7a1bb1b1a6bac9"
+              },
+              {
+                "path": "fortran/bobyqa/bobyqb.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/bobyqa/bobyqb.f90",
+                "sha256": "03e0d5a86605c314deefb5f616ddaa351a61d1d80fb1f3e24035e6d8d5cc92a2"
+              },
+              {
+                "path": "fortran/common/consts.F90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/common/consts.F90",
+                "sha256": "8f5690bf03c82fd7cd5652dc1252da33b29173667332b9f0272196fac9c3ee35"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bobyqa",
+                "role": "public-entry-point",
+                "summary": "Public module derivative-free bound-constrained optimizer. Only CALFUN and X are mandatory; the sketch supplies explicit bounds and requests termination status.",
+                "signature": "CALL bobyqa(CALFUN,X,F,XL,XU, ... ,INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "fortran/bobyqa/bobyqa.f90",
+                    "line_start": 39,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "fortran/bobyqa/bobyqa.f90",
+                    "line_start": 64,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "fortran/bobyqa/bobyqa.f90",
+                    "line_start": 216,
+                    "line_end": 242
+                  }
+                ],
+                "path": "fortran/bobyqa/bobyqa.f90",
+                "line_start": 39,
+                "line_end": 532,
+                "module": "bobyqa_mod",
+                "usage": "use consts_mod, only: RP,IK\nuse bobyqa_mod, only: bobyqa\nreal(RP) :: x(2),lower(2),upper(2),value\ninteger(IK) :: status,evaluations\n! Supply OBJECTIVE(X,F) as an internal/module procedure using REAL(RP), X(:).\nx=[0.0_RP,0.0_RP]; lower=-2.0_RP; upper=2.0_RP\ncall bobyqa(objective,x,f=value,xl=lower,xu=upper, &\n     maxfun=500_IK,rhoend=1.0e-6_RP,nf=evaluations,info=status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interpret INFO against the PRIMA termination codes rather than treating every nonzero value as failure or every exit as convergence. Link the complete PRIMA dependency set using one consistent RP/IK configuration. No objective callback, minimizer, constraint residual or timing was tested."
+              },
+              {
+                "procedure": "bobyqb",
+                "role": "implementation-helper",
+                "path": "fortran/bobyqa/bobyqb.f90",
+                "line_start": 46,
+                "line_end": 697,
+                "module": "bobyqb_mod"
+              }
+            ]
+          },
+          {
+            "code": "G2h2a1",
+            "level": "source-reviewed",
+            "revision": "43863c69ccd6408dedcd782d0dfdcbaad404dcde",
+            "reviewed_on": "2026-11-05",
+            "notes": "LINCOA minimizes a smooth objective without user derivatives under linear equalities/inequalities and optional bounds. The modern driver assembles and scales constraints, prepares a quadratic interpolation model and dispatches feasible trust-region/geometry steps to LINCOB. AINEQ has one constraint per row with AINEQ*X<=BINEQ; AEQ*X=BEQ is the equality convention. This is local linearly constrained optimization, not nonlinear constraint handling or a global certificate. Returned CSTRV is the reported constraint violation and INFO/NF describe termination and work, which need inspection alongside an independent residual calculation. The review covers driver and selected trust-region dispatch, not all initialization/geometry/update routines.",
+            "evidence": [
+              {
+                "path": "fortran/lincoa/lincoa.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/lincoa/lincoa.f90",
+                "sha256": "bca27355ba5ed158d2de8463ed4c1834ecdacaa6e5aee1c0170dc3c54154f896"
+              },
+              {
+                "path": "fortran/lincoa/lincob.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/lincoa/lincob.f90",
+                "sha256": "4f11d7df91bdaa82d090280b4812bac9c1e76b11099d0cb343d61aa9f33af66d"
+              },
+              {
+                "path": "fortran/common/consts.F90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/common/consts.F90",
+                "sha256": "8f5690bf03c82fd7cd5652dc1252da33b29173667332b9f0272196fac9c3ee35"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lincoa",
+                "role": "public-entry-point",
+                "summary": "Public module derivative-free linearly constrained optimizer; objective callback uses CALFUN(X,F) with the configured RP kind.",
+                "signature": "CALL lincoa(CALFUN,X,F,CSTRV,AINEQ,BINEQ,AEQ,BEQ, ... ,INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "fortran/lincoa/lincoa.f90",
+                    "line_start": 50,
+                    "line_end": 56
+                  },
+                  {
+                    "path": "fortran/lincoa/lincoa.f90",
+                    "line_start": 245,
+                    "line_end": 279
+                  }
+                ],
+                "path": "fortran/lincoa/lincoa.f90",
+                "line_start": 50,
+                "line_end": 629,
+                "module": "lincoa_mod",
+                "usage": "use consts_mod, only: RP,IK\nuse lincoa_mod, only: lincoa\nreal(RP) :: x(2),a(1,2),b(1),value,violation\ninteger(IK) :: status\n! Supply a compatible internal/module OBJECTIVE(X,F) procedure.\nx=0.0_RP; a(1,:)=[1.0_RP,1.0_RP]; b=1.0_RP\ncall lincoa(objective,x,f=value,cstrv=violation,Aineq=a,bineq=b, &\n     maxfun=500_IK,info=status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The example constraint is x(1)+x(2)<=1. Supply valid finite row-oriented matrices, examine INFO/CSTRV and independently check feasibility and objective values in a complete driver. No constrained fit or numerical comparison was run."
+              },
+              {
+                "procedure": "lincob",
+                "role": "implementation-helper",
+                "path": "fortran/lincoa/lincob.f90",
+                "line_start": 29,
+                "line_end": 760,
+                "module": "lincob_mod"
+              }
+            ]
+          },
+          {
+            "code": "G2h3b1a",
+            "level": "source-reviewed",
+            "revision": "43863c69ccd6408dedcd782d0dfdcbaad404dcde",
+            "reviewed_on": "2026-11-05",
+            "notes": "The modern COBYLA interface minimizes an objective with nonlinear INEQUALITY values NLCONSTR(X)<=0, alongside optional LINEAR equalities/inequalities and bounds, without user derivatives. The core maintains simplex-based linear models and solves trust-region linear subproblems. This sign convention differs from historical COBYLA interfaces using nonnegative constraint residuals. M_NLCON must exactly match the callback output count; CALCFC evaluates both objective and nonlinear values. The selected mixed-constraint sketch includes a linear equality plus one nonlinear inequality; it does not claim a separate native nonlinear-equality callback. Smooth-function classification records this local derivative-free approximation path, not a global convergence or exact-feasibility guarantee. INFO/CSTRV/CTOL and termination details need independent interpretation.",
+            "evidence": [
+              {
+                "path": "fortran/cobyla/cobyla.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/cobyla/cobyla.f90",
+                "sha256": "ed318b406cc0fcbe10ee04552440b722b046a9a3f930196ad20d67e2bb354c6d"
+              },
+              {
+                "path": "fortran/cobyla/cobylb.f90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/cobyla/cobylb.f90",
+                "sha256": "7d272968b1591746b35d27acb8929baa57624143a93f89d1a16e104d2926d631"
+              },
+              {
+                "path": "fortran/common/consts.F90",
+                "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/fortran/common/consts.F90",
+                "sha256": "8f5690bf03c82fd7cd5652dc1252da33b29173667332b9f0272196fac9c3ee35"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cobyla",
+                "role": "public-entry-point",
+                "summary": "Public module derivative-free constrained optimizer. Callback is CALCFC(X,F,NLCONSTR), all REAL(RP), with the exact nonlinear constraint count.",
+                "signature": "CALL cobyla(CALCFC,M_NLCON,X,F,CSTRV,NLCONSTR, ... ,INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "fortran/cobyla/cobyla.f90",
+                    "line_start": 56,
+                    "line_end": 63
+                  },
+                  {
+                    "path": "fortran/cobyla/cobyla.f90",
+                    "line_start": 96,
+                    "line_end": 101
+                  },
+                  {
+                    "path": "fortran/cobyla/cobyla.f90",
+                    "line_start": 285,
+                    "line_end": 322
+                  }
+                ],
+                "path": "fortran/cobyla/cobyla.f90",
+                "line_start": 56,
+                "line_end": 759,
+                "module": "cobyla_mod",
+                "usage": "use consts_mod, only: RP,IK\nuse cobyla_mod, only: cobyla\nreal(RP) :: x(2),aeq(1,2),beq(1),value,violation,nonlinear(1)\ninteger(IK) :: status\n! Supply MODEL(X,F,C): C(1)=X(1)**2+X(2)**2-1 <= 0.\n! MODEL must be an internal/module procedure with the pinned assumed-shape interface.\nx=[0.5_RP,0.5_RP]; aeq=1.0_RP; beq=1.0_RP\ncall cobyla(model,1_IK,x,f=value,cstrv=violation,nlconstr=nonlinear, &\n     Aeq=aeq,beq=beq,maxfun=500_IK,info=status)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The linear equality is x(1)+x(2)=1. This is a callback/setup fragment with no actual objective definition or checked feasibility result. Do not reuse the historical opposite constraint sign. Review INFO and both linear/nonlinear residuals; no optimization run was performed."
+              },
+              {
+                "procedure": "cobylb",
+                "role": "implementation-helper",
+                "path": "fortran/cobyla/cobylb.f90",
+                "line_start": 31,
+                "line_end": 714,
+                "module": "cobylb_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "43863c69ccd6408dedcd782d0dfdcbaad404dcde",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root BSD three-clause notice names Zaikun Zhang and applies to the modern PRIMA implementation. Classical archives, historical Powell attributions and every optional language/build dependency were not fully audited here.",
+          "evidence": [
+            {
+              "path": "LICENCE.txt",
+              "url": "https://github.com/libprima/prima/blob/43863c69ccd6408dedcd782d0dfdcbaad404dcde/LICENCE.txt",
+              "sha256": "66d109d942fbc3d235154abde881fd646bdacf94981d1e0b64bb76025597d50a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41614,12 +42356,82 @@
             ],
             "notes": "The README explicitly says the project no longer receives updates and older installation instructions are stale. It bundles DQED under separate licensing terms; this is documentation coverage, not a claim of current platform readiness.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K1b2a",
+            "level": "source-reviewed",
+            "revision": "9377ec27f08a124ada3ef2cb701d48f2383e6693",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected DQED path minimizes a sum of squared nonlinear residuals under simple bounds and linear equality/inequality constraints. DQEDEV supplies function/constraint values AND first derivatives in FJAC; numerical differentiation is not supplied by the driver. IND encodes lower/upper/two-sided/unbounded entries for variables and constraint values. DQED sizes workspace and dispatches DQEDMN for bounded linear/quadratic local models and iteration control. The source documents slightly nonlinear constraints but warns about strongly nonlinear ones; this mapping deliberately selects the linear-constraint class. WA/IWA storage and IOPT/ROPT/IGO protocols must follow the documented options. Saved driver/workspace state prevents arbitrary interleaved solves and some storage errors STOP. This is driver/interface and model-dispatch review, not a complete audit of every bounded least-squares kernel, convergence flag or a new optimization result.",
+            "evidence": [
+              {
+                "path": "dqed.f90",
+                "url": "https://github.com/ReactionMechanismGenerator/PyDQED/blob/9377ec27f08a124ada3ef2cb701d48f2383e6693/dqed.f90",
+                "sha256": "038b13d09f19356328345827037adb7cac8c7e280ed763c2eaf301aba0301453"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ReactionMechanismGenerator/PyDQED/blob/9377ec27f08a124ada3ef2cb701d48f2383e6693/README.md",
+                "sha256": "93c1b7212642ca6ddf618b27bd29b9ce6cfe14eae16b82db55a11b566166d9e5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqed",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) constrained nonlinear least-squares driver with forward/reverse communication options. Supply a real user evaluator rather than mistaking the bundled DQEDEV placeholder for a problem definition.",
+                "signature": "CALL dqed(DQEDEV,MEQUA,NVARS,MCON,IND,BL,BU,X,FJAC, &\n     LDFJAC,FNORM,IGO,IOPT,ROPT,IWA,WA)",
+                "declarations": [
+                  {
+                    "path": "dqed.f90",
+                    "line_start": 4853,
+                    "line_end": 4854
+                  },
+                  {
+                    "path": "dqed.f90",
+                    "line_start": 5860,
+                    "line_end": 5911
+                  }
+                ],
+                "path": "dqed.f90",
+                "line_start": 4853,
+                "line_end": 6140,
+                "usage": "! Setup fragment: allocate/initialize bounds, IND, state/options and work arrays.\n! Provide EVALUATOR(X,FJ,LDFJ,IGO,IOPT,ROPT) with values and first derivatives.\n! IWA(1:2) initially state allocated real/integer workspace lengths.\ncall dqed(evaluator,mequa,nvars,mcon,ind,bl,bu,x,fjac, &\n     ldfjac,fnorm,igo,iopt,ropt,iwa,wa)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Follow the pinned options/workspace documentation and service requested IGO states before interpreting FNORM or X. Callback and Jacobian row layout depend on MCON/MEQUA; this fragment does not define them. No Jacobian, stationarity, feasibility or least-squares residual check was run."
+              },
+              {
+                "procedure": "dqedmn",
+                "role": "implementation-helper",
+                "path": "dqed.f90",
+                "line_start": 7105,
+                "line_end": 8689
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT wrapper notice; legacy DQED provenance separate",
+          "spdx_expression": null,
+          "revision": "9377ec27f08a124ada3ef2cb701d48f2383e6693",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Joshua W. Allen. The numerical source separately attributes Hanson/Krogh and historical LINPACK/least-squares algorithms without reproducing an explicit grant for every legacy routine. This records the wrapper notice without asserting it resolves all inherited algorithm-source rights.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ReactionMechanismGenerator/PyDQED/blob/9377ec27f08a124ada3ef2cb701d48f2383e6693/LICENSE",
+              "sha256": "fc18f4f3fd80132f2cb21d45525595bcd5bf56764200bf38d8c516d7f46ae8c3"
+            },
+            {
+              "path": "dqed.f90",
+              "url": "https://github.com/ReactionMechanismGenerator/PyDQED/blob/9377ec27f08a124ada3ef2cb701d48f2383e6693/dqed.f90",
+              "sha256": "038b13d09f19356328345827037adb7cac8c7e280ed763c2eaf301aba0301453"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41663,12 +42475,132 @@
             ],
             "notes": "The README describes OPTGRA as designed for near-linear constrained problems and documents pygmo integration. Broader nonlinear applicability and solver behavior were not independently tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h3b1b",
+            "level": "source-reviewed",
+            "revision": "3f0b00ddb62f28b896eaa8baddab57378d0b246e",
+            "reviewed_on": "2026-11-05",
+            "notes": "OGEXEC coordinates feasibility correction and gradient-based objective improvement with active constraints, scaling and line searches through OGCORR/OGOPTI. Constraint types support >=, <= and equality against zero/reference conventions configured by setup; the last output is the objective/merit. The selected VARDER=1 path uses caller first derivatives, configured through OGDERI; finite-difference modes exist but are outside this mapping. CALVAL is actually called with (VALVAR,VALCON,IFLAG), while CALDER receives (VALVAR,VALCON,DERCON), with physical unscaled callback quantities. FINITE is an iteration-count output, not the derivative-mode selector. Call OGINIT and configure types, scales/tolerances and objective direction before OGEXEC, then release through OGCLOS. COMMON pointer/array state is shared and not reentrant. The algorithm targets near-linear constraints; FINOPT local optimality/feasibility labels are termination criteria, not mathematical certificates or a new trajectory/domain validation.",
+            "evidence": [
+              {
+                "path": "pyoptgra/core/ogexec.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogexec.F",
+                "sha256": "afaa88aa49be1f4c81b85a9ec09f10d3ee42579e6783ad48244cd536d53bd520"
+              },
+              {
+                "path": "pyoptgra/core/ogeval.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogeval.F",
+                "sha256": "30743c69720f55fadcde7fc697f342cdcd10bc3f819f1a73a610db4f50f87667"
+              },
+              {
+                "path": "pyoptgra/core/oginit.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/oginit.F",
+                "sha256": "267702701cdb9cba167a6e18cadd5541be0da6fbdb788e7bcb7f30d3c09ce3ed"
+              },
+              {
+                "path": "pyoptgra/core/ogderi.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogderi.F",
+                "sha256": "139ea2ac986da3b96f6867b64b2a58e08085d7ad7d6385685d1bc995d86f80d6"
+              },
+              {
+                "path": "pyoptgra/core/ogopti.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogopti.F",
+                "sha256": "db2a32af5aa1fea38c557f5951488df08ae8e89945fa0e7974a64732bd2b1716"
+              },
+              {
+                "path": "pyoptgra/core/ogdata.inc",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogdata.inc",
+                "sha256": "fff2e5a7d561fe0574383ff5d02c5a984d8348efa2b43ae2f5e53792a0286c83"
+              },
+              {
+                "path": "pyoptgra/core/ogctyp.F",
+                "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/pyoptgra/core/ogctyp.F",
+                "sha256": "540904c8b06257bf56eaa5e61d99d2247728a2ec0ddfbc49dda7015cfcda3a7c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "OGEXEC",
+                "role": "public-entry-point",
+                "summary": "External preprocessed fixed-form REAL(8)/INTEGER(4) optimization coordinator. Initialize/configure the shared state and supply both callback signatures exactly.",
+                "signature": "CALL OGEXEC(VALVAR,VALCON,FINOPT,FINITE,CALVAL,CALDER)",
+                "declarations": [
+                  {
+                    "path": "pyoptgra/core/ogexec.F",
+                    "line_start": 1,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "pyoptgra/core/ogeval.F",
+                    "line_start": 16,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "pyoptgra/core/ogeval.F",
+                    "line_start": 47,
+                    "line_end": 52
+                  }
+                ],
+                "path": "pyoptgra/core/ogexec.F",
+                "line_start": 1,
+                "line_end": 428,
+                "usage": "! Interface fragment after OGINIT and problem-specific OG* setup.\n! Configure active variables, constraint/merit types and finite nonzero scales.\n! DERIVATIVE_MODE=1 requests caller derivatives; PERTURBATION has NUMVAR entries.\ncall OGDERI(derivative_mode,perturbation)\ncall OGEXEC(variables,values,status,iterations,calval,calder)\ncall OGCLOS()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide CALVAL(X,VALUES,IFLAG) and CALDER(X,VALUES,JAC), with JAC(NUMCON+1,NUMVAR), and initialize DERIVATIVE_MODE to 1. Inspect FINOPT and independent feasibility/gradient measures. Setup/close and callback bodies are omitted; no solve or sensitivity check was run."
+              },
+              {
+                "procedure": "OGINIT",
+                "role": "public-entry-point",
+                "summary": "External shared-state allocation/default setup; additional configuration defines the actual problem.",
+                "signature": "CALL OGINIT(VARNUM,CONNUM)",
+                "declarations": [
+                  {
+                    "path": "pyoptgra/core/oginit.F",
+                    "line_start": 1,
+                    "line_end": 17
+                  }
+                ],
+                "path": "pyoptgra/core/oginit.F",
+                "line_start": 1,
+                "line_end": 144
+              },
+              {
+                "procedure": "OGDERI",
+                "role": "public-entry-point",
+                "summary": "External derivative-mode/perturbation configuration. DERVAR=1 selects supplied derivatives; 2/3 select finite differences.",
+                "signature": "CALL OGDERI(DERVAR,PERVAR)",
+                "declarations": [
+                  {
+                    "path": "pyoptgra/core/ogderi.F",
+                    "line_start": 1,
+                    "line_end": 21
+                  }
+                ],
+                "path": "pyoptgra/core/ogderi.F",
+                "line_start": 1,
+                "line_end": 32
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3 or ESCL 2.4 Weak Copyleft (author choice)",
+          "spdx_expression": null,
+          "revision": "3f0b00ddb62f28b896eaa8baddab57378d0b246e",
+          "reviewed_on": "2026-11-05",
+          "notes": "LEGAL explicitly offers a choice between GNU GPL version 3 and ESA Software Community Licence 2.4 Weak Copyleft and identifies both license texts. This preserves the dual-license choice without inventing a standard SPDX identifier for ESCL or inferring a GPL or-later option.",
+          "evidence": [
+            {
+              "path": "LEGAL",
+              "url": "https://github.com/esa/pyoptgra/blob/3f0b00ddb62f28b896eaa8baddab57378d0b246e/LEGAL",
+              "sha256": "f11d84673aff458e3dbf470bc7e0fb3f92746af3656795afe97c88e8ae973e5a"
+            }
+          ]
         }
       },
       "imports": {}

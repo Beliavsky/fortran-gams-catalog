@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 284 repositories now have 368 source-reviewed
+Reviewed on 2026-11-05. 292 repositories now have 380 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-276 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Eight further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT and TREAT) identify supplied program entry points and keep their internal/benchmark
+283 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Nine further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT and main_Gaussian) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 284 independently source-reviewed repositories now have an
+separately. All 292 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -308,6 +308,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Spectrum-Revealing CUR | `carrqr` | MIT/BSD notices scoped to LUSOL; QR grant not separately identified |
 | TT Fortran core | `tt_lib::svd`, `tt_lib::dot` | MIT |
 | KronLinInv | `kronlininv::posteriormean`, `kronlininv::calcfactors` | GPL-3.0-or-later |
+| diaglib | `dgl_interface::dgl_davidson_driver`, `dgl_interface::dgl_lobpcg_driver` | MPL-2.0 |
+| Exponential sum approximations | `main_Gaussian` | BSD-3-Clause |
+| pypolsys | `polsyswrap::solve`, `polsyswrap::init_poly`, `polsyswrap::init_partition` | GPL version 3 root; historical POLSYS provenance separate |
+| monolis | `mod_monolis_solve::monolis_solve_R` | MIT (README declaration) |
+| Nonlinear Optimization Algorithms Multilang | `hooke` | Unlicense |
+| PRIMA | `bobyqa_mod::bobyqa`, `lincoa_mod::lincoa`, `cobyla_mod::cobyla` | BSD-3-Clause |
+| PyDQED | `dqed` | MIT wrapper notice; legacy DQED provenance separate |
+| pyoptgra | `OGEXEC`, `OGINIT`, `OGDERI` | GPL-3 or ESCL 2.4 Weak Copyleft (author choice) |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -611,6 +619,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Spectrum-Revealing CUR](https://github.com/Rioghasarig/sr-cur) | D5 | Fortran blocked column-pivoted QR component | Not the whole MATLAB CUR workflow; enforce LDA independently of defective guard; current driver fixes one thread. |
 | [TT Fortran core](https://github.com/oseledets/tt-fort) | K4; D1a4 | Dense tensor-to-TT SVD approximation and real core contractions | Explicit pointer-core cleanup; rank cap can override accuracy request; DOT returns a rank-one array. |
 | [KronLinInv](https://github.com/inverseproblem/KronLinInv) | L4c1a | Separable linear-Gaussian posterior factorization and mean contractions | Repair progress-report zero divisors; consistent covariance factors, OpenMP runtime and tensor ordering required. |
+| [diaglib](https://github.com/molecolab-pisa/diaglib) | D4a1; D4b1 | Few lowest ordinary and generalized real symmetric eigenpairs | Metric must be SPD; convergence OK and API INFO are separate outputs. |
+| [Exponential sum approximations](https://github.com/alexey-kuznetsov-math/exponential_sum_approximations) | K4 | Supplied Gaussian exponential-sum approximation program | Program and internal helpers, not a general library API; MPFUN and build-target selection required. |
+| [pypolsys](https://github.com/nennigb/pypolsys) | F2 | Polynomial-system homotopy continuation | Pass optional DENSE explicitly to avoid the inspected absent-dummy write; fixed N<=30 wrapper workspace. |
+| [monolis](https://github.com/nqomorita/monolis) | D2b4; D2a4 | Real sparse CPU conjugate gradients and BiCGSTAB | Assembled matrix, communicator and preconditioner required; inspect status and independently check residuals. |
+| [Nonlinear Optimization Algorithms Multilang](https://github.com/rgolubtsov/nonlinear-optimization-algorithms-multilang) | G1b2 | Derivative-free Hooke-Jeeves coordinate/pattern search | External objective and shared evaluation counter; separate supplied main; returned count is not a convergence flag. |
+| [PRIMA](https://github.com/libprima/prima) | G2h1a1; G2h2a1; G2h3b1a | Derivative-free bound, linear and nonlinear-inequality constrained trust-region optimization | Modern nonlinear constraint sign is <=0; callback kinds/counts and termination reasons need interpretation. |
+| [PyDQED](https://github.com/reactionmechanismgenerator/pydqed) | K1b2a | Bounded nonlinear least squares with linear constraints | Caller workspace and Jacobian/value callback required; saved state is not reentrant. |
+| [pyoptgra](https://github.com/esa/pyoptgra) | G2h3b1b | Gradient-based constrained optimization | Initialize/configure shared state; CALVAL has a third status argument and derivative mode has two controls. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1157,3 +1173,10 @@ findings need correction before meaningful numerical validation; the cards retai
 these limitations explicitly. GADfit global fitting refers to shared dataset
 parameters, with forward and reverse AD state treated separately. All newly added
 calling sketches remain uncompiled and unrun.
+
+The PRIMA, DQED, OPTGRA, MONOLIS, Diaglib, exponential-sum, PyPOLSYS and
+Hooke-Jeeves interfaces have pinned source evidence and calling sketches. These
+sketches were not compiled or run. Their scoped findings distinguish callback and
+workspace contracts, convergence from API status, and supplied programs from
+reusable routines. No new checked hosted drivers or numerical certifications are
+claimed. License findings retain separate wrapper and legacy-core qualifications.
