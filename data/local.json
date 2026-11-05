@@ -2823,12 +2823,83 @@
             ],
             "notes": "The README enumerates DOPRI5, DOP853, ODEX, RETARD and RADAU variants. Individual solver classes and interfaces need separate source review before granular mappings are added.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "784b80fe5ed02670bd9f17a73489de42652c38b3",
+            "reviewed_on": "2026-11-05",
+            "notes": "DOPRI5 provides an explicit embedded Dormand-Prince 5(4) method for nonstiff initial-value systems. The inspected entry checks options/workspace, configures error tolerances and dispatches the stage/acceptance/step-control core in the same file. Stiffness detection can stop integration; it is not a stiff solver. This fork adds a LOGICAL DEBUG argument between IOUT and WORK, so an unmodified upstream DOPRI5 call is incompatible. Dense output requires selected component storage and SOLOUT configuration. Only this method, not all HWODE solvers, is source reviewed.",
+            "evidence": [
+              {
+                "path": "dopri5.f",
+                "url": "https://github.com/cpmech/hwode/blob/784b80fe5ed02670bd9f17a73489de42652c38b3/dopri5.f",
+                "sha256": "ed6f521df000904fb3769c03b382a285b361068f408d6448a4a28c4de5d18fd9"
+              },
+              {
+                "path": "examples/dopri5_eq1.f",
+                "url": "https://github.com/cpmech/hwode/blob/784b80fe5ed02670bd9f17a73489de42652c38b3/examples/dopri5_eq1.f",
+                "sha256": "a1a548ba62f9d460bf7d01d2bccd403b98c14c5770624d0c409630ce892ea6a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DOPRI5",
+                "role": "public-entry-point",
+                "summary": "External double-precision nonstiff ODE driver. FCN(N,X,Y,F,RPAR,IPAR) supplies derivatives. ITOL=0 uses scalar tolerances and ITOL=1 vectors. Y and X are advanced. With NRDENS dense components, the author allocates LWORK=8*N+5*NRDENS+21 and LIWORK=NRDENS+21.",
+                "signature": "CALL DOPRI5(N, FCN, X, Y, XEND, RTOL, ATOL, ITOL, &\n     SOLOUT, IOUT, DEBUG, WORK, LWORK, IWORK, LIWORK, RPAR, IPAR, IDID)",
+                "declarations": [
+                  {
+                    "path": "dopri5.f",
+                    "line_start": 1,
+                    "line_end": 4
+                  },
+                  {
+                    "path": "dopri5.f",
+                    "line_start": 191,
+                    "line_end": 195
+                  }
+                ],
+                "path": "dopri5.f",
+                "line_start": 1,
+                "line_end": 350,
+                "usage": "! Initialize X/Y/XEND, tolerances, arrays and matching FCN/SOLOUT callbacks.\nwork = 0.0d0\niwork = 0\ndebug = .false.\niout = 0  ! no step-output callback; no dense components\ncall dopri5(n,fcn,x,y,xend,rtol,atol,0,solout,iout,debug, &\n     work,size(work),iwork,size(iwork),rpar,ipar,idid)\nif (idid < 0) error stop \"DOPRI5 failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use positive compatible tolerances and initialized callback parameters. IDID=1 reaches the endpoint; 2 means interrupted by SOLOUT. Negative codes describe input, step-budget, step-size and stiffness failures. The pinned example enables dense output; the fragment above disables it.",
+                "examples": [
+                  {
+                    "path": "examples/dopri5_eq1.f",
+                    "line_start": 4,
+                    "line_end": 39
+                  },
+                  {
+                    "path": "examples/dopri5_eq1.f",
+                    "line_start": 53,
+                    "line_end": 79
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause",
+          "spdx_expression": "BSD-2-Clause",
+          "revision": "784b80fe5ed02670bd9f17a73489de42652c38b3",
+          "reviewed_on": "2026-11-05",
+          "notes": "Hairer notice has two redistribution clauses and a disclaimer. Only the inspected root notice and DOPRI5 scope are recorded.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/cpmech/hwode/blob/784b80fe5ed02670bd9f17a73489de42652c38b3/LICENSE",
+              "sha256": "d7c400e44d8f76a14951cae1b81b2963bf0f1af8815683d54e54b989344ad83f",
+              "source_encoding": "cp1252"
+            }
+          ]
         }
       },
       "imports": {}
@@ -7874,12 +7945,76 @@
             ],
             "notes": "The README separates inverse-distance weighting, triangle barycentric interpolation and bilinear interpolation. Its example shows larger boundary deviations; these methods are not treated as interchangeable or uniformly accurate.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "8d46f927432837cb379a2caa4d2eeb0b28ebadae",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public BILINEAR routine interpolates values from a regular rectangular input grid to query points using four tensor-product weights. It estimates uniform spacing from axis endpoints; it does not search nonuniform coordinates. DATA_IN is laid out (NY,NX) and POINTS is (NQUERY,2). The out-of-range branches contain CONTINUE rather than CYCLE, so they fall through to invalid indexing and overwrite the sentinel; upper endpoints are also unsafe. This mapping records implemented gridded interpolation, not correctness at boundaries or source review of the separate scattered-data/triangle methods.",
+            "evidence": [
+              {
+                "path": "interpolation.f90",
+                "url": "https://github.com/ChristianSteger/grid_interpolation/blob/8d46f927432837cb379a2caa4d2eeb0b28ebadae/interpolation.f90",
+                "sha256": "f793160c1b1d9e113d732d07f093fe35c924610a229645535ffc4fb544a41494"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ChristianSteger/grid_interpolation/blob/8d46f927432837cb379a2caa4d2eeb0b28ebadae/README.md",
+                "sha256": "91816573dfc92cfe3a2e06730110805726bafc49fecb6205e51c17f0d7c6b4d5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bilinear",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine using default REAL. Require ascending uniformly spaced axes with at least two nodes each and strictly interior queries. The module imports other project modules and OMP_LIB, and prints elapsed time. The current out-of-domain handling is unsafe.",
+                "signature": "CALL bilinear(X_AXIS, LEN_X, Y_AXIS, LEN_Y, DATA_IN, POINTS, NUM_POINTS, DATA_IP)",
+                "declarations": [
+                  {
+                    "path": "interpolation.f90",
+                    "line_start": 6,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "interpolation.f90",
+                    "line_start": 20,
+                    "line_end": 38
+                  }
+                ],
+                "path": "interpolation.f90",
+                "line_start": 20,
+                "line_end": 100,
+                "module": "interpolation",
+                "usage": "use interpolation, only: bilinear\nreal :: x(2), y(2), values(2,2), points(1,2), result(1)\nx = [0.0,1.0]; y = [0.0,1.0]\nvalues(:,1) = [0.0,2.0]\nvalues(:,2) = [1.0,3.0]\npoints(1,:) = [0.25,0.5]\ncall bilinear(x,2,y,2,values,points,1,result)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The interior sketch samples x+2*y, whose analytic query value is 1.25; this value was not compared by execution. Reject boundary/outside queries before this routine or repair its fall-through branches. Compile/link the imported project modules and OpenMP runtime. F2PY hides length arguments, but direct Fortran callers supply them."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "8d46f927432837cb379a2caa4d2eeb0b28ebadae",
+          "reviewed_on": "2026-11-05",
+          "notes": "No grant was identified in the reviewed README/module and no separately named LICENSE/COPYING file appears in the pinned tree. Public source access does not establish redistribution permission.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ChristianSteger/grid_interpolation/blob/8d46f927432837cb379a2caa4d2eeb0b28ebadae/README.md",
+              "sha256": "91816573dfc92cfe3a2e06730110805726bafc49fecb6205e51c17f0d7c6b4d5"
+            },
+            {
+              "path": "interpolation.f90",
+              "url": "https://github.com/ChristianSteger/grid_interpolation/blob/8d46f927432837cb379a2caa4d2eeb0b28ebadae/interpolation.f90",
+              "sha256": "f793160c1b1d9e113d732d07f093fe35c924610a229645535ffc4fb544a41494"
+            }
+          ]
         }
       },
       "imports": {}
@@ -8911,12 +9046,97 @@
             ],
             "notes": "The README specifies G(t,y,ydot)=0 and says modernization of the library is still in progress. Root detection during integration is not classified as a standalone general nonlinear-system solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a2",
+            "level": "source-reviewed",
+            "revision": "056a1ffabfa7668d76702f8d4b9094e0a5e08671",
+            "reviewed_on": "2026-11-05",
+            "notes": "The fixed-form DASKR driver integrates implicit residual systems G(t,Y,YPRIME)=0 by variable-order BDF. Its inspected option/initialization and dispatch paths select direct dense/band or iterative Krylov Newton solves, and optionally event/root handling. The actual entry is DASKR although inherited prose says DDASKR. This review covers that legacy external driver, not a claim that the partially modernized module offers an interchangeable full solver interface. Consistent initial values, residual callback, mode-dependent workspaces and continuation/status handling are required; no DAE was integrated or dependency kernels validated.",
+            "evidence": [
+              {
+                "path": "src/daskr.f",
+                "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/src/daskr.f",
+                "sha256": "cf53fbefdf3e962164d7fd95ae24d67ffd1f38d60d3c7321caf1e1c447bdf227"
+              },
+              {
+                "path": "src/daskr_new.f90",
+                "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/src/daskr_new.f90",
+                "sha256": "7d6d7a3d3fddc75c8d7d6baafdec3ec3e30dfc112f4dc1e8e14ec898fc016bbc"
+              },
+              {
+                "path": "example/example_heat.f90",
+                "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/example/example_heat.f90",
+                "sha256": "7123bdb3cd17a1ccdfb9bc488ce897549ea55c5655ac1e35c7ec59b7c93626e3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DASKR",
+                "role": "public-entry-point",
+                "summary": "External double-precision implicit-system driver. INFO(20), RWORK(LRW), IWORK(LIW) select/retain solver state. RES(T,Y,YPRIME,CJ,DELTA,IRES,RPAR,IPAR) returns residuals. JAC/PSOL contracts depend on direct versus Krylov mode; RT supplies event functions when NRT>0. Inspect IDID on every return.",
+                "signature": "CALL DASKR(RES, NEQ, T, Y, YPRIME, TOUT, INFO, RTOL, ATOL, &\n     IDID, RWORK, LRW, IWORK, LIW, RPAR, IPAR, JAC, PSOL, RT, NRT, JROOT)",
+                "declarations": [
+                  {
+                    "path": "src/daskr.f",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "src/daskr.f",
+                    "line_start": 1402,
+                    "line_end": 1410
+                  },
+                  {
+                    "path": "src/daskr_new.f90",
+                    "line_start": 10,
+                    "line_end": 21
+                  }
+                ],
+                "path": "src/daskr.f",
+                "line_start": 1,
+                "line_end": 2492,
+                "usage": "! Initialize consistent Y/YPRIME, INFO, tolerances and mode-specific workspaces.\n! Provide RES and the JAC/PSOL/RT callbacks appropriate to the selected mode.\ncall daskr(res,neq,t,y,yprime,tout,info,rtol,atol,idid, &\n     rwork,lrw,iwork,liw,rpar,ipar,jac,psol,rt,nrt,jroot)\n! Decode IDID, update continuation controls, and handle roots/failures before reuse.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment is not a complete initialized DAE problem. Work lengths and callback signatures must follow the chosen solver mode; do not copy heat-example Krylov storage into an unrelated direct solve. SAVE state in the driver precludes assuming independent nested calls. The heat example is linked for residual/setup context, not reported as executed.",
+                "examples": [
+                  {
+                    "path": "example/example_heat.f90",
+                    "line_start": 53,
+                    "line_end": 90
+                  },
+                  {
+                    "path": "example/example_heat.f90",
+                    "line_start": 175,
+                    "line_end": 234
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; UC/LLNL BSD notice for inherited code",
+          "spdx_expression": null,
+          "revision": "056a1ffabfa7668d76702f8d4b9094e0a5e08671",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant and the inherited UC/LLNL three-clause BSD notice with additional DOE notice both remain relevant. No single SPDX expression is asserted for the entire mixed/modernized tree.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/LICENSE",
+              "sha256": "af82b868403f0d9a6ce85ee8a49e093823625df528815912dfc0b95cbd2c1829"
+            },
+            {
+              "path": "original/LICENSE",
+              "url": "https://github.com/HugoMVale/daskr/blob/056a1ffabfa7668d76702f8d4b9094e0a5e08671/original/LICENSE",
+              "sha256": "25d6d87e1e8cf6248924a23087e2bc680c885a13c56d5497bf78bfe389efc03c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13214,12 +13434,81 @@
             ],
             "notes": "The README distinguishes variable-precision and native-arithmetic examples and notes random-point reproducibility differences. Accuracy of computed weights and complete PDE examples is not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "ef0f351b7a2ae187833d574b8aeea3cabde0a105",
+            "reviewed_on": "2026-11-05",
+            "notes": "The root CALC_DQ_COEFF generic dispatches to coefficient generators; the reviewed real_kind binding constructs Gaussian RBF matrices and differentiated right-hand sides using variable precision/hyper-dual arithmetic, calls LDL_SOLVE, adapts width/precision and rescales derivative weights. This is a numerical-differentiation weight service, not automatic differentiation of an arbitrary user function. It supports named first/second coordinate derivatives and mixed derivatives on 3-coordinate point stencils. Duplicate nodes and unknown derivative strings are not guarded; optional Taylor indices need valid bounds. A precision failure sets STAT but output coefficients are still copied. Only this root variable-precision path was reviewed, not the separate native-precision examples or every arithmetic/linear-solve kernel.",
+            "evidence": [
+              {
+                "path": "dq_coeff.f90",
+                "url": "https://github.com/jlr581/finite_difference/blob/ef0f351b7a2ae187833d574b8aeea3cabde0a105/dq_coeff.f90",
+                "sha256": "27d88a5c861d6e38260a2eddf5c76f0f8dca929d7eb3d0c611534b3d5b4387b4"
+              },
+              {
+                "path": "data_types.f90",
+                "url": "https://github.com/jlr581/finite_difference/blob/ef0f351b7a2ae187833d574b8aeea3cabde0a105/data_types.f90",
+                "sha256": "3ae1baa72c8aca52c9588cd13f981c9390f59772cd5a96f7133dbf1fd024680e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calc_dq_coeff",
+                "role": "public-entry-point",
+                "summary": "Public generic; reviewed CALC_DQ_COEFF_R8 binding uses data_types_mod::real_kind (SELECTED_REAL_KIND(10,100)). TARGET_POINT(3), POINTS(N,3), COEFF(N,NDER), DERIVATIVE(NDER) strings and integer STAT are required. Optional controls set width, precision and Taylor handling. Inspect STAT before applying weights.",
+                "signature": "CALL calc_dq_coeff(TARGET_POINT, POINTS, DERIVATIVE, COEFF, STAT, &\n     EPSILON2_STEP, SET_EPSILON2, REQUIRED_EPSILON2, REQUIRED_PRECISION, &\n     INITIAL_EPSILON2, INITIAL_PRECISION, TAYLOR_SERIES)",
+                "declarations": [
+                  {
+                    "path": "dq_coeff.f90",
+                    "line_start": 28,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "data_types.f90",
+                    "line_start": 24,
+                    "line_end": 41
+                  }
+                ],
+                "path": "dq_coeff.f90",
+                "line_start": 28,
+                "line_end": 271,
+                "module": "dq_coeff_mod",
+                "usage": "use data_types_mod, only: real_kind\nuse dq_coeff_mod, only: calc_dq_coeff\n! Allocate/init distinct POINTS(N,3), sampled VALUES(N), WEIGHTS(N,1), TARGET(3).\ncall calc_dq_coeff(target,points,[character(len=4) :: \"d_dx\"],weights,stat)\nif (stat /= 0) error stop \"Coefficient generation failed\"\nderivative_estimate = sum(weights(:,1)*values)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use supported exact derivative tags, compatible output dimensions and distinct nodes; validate derivative accuracy independently on known functions. Automatic precision state is module/global (with a threadprivate directive), so do not assume nested reentrancy. No choice of stencil or adaptive-precision convergence was validated. Required support modules must be built; the native-precision example API is not substituted here."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "ef0f351b7a2ae187833d574b8aeea3cabde0a105",
+          "reviewed_on": "2026-11-05",
+          "notes": "Both inspected defining modules explicitly grant GPL version 3 or later. The license.txt copy is a GPL preamble excerpt; the module grants establish the recorded version choice. Other arithmetic/support components were not exhaustively audited.",
+          "evidence": [
+            {
+              "path": "dq_coeff.f90",
+              "url": "https://github.com/jlr581/finite_difference/blob/ef0f351b7a2ae187833d574b8aeea3cabde0a105/dq_coeff.f90",
+              "sha256": "27d88a5c861d6e38260a2eddf5c76f0f8dca929d7eb3d0c611534b3d5b4387b4"
+            },
+            {
+              "path": "data_types.f90",
+              "url": "https://github.com/jlr581/finite_difference/blob/ef0f351b7a2ae187833d574b8aeea3cabde0a105/data_types.f90",
+              "sha256": "3ae1baa72c8aca52c9588cd13f981c9390f59772cd5a96f7133dbf1fd024680e"
+            },
+            {
+              "path": "license.txt",
+              "url": "https://github.com/jlr581/finite_difference/blob/ef0f351b7a2ae187833d574b8aeea3cabde0a105/license.txt",
+              "sha256": "7da5c2e6d7b5e16c5ffaef5552043f3fc306d0d6a5886838c48c9d8f9bd51042"
+            }
+          ]
         }
       },
       "imports": {}
@@ -13394,12 +13683,70 @@
             ],
             "notes": "The README specifies box bounds and optional unconstrained use. General nonlinear/equality constraints are not supported merely because this is a constrained optimizer; this entry records this particular distribution.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h1a2",
+            "level": "source-reviewed",
+            "revision": "289d99c2981ce7852e8d2f0ddb8716289076947a",
+            "reviewed_on": "2026-11-05",
+            "notes": "SETULB partitions workspace and dispatches MAINLB. The inspected MAINLB path projects the initial point onto simple bounds, computes a generalized Cauchy point and subspace step, invokes line search and maintains limited-memory BFGS state. This is smooth simple-bound optimization with caller-supplied first derivatives, not general nonlinear constraints or a global optimum guarantee. Reverse communication returns FG requests for objective/gradient and NEW_X for an accepted iterate. Inspect the final TASK, including error and abnormal-termination strings. The review covers dispatch and iteration structure, not all linked kernels or numerical convergence.",
+            "evidence": [
+              {
+                "path": "src/setulb.f",
+                "url": "https://github.com/jonathanschilling/L-BFGS-B/blob/289d99c2981ce7852e8d2f0ddb8716289076947a/src/setulb.f",
+                "sha256": "adaa0a37ad74b8921cd9ac74b5b1cf0d5f7d8c63461d175f41642178fcadbced"
+              },
+              {
+                "path": "src/mainlb.f",
+                "url": "https://github.com/jonathanschilling/L-BFGS-B/blob/289d99c2981ce7852e8d2f0ddb8716289076947a/src/mainlb.f",
+                "sha256": "f0d386686d80309ad0b68dbc7e5a2556ac4d1b0fb40beea4783a58efcf44eb72"
+              },
+              {
+                "path": "drivers/driver1.f90",
+                "url": "https://github.com/jonathanschilling/L-BFGS-B/blob/289d99c2981ce7852e8d2f0ddb8716289076947a/drivers/driver1.f90",
+                "sha256": "1a334f7d88de14e427b3a67d90e21d77d249f275a85f16f95c5f2fabbd407eca"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SETULB",
+                "role": "public-entry-point",
+                "summary": "External reverse-communication driver. NBD=0/1/2/3 means no/lower/both/upper bounds. Preserve all state arrays between calls. WA requires 2*M*N+5*N+11*M*M+8*M doubles; IWA(3*N), LSAVE(4), ISAVE(44), DSAVE(29), TASK and CSAVE of length 60 are required.",
+                "signature": "CALL SETULB(N, M, X, L, U, NBD, F, G, FACTR, PGTOL, WA, IWA, &\n     TASK, IPRINT, CSAVE, LSAVE, ISAVE, DSAVE)",
+                "declarations": [
+                  {
+                    "path": "src/setulb.f",
+                    "line_start": 188,
+                    "line_end": 198
+                  }
+                ],
+                "path": "src/setulb.f",
+                "line_start": 188,
+                "line_end": 270,
+                "usage": "! Declare/allocate the documented workspace and initialize X, bounds and NBD.\ntask = \"START\"\ndo\n  call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa, &\n       task,iprint,csave,lsave,isave,dsave)\n  if (task(1:2) == \"FG\") then\n    ! Evaluate both F and G at the returned X here.\n  else if (task(1:5) == \"NEW_X\") then\n    cycle\n  else\n    exit\n  end if\nend do\n! Inspect TASK; an exit is not necessarily convergence.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Fragment requires an objective, gradient, initialized tolerances and all library dependencies. FACTR scales a relative reduction tolerance by machine precision; PGTOL bounds the projected-gradient norm. Add an application evaluation/iteration budget. The linked author driver demonstrates reverse communication."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "289d99c2981ce7852e8d2f0ddb8716289076947a",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root BSD three-clause notice inspected; not a complete dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jonathanschilling/L-BFGS-B/blob/289d99c2981ce7852e8d2f0ddb8716289076947a/LICENSE",
+              "sha256": "4c7e01adfc44fc742036508817770b5d199ad5f8ed226ae23ac1c1bace2dc732"
+            }
+          ]
         }
       },
       "imports": {}
@@ -20442,12 +20789,60 @@
             ],
             "notes": "The README lists quadratic-interpolation and golden-section line minimization and directs users to test_minimize.F90. Interface and convergence assumptions need further review; a test executable being supplied is not a test result here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "747a81b7a022210ae780314bbc5e25e21e9036c2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected STEEPEST_DESCENT entry uses a user objective and array-valued gradient, normalizes the descent direction, dispatches quadratic line interpolation with golden-section fallback, and tests mean squared gradient and relative cost change. Only this local smooth supplied-gradient method is mapped here, not the unreviewed CG/BFGS entries in the same file. Source findings: normalization precedes the zero-gradient test, relative cost change divides by the previous cost, and a SAVE allocatable gradient is allocated only once without resizing. Stationary points, zero costs, changing dimensions and reentrancy therefore require attention before relying on this implementation.",
+            "evidence": [
+              {
+                "path": "minimize.F90",
+                "url": "https://github.com/ryokbys/minimize/blob/747a81b7a022210ae780314bbc5e25e21e9036c2/minimize.F90",
+                "sha256": "3d03393396677b4441677397e1d040d80e83c407765d0d736b5d8f9beaac9858"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "steepest_descent",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) minimizer. FUNC(N,X) returns a scalar; GRAD(N,X) returns an N-vector. X/F and IFLAG are input/output. Initialize IFLAG=0 and inspect arithmetic status additions, rather than treating every return as success. REAL(8) is the author kind choice, not a portable real64 declaration.",
+                "signature": "CALL steepest_descent(NDIM, X, F, XTOL, GTOL, FTOL, MAXITER, &\n     IPRINT, IFLAG, FUNC, GRAD)",
+                "declarations": [
+                  {
+                    "path": "minimize.F90",
+                    "line_start": 2,
+                    "line_end": 21
+                  }
+                ],
+                "path": "minimize.F90",
+                "line_start": 2,
+                "line_end": 92,
+                "usage": "! Declare matching scalar FUNC and array-valued GRAD callbacks and REAL(8) inputs.\niflag = 0\ncall steepest_descent(ndim,x,f,xtol,gtol,ftol,maxiter, &\n     0,iflag,func,grad)\n! Decode IFLAG and independently check the returned point.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. An explicit matching interface is needed for the array-valued gradient. This calling fragment does not repair zero-gradient/zero-cost divisions or saved-array resizing. GTOL is compared with SUM(G**2)/NDIM; convergence diagnostics can still print at IPRINT=0. No runtime failure or convergence was reproduced."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "747a81b7a022210ae780314bbc5e25e21e9036c2",
+          "reviewed_on": "2026-11-05",
+          "notes": "Pinned root MIT notice inspected; no full dependency or source-file-by-file license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ryokbys/minimize/blob/747a81b7a022210ae780314bbc5e25e21e9036c2/LICENSE",
+              "sha256": "50229321c0d679d1680b5120a351baf17a39c1c7a40dc57b6c8c4296662be940"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23747,12 +24142,80 @@
             ],
             "notes": "The README describes suitability for noisy or discontinuous objectives and attributes the algorithm to Tom Rowan. Such suitability is method guidance, not a guarantee for every noise model or discontinuity.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "4808b7103490cf6533d9240301633f38cb4246b6",
+            "reviewed_on": "2026-11-05",
+            "notes": "SUBPLX sorts step scales, partitions coordinates into subspaces and calls SIMPLX for derivative-free simplex minimization, repeating until its relative coordinate/step test is satisfied or a limit is returned. The nonsmooth unconstrained class records this local search, not global optimization. Unlike older comments, this fork has no MODE argument and always initializes default options through SUBOPT. COMMON and SAVE state make nested/concurrent use unsafe without isolation. This review does not establish noisy-objective performance or inspect the entire R bridge.",
+            "evidence": [
+              {
+                "path": "src/subplx.f",
+                "url": "https://github.com/kingaa/subplex/blob/4808b7103490cf6533d9240301633f38cb4246b6/src/subplx.f",
+                "sha256": "b19fb1d937250e89f7132a050f5668ff71729b9c454918b4a26de180d3d599c6"
+              },
+              {
+                "path": "src/simplx.f",
+                "url": "https://github.com/kingaa/subplex/blob/4808b7103490cf6533d9240301633f38cb4246b6/src/simplx.f",
+                "sha256": "8dee242e3cea863f7cfcb0dec3da2d22c7d25c6a6159a7c876ffd27ac3ffae43"
+              },
+              {
+                "path": "src/subopt.f",
+                "url": "https://github.com/kingaa/subplex/blob/4808b7103490cf6533d9240301633f38cb4246b6/src/subopt.f",
+                "sha256": "f961036a5e8bf349160bdd62bf9562e23f78e881e53f2eefb657feeed338cbc8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SUBPLX",
+                "role": "public-entry-point",
+                "summary": "External objective-only minimizer with DOUBLE PRECISION F(N,X). X is overwritten, FX is the resulting cost, NFE the evaluation count. Allocate WORK >= 2*N+NSMAX*(NSMAX+4)+1 and IWORK >= N+INT(N/NSMIN), with default NSMAX=MIN(5,N), NSMIN=MIN(2,N).",
+                "signature": "CALL SUBPLX(F, N, TOL, MAXNFE, SCALE, X, FX, NFE, WORK, IWORK, IFLAG)",
+                "declarations": [
+                  {
+                    "path": "src/subplx.f",
+                    "line_start": 1,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "src/subplx.f",
+                    "line_start": 29,
+                    "line_end": 80
+                  }
+                ],
+                "path": "src/subplx.f",
+                "line_start": 1,
+                "line_end": 216,
+                "usage": "! N > 0; declare F DOUBLE PRECISION EXTERNAL and allocate documented work arrays.\nscale(1) = -1.0d0  ! common initial step magnitude for every coordinate\niflag = 0\ncall subplx(f,n,1.0d-6,10000,scale,x,fx,nfe,work,iwork,iflag)\n! IFLAG=0 tolerance; 1 machine limit; -1 evaluation budget; -2 invalid input.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use positive dimensions, a nonnegative tolerance, positive evaluation budget and nonzero representable initial steps. This fork does not expose the old MODE restart/custom-option API. Compile the supporting routines/BLAS; this is the Fortran core of an R package."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "4808b7103490cf6533d9240301633f38cb4246b6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The repository supplies GPL v3 text and identifies an R package; this scoped review does not infer version-only versus or-later terms for every numerical component.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/kingaa/subplex/blob/4808b7103490cf6533d9240301633f38cb4246b6/LICENSE.md",
+              "sha256": "6d427a39faab2d85898e69c3335069c39f481a857059b3f6cbf77da72c6414fc"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/kingaa/subplex/blob/4808b7103490cf6533d9240301633f38cb4246b6/README.md",
+              "sha256": "ad51cad705fd4c02828a7ec1e9c06ac86b5e887b3ee85599676189b5bf2a5a7e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23885,12 +24348,92 @@
             ],
             "notes": "The README documents soft line search with trust-region-style monitoring and an optim-like interface. The example and convergence behavior were not reproduced; this is not classified as constrained optimization.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "3c7b956c057acecddd34ab66d6830ec04ddc1966",
+            "reviewed_on": "2026-11-05",
+            "notes": "The UCMINF core forms an inverse-Hessian search direction, limits its length, performs a soft line search and updates a packed inverse Hessian by BFGS when a curvature test permits it. This mapping is scoped to supplied first derivatives: the R frontend sets GRAD=0 when GR is provided; FDF dispatches objective/gradient through linked C routines evaluating an R environment. The fork removed the FDF callback argument from the Fortran entry. RHO is an opaque runtime handle, not an ordinary user integer work array. This is local smooth unconstrained optimization, not a standalone Fortran callback solver or a certified trust-region method.",
+            "evidence": [
+              {
+                "path": "src/fortran.f",
+                "url": "https://github.com/hdakpo/ucminf/blob/3c7b956c057acecddd34ab66d6830ec04ddc1966/src/fortran.f",
+                "sha256": "eadbc2a14c1facd229742364b4587ed80c6e35c4f7ef6e4c7c88e7964676a953"
+              },
+              {
+                "path": "src/interface.c",
+                "url": "https://github.com/hdakpo/ucminf/blob/3c7b956c057acecddd34ab66d6830ec04ddc1966/src/interface.c",
+                "sha256": "22e8f0c5f199a0a11f12a5d69fad16df0ec7be29595cfd9087e69ca0817e6974"
+              },
+              {
+                "path": "R/ucminf.R",
+                "url": "https://github.com/hdakpo/ucminf/blob/3c7b956c057acecddd34ab66d6830ec04ddc1966/R/ucminf.R",
+                "sha256": "18a94d057cd0ced301d9e69088110e764df066b389b24a8b453fb7490896667d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "UCMINF",
+                "role": "public-entry-point",
+                "summary": "External Fortran core of the R package. DOUBLE PRECISION X(N), DX, EPS(2), W(IW), GRSTEP(2); integer controls and an R runtime handle passed through the bridge. MAXFUN and ICONTR are input/output; W(1) returns the cost. Do not manufacture RHO for a standalone Fortran call.",
+                "signature": "CALL UCMINF(N, X, DX, EPS, MAXFUN, W, IW, ICONTR, GRAD, GRSTEP, RHO)",
+                "declarations": [
+                  {
+                    "path": "src/fortran.f",
+                    "line_start": 1,
+                    "line_end": 35
+                  }
+                ],
+                "path": "src/fortran.f",
+                "line_start": 1,
+                "line_end": 226,
+                "usage": "! Interface fragment only: RHO and linked FDF/FUNC/USRGR require the R runtime.\ncall ucminf(n,x,dx,eps,maxfun,w,iw,icontr,grad,grstep,rho)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the supported R frontend ucminf::ucminf(par, fn, gr=gradient) to construct the runtime state; FN returns a scalar and GR a numeric vector of length N. The R formal arguments and bridge declarations are linked separately. Positive termination codes distinguish small gradient, small step, evaluation budget and stalled line search; inspect the returned message.",
+                "examples": [
+                  {
+                    "path": "R/ucminf.R",
+                    "line_start": 153,
+                    "line_end": 160
+                  },
+                  {
+                    "path": "R/ucminf.R",
+                    "line_start": 159,
+                    "line_end": 209
+                  },
+                  {
+                    "path": "src/interface.c",
+                    "line_start": 82,
+                    "line_end": 115
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "3c7b956c057acecddd34ab66d6830ec04ddc1966",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION explicitly declares GPL (>= 2); the accompanying GPL text was inspected. This is package-level evidence, not an audit of linked R/BLAS dependencies.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/hdakpo/ucminf/blob/3c7b956c057acecddd34ab66d6830ec04ddc1966/DESCRIPTION",
+              "sha256": "52a59afde2b19657672b4e4a2a181d877d910cbbeda5d83c33759cfe10ac3d61"
+            },
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/hdakpo/ucminf/blob/3c7b956c057acecddd34ab66d6830ec04ddc1966/LICENSE.md",
+              "sha256": "62f171d4d8b6726df61f18a6bbc0a70f79c4bc2134d837d35c81fc6289a2d84d"
+            }
+          ]
         }
       },
       "imports": {}

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. Sixty-eight repositories now have eighty-seven source-reviewed
+Reviewed on 2026-11-05. Seventy-six repositories now have ninety-five source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Sixty-seven repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A sixty-eighth, DDFSA, identifies the supplied
+Seventy-five repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A seventy-sixth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All sixty-eight independently source-reviewed repositories now have an
+separately. All seventy-six independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -91,6 +91,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Polylogarithm | External `dli2` (real dilogarithm) | MIT |
 | FTLib | `ftlib_quadrature::trapezoidal_rule`, `::gaussian_quadrature` (scoped overloads) | No license identified in reviewed material |
 | spline_interpolation_fortran | External `splift`, `splint` | Source GPL v2 notices; inherited search terms unresolved |
+| L-BFGS-B | External `SETULB` (reverse communication) | BSD-3-Clause |
+| Subplex | External `SUBPLX` (objective callback; fork omits MODE) | GPL v3 text; version scope unresolved |
+| UCMINF | External `UCMINF` (R runtime/bridge required) | GPL-2.0-or-later |
+| HWODE | External `DOPRI5` (fork adds LOGICAL DEBUG) | BSD-2-Clause |
+| DASKR | External `DASKR` (legacy fixed-form driver) | MIT root; inherited UC/LLNL BSD and DOE notice |
+| minimize | External `steepest_descent` (scalar objective/vector gradient) | MIT |
+| grid_interpolation | `interpolation::bilinear` | No license identified in reviewed material |
+| finite_difference | `dq_coeff_mod::calc_dq_coeff` (root variable-precision binding) | GPL-3.0-or-later |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -178,6 +186,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Polylogarithm](https://github.com/Expander/polylogarithm) | C19 | Real dilogarithm argument transformations and rational approximation | DLI2 returns real part above the real cut. Link log support for the complete source object. Complex/higher orders and claimed approximation error unverified. |
 | [FTLib](https://github.com/fradevita/FTLib) | H2a1b2; H2a1a2 | Sampled composite trapezoid and fixed-order callback Gauss-Legendre rule | Gaussian orders 1..5 only; no default/error estimate. Parent/submodule definitions need build checking; callback trapezoid body absent in reviewed submodule. No runnable support claimed. |
 | [spline_interpolation_fortran](https://github.com/jlm785/spline_interpolation_fortran) | E1a | Cubic-spline tridiagonal fit and value/derivative evaluation | Normal status is one. N>=4 for normal fit; reuse requires unchanged grid/workspace/boundary coefficients. End-cubic extrapolation flagged; repeated nodes can STOP. Integration not reviewed. |
+| [L-BFGS-B](https://github.com/jonathanschilling/L-BFGS-B) | G2h1a2 | Workspace partition, bound projection, Cauchy/subspace and line-search dispatch | Reverse communication requires objective and gradient on FG requests; preserve workspace/state and inspect final TASK. No general nonlinear constraints or global guarantee. |
+| [Subplex](https://github.com/kingaa/subplex) | G1b2 | Coordinate partitioning and derivative-free subspace simplex dispatch | This fork removed MODE and resets defaults. COMMON/SAVE state requires isolation; supporting routines and BLAS are needed. |
+| [UCMINF](https://github.com/hdakpo/ucminf) | G1b1b | Supplied-gradient branch, soft line search and inverse-BFGS update | R frontend/C bridge owns runtime state. RHO is not an ordinary Fortran work buffer; the fork has no FDF callback argument. |
+| [HWODE](https://github.com/cpmech/hwode) | I1a1a | DOPRI5 option checks, nonstiff embedded Runge-Kutta and step-control dispatch | LOGICAL DEBUG is an extra fork argument. Stiffness detection does not provide stiff integration. Dense output needs additional setup. |
+| [DASKR](https://github.com/hugomvale/daskr) | I1a2 | Implicit BDF driver initialization and direct/Krylov dispatch | Fixed-form external DASKR entry, despite DDASKR prose. Consistent initial state, mode-specific callback/workspaces and status/continuation handling required. |
+| [minimize](https://github.com/ryokbys/minimize) | G1b1b | Steepest-descent direction and line-search dispatch | Zero-gradient/zero-cost divisions and saved-array dimension reuse need attention. Other solver methods remain unreviewed. |
+| [grid_interpolation](https://github.com/ChristianSteger/grid_interpolation) | E2a | Four-weight bilinear evaluation on a uniform rectangular grid | Data layout is (NY,NX). Boundary branches fall through because CONTINUE does not skip an iteration; outside and upper-endpoint queries are unsafe. |
+| [finite_difference](https://github.com/jlr581/finite_difference) | H1 | Gaussian RBF differentiation-weight construction, LDL dispatch and adaptive precision | Root variable-precision API only. Check STAT; reject duplicate nodes/unknown tags; validate stencil accuracy. No full arithmetic/linear-kernel audit. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
