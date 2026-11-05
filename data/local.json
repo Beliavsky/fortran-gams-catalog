@@ -41281,12 +41281,110 @@
             ],
             "notes": "The README describes differently shaped views over one storage array and notes TARGET/SIMD tradeoffs. This supports array handling, not a claim that the underlying elements are physically permuted in place or that performance improves for every compiler.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b3",
+            "level": "source-reviewed",
+            "revision": "b439e36d0c97695eec88464d9981a8a7cd7a312e",
+            "reviewed_on": "2026-11-05",
+            "notes": "insitu_Array%init remaps contiguous REAL(4) target storage into a two-dimensional pointer with the supplied shape. %t then calls mipt to permute the underlying one-dimensional elements in place and remaps the two-dimensional view with reversed extents. This is a data-rearranging transpose, not merely a stride-only view. The implementation allocates a LOGICAL(KIND=1) flag array of m*n elements but never uses it, so no constant-workspace claim is made. Positive compatible extents, associated contiguous storage, sufficient capacity and nonoverflowing integer index products are caller preconditions, with no validation/status. REAL(4)/C interoperability and rectangular permutation edge cases need independent build/runtime checks.",
+            "evidence": [
+              {
+                "path": "insitu.f90",
+                "url": "https://github.com/PaulStryck/insitu_array/blob/b439e36d0c97695eec88464d9981a8a7cd7a312e/insitu.f90",
+                "sha256": "c45a3fed8a1361d2f6235a2fd3adef9ae1fe1e4b056005e7f82eb33ff00c175c"
+              },
+              {
+                "path": "main.f90",
+                "url": "https://github.com/PaulStryck/insitu_array/blob/b439e36d0c97695eec88464d9981a8a7cd7a312e/main.f90",
+                "sha256": "057e70eed50f270926c721ce0d658004bbd69cc21b6393b49c51f87207f06c76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "role": "public-entry-point",
+                "summary": "Type-bound remapping initializer. Associate storage with a live contiguous target and set shp before calling.",
+                "signature": "CALL array%init()",
+                "declarations": [
+                  {
+                    "path": "insitu.f90",
+                    "line_start": 4,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "insitu.f90",
+                    "line_start": 16,
+                    "line_end": 20
+                  }
+                ],
+                "path": "insitu.f90",
+                "line_start": 16,
+                "line_end": 21,
+                "module": "insitu",
+                "derived_type": "insitu_Array",
+                "usage": "use insitu, only: insitu_Array\ntype(insitu_Array) :: array\nreal(kind=4), target :: buffer(6)\nbuffer=[1.0,2.0,3.0,4.0,5.0,6.0]\narray%storage=>buffer\narray%shp=[2,3]\ncall array%init()\ncall array%t()\n! array%A now has reversed extents; buffer has been permuted.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Keep buffer alive and contiguous while the object/views reference it; do not deallocate storage owned by a separate target. All aliases observe rearranged data. The implementation assumes compatible kind-4 real/C storage and kind-1 logical support; no transpose residual was tested.",
+                "examples": [
+                  {
+                    "path": "main.f90",
+                    "line_start": 6,
+                    "line_end": 19
+                  }
+                ]
+              },
+              {
+                "procedure": "t",
+                "role": "public-entry-point",
+                "summary": "Type-bound transpose that mutates storage, invalidates/remaps the object view and reverses its shape.",
+                "signature": "CALL array%t()",
+                "declarations": [
+                  {
+                    "path": "insitu.f90",
+                    "line_start": 23,
+                    "line_end": 31
+                  }
+                ],
+                "path": "insitu.f90",
+                "line_start": 23,
+                "line_end": 33,
+                "module": "insitu",
+                "derived_type": "insitu_Array"
+              },
+              {
+                "procedure": "mipt",
+                "role": "implementation-helper",
+                "path": "insitu.f90",
+                "line_start": 36,
+                "line_end": 71,
+                "module": "insitu"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit reuse grant identified",
+          "spdx_expression": null,
+          "revision": "b439e36d0c97695eec88464d9981a8a7cd7a312e",
+          "reviewed_on": "2026-11-05",
+          "notes": "No license grant was identified in the reviewed README or defining module, and the pinned tree has no LICENSE/COPYING file. This records the absence in reviewed material, not public-domain status.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/PaulStryck/insitu_array/blob/b439e36d0c97695eec88464d9981a8a7cd7a312e/README.md",
+              "sha256": "29f42a2e27d8ccbde83e650356408400ab7251f352308b091bd7f0e097aa7e8a"
+            },
+            {
+              "path": "insitu.f90",
+              "url": "https://github.com/PaulStryck/insitu_array/blob/b439e36d0c97695eec88464d9981a8a7cd7a312e/insitu.f90",
+              "sha256": "c45a3fed8a1361d2f6235a2fd3adef9ae1fe1e4b056005e7f82eb33ff00c175c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41630,12 +41728,132 @@
             ],
             "notes": "The README lists scalar take/drop on vectors and a gamma offset function as implemented. The gamma name here concerns array indexing, not the special Gamma function; a complete array algebra is not inferred.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1a11",
+            "level": "source-reviewed",
+            "revision": "a0499fded8d423f25bd1df8d098c0bc4d0e9b602",
+            "reviewed_on": "2026-11-05",
+            "notes": "The Fypp-generated public moa_take/moa_drop generics select vector sections by signed counts and return POINTER views, not allocated copies. Take with a positive count selects the prefix and negative count the suffix; take zero yields an empty section. Positive drop selects the remainder after removing a prefix. The inspected nonpositive drop branch uses vec(:(n+sigma-1)), an off-by-one discrepancy: drop zero removes one element and negative drop removes one extra trailing element. The sketch therefore uses only positive drop. Counts with abs(sigma)>SIZE(vec) print a diagnostic and return a disassociated pointer; minimum-integer ABS overflow is unchecked. Actual vectors must be persistent TARGET objects if the returned pointer is retained. This is vector section service (D1a11), not a mathematical gamma function or general array algebra audit.",
+            "evidence": [
+              {
+                "path": "src/take.fypp",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/src/take.fypp",
+                "sha256": "a45eacaf994cd7112993dced5278abeca3e2aba532e653c62253d93a5a97a215"
+              },
+              {
+                "path": "src/drop.fypp",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/src/drop.fypp",
+                "sha256": "e66e3694bbe78b3db826532e0166c10a18e2d5ce5ec6f149ae573d90797bbbb6"
+              },
+              {
+                "path": "src/common/prec.f90",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/src/common/prec.f90",
+                "sha256": "56b8d2b1d2ac0142fe8808d9891309c858eb6291968c1fc26bd00fe80bbc2a49"
+              },
+              {
+                "path": "mod_moa.f90",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/mod_moa.f90",
+                "sha256": "016c7ea8bc18575eb038daec2e91f7ea7644026162747fab2a7eb85f3b27ea6d"
+              },
+              {
+                "path": "tests/test_take.f90",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/tests/test_take.f90",
+                "sha256": "688907f592362c4e4cd9f67547e4c6fd9efde6ec9673311abab8d647e7d00f3c"
+              },
+              {
+                "path": "tests/test_drop.f90",
+                "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/tests/test_drop.f90",
+                "sha256": "2596889f69eace2aa1f6fa2769fe58532ff301bd1c4286352982de62c339f7b6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "moa_take",
+                "role": "public-entry-point",
+                "summary": "Public generic with Fypp-generated integer-count/integer-or-real vector overloads. Returns a pointer alias into the argument, with unit lower bound for the selected section.",
+                "signature": "ptr => moa_take(sigma, vec)",
+                "declarations": [
+                  {
+                    "path": "src/take.fypp",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/take.fypp",
+                    "line_start": 69,
+                    "line_end": 83
+                  },
+                  {
+                    "path": "src/common/prec.f90",
+                    "line_start": 5,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/take.fypp",
+                "line_start": 69,
+                "line_end": 106,
+                "module": "mod_moa_take",
+                "usage": "use mod_prec, only: di, dd\nuse moa, only: moa_take, moa_drop\nreal(dd), target :: vec(4)\nreal(dd), pointer :: prefix(:), remainder(:)\nvec=[1.0_dd,2.0_dd,3.0_dd,4.0_dd]\nprefix=>moa_take(2_di,vec)\nremainder=>moa_drop(2_di,vec)\nif (.not.associated(prefix)) error stop \"Take rejected\"\nif (.not.associated(remainder)) error stop \"Drop rejected\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Generate the Fortran modules with the repository Fypp build first. Views alias the original target and require its continued lifetime; use pointer assignment, not allocation. The sketch avoids the nonpositive-drop discrepancy. No generation, compilation or slicing test was run.",
+                "examples": [
+                  {
+                    "path": "tests/test_take.f90",
+                    "line_start": 7,
+                    "line_end": 39
+                  }
+                ]
+              },
+              {
+                "procedure": "moa_drop",
+                "role": "public-entry-point",
+                "summary": "Pointer-returning public generic. Positive drop is the reviewed sketch path; zero/negative counts have the recorded off-by-one implementation discrepancy.",
+                "signature": "ptr => moa_drop(sigma, vec)",
+                "declarations": [
+                  {
+                    "path": "src/drop.fypp",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/drop.fypp",
+                    "line_start": 69,
+                    "line_end": 83
+                  }
+                ],
+                "path": "src/drop.fypp",
+                "line_start": 69,
+                "line_end": 107,
+                "module": "mod_moa_drop",
+                "examples": [
+                  {
+                    "path": "tests/test_drop.f90",
+                    "line_start": 26,
+                    "line_end": 39
+                  }
+                ]
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "a0499fded8d423f25bd1df8d098c0bc4d0e9b602",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root BSD three-clause notice credits Wileam Y. Phan and contributors and permits source/binary redistribution with its notice and endorsement conditions. This records the project notice, not the separate Fypp tool dependency license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/wyphan/moa-fortran/blob/a0499fded8d423f25bd1df8d098c0bc4d0e9b602/LICENSE",
+              "sha256": "6e85ae2f8c2716784b300c2b0e951c2573004863fb9f05d30a5d92f984da4b21"
+            }
+          ]
         }
       },
       "imports": {}
@@ -42442,12 +42660,190 @@
             ],
             "notes": "The README identifies the generator and stream-oriented use with a Fortran/OpenMP example. Stated periods and randomness-test results are upstream claims; passing tests is not proof of suitability for every simulation or cryptographic use.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "1fc7ed2df1b6785144f1d249bdbba18cf0f70340",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected RngStream_RandU01 path dispatches to a six-state combined multiple-recursive MRG32k3a recurrence, or a two-draw increased-precision variant. The basic recurrence combines two modular components and optionally reflects the result for antithetic sampling. Stream objects hold mutable current/start states; these are pseudorandom uniforms, not cryptographic randomness. The rng module defines the type/constants, while the callable functions are EXTERNAL procedures after END MODULE, so USE rng alone does not import their interfaces. Literal real/integer kind 8 assumptions, valid nondegenerate seeds and serialized shared package initialization matter. No period, distribution, independence or reproducibility claim was tested.",
+            "evidence": [
+              {
+                "path": "rngstream.f90",
+                "url": "https://github.com/p-serna/LEcuyer-RNG-Fortran90/blob/1fc7ed2df1b6785144f1d249bdbba18cf0f70340/rngstream.f90",
+                "sha256": "4d6f5a1a2411a82e5303ce4e22c39f69dcc5f85c1272e9fae40cda63384e22be"
+              },
+              {
+                "path": "example.f90",
+                "url": "https://github.com/p-serna/LEcuyer-RNG-Fortran90/blob/1fc7ed2df1b6785144f1d249bdbba18cf0f70340/example.f90",
+                "sha256": "7276e62bb2820484ca1d2a8081391f05eb3fa7769418d1f6d694842cf57665bd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RngStream_RandU01",
+                "role": "public-entry-point",
+                "summary": "External REAL(KIND=8) generator mutating the supplied RngStream. Construct a stream before drawing and declare the external function interface/result kind.",
+                "signature": "value = RngStream_RandU01(g)",
+                "declarations": [
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 537,
+                    "line_end": 540
+                  },
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 51,
+                    "line_end": 58
+                  }
+                ],
+                "path": "rngstream.f90",
+                "line_start": 537,
+                "line_end": 549,
+                "usage": "use rng, only: RngStream\ninterface\n  function RngStream_CreateStream(cname) result(g)\n    use rng, only: RngStream\n    character(len=*) :: cname\n    type(RngStream) :: g\n  end function\n  function RngStream_RandU01(g) result(value)\n    use rng, only: RngStream\n    type(RngStream) :: g\n    real(kind=8) :: value\n  end function\nend interface\ntype(RngStream) :: stream\nreal(kind=8) :: value\nstream=RngStream_CreateStream(\"example\")\nvalue=RngStream_RandU01(stream)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Explicit interfaces in the sketch describe external procedures, not module procedures. Default initialized streams use the package state. Do not share a mutable stream concurrently; no statistical or stream-separation test was run.",
+                "examples": [
+                  {
+                    "path": "example.f90",
+                    "line_start": 36,
+                    "line_end": 57
+                  }
+                ]
+              },
+              {
+                "procedure": "RngStream_CreateStream",
+                "role": "public-entry-point",
+                "summary": "External derived-type-returning constructor. Lazily initializes transition matrices, copies the package seed and advances that shared seed for the next stream.",
+                "signature": "g = RngStream_CreateStream(cname)",
+                "declarations": [
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 335,
+                    "line_end": 341
+                  }
+                ],
+                "path": "rngstream.f90",
+                "line_start": 335,
+                "line_end": 367
+              },
+              {
+                "procedure": "U01",
+                "role": "implementation-helper",
+                "path": "rngstream.f90",
+                "line_start": 221,
+                "line_end": 262
+              },
+              {
+                "procedure": "U01d",
+                "role": "implementation-helper",
+                "path": "rngstream.f90",
+                "line_start": 266,
+                "line_end": 286
+              }
+            ]
+          },
+          {
+            "code": "L6c",
+            "level": "source-reviewed",
+            "revision": "1fc7ed2df1b6785144f1d249bdbba18cf0f70340",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected reset methods restore the current state from the initial-stream or current-substream seed, or advance the substream seed with the hardcoded A1p76/A2p76 modular matrices. Creation uses A1p127/A2p127 to advance the package state. This records implemented seed/stream services, not independently verified jump lengths or independence. The inspected CheckSeed routine is incomplete: it rejects values greater than the moduli rather than greater than or equal, does not reject negatives, and prints but fails to set ierror for an all-zero first component. Supply six positive interior seeds and do not rely on this validation for arbitrary inputs. Reset/creation/package state are mutable and not automatically thread-safe.",
+            "evidence": [
+              {
+                "path": "rngstream.f90",
+                "url": "https://github.com/p-serna/LEcuyer-RNG-Fortran90/blob/1fc7ed2df1b6785144f1d249bdbba18cf0f70340/rngstream.f90",
+                "sha256": "4d6f5a1a2411a82e5303ce4e22c39f69dcc5f85c1272e9fae40cda63384e22be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RngStream_ResetStartStream",
+                "role": "public-entry-point",
+                "summary": "External subroutine restoring Cg and Bg from Ig. This restarts a previously created stream; it is not a new random seed.",
+                "signature": "CALL RngStream_ResetStartStream(g)",
+                "declarations": [
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 371,
+                    "line_end": 376
+                  },
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 51,
+                    "line_end": 57
+                  }
+                ],
+                "path": "rngstream.f90",
+                "line_start": 371,
+                "line_end": 379,
+                "usage": "use rng, only: RngStream\ninterface\n  function RngStream_CreateStream(cname) result(g)\n    use rng, only: RngStream\n    character(len=*) :: cname\n    type(RngStream) :: g\n  end function\n  function RngStream_RandU01(g) result(value)\n    use rng, only: RngStream\n    type(RngStream) :: g\n    real(kind=8) :: value\n  end function\nend interface\ntype(RngStream) :: stream\nreal(kind=8) :: value\nstream=RngStream_CreateStream(\"example\")\nvalue=RngStream_RandU01(stream)\ncall RngStream_ResetStartStream(stream)\n! The next draw restarts the same stream sequence.\nvalue=RngStream_RandU01(stream)\ncall RngStream_ResetNextSubstream(stream)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch uses the valid default seed and does not exercise incomplete seed validation. Initialize transition matrices through stream creation before advancing a substream. No jump-ahead equivalence test was performed."
+              },
+              {
+                "procedure": "RngStream_ResetNextSubstream",
+                "role": "public-entry-point",
+                "summary": "Advances Bg with modular matrix products and copies it to Cg.",
+                "signature": "CALL RngStream_ResetNextSubstream(g)",
+                "declarations": [
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 381,
+                    "line_end": 386
+                  }
+                ],
+                "path": "rngstream.f90",
+                "line_start": 381,
+                "line_end": 390
+              },
+              {
+                "procedure": "RngStream_SetPackageSeed",
+                "role": "public-entry-point",
+                "summary": "Sets the shared six-INTEGER(KIND=8) seed after incomplete validation; invalid inputs may STOP.",
+                "signature": "CALL RngStream_SetPackageSeed(seed)",
+                "declarations": [
+                  {
+                    "path": "rngstream.f90",
+                    "line_start": 401,
+                    "line_end": 408
+                  }
+                ],
+                "path": "rngstream.f90",
+                "line_start": 401,
+                "line_end": 410
+              },
+              {
+                "procedure": "CheckSeed",
+                "role": "implementation-helper",
+                "path": "rngstream.f90",
+                "line_start": 288,
+                "line_end": 329
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "1fc7ed2df1b6785144f1d249bdbba18cf0f70340",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies GPL version 3 text. The README and selected source identify the implementation and upstream algorithm, but do not resolve an only-versus-or-later project choice or the complete upstream component provenance.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/p-serna/LEcuyer-RNG-Fortran90/blob/1fc7ed2df1b6785144f1d249bdbba18cf0f70340/LICENSE",
+              "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/p-serna/LEcuyer-RNG-Fortran90/blob/1fc7ed2df1b6785144f1d249bdbba18cf0f70340/README.md",
+              "sha256": "90f1aed5e7512ba6d1b568c83a9be7f37c3e14c735a424eeabaf37f72fe85e88"
+            }
+          ]
         }
       },
       "imports": {}
@@ -42489,12 +42885,163 @@
             ],
             "notes": "The README documents scalar/vector/range interfaces, seeds and basic histogram/mean/pi tests. Those elementary diagnostics do not establish statistical quality or cryptographic safety for every included generator, and were not executed here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6a21",
+            "level": "source-reviewed",
+            "revision": "d746a25d2e587270debf077410386771db492f1f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected lfsr258 module updates five saved signed integer states with shift, mask and XOR recurrences, combines them with XOR and maps the result to REAL(dp) by multiplying by about 2**(-64) and adding 0.5. rand is a scalar wrapper and rand_arr repeats it N times. The source comment describes [0,1), but floating-point rounding can reach an endpoint; strict open/half-open endpoint guarantees were not established. Seeds are adjusted with masks rather than validated through a returned status. Correct bit behavior assumes the intended 64-bit integer model; shared saved state is not reentrant or thread-safe. This mapping concerns the selected LFSR path, not all generators in the file or cryptographic security. No statistical, period or reference-sequence test was performed.",
+            "evidence": [
+              {
+                "path": "RandLib.f90",
+                "url": "https://github.com/pointedsphere/pseudo_RNG_modules/blob/d746a25d2e587270debf077410386771db492f1f/RandLib.f90",
+                "sha256": "2df80009b31b39082050cb1a5c2f48a5838d630ff30337d616657ae517298122"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/pointedsphere/pseudo_RNG_modules/blob/d746a25d2e587270debf077410386771db492f1f/README.md",
+                "sha256": "f601f4acd8938c7f336f7f4639f0d48401e2f45e87e30cb8efadd759f9102123"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rand",
+                "role": "public-entry-point",
+                "summary": "Module subroutine returning one REAL(dp) draw from the saved LFSR258 state.",
+                "signature": "CALL rand(R)",
+                "declarations": [
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 1279,
+                    "line_end": 1282
+                  },
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 1162,
+                    "line_end": 1178
+                  },
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 13,
+                    "line_end": 17
+                  }
+                ],
+                "path": "RandLib.f90",
+                "line_start": 1263,
+                "line_end": 1283,
+                "module": "lfsr258",
+                "usage": "use types, only: dp, k18\nuse lfsr258, only: set_seed, rand, rand_arr\nreal(dp) :: value, draws(4)\ncall set_seed(153587801_k18,-759022222_k18,1288503317_k18, &\n     -1718083407_k18,-123456789_k18)\ncall rand(value)\ncall rand_arr(4,draws)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a compiler with the intended 64-bit k18 bit model; the combined source also declares wider selected kinds in other generators. Do not share module state concurrently or assume strict endpoint exclusion. This sketch does not establish randomness quality or cross-compiler sequence equivalence."
+              },
+              {
+                "procedure": "set_seed",
+                "role": "public-entry-point",
+                "summary": "Copies five INTEGER(k18) seeds into module state and applies mask-based adjustments to unsuitable low-bit patterns.",
+                "signature": "CALL set_seed(i1, i2, i3, i4, i5)",
+                "declarations": [
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 1191,
+                    "line_end": 1204
+                  }
+                ],
+                "path": "RandLib.f90",
+                "line_start": 1182,
+                "line_end": 1207,
+                "module": "lfsr258"
+              },
+              {
+                "procedure": "rand_arr",
+                "role": "public-entry-point",
+                "summary": "Fills an explicit-shape REAL(dp) vector by repeated scalar draws.",
+                "signature": "CALL rand_arr(N, Rarr)",
+                "declarations": [
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 1306,
+                    "line_end": 1312
+                  }
+                ],
+                "path": "RandLib.f90",
+                "line_start": 1285,
+                "line_end": 1313,
+                "module": "lfsr258"
+              },
+              {
+                "procedure": "lfsr258_",
+                "role": "implementation-helper",
+                "path": "RandLib.f90",
+                "line_start": 1209,
+                "line_end": 1261,
+                "module": "lfsr258"
+              }
+            ]
+          },
+          {
+            "code": "B",
+            "level": "source-reviewed",
+            "revision": "d746a25d2e587270debf077410386771db492f1f",
+            "reviewed_on": "2026-11-05",
+            "notes": "RNGutil::GCD64_ implements Euclid remainder iteration on INTEGER(k18) inputs. The public routine insists on a<b and otherwise prints an error and STOP through stop_E; the sketch further restricts to positive inputs so the result has the usual positive-GCD interpretation. It does not reorder inputs or normalize signs. B is the available GAMS number-theory leaf in the imported/reviewed taxonomy. This routine is a seed-support utility, not a primality/factorization algorithm, and was not executed.",
+            "evidence": [
+              {
+                "path": "RandLib.f90",
+                "url": "https://github.com/pointedsphere/pseudo_RNG_modules/blob/d746a25d2e587270debf077410386771db492f1f/RandLib.f90",
+                "sha256": "2df80009b31b39082050cb1a5c2f48a5838d630ff30337d616657ae517298122"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GCD64_",
+                "role": "public-entry-point",
+                "summary": "Module integer greatest-common-divisor subroutine with a strict a<b precondition and STOP error handling.",
+                "signature": "CALL GCD64_(a, b, gcd)",
+                "declarations": [
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 203,
+                    "line_end": 210
+                  },
+                  {
+                    "path": "RandLib.f90",
+                    "line_start": 13,
+                    "line_end": 17
+                  }
+                ],
+                "path": "RandLib.f90",
+                "line_start": 184,
+                "line_end": 225,
+                "module": "RNGutil",
+                "usage": "use types, only: k18\nuse RNGutil, only: GCD64_\ninteger(k18) :: divisor\ncall GCD64_(18_k18,24_k18,divisor)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use positive a<b. Equality or reversed order stops the process rather than swapping arguments. No result or large-integer portability test was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 text; inherited RNG scope unresolved",
+          "spdx_expression": null,
+          "revision": "d746a25d2e587270debf077410386771db492f1f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GPL version 3 text. The selected LFSR header explicitly credits an Alan Miller translation and original upstream recurrence; the review does not resolve the complete inherited-code licensing or a version-only versus or-later project choice.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/pointedsphere/pseudo_RNG_modules/blob/d746a25d2e587270debf077410386771db492f1f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "RandLib.f90",
+              "url": "https://github.com/pointedsphere/pseudo_RNG_modules/blob/d746a25d2e587270debf077410386771db492f1f/RandLib.f90",
+              "sha256": "2df80009b31b39082050cb1a5c2f48a5838d630ff30337d616657ae517298122"
+            }
+          ]
         }
       },
       "imports": {}
@@ -43228,12 +43775,128 @@
             ],
             "notes": "The README identifies original James Filliben routines, a module adaptation and documentation independent of Dataplot. The original package stopped development; no blanket accuracy or current-compiler verification is inferred for all inherited routines.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "9695613622354d6a372fea1e3b4a62e29430bb21",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected real64 module mean routine directly sums X(1:N) and divides by N, with special diagnostics for one/all-equal observations. median copies/sorts the selected observations into fixed COMMON workspace and returns the middle element or the average of the two middle elements. The median count limit is 15000. Both require N<=SIZE(X); invalid counts print diagnostics and return without a defined output/status rather than throwing a structured error. The sketch imports M_datapac__d directly to select the real64 implementation. This is descriptive sample location, not distribution fitting or a new numerical verification of all DATAPAC routines.",
+            "evidence": [
+              {
+                "path": "src/M_datapac__d.f90",
+                "url": "https://github.com/urbanjost/M_datapac/blob/9695613622354d6a372fea1e3b4a62e29430bb21/src/M_datapac__d.f90",
+                "sha256": "1d2916708826c331e3c363bf8a3dce1b59b99210bce6c822f798adda74003ac7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "REAL64 module sample mean over the first N entries. Iwrite=0 suppresses the normal result report, but input/special-case diagnostics can still print.",
+                "signature": "CALL mean(X, N, Iwrite, Xmean)",
+                "declarations": [
+                  {
+                    "path": "src/M_datapac__d.f90",
+                    "line_start": 1,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "src/M_datapac__d.f90",
+                    "line_start": 14990,
+                    "line_end": 14997
+                  }
+                ],
+                "path": "src/M_datapac__d.f90",
+                "line_start": 14990,
+                "line_end": 15033,
+                "module": "M_datapac__d",
+                "usage": "use iso_fortran_env, only: real64\nuse M_datapac__d, only: mean, median\nreal(real64) :: x(4), average, middle\nx=[1.0_real64,2.0_real64,4.0_real64,5.0_real64]\ncall mean(x,size(x),0,average)\ncall median(x,size(x),0,middle)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use 1<=N<=SIZE(X), and N<=15000 for median. Diagnostics do not supply a success flag; invalid counts leave result undefined. Median uses shared COMMON workspace and is not a reentrant routine."
+              },
+              {
+                "procedure": "median",
+                "role": "public-entry-point",
+                "summary": "REAL64 module median with fixed 15000-value shared workspace and sorting dependency.",
+                "signature": "CALL median(X, N, Iwrite, Xmed)",
+                "declarations": [
+                  {
+                    "path": "src/M_datapac__d.f90",
+                    "line_start": 15124,
+                    "line_end": 15129
+                  }
+                ],
+                "path": "src/M_datapac__d.f90",
+                "line_start": 15124,
+                "line_end": 15175,
+                "module": "M_datapac__d"
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "9695613622354d6a372fea1e3b4a62e29430bb21",
+            "reviewed_on": "2026-11-05",
+            "notes": "The real64 var routine uses two passes: sum to form the arithmetic mean, then sum squared centered differences and divide by N-1. It returns zero with diagnostics for N=1 or constant data. N<1 prints an error and returns with Xvar undefined; N>SIZE(X) is not checked. This supports descriptive sample variance, not a robust, compensated or streaming estimator, and the singleton result is a repository convention rather than an unbiased sample-variance estimate. No numerical result was computed.",
+            "evidence": [
+              {
+                "path": "src/M_datapac__d.f90",
+                "url": "https://github.com/urbanjost/M_datapac/blob/9695613622354d6a372fea1e3b4a62e29430bb21/src/M_datapac__d.f90",
+                "sha256": "1d2916708826c331e3c363bf8a3dce1b59b99210bce6c822f798adda74003ac7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "var",
+                "role": "public-entry-point",
+                "summary": "REAL64 two-pass sample variance using denominator N-1 for nonconstant N>1 data.",
+                "signature": "CALL var(X, N, Iwrite, Xvar)",
+                "declarations": [
+                  {
+                    "path": "src/M_datapac__d.f90",
+                    "line_start": 1,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "src/M_datapac__d.f90",
+                    "line_start": 35018,
+                    "line_end": 35025
+                  }
+                ],
+                "path": "src/M_datapac__d.f90",
+                "line_start": 35018,
+                "line_end": 35072,
+                "module": "M_datapac__d",
+                "usage": "use iso_fortran_env, only: real64\nuse M_datapac__d, only: var\nreal(real64) :: x(4), variance\nx=[1.0_real64,2.0_real64,4.0_real64,5.0_real64]\ncall var(x,size(x),0,variance)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply at least two finite observations for the usual sample-variance interpretation. Invalid counts lack a returned status; Iwrite=0 does not suppress diagnostics. No residual/accuracy comparison was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CC0 root with original NIST notice",
+          "spdx_expression": null,
+          "revision": "9695613622354d6a372fea1e3b4a62e29430bb21",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE contains CC0-1.0. COPYRIGHT separately preserves the original NIST software notice, including notice retention and acknowledgment of modifications. Both notices are recorded; a single unqualified SPDX expression is not assigned to the combined provenance.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/urbanjost/M_datapac/blob/9695613622354d6a372fea1e3b4a62e29430bb21/LICENSE",
+              "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+            },
+            {
+              "path": "COPYRIGHT",
+              "url": "https://github.com/urbanjost/M_datapac/blob/9695613622354d6a372fea1e3b4a62e29430bb21/COPYRIGHT",
+              "sha256": "cd6a568aac7608c4e47c106d77cdc2553a725378c6f95363372542c472eec992"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44431,12 +45094,70 @@
             ],
             "notes": "The general README is supplemented by the Russian BS01R comments describing mean, mean deviation, variance and standard deviation. Only this supported broad statistical scope is assigned now; the entire original MSU library is not assumed translated or validated.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1c",
+            "level": "source-reviewed",
+            "revision": "894754c36a5886daceaa4bfe2503302692e79053",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external BS02R routine sums centered third and fourth powers, then normalizes them with the N-1 sample variance: SKEW=sum(delta**3)/(N*SDEV**3) and CURT=sum(delta**4)/(N*VAR**2)-3. These are the exact implemented sample-shape conventions, not claimed unbiased skewness/kurtosis estimators. Require N>=2 with N available finite values. The input-length check is commented out; for constant data the code leaves SKEW=CURT=0 rather than flagging undefined normalized moments. No hypothesis test, robustness or numerical accuracy was verified. Unlike the BS01R examples with internal routines, this reviewed file supplies a standalone external procedure.",
+            "evidence": [
+              {
+                "path": "src/bs02r/bs02r.f90",
+                "url": "https://github.com/VadimAnIsaev/Library-of-Numerical-Analysis-MSU/blob/894754c36a5886daceaa4bfe2503302692e79053/src/bs02r/bs02r.f90",
+                "sha256": "02ff7e36e483b215b4f5ef45064100e8eff99d1550b990bf8a902a7fcb29a5ac"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/VadimAnIsaev/Library-of-Numerical-Analysis-MSU/blob/894754c36a5886daceaa4bfe2503302692e79053/README.md",
+                "sha256": "3483f08a06d5e42519f11577e6bf168fc855fed6c697f48e5ba652a39eb4190a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BS02R",
+                "role": "public-entry-point",
+                "summary": "Default-REAL sample skewness and excess-kurtosis subroutine using sample-variance normalization and no status output.",
+                "signature": "CALL BS02R(vector, N, SKEW, CURT)",
+                "declarations": [
+                  {
+                    "path": "src/bs02r/bs02r.f90",
+                    "line_start": 11,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/bs02r/bs02r.f90",
+                "line_start": 11,
+                "line_end": 54,
+                "usage": "real :: x(4), skew, excess\nexternal :: bs02r\nx=[1.0,2.0,3.0,5.0]\ncall bs02r(x,size(x),skew,excess)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use N>=2 and nonconstant finite data. Results follow the recorded N versus N-1 normalization and are not bias-corrected estimators. Constant data produces zero sentinels without a diagnostic. No compile or numerical check was made."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "894754c36a5886daceaa4bfe2503302692e79053",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit reuse grant was identified in the reviewed README or selected routine, and the pinned tree has no separately named LICENSE/COPYING file. Historical algorithm provenance and public repository access do not establish permission to redistribute.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/VadimAnIsaev/Library-of-Numerical-Analysis-MSU/blob/894754c36a5886daceaa4bfe2503302692e79053/README.md",
+              "sha256": "3483f08a06d5e42519f11577e6bf168fc855fed6c697f48e5ba652a39eb4190a"
+            },
+            {
+              "path": "src/bs02r/bs02r.f90",
+              "url": "https://github.com/VadimAnIsaev/Library-of-Numerical-Analysis-MSU/blob/894754c36a5886daceaa4bfe2503302692e79053/src/bs02r/bs02r.f90",
+              "sha256": "02ff7e36e483b215b4f5ef45064100e8eff99d1550b990bf8a902a7fcb29a5ac"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44767,12 +45488,131 @@
             ],
             "notes": "The HTML README documents numerical interfaces and PLplot/Python plotting integration with an older Intel/MKL installation workflow. Bundled/wrapped backends and convenience routines are distinguished; current dependency compatibility and numerical outputs were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "J1a2",
+            "level": "source-reviewed",
+            "revision": "77cf2d947511adfd67e698c068c6180a106ba0cd",
+            "reviewed_on": "2026-11-05",
+            "notes": "numFort::fft is an in-place recursive radix-two complex transform: split odd/even-indexed subsequences, recurse and recombine with exp(-2*pi*i*k/N). It computes an unnormalized forward transform. Correct radix-two use requires a positive power-of-two length; the code does not enforce that precondition, and odd lengths leave unmatched entries. No inverse, normalization parameter, multidimensional transform or general mixed-radix support is claimed. The enclosing module imports QUADPACK, LAPACK95 and minFun, so this routine is not a standalone build merely because its arithmetic uses intrinsics. No transform accuracy or timing was tested.",
+            "evidence": [
+              {
+                "path": "src/NumFort.f90",
+                "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/src/NumFort.f90",
+                "sha256": "c23f42d91c4c43d879eaab714f195067c99caa743005fdc77c50b77339de76cd"
+              },
+              {
+                "path": "src/kinds.f90",
+                "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/src/kinds.f90",
+                "sha256": "4ec5aa040c9c4828845c50a92ae12206c8c75494f568583fe3c5eb7f04fed8ed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fft",
+                "role": "public-entry-point",
+                "summary": "Recursive module subroutine overwriting a COMPLEX(DP) vector with the forward unnormalized transform; use power-of-two sizes.",
+                "signature": "CALL fft(x)",
+                "declarations": [
+                  {
+                    "path": "src/NumFort.f90",
+                    "line_start": 49,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "src/NumFort.f90",
+                    "line_start": 96,
+                    "line_end": 102
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 1,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/NumFort.f90",
+                "line_start": 96,
+                "line_end": 129,
+                "module": "numFort",
+                "usage": "use kinds, only: DP\nuse numFort, only: fft\ncomplex(DP) :: x(4)\nx=cmplx([1.0_DP,0.0_DP,0.0_DP,0.0_DP],0.0_DP,DP)\ncall fft(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete compatible module dependency set, or deliberately extract/adapt the selected routine. The kinds module uses the nonstandard Q exponent literal elsewhere and may need compiler support. The sketch does not establish a DFT residual or performance result."
+              }
+            ]
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "77cf2d947511adfd67e698c068c6180a106ba0cd",
+            "reviewed_on": "2026-11-05",
+            "notes": "The sampled-data trapZZ overload, exposed through generic trapZ, applies the trapezoidal sum using ONE width abs(x(1)-x(2)) for every panel. It is therefore restricted to an equally spaced ascending grid in this mapping, with at least two x values and matching y length. Nonuniform-grid integration is not implemented by this overload. Descending grids do not produce signed reversal because the width is absolute; mismatched lengths and short arrays are unchecked. There is no error estimate or adaptive refinement. The callback-based trapZ and QUADPACK wrappers are outside this selected source review.",
+            "evidence": [
+              {
+                "path": "src/NumFort.f90",
+                "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/src/NumFort.f90",
+                "sha256": "c23f42d91c4c43d879eaab714f195067c99caa743005fdc77c50b77339de76cd"
+              },
+              {
+                "path": "src/kinds.f90",
+                "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/src/kinds.f90",
+                "sha256": "4ec5aa040c9c4828845c50a92ae12206c8c75494f568583fe3c5eb7f04fed8ed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "trapZ",
+                "role": "public-entry-point",
+                "summary": "Public generic sampled-array overload implemented by trapZZ. Returns REAL(DP) composite trapezoidal quadrature for a uniform grid.",
+                "signature": "value = trapZ(x, y)",
+                "declarations": [
+                  {
+                    "path": "src/NumFort.f90",
+                    "line_start": 83,
+                    "line_end": 85
+                  },
+                  {
+                    "path": "src/NumFort.f90",
+                    "line_start": 1734,
+                    "line_end": 1746
+                  },
+                  {
+                    "path": "src/kinds.f90",
+                    "line_start": 4,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/NumFort.f90",
+                "line_start": 1734,
+                "line_end": 1754,
+                "module": "numFort",
+                "usage": "use kinds, only: DP\nuse numFort, only: trapZ\nreal(DP) :: x(3),y(3),value\nx=[0.0_DP,0.5_DP,1.0_DP]\ny=x*x\nvalue=trapZ(x,y)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use an ascending uniformly spaced grid, SIZE(X)>=2 and SIZE(Y)=SIZE(X). Every panel uses the first absolute spacing. Full module dependencies still apply; neither an error estimate nor a numerical quadrature check was performed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit project reuse grant identified",
+          "spdx_expression": null,
+          "revision": "77cf2d947511adfd67e698c068c6180a106ba0cd",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and defining module credit several authors/dependencies but supply no explicit project-wide reuse grant; the pinned tree has no separately named LICENSE/COPYING file. Bundled or linked numerical packages can carry their own distinct terms.",
+          "evidence": [
+            {
+              "path": "README.org",
+              "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/README.org",
+              "sha256": "d676910fa03b958cafbefe35404cadc9bf7893aa146ee50dbfd63b2d0c5b3f1e"
+            },
+            {
+              "path": "src/NumFort.f90",
+              "url": "https://github.com/AnthonyKalaitzis/NumFort/blob/77cf2d947511adfd67e698c068c6180a106ba0cd/src/NumFort.f90",
+              "sha256": "c23f42d91c4c43d879eaab714f195067c99caa743005fdc77c50b77339de76cd"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45488,12 +46328,143 @@
             ],
             "notes": "The README is supplemented by Algorithms.md, whose dated table identifies implemented error functions, matrix routines and distribution generators. Approximation quality and present source/table consistency need procedure-level review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "f73f2a7bb8ee256c394a890993e634a069d4f6e7",
+            "reviewed_on": "2026-11-05",
+            "notes": "Interpolation::lagrange directly evaluates the global Lagrange interpolation polynomial by multiplying all nodal factors for each datum and summing the weighted ordinates. lagrangep applies that scalar function to query points, allocating yEval only if not already allocated. Require nonempty equal-length data with distinct abscissae; no duplicate-node, conditioning or overflow check exists. An already allocated yEval must match the query length because the routine does not resize it. This is global polynomial interpolation, not piecewise splines: the naturalcubicspline routines are unimplemented ERROR STOP placeholders, and are not mapped. No interpolation check was run.",
+            "evidence": [
+              {
+                "path": "src/Interpolation.f90",
+                "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/src/Interpolation.f90",
+                "sha256": "d72b0d539a0c9f2ff0add404656d67e56b3096646b1e8b7496a2979c78d37bf1"
+              },
+              {
+                "path": "src/Constants.f90",
+                "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/src/Constants.f90",
+                "sha256": "3a5beed454b8c63cc231f71f565a265306374eceb1c1f9585abcf0b9a3850dab"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lagrange",
+                "role": "public-entry-point",
+                "summary": "REAL(DP) scalar module interpolation function using direct product-form global Lagrange polynomials.",
+                "signature": "y = lagrange(xData, yData, x)",
+                "declarations": [
+                  {
+                    "path": "src/Interpolation.f90",
+                    "line_start": 44,
+                    "line_end": 48
+                  },
+                  {
+                    "path": "src/Constants.f90",
+                    "line_start": 1,
+                    "line_end": 4
+                  }
+                ],
+                "path": "src/Interpolation.f90",
+                "line_start": 44,
+                "line_end": 67,
+                "module": "Interpolation",
+                "usage": "use Constants, only: DP\nuse Interpolation, only: lagrange\nreal(DP) :: nodes(3), values(3), y\nnodes=[0.0_DP,1.0_DP,2.0_DP]\nvalues=[0.0_DP,1.0_DP,4.0_DP]\ny=lagrange(nodes,values,0.5_DP)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use distinct nodes and equal, nonempty arrays. The direct product formula is not a barycentric stability guarantee. The enclosing module imports IO, LinearAlgebra and Polynomials, so normal module build dependencies remain."
+              },
+              {
+                "procedure": "lagrangep",
+                "role": "public-entry-point",
+                "summary": "Query-vector wrapper with allocatable INTENT(INOUT) output; a preallocated output must have the correct size.",
+                "signature": "CALL lagrangep(xData, yData, xEval, yEval)",
+                "declarations": [
+                  {
+                    "path": "src/Interpolation.f90",
+                    "line_start": 69,
+                    "line_end": 72
+                  }
+                ],
+                "path": "src/Interpolation.f90",
+                "line_start": 69,
+                "line_end": 86,
+                "module": "Interpolation"
+              }
+            ]
+          },
+          {
+            "code": "C3b",
+            "level": "source-reviewed",
+            "revision": "f73f2a7bb8ee256c394a890993e634a069d4f6e7",
+            "reviewed_on": "2026-11-05",
+            "notes": "Polynomials::horner evaluates a polynomial stored in increasing-power coefficient order by starting from the last coefficient and descending with y=y*x+p(i). It checks for a nonempty coefficient array using ERROR STOP. This is ordinary nonorthogonal power-basis polynomial evaluation, not root finding or an orthogonal basis algorithm. No compensation, overflow detection or error estimate is provided. The empty Broyden stub and the root-finding module callback precision mismatch are not promoted as additional supported methods.",
+            "evidence": [
+              {
+                "path": "src/Polynomials.f90",
+                "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/src/Polynomials.f90",
+                "sha256": "12eb110bc391788cb63f0a18f33493df2b1dc5076870e02f0ca18c4a30a78a28"
+              },
+              {
+                "path": "src/Constants.f90",
+                "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/src/Constants.f90",
+                "sha256": "3a5beed454b8c63cc231f71f565a265306374eceb1c1f9585abcf0b9a3850dab"
+              },
+              {
+                "path": "src/RootFinding.f90",
+                "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/src/RootFinding.f90",
+                "sha256": "db2a14493ddedcae3ebb9192d143ca1ee88b19b6b60086200293f62bbe74ab71"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "horner",
+                "role": "public-entry-point",
+                "summary": "REAL(DP) scalar Horner evaluator; p(1) is the constant coefficient.",
+                "signature": "y = horner(p, x)",
+                "declarations": [
+                  {
+                    "path": "src/Polynomials.f90",
+                    "line_start": 8,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/Constants.f90",
+                    "line_start": 1,
+                    "line_end": 4
+                  }
+                ],
+                "path": "src/Polynomials.f90",
+                "line_start": 8,
+                "line_end": 23,
+                "module": "Polynomials",
+                "usage": "use Constants, only: DP\nuse Polynomials, only: horner\nreal(DP) :: value\nvalue=horner([1.0_DP,2.0_DP,3.0_DP],0.5_DP)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Coefficients are ordered constant first, not highest degree first. Empty arrays terminate with ERROR STOP; finite arithmetic and conditioning remain caller concerns. No polynomial value was checked by execution."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL version 3 text; version scope unresolved",
+          "spdx_expression": null,
+          "revision": "f73f2a7bb8ee256c394a890993e634a069d4f6e7",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README declares GPL and the root supplies GPL version 3 text. The reviewed notices do not settle a version-only versus or-later choice; this finding does not extend a license claim to unrelated dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/LICENSE",
+              "sha256": "8b1ba204bb69a0ade2bfcf65ef294a920f6bb361b317dba43c7ef29d96332b9b"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/mrtkp9993/Numerical-Methods-in-Fortran/blob/f73f2a7bb8ee256c394a890993e634a069d4f6e7/README.md",
+              "sha256": "b9f50c6f10f5f7526d4e286e73034a0082dd9dc9eeaf31992fefb222dc6b6b64"
+            }
+          ]
         }
       },
       "imports": {}

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 236 repositories now have 295 source-reviewed
+Reviewed on 2026-11-05. 244 repositories now have 308 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-229 repository cards now identify public routines and link their usage lines
+237 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 236 independently source-reviewed repositories now have an
+separately. All 244 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -260,6 +260,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fortran-gmm-em | `gmmEM::fit`, `initRandomGaussians`; `linalg::gramSchmidt` | GPL-3.0-or-later |
 | spharm-interp | External `ylgndr`, `sheval3d` (basis/expansion evaluation, not MATLAB fit) | Apache-2.0 |
 | EqualSpherePartition | `ACM_EqualSphere::eq_sphere`; appended demonstration main must be separated for library use | No license grant identified in reviewed material |
+| LEcuyer-RNG-Fortran90 | External `RngStream_CreateStream`, `RngStream_RandU01`, reset and package-seed routines; `rng` supplies the type | GPL version 3 text; version scope unresolved |
+| M_datapac | `M_datapac__d::mean`, `median`, `var` (REAL64) | CC0 root with original NIST notice |
+| numFort | `numFort::fft`, sampled-array `trapZ` generic | No explicit project reuse grant identified |
+| Numerical-Methods-in-Fortran | `Interpolation::lagrange`, `lagrangep`; `Polynomials::horner` | GPL version 3 text; version scope unresolved |
+| library-of-numerical-analysis-msu | External `BS02R` | No license grant identified in reviewed material |
+| insitu_array | `insitu::insitu_Array%init`, `%t` | No explicit reuse grant identified |
+| MoA-Fortran | `mod_moa_take::moa_take`, `mod_moa_drop::moa_drop`; reexported by `moa` | BSD-3-Clause |
+| pseudo_rng_modules | `lfsr258::rand`, `set_seed`, `rand_arr`; `RNGutil::GCD64_` | GPL version 3 text; inherited RNG scope unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -515,6 +523,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [fortran-gmm-em](https://github.com/jonas-finkler/fortran-gmm-em) | L4c1a; D5 | Gaussian-mixture EM and modified Gram-Schmidt orthogonalization | EM has no iteration cap/status; Gram-Schmidt has no rank or zero-residual check. |
 | [spharm-interp](https://github.com/ahbarnett/spharm-interp) | C9; K6a1 | Normalized associated Legendre functions and spherical-harmonic expansion evaluation | Fortran evaluator scope; scattered-point coefficient fitting is MATLAB. Normalization and lower-triangle storage matter. |
 | [EqualSpherePartition](https://github.com/gongzheng-justin/EqualSpherePartition) | P | Unit-sphere representative points from zonal partition construction | Points only, not cell boundaries or a verified area/diameter guarantee; combined source contains a main program. |
+| [LEcuyer-RNG-Fortran90](https://github.com/p-serna/lecuyer-rng-fortran90) | L6a21; L6c | Combined multiple-recursive uniform streams and reset/seed services | External procedures are outside the module. Seed validation has boundary/degeneracy omissions; shared initialization/state need care. |
+| [M_datapac](https://github.com/urbanjost/M_datapac) | L1a1a; L1a1b | REAL64 mean, median and two-pass sample variance | Median uses 15000-value shared workspace; invalid counts can return undefined outputs without status. |
+| [numFort](https://github.com/anthonykalaitzis/numfort) | J1a2; H2a1b2 | Radix-two complex FFT and sampled uniform-grid trapezoidal quadrature | FFT requires power-of-two length. Quadrature reuses one absolute spacing; module has external package dependencies. |
+| [Numerical-Methods-in-Fortran](https://github.com/mrtkp9993/numerical-methods-in-fortran) | E1b; C3b | Direct global Lagrange interpolation and ordinary Horner evaluation | Distinct nodes and constant-first coefficients; spline/Broyden placeholders are excluded. |
+| [library-of-numerical-analysis-msu](https://github.com/vadimanisaev/library-of-numerical-analysis-msu) | L1a1c | Sample skewness and excess kurtosis using the implemented N/N-1 normalization | Not bias-corrected estimators. Constant data returns zero sentinels for undefined normalized moments. |
+| [insitu_array](https://github.com/paulstryck/insitu_array) | D1b3 | In-place storage permutation and pointer remapping for transpose | Associated contiguous target storage required. Allocates an unused full-size flag array; no constant-workspace claim. |
+| [MoA-Fortran](https://github.com/wyphan/moa-fortran) | D1a11 | Fypp-generated pointer views for vector take/drop | Target lifetime matters; nonpositive drop has an off-by-one discrepancy, avoided by the sketch. |
+| [pseudo_rng_modules](https://github.com/pointedsphere/pseudo_rng_modules) | L6a21; B | Selected LFSR258 uniforms and Euclidean GCD utility | Shared 64-bit RNG state; endpoints not certified. GCD requires positive ascending inputs and otherwise can STOP. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -991,3 +1007,22 @@ use squared weights and do not center or normalize statistical data. The spheric
 harmonic Fortran routines evaluate bases/expansions; MATLAB performs the repository's
 scattered-point least-squares fit. These findings and the new calling sketches are
 source reviews, not compilation or numerical checks.
+
+The RNG stream interfaces distinguish module-defined types from separately defined
+external functions and retain the incomplete seed-validation finding. DATAPAC
+entries explicitly select the REAL64 module and record count/workspace limits.
+MoA take/drop return aliases into a persistent target; they do not copy data, and
+the nonpositive-drop branch needs correction. The transpose implementation does
+rearrange storage and still allocates a full-size unused flag array. Numerical
+calculus/FFT sketches state their uniform-grid and radix-two preconditions.
+All new calling sketches remain uncompiled and unrun.
+
+The Sherman-Morrison candidate remains deferred from source-reviewed mappings:
+at pinned commit `0ba978e78727cb4c70e17d50153b09b4839d5c0a`,
+[the Fortran SM1 interface](https://github.com/TREX-CoE/Sherman-Morrison/blob/0ba978e78727cb4c70e17d50153b09b4839d5c0a/src/finterface_mod.f90#L18-L24)
+declares five arguments with allocatable arrays, whereas
+[the C++ SM1_f wrapper](https://github.com/TREX-CoE/Sherman-Morrison/blob/0ba978e78727cb4c70e17d50153b09b4839d5c0a/src/SM_Standard.cpp#L282-L286)
+expects six arguments (including a by-value breakdown threshold) and raw
+pointer-to-pointer buffers. The interfaces need reconciliation and a checked
+interop driver before promoting a usable Fortran calling example. This is a
+source finding, not a reproduced build/runtime failure.

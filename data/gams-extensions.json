@@ -390,6 +390,12 @@
       "parent": "L4c1",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "C3b": {
+      "label": "Non-orthogonal",
+      "parent": "C3",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
