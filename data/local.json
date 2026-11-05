@@ -842,12 +842,128 @@
             ],
             "notes": "The rbf_mod source documentation identifies the RBF implementation, interpolation matrices and derivative matrices. Kept at interpolation class E pending a procedure-level review; no PDE solver claim is made.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E3",
+            "level": "source-reviewed",
+            "revision": "0e66c2452b01d1711884c1b2d70b4b854ee30ec2",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected rbf_type%build constructs a local RBF interpolation matrix for each caller-supplied neighbor stencil, obtains its inverse and forms derivative matrices from kernel evaluations. This is an interpolation service (E3), not a complete value-evaluation API: optional y is not referenced, and the routine neither fits data values nor returns values at arbitrary queries. The Gaussian unaugmented matrix path is identifiable in source; the derivative and polynomial branches need correction/checking. In particular, the Gaussian second derivative expression differs from the analytic derivative; polynomial-augmented B entries are not fully initialized before whole-matrix multiplication, and an active debug print indexes node ten without checking node count. Compile with USE_LAPACK: inverse_matrix has an empty alternative branch. Select a distance function first, validate indices and stencil nonsingularity, and use poly_order=-1 to avoid augmentation. No interpolant, derivative matrix or failure was checked by execution; no PDE-solver or general scattered-interpolator mapping is inferred.",
+            "evidence": [
+              {
+                "path": "src/rbf_mod.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/rbf_mod.F90",
+                "sha256": "7c06be08a568c32f3edaac96d674d1640da11990c4badf784e3addcd04f022ab"
+              },
+              {
+                "path": "src/math_mod.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/math_mod.F90",
+                "sha256": "09f9db75e182229bdd71dbdbdfcc27ebd44917cfd38e9c59923c9f56ef553f15"
+              },
+              {
+                "path": "src/kernel_mod.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/kernel_mod.F90",
+                "sha256": "43c8e02fd5afda5d605ccad42112baabda6246e277bf70512fed87604a041948"
+              },
+              {
+                "path": "src/distance_mod.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/distance_mod.F90",
+                "sha256": "1c39ec35c1ff6e405e73c3d387940127558f4840b80f10b85520fc6f7225d197"
+              },
+              {
+                "path": "src/const_mod.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/const_mod.F90",
+                "sha256": "fb4235019b60bde0ed89fbf2d349e328b036d7108dd198b5ed7b7de70640373a"
+              },
+              {
+                "path": "src/rbf_test.F90",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/rbf_test.F90",
+                "sha256": "ef2db86360033e3c18b1983e52bbd4422486d8002119fc5749c2664b08703b23"
+              },
+              {
+                "path": "CMakeLists.txt",
+                "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/CMakeLists.txt",
+                "sha256": "270ed278377f32a60e7e151bbdbdfbfbabe307dd022b08ae9c7000c5e52a0903"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "build",
+                "role": "public-entry-point",
+                "summary": "Type-bound rbf_type constructor, with x(num_dim,num_node), ngb_idx(num_ngb,num_node), a supported kernel selector and real(r8) parameter. r8 is hard-coded kind 8. ngb_idx contains valid one-based node indices; neighbor selection is caller work. Initialize distance_mod first. Reviewed unaugmented Gaussian use sets kernel_ga and poly_order=-1. Matrices are stored on the object; y is unused and no status is returned.",
+                "signature": "CALL rbf%build(x, ngb_idx, kernel_type, kernel_opt, poly_order, y)",
+                "declarations": [
+                  {
+                    "path": "src/rbf_mod.F90",
+                    "line_start": 48,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "src/rbf_mod.F90",
+                    "line_start": 23,
+                    "line_end": 40
+                  }
+                ],
+                "path": "src/rbf_mod.F90",
+                "line_start": 44,
+                "line_end": 167,
+                "module": "rbf_mod",
+                "derived_type": "rbf_type",
+                "examples": [
+                  {
+                    "path": "src/rbf_test.F90",
+                    "line_start": 21,
+                    "line_end": 29
+                  }
+                ]
+              },
+              {
+                "procedure": "inverse_matrix",
+                "module": "math_utils_mod",
+                "role": "implementation-evidence",
+                "path": "src/math_mod.F90",
+                "line_start": 102,
+                "line_end": 127
+              },
+              {
+                "procedure": "kernel_ga_derivative",
+                "module": "kernel_mod",
+                "role": "implementation-evidence",
+                "path": "src/kernel_mod.F90",
+                "line_start": 54,
+                "line_end": 81
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "0e66c2452b01d1711884c1b2d70b4b854ee30ec2",
+          "reviewed_on": "2026-11-04",
+          "notes": "No license/copying file was identified in the pinned root tree and no grant was identified in the inspected RBF, matrix utility and build files. Linked libraries and git submodules have not received a component-license audit. This scoped absence finding is not permission to redistribute.",
+          "evidence": [
+            {
+              "path": "src/rbf_mod.F90",
+              "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/rbf_mod.F90",
+              "sha256": "7c06be08a568c32f3edaac96d674d1640da11990c4badf784e3addcd04f022ab"
+            },
+            {
+              "path": "src/math_mod.F90",
+              "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/src/math_mod.F90",
+              "sha256": "09f9db75e182229bdd71dbdbdfcc27ebd44917cfd38e9c59923c9f56ef553f15"
+            },
+            {
+              "path": "CMakeLists.txt",
+              "url": "https://github.com/dongli/fortran-rbf/blob/0e66c2452b01d1711884c1b2d70b4b854ee30ec2/CMakeLists.txt",
+              "sha256": "270ed278377f32a60e7e151bbdbdfbfbabe307dd022b08ae9c7000c5e52a0903"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3746,12 +3862,101 @@
             ],
             "notes": "The README describes lower/upper/percentage limits and a monthly-temperature example. Preservation and bound behavior have not been reproduced for this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "1cc98c9966641ea1fc6f111bfc2846e55d1cca2e",
+            "reviewed_on": "2026-11-04",
+            "notes": "The inspected unbounded newspline path constructs interval-wall control points, solves a linear system for mid-control adjustments using integrated Hermite basis formulas, then evaluates cubic Hermite pieces at subinterval sample locations. This supports univariate piecewise-polynomial interpolation from interval means (E1a), not ordinary interpolation through point-valued samples. The construction targets continuous interval-mean constraints; exact equality of discrete output arithmetic means was not established. Boundary inputs act as adjacent buffer interval values in the wall/control formulas. Require at least two input intervals, matching positive subdivision counts and output storage of sum(nk). No size/status checks or recoverable solve flag are supplied. matsol substitutes a tiny value for a zero pivot and does not return conditioning information. Optional lower/upper/absolute/percentage adjustment branches are present but outside this unbounded-path review; their bounds and conservation are not certified. No mean-preservation or spline test was run.",
+            "evidence": [
+              {
+                "path": "newsplinemod.f90",
+                "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/newsplinemod.f90",
+                "sha256": "6e101a8e78b207f4acd705e67b7139a403d75f6be8004176c41a29fa364e7369"
+              },
+              {
+                "path": "utilitiesmod.f90",
+                "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/utilitiesmod.f90",
+                "sha256": "e3427b6d4c90fede4de131cd351b862d38ca5b3f4d409a5b57c391be7747eb9b"
+              },
+              {
+                "path": "parametersmod.f90",
+                "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/parametersmod.f90",
+                "sha256": "449b798b1ea7b9d0b8019ae1a7fbf348de87d5f175c78550283dd49cc3516239"
+              },
+              {
+                "path": "output_daily_final.f90",
+                "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/output_daily_final.f90",
+                "sha256": "a1fdb6b9edc2f58905d7facba83251af5c54dbab522befce432f8a5ebe1330f1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "newspline",
+                "role": "public-entry-point",
+                "summary": "Module subroutine taking real32 monthdata(:), int32 nk(:), real32 bcond(2) and caller-allocated real32 daydata(sum(nk)). Supply size(monthdata)=size(nk) >= 2 and nk > 0. bcond supplies the two buffer interval values used by the boundary construction. The reviewed call omits all optional limits. Names month/day describe the example, not a requirement for calendar data. No status flag is returned.",
+                "signature": "CALL newspline(monthdata, nk, bcond, daydata, alim, llim, ulim, plim)",
+                "declarations": [
+                  {
+                    "path": "newsplinemod.f90",
+                    "line_start": 30,
+                    "line_end": 37
+                  },
+                  {
+                    "path": "parametersmod.f90",
+                    "line_start": 7,
+                    "line_end": 8
+                  }
+                ],
+                "path": "newsplinemod.f90",
+                "line_start": 25,
+                "line_end": 309,
+                "module": "newsplinemod",
+                "examples": [
+                  {
+                    "path": "output_daily_final.f90",
+                    "line_start": 35,
+                    "line_end": 56
+                  }
+                ],
+                "usage": "use parametersmod, only: sp, i4\nuse newsplinemod, only: newspline\nreal(sp) :: means(3), boundary(2), samples(12)\ninteger(i4) :: subdivisions(3)\nmeans = 2.0_sp\nboundary = 2.0_sp\nsubdivisions = [4,4,4]\ncall newspline(means,subdivisions,boundary,samples)",
+                "usage_notes": "Uncompiled constant-data calling sketch of the unbounded path. The intended constant reconstruction is two; neither this nor nonconstant mean preservation was checked. Compile parametersmod, utilitiesmod and newsplinemod before the caller. Optional bounded adjustments, arbitrary singleton inputs and conditioning of the internal solve have not been validated."
+              },
+              {
+                "procedure": "matsol",
+                "module": "utilitiesmod",
+                "role": "implementation-evidence",
+                "path": "utilitiesmod.f90",
+                "line_start": 14,
+                "line_end": 106
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Root GNU GPL v3 notice; Numerical Recipes-derived utility terms unresolved",
+          "spdx_expression": null,
+          "revision": "1cc98c9966641ea1fc6f111bfc2846e55d1cca2e",
+          "reviewed_on": "2026-11-04",
+          "notes": "The root LICENSE supplies GNU GPL version 3, without an inspected version-only versus or-later project notice. utilitiesmod identifies matsol and findloc as adapted from Numerical Recipes in Fortran 90. Their upstream permissions/compatibility were not established by the root GPL text, so no project-wide SPDX expression is asserted. This records the evidence and unresolved component scope, not a determination of infringement.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "utilitiesmod.f90",
+              "url": "https://github.com/ARVE-Research/newspline/blob/1cc98c9966641ea1fc6f111bfc2846e55d1cca2e/utilitiesmod.f90",
+              "sha256": "e3427b6d4c90fede4de131cd351b862d38ca5b3f4d409a5b57c391be7747eb9b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -3791,12 +3996,134 @@
             ],
             "notes": "The README identifies ppr_1d, rcon1d and rmap1d with PCM/PLM/PPM/PQM and limiter variants. These are reconstruction/remapping components; their use inside transport examples is not treated as a general PDE solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "3c2246463d5de14f492139987bd84978b84e86ea",
+            "reviewed_on": "2026-11-04",
+            "notes": "The reviewed PCM path of ppr_1d reconstructs piecewise-constant cell profiles from cell means and remaps them by integrating profile/target-cell overlaps. rcon1d dispatches to pcm, which copies each cell mean as its constant coefficient; rmap1d/xmap1d selects that one-coefficient representation, and imap1d evaluates integral basis differences and divides the accumulated mass by target-cell width. A subsequent compensated-sum defect correction adjusts an extremal target mean. This establishes a degree-zero piecewise-polynomial reconstruction/remapping path in E1a; it is not point-sample interpolation or a standalone PDE integrator. Restrict this review to ndof=1, PCM, compatible monotone source/target edges over the same domain and positive cell widths. The higher-order PLM/PPM/PQM and limiter implementations were not fully reviewed. Workspaces and all option fields must be initialized; the init methods dereference opts even though declared optional. No conservation, positivity or remapping-accuracy test was run.",
+            "evidence": [
+              {
+                "path": "src/rcon1d.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/rcon1d.f90",
+                "sha256": "2e7c481b9453d2e6c36ecf8afc5741aa1bdb53ce0ca5018297c029b7e1c19070"
+              },
+              {
+                "path": "src/rmap1d.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/rmap1d.f90",
+                "sha256": "175c1e687a157de4972746dc5fd83b79918ec8be12d5bd4f763c0d580cb051e1"
+              },
+              {
+                "path": "src/ppr_1d.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/ppr_1d.f90",
+                "sha256": "7e4b1b037496538a28dfa7f7cdcb4a5c27dca71db03560d9e8a6d8c05b2fd622"
+              },
+              {
+                "path": "src/pcm.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/pcm.f90",
+                "sha256": "839848e3722f9b5a5b41b0ad0a45f11b17cf7ced6995b50e6e49ab67f58ff876"
+              },
+              {
+                "path": "src/bfun1d.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/bfun1d.f90",
+                "sha256": "0033caeef44a622a7a5350b3f8eede730df8825d4ca44a03ce91be73299b65a6"
+              },
+              {
+                "path": "example/ex_1.f90",
+                "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/example/ex_1.f90",
+                "sha256": "a99246f65c0d5b5211121cd1ecb43b42658b74243b7ee6b147a0cf0e00f37533"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rcon1d",
+                "role": "public-entry-point",
+                "summary": "Module routine reconstructing cell moments. For the reviewed PCM path, use ndof=1, opts%cell_meth=pcm_method and initialized work/options. fdat and fhat have shape (1,nvar,npos-1); delx is positive spacing, length one for uniform grids or npos-1 otherwise. Supply nvar-element boundary arrays even though PCM does not use their values. No status flag is returned.",
+                "signature": "CALL rcon1d(npos, nvar, ndof, delx, fdat, bclo, bchi, fhat, work, opts, tCPU)",
+                "declarations": [
+                  {
+                    "path": "src/rcon1d.f90",
+                    "line_start": 62,
+                    "line_end": 71
+                  },
+                  {
+                    "path": "src/ppr_1d.f90",
+                    "line_start": 95,
+                    "line_end": 118
+                  }
+                ],
+                "path": "src/rcon1d.f90",
+                "line_start": 38,
+                "line_end": 202,
+                "module": "ppr_1d"
+              },
+              {
+                "procedure": "rmap1d",
+                "role": "public-entry-point",
+                "summary": "Module conservative remapper using source/target edge coordinates, not cell centers. With reviewed PCM and ndof=1, fdat is (1,nvar,npos-1) and fnew is (1,nvar,nnew-1). Supply same-domain compatible edge arrays, rmap_work initialized for the source grid, rmap_opts and boundary arrays. Pass opts to work%init despite its optional declaration. Routine assumes valid shapes and geometry and returns no status.",
+                "signature": "CALL rmap1d(npos, nnew, nvar, ndof, xpos, xnew, fdat, fnew, bclo, bcup, work, opts, tCPU)",
+                "declarations": [
+                  {
+                    "path": "src/rmap1d.f90",
+                    "line_start": 65,
+                    "line_end": 76
+                  },
+                  {
+                    "path": "src/ppr_1d.f90",
+                    "line_start": 120,
+                    "line_end": 131
+                  }
+                ],
+                "path": "src/rmap1d.f90",
+                "line_start": 38,
+                "line_end": 100,
+                "module": "ppr_1d",
+                "usage": "use ppr_1d\ntype(rmap_work) :: work\ntype(rmap_opts) :: opts\ntype(rcon_ends) :: lower(1), upper(1)\nreal(dp) :: old_edges(3), new_edges(2), old_mean(1,1,2), new_mean(1,1,1)\nopts%edge_meth = p1e_method\nopts%cell_meth = pcm_method\nopts%cell_lims = null_limit\nopts%wall_lims = null_limit\nlower = rcon_ends(bcon_loose,0.0_dp,0.0_dp)\nupper = lower\nold_edges = [0.0_dp,1.0_dp,2.0_dp]\nnew_edges = [0.0_dp,2.0_dp]\nold_mean(1,1,:) = [1.0_dp,3.0_dp]\ncall work%init(3,1,opts)\ncall rmap1d(3,2,1,1,old_edges,new_edges,old_mean,new_mean, &\n            lower,upper,work,opts)\ncall work%free()",
+                "usage_notes": "Uncompiled PCM calling sketch; the analytic coarse-cell average is two. The inputs are cell means, and conservation compares width-weighted sums. Compile the module with preprocessing enabled and its included source files available; do not compile the include fragments as unrelated standalone modules. No higher-order limiter, transport example or numerical check is demonstrated."
+              },
+              {
+                "procedure": "pcm",
+                "module": "ppr_1d",
+                "role": "implementation-evidence",
+                "path": "src/pcm.f90",
+                "line_start": 38,
+                "line_end": 73
+              },
+              {
+                "procedure": "imap1d",
+                "module": "ppr_1d",
+                "role": "implementation-evidence",
+                "path": "src/rmap1d.f90",
+                "line_start": 260,
+                "line_end": 533
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom PPR research/noncommercial terms",
+          "spdx_expression": null,
+          "revision": "3c2246463d5de14f492139987bd84978b84e86ea",
+          "reviewed_on": "2026-11-04",
+          "notes": "The pinned license allows private/research/institutional use subject to its stated conditions, requires preservation of notices and availability/marking of modified versions, and requires direct arrangement with the author for commercial-system distribution. No standard permissive or GPL SPDX expression is asserted. Consult the pinned full terms for the intended use.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/LICENSE.md",
+              "sha256": "1875e2366bd072411894fae8f4257ecf11dcea02d951c01a1310114ba2e85fdf"
+            },
+            {
+              "path": "src/ppr_1d.f90",
+              "url": "https://github.com/dengwirda/PPR/blob/3c2246463d5de14f492139987bd84978b84e86ea/src/ppr_1d.f90",
+              "sha256": "7e4b1b037496538a28dfa7f7cdcb4a5c27dca71db03560d9e8a6d8c05b2fd622"
+            }
+          ]
         }
       },
       "imports": {}

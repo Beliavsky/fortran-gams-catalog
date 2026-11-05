@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-04. Thirty-six repositories now have fifty source-reviewed
+Reviewed on 2026-11-04. Thirty-nine repositories now have fifty-three source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,11 +13,11 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-Thirty-five repository cards now identify public routines and link their usage lines
-to pinned argument declarations. A thirty-sixth, DDFSA, identifies the supplied
+Thirty-eight repository cards now identify public routines and link their usage lines
+to pinned argument declarations. A thirty-ninth, DDFSA, identifies the supplied
 program entry point and keeps its benchmark harness among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All thirty-six independently source-reviewed repositories now have an
+separately. All thirty-nine independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -59,6 +59,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | NITSOL | External `nitsol` (square residual system; reviewed GMRES path) | No license identified in reviewed material |
 | JFNK-Hookstep | External `newtonhook`; state in module `newton` | GNU GPL version 3; version scope unresolved |
 | easydop853 | `easydop853_module::easydop853` | BSD-3-Clause and BSD-2-Clause component notices |
+| fortran-rbf | `rbf_mod::rbf_type%build` (stencil matrices, not data-value evaluation) | No license identified in reviewed material |
+| PPR | `ppr_1d::rcon1d`, `::rmap1d` (reviewed PCM path) | Custom research/noncommercial terms |
+| newspline | `newsplinemod::newspline` (reviewed unbounded path) | Root GPL v3; Numerical Recipes utility terms unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -114,6 +117,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [NITSOL](https://github.com/cmacmackin/nitsol) | F2 | Inexact Newton driver, GMRES products/corrections and residual backtracking | Small-step termination need not satisfy residual tolerance. Caller workspace, callbacks, common blocks and linked block-data defaults require care; other Krylov implementations not reviewed. |
 | [JFNK-Hookstep](https://github.com/apwillis1/JFNK-Hookstep) | F2 | Newton trust-radius trials, GMRES and SVD-regularized hookstep | Caller supplies Jacobian action and shared-state initialization. GMRES flag overwritten in Newton wrapper; zero-norm normalization guards need checking. Some failures STOP. |
 | [easydop853](https://github.com/GasinAn/easydop853) | I1a1a | Fixed-configuration wrapper and explicit adaptive DOP853 stage path | Fixed tolerances/step limit, endpoint-only output and ERROR STOP on failure. Stiffness detection does not establish stiff integration. |
+| [fortran-rbf](https://github.com/dongli/fortran-rbf) | E3 | Local RBF matrix/inverse construction and stored derivative matrices | No fitted-value API, y unused. LAPACK build required; polynomial B initialization, node-ten debug output and Gaussian second derivative need correction/checking. |
+| [PPR](https://github.com/dengwirda/PPR) | E1a | Piecewise-constant reconstruction, overlap integration and conservation-defect correction | Reviewed PCM with one mean per cell only. Matching domains/valid edge grids, initialized options and workspace required. Higher-order methods not fully reviewed. |
+| [newspline](https://github.com/ARVE-Research/newspline) | E1a | Interval-mean control construction and unbounded cubic Hermite sampling | Requires >= 2 intervals and positive subdivision counts. Continuous constraints do not prove exact discrete sample means; optional bounded branches unverified. |
 
 [G2i](https://gams.nist.gov/cgi-bin/serve.cgi/Class/G2i) covers global solution
 to nonconvex optimization problems and has no subclasses.
@@ -240,3 +246,14 @@ author template rather than automatically constructed by the core.
 The easydop853 entry records its fixed tolerances and callback object argument,
 and distinguishes stiffness detection from stiff-system capability.
 These are source reviews and uncompiled calling fragments, not checked drivers.
+
+## Cell means, interval means and RBF services
+
+PPR's reviewed inputs are cell means and edge coordinates, while newspline's
+inputs describe interval means and subdivision counts. Their sketches do not
+treat those values as ordinary point samples. The PPR mapping is restricted to
+the inspected PCM path and newspline to the unbounded path.
+The fortran-rbf entry is scoped to E3 interpolation services: it exposes stencil
+matrices, not a complete data-fitting or arbitrary-query value API. Its source
+findings preclude presenting all advertised derivative/polynomial paths as
+checked algorithms. No upstream code or calling sketch was compiled or run.
