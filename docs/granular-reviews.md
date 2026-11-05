@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 116 repositories now have 136 source-reviewed
+Reviewed on 2026-11-05. 124 repositories now have 146 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-112 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Four further cards?DDFSA, CWT, polyfit and
-StatTools?identify supplied program entry points and keep their internal/benchmark
+120 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Four further cards (DDFSA, CWT, polyfit and
+StatTools) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 116 independently source-reviewed repositories now have an
+separately. All 124 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -140,6 +140,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | mtprng | `mtprng::mtprng_init`, `::mtprng_rand_real2` | Original custom notices and GPL-3.0-or-later modifications |
 | sobseq | `mod_sobseq::sobol_state%initialize`, `%next`, `%skip_ahead` | MIT |
 | pcg-fortran | `pcg_fortran::pcg_state_oneseq_64_type%random_number_xsh_rr` | MIT |
+| Fortran-parallel-sort | `mod_sort::parallel_sort` (REAL(8) passive ranking) | Root CC0; ORDERPACK component scope unresolved |
+| Fortran-Timsort | `tim_sort_mod::sort` (INTEGER(INT32), no history) | MIT |
+| fsort | `fsort_mod::fsort` (repair required) | No license identified in reviewed material |
+| HeapSort | `heap_sort_module::heap_sort` | BSD-3-Clause |
+| Fortran-Iterative-Quicksort | `sorting_module::quicksort` (integer and real overloads) | Informal README permission |
+| Fortran-quicksort | `qsort_mod::indexx`, `::quick_sort_in_place` (real overloads) | MIT root; adapted-source scope unresolved |
+| numerical-analysis | `numa__integrate::simpson_integrator_vals` | BSD-3-Clause with component notices |
+| INTEGRAL | `integral_core::adaptive_integrator%integrate` | GPL v3 text; component/version scope unresolved |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -267,7 +275,6 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [TRDF](https://github.com/fsobral/TRDF) | G2h3b | Feasibility/model/subproblem dispatch and trust-region outer iteration | Linked evaluators and constrained solver; fixed limits/COMMON state. Inconsistent CALFUN arity and early-output risks require checked repair. No termination flag. |
 | [DFO mirror](https://github.com/jacobwilliams/dfo) | G2h3b | Input/scaling/interpolation setup and constrained trust-region solver dispatch | Legacy flat arrays, CHARACTER*256 and linked FUN; saved COMMON and default 50-dimensional model limits. Backend configuration/rights and INFO checks required. |
 | [LMBM](https://github.com/WilmerHenao/lmbm) | G1b2 | Workspace initialization, bundle/update dispatch and termination tests | Linked objective/subgradient; no callback argument. Default-REAL time buffers mixed with double work. Distinguish stationarity from progress/budget exits in IOUT(3). |
-
 | [polyfit](https://github.com/plopezrios/polyfit) | K1a1a2 | Independent polynomial fits via weighted normal equations and LAPACK symmetric inversion | Standalone program; internal helpers are not library APIs. Rank/scaling issues and skipped undersized data sets; other fitting branches unreviewed. |
 | [samplestat](https://github.com/haniibrahim/samplestat) | L1a1a; L1a1b | Direct arithmetic mean, N-1 sample variance and square-root standard deviation | Separate N must fit the vector. Raw-moment cancellation and absent validation/status; confidence routines unreviewed. |
 | [StatTools](https://github.com/AstroFloyd/StatTools) | L1a1 | Command-argument data summaries and dispatch to libSUFR median/stdev | Program, not a library. External statistical kernels unreviewed; zero-denominator and geometric-mean domain issues. |
@@ -276,6 +283,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [mtprng](https://github.com/pdebuyl/mtprng) | L6a21 | Explicit single-seed MT19937 and 32-bit-to-real scaling | Explicit initialization essential: default-state lazy seeding is unreachable. INT64 storage does not mean 64 random bits. |
 | [sobseq](https://github.com/daanvanvugt/sobseq) | L6a21 | Scalar Sobol coordinate, direction recurrence and Gray-code next/skip-ahead | Deterministic low-discrepancy sequence, not independent random draws. User direction parameters, default REAL rounding and unchecked exhaustion. |
 | [pcg-fortran](https://github.com/dscf-1224/pcg-fortran) | L6a21 | Fixed initialization and oneseq 64-state/32-output XSH-RR update | Raw signed bit words; modular overflow/narrowing depends on compiler behavior. Other variants and author C comparisons unverified. |
+| [Fortran-parallel-sort](https://github.com/cphyc/fortran-parallel-sort) | N6a1b | OpenMP chunk ranking and adjacent merges, REAL(8) input retained | One-based permutation; kind-8/REAL64 agreement and OpenMP configuration required. Tiny/chunk-edge cases and scaling unverified. |
+| [Fortran-Timsort](https://github.com/suzuyuyuyu/fortran-timsort) | N6a2a | Generated INT32 run detection, insertion extension and default shorter-run merging | Final-singleton overread risk; equal keys in reversed runs preclude a blanket stability claim. No history/real-path review. |
+| [fsort](https://github.com/snljty/fsort) | N6a2b | Size-selected insertion, quick partitioning and heapsort intent | Repair required: malformed IF statements, heap offsets ignoring beg and insertion guard lacking guaranteed short circuit. |
+| [HeapSort](https://github.com/SAG2021/HeapSort) | N6a2b | In-place maximum-heap construction/extraction with paired permutation swaps | Use C_SIZE_T/C_DOUBLE kinds. Actual permutation is sorted(i)=original(perm(i)), contrary to header formula. |
+| [Fortran-Iterative-Quicksort](https://github.com/mustafa-ayyub/Fortran-Iterative-Quicksort) | N6a2a; N6a2b | Caller-workspace iterative Lomuto quicksort, integer and default real | Insufficient stack silently drops ranges; use 2*N workspace. Last pivots retain quadratic cases; NaNs unsupported. |
+| [Fortran-quicksort](https://github.com/Beliavsky/Fortran-quicksort) | N6a1b; N6a2b | Pure real permutation sorting and overwrite-by-permutation wrapper | indexx returns identity on NaNs; overwrite wrapper lacks that guard. Automatic O(N) index storage; integer conversion path unreviewed. |
+| [numerical-analysis](https://github.com/jeffirwin/numerical-analysis) | H2a1b2 | Composite sampled Simpson 1/3 with final 3/8 panel for even counts | Uniform grid, >=3 odd or >=4 even samples required. No error estimate, validation or automatic refinement. |
+| [INTEGRAL](https://github.com/jchristopherson/integral) | H2a1a1 | Procedure-pointer wrapper and finite-interval DQAGS/DQAGSE adaptive-controller path | FERROR dependency; workspace-reuse flag and breakpoint-name findings require repair/checks. Numerical kernels not fully audited. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -452,3 +467,21 @@ intent and calling contract, without certifying distribution quality.
 StatTools delegates its median and standard-deviation kernels to libSUFR;
 that dependency was not audited in this batch. No upstream code or calling
 sketch in this batch was compiled or run.
+
+## Sorting contracts and sampled versus adaptive quadrature
+
+Passive sorting preserves values and returns a permutation; active sorting
+changes their order. Fortran-parallel-sort and the real `indexx` overload use
+passive mappings. HeapSort, Timsort and the iterative quicksort change values.
+Fortran-quicksort has both interfaces; its overwrite wrapper still uses O(N)
+index storage. HeapSort's paired swaps and author test establish the intended
+permutation convention in source, which differs from its header formula.
+
+Source mappings include repair findings rather than hiding them: fsort contains
+two malformed IF statements, Timsort run discovery can read past a final singleton,
+and iterative quicksort silently ignores pushes into an undersized stack.
+Usage sketches state their preconditions and do not assert successful execution.
+The two quadrature cards distinguish fixed-grid sampled Simpson rules from an
+adaptive callback wrapper. The latter retains workspace-reuse and breakpoint
+source findings, and depends on FERROR for reporting failures.
+No upstream routine or calling sketch in this batch was compiled or run.

@@ -2817,12 +2817,145 @@
             ],
             "notes": "The README separately documents definite integration and ODE initial-value examples. The two classifications describe different library facilities, not a claim that all integrators solve both problem types.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2a1a1",
+            "level": "source-reviewed",
+            "revision": "0ac990026652bdea64e8ba03af1fb497780a7641",
+            "reviewed_on": "2026-11-05",
+            "notes": "adaptive_integrator%integrate wraps a procedure-pointer integrand, allocates work storage, obtains tolerances and subdivision limits, and dispatches the no-breakpoint finite-interval path to DQAGS. DQAGS partitions workspace for DQAGSE, whose inspected controller bisects high-error subintervals, calls DQK21 and uses DQELG extrapolation/error ordering. H2a1a1 records automatic finite-interval callback quadrature, scoped to dispatch and adaptive controller rather than an audit of every numerical kernel. Defaults are absolute/relative tolerance 1e-8 and ten subdivisions. Source concerns remain: ai_init can read an unassigned local flag when reusing adequate existing workspace; the separate breakpoint call passes bare iwork/work names instead of the declared object components. That breakpoint path is not validated here. Output info contains estimated error/evaluation/subinterval counts, while failures are reported through FERROR. No upstream library, example or numerical accuracy check was built/run.",
+            "evidence": [
+              {
+                "path": "src/integral_adaptive_integrator.f90",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/integral_adaptive_integrator.f90",
+                "sha256": "e5b9c2a54fcef1d33c764b6c36e25a09280ddc4b5d12f98ad0860593a9e4e9e4"
+              },
+              {
+                "path": "src/integral_core.f90",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/integral_core.f90",
+                "sha256": "1ffc2a308e88a41b51149daa70efec6951b6ddaf3ac7c87837e600e63e141ee3"
+              },
+              {
+                "path": "src/integral_integrator_base.f90",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/integral_integrator_base.f90",
+                "sha256": "7535eaf7ac0764a868cc596a59d53c11431d2c98c0106826f98b03e211fddd62"
+              },
+              {
+                "path": "src/QUADPACK/dqags.f",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/QUADPACK/dqags.f",
+                "sha256": "53642bc1c5a0d83a3d2f4ce4d05355ceb6198ea4ae86dab3ddb532a4c671490c"
+              },
+              {
+                "path": "src/QUADPACK/dqagse.f",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/QUADPACK/dqagse.f",
+                "sha256": "6d1c3ae36964cfd904a5bc5282f4c87431ed2a1fa4531dc25be9ae8041aaecac"
+              },
+              {
+                "path": "examples/integral_example_1.f90",
+                "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/examples/integral_example_1.f90",
+                "sha256": "b261c0a1b33c9e1eb4b0d73d91aebc63d9090527279d47249321edff334349fb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "integrate",
+                "role": "public-entry-point",
+                "summary": "Public REAL(real64) function binding taking a procedure(integrand) POINTER, scalar a/b, optional integration_behavior output and optional FERROR errors object. Use a fresh adaptive_integrator and the default no-breakpoint mode for the reviewed usage; repair/build-check the recorded source findings before relying on this pinned revision.",
+                "signature": "area = integrator%integrate(fcn, a, b [, info, err])",
+                "declarations": [
+                  {
+                    "path": "src/integral_core.f90",
+                    "line_start": 47,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "src/integral_core.f90",
+                    "line_start": 133,
+                    "line_end": 137
+                  },
+                  {
+                    "path": "src/integral_core.f90",
+                    "line_start": 709,
+                    "line_end": 716
+                  },
+                  {
+                    "path": "src/integral_core.f90",
+                    "line_start": 211,
+                    "line_end": 218
+                  }
+                ],
+                "path": "src/integral_adaptive_integrator.f90",
+                "line_start": 66,
+                "line_end": 175,
+                "module": "integral_core",
+                "derived_type": "adaptive_integrator",
+                "examples": [
+                  {
+                    "path": "examples/integral_example_1.f90",
+                    "line_start": 4,
+                    "line_end": 37
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse integral_core, only: adaptive_integrator, integrand, integration_behavior\nuse ferror, only: errors\ntype(adaptive_integrator) :: integrator\ntype(integration_behavior) :: info\ntype(errors) :: err\nprocedure(integrand), pointer :: fcn\nreal(real64) :: area\n! Define a compatible function square(x) in a module or CONTAINS section.\nfcn => square\narea = integrator%integrate(fcn, 0.0_real64, 1.0_real64, info, err)\nif (err%has_error_occurred()) error stop \"quadrature failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface fragment, not a complete buildable driver: supply square with REAL(real64) input INTENT(IN) and REAL(real64) result, and link INTEGRAL plus FERROR. Error-manager reporting behavior depends on FERROR configuration; info is not guaranteed assigned on an early failure. Error_estimate is an estimate, not a proven bound. Workspace reuse and breakpoint-source issues need repair/validation; the author example was not executed."
+              },
+              {
+                "procedure": "ai_init",
+                "role": "implementation-helper",
+                "path": "src/integral_adaptive_integrator.f90",
+                "line_start": 6,
+                "line_end": 63
+              },
+              {
+                "procedure": "DQAGS",
+                "role": "implementation-helper",
+                "path": "src/QUADPACK/dqags.f",
+                "line_start": 156,
+                "line_end": 188
+              },
+              {
+                "procedure": "DQAGSE",
+                "role": "implementation-helper",
+                "path": "src/QUADPACK/dqagse.f",
+                "line_start": 216,
+                "line_end": 444
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text; component/version scope unresolved",
+          "spdx_expression": null,
+          "revision": "0ac990026652bdea64e8ba03af1fb497780a7641",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies GPLv3 text; the reviewed README/interface source does not settle version-only versus or-later terms. The numerical wrapper bundles QUADPACK and depends on separately supplied FERROR; no complete dependency/license audit is implied by this scoped finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/LICENSE",
+              "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/README.md",
+              "sha256": "86b2a9dfd1e55f3ed86673c48bc5759b9fb310be73dcd76a0d17ff7f4d0183b9"
+            },
+            {
+              "path": "src/integral_core.f90",
+              "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/integral_core.f90",
+              "sha256": "1ffc2a308e88a41b51149daa70efec6951b6ddaf3ac7c87837e600e63e141ee3"
+            },
+            {
+              "path": "src/QUADPACK/dqags.f",
+              "url": "https://github.com/jchristopherson/integral/blob/0ac990026652bdea64e8ba03af1fb497780a7641/src/QUADPACK/dqags.f",
+              "sha256": "53642bc1c5a0d83a3d2f4ce4d05355ceb6198ea4ae86dab3ddb532a4c671490c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15797,12 +15930,107 @@
             ],
             "notes": "The documented integer-array interface returns indices ordering the input. Stability, scaling and support for other element types are not inferred from the generic library name.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a1b",
+            "level": "source-reviewed",
+            "revision": "671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10",
+            "reviewed_on": "2026-11-05",
+            "notes": "The inspected REAL(8) overload initializes an index permutation, ranks OpenMP chunks through the bundled REAL64 ORDERPACK-derived merge-ranker, offsets local indices, and repeatedly merges adjacent ranked chunks. A is INTENT(IN); A(order) is the intended ascending sequence. N6a1b records passive internal real sorting, not in-place value mutation. Review covers the REAL(8) wrapper, REAL64 ranker and outer merge, not the other overloads or a parallel scaling/stability proof. Kind 8 must match REAL64 on the compiler. Chunking uses omp_get_max_threads rather than an actual-team-size query, and tiny/empty inputs, large index arithmetic and oversubscribed chunk layouts have not been checked. No OpenMP build, permutation or timing was run.",
+            "evidence": [
+              {
+                "path": "mod_sort.f90",
+                "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/mod_sort.f90",
+                "sha256": "913a3d33acf2648824fc9009488ff3a60a48926214f30e8846936e51526b2277"
+              },
+              {
+                "path": "m_mrgrnk.f90",
+                "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/m_mrgrnk.f90",
+                "sha256": "1e5564d94088214523766f703a41977e9612615743b9c12b786afbce5ead60dc"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/README.md",
+                "sha256": "fa3ddb5040a30a646eb1202fd088b9cc92c337ab1fd932f7bb3c4f734cd86575"
+              },
+              {
+                "path": "test.f90",
+                "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/test.f90",
+                "sha256": "5130ccad666a8ed27b324343f2e03c96039ed9ce69ffaa7061a0ebbaa9bc681b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "parallel_sort",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for REAL(8) values and default-integer order(SIZE(A)). The input values are retained; use A(order) to obtain the sorted values and apply the same order to associated data. Compile m_mrgrnk before mod_sort and link the OpenMP runtime.",
+                "signature": "CALL parallel_sort(A, order)",
+                "declarations": [
+                  {
+                    "path": "mod_sort.f90",
+                    "line_start": 9,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "mod_sort.f90",
+                    "line_start": 134,
+                    "line_end": 138
+                  }
+                ],
+                "path": "mod_sort.f90",
+                "line_start": 134,
+                "line_end": 190,
+                "module": "mod_sort",
+                "usage": "use omp_lib, only: omp_set_dynamic, omp_set_num_threads\nuse mod_sort, only: parallel_sort\nreal(8) :: values(4), sorted(4)\ninteger :: order(4)\nvalues = [3.0d0, 1.0d0, 4.0d0, 2.0d0]\ncall omp_set_dynamic(.false.)\ncall omp_set_num_threads(2)\ncall parallel_sort(values, order)\nsorted = values(order)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch uses a nonempty input evenly divisible into two chunks; it does not validate arbitrary team/chunk configurations. Ensure REAL(8) matches the bundled REAL64 ranker. Use finite, non-NaN values and validate the returned permutation before applying it. No throughput, thread-safety or stable-tie claim is established."
+              },
+              {
+                "procedure": "D_merge",
+                "role": "implementation-helper",
+                "path": "mod_sort.f90",
+                "line_start": 194,
+                "line_end": 249,
+                "module": "mod_sort"
+              },
+              {
+                "procedure": "D_mrgrnk",
+                "role": "implementation-helper",
+                "path": "m_mrgrnk.f90",
+                "line_start": 220,
+                "line_end": 418,
+                "module": "m_mrgrnk"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Root CC0-1.0; bundled ORDERPACK scope unresolved",
+          "spdx_expression": null,
+          "revision": "671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE is CC0 1.0 Universal. The bundled m_mrgrnk source attributes ORDERPACK to Michel Olagnon and links the upstream ranking site, without an independent grant in the reviewed file. Record the root dedication and the third-party attribution separately; no complete relicensing/permission audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/LICENSE",
+              "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+            },
+            {
+              "path": "mod_sort.f90",
+              "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/mod_sort.f90",
+              "sha256": "913a3d33acf2648824fc9009488ff3a60a48926214f30e8846936e51526b2277"
+            },
+            {
+              "path": "m_mrgrnk.f90",
+              "url": "https://github.com/cphyc/Fortran-parallel-sort/blob/671ff4f67cf2f9cb9b9df8ad221f18aa23cfbf10/m_mrgrnk.f90",
+              "sha256": "1e5564d94088214523766f703a41977e9612615743b9c12b786afbce5ead60dc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15842,12 +16070,136 @@
             ],
             "notes": "The README identifies the algorithm and compiler presets. Stability, worst-case behavior and supported types require source/driver checks rather than relying solely on the algorithm name.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a2a",
+            "level": "source-reviewed",
+            "revision": "58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71",
+            "reviewed_on": "2026-11-05",
+            "notes": "The committed generated INTEGER(INT32) no-history overload dispatches small arrays to binary insertion sort, detects ascending/descending runs, extends short runs, maintains a run stack and merges it. The default OPTMLVL=1 merge copies the shorter run and merges forwards/backwards; OPTMLVL=0 is the simple merge. This supports active internal integer sorting N6a2a. Private tsort_int32 is reached through public sort. Source findings qualify the implementation: run discovery reads array(start_+1) without guarding a final singleton run; descending runs admit equal keys before reversal, so stable tie ordering is not established. Module-wide gallop variables are reset on calls, so do not assume reentrancy. History, real overloads, optimization-level 2 and asymptotic/performance claims were not verified, and no sort was executed.",
+            "evidence": [
+              {
+                "path": "src/tim-sort.F90",
+                "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/src/tim-sort.F90",
+                "sha256": "df9ae81a36dc6627c9a99724130b7fb9ca544a7b66f0fb8bb46f028f1cc36964"
+              },
+              {
+                "path": "src/tim-sort.fypp",
+                "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/src/tim-sort.fypp",
+                "sha256": "16bebe1d84e65ed4595806b98f50aa1f47702b9f718143e0b163bb25252217f4"
+              },
+              {
+                "path": "src/bisort.fypp",
+                "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/src/bisort.fypp",
+                "sha256": "e2ac71d4eacafc98697d84a1d87015760f14156ddd89918575ff3767073d8096"
+              },
+              {
+                "path": "src/common.fypp",
+                "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/src/common.fypp",
+                "sha256": "c11f10d7f882b19c1b93a81f2523bc92d547c829307edc04a88802ff193d7024"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/README.md",
+                "sha256": "750da7fb45cd1df2bf3f7104d73614c1cc5df64bf1076486f174edc3d9342d58"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sort",
+                "role": "public-entry-point",
+                "summary": "Public generic sort, shown for an INTEGER(INT32) vector without history. Values are changed in place; optional reverse=.true. reverses the final order. The defining specific is private. The sketch deliberately uses the small-array binary-insertion path; larger run-discovery paths need the recorded boundary finding resolved.",
+                "signature": "CALL sort(arr [, reverse])",
+                "declarations": [
+                  {
+                    "path": "src/tim-sort.F90",
+                    "line_start": 45,
+                    "line_end": 60
+                  },
+                  {
+                    "path": "src/tim-sort.F90",
+                    "line_start": 1044,
+                    "line_end": 1052
+                  },
+                  {
+                    "path": "src/tim-sort.F90",
+                    "line_start": 119,
+                    "line_end": 120
+                  }
+                ],
+                "path": "src/tim-sort.F90",
+                "line_start": 1044,
+                "line_end": 1100,
+                "module": "tim_sort_mod",
+                "usage": "use iso_fortran_env, only: int32\nuse tim_sort_mod, only: sort\ninteger(int32) :: values(4)\nvalues = [3_int32, 1_int32, 4_int32, 2_int32]\ncall sort(values)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The committed .F90 file requires preprocessing; the author CMake configuration builds it. This four-element sketch exercises the <=32 insertion branch, not the larger-array run/merge path. Resolve the possible final-singleton overread and validate desired tie behavior before general use. History tracking and real/NaN ordering are outside this review."
+              },
+              {
+                "procedure": "merge_runs_opt_int32",
+                "role": "implementation-helper",
+                "path": "src/tim-sort.F90",
+                "line_start": 1271,
+                "line_end": 1345,
+                "module": "tim_sort_mod"
+              },
+              {
+                "procedure": "merge_collapse_int32",
+                "role": "implementation-helper",
+                "path": "src/tim-sort.F90",
+                "line_start": 1392,
+                "line_end": 1422,
+                "module": "tim_sort_mod"
+              },
+              {
+                "procedure": "merge_at_int32",
+                "role": "implementation-helper",
+                "path": "src/tim-sort.F90",
+                "line_start": 1432,
+                "line_end": 1460,
+                "module": "tim_sort_mod"
+              },
+              {
+                "procedure": "find_ascending_range_int32",
+                "role": "implementation-helper",
+                "path": "src/tim-sort.F90",
+                "line_start": 1462,
+                "line_end": 1483,
+                "module": "tim_sort_mod"
+              },
+              {
+                "procedure": "bisort_int32",
+                "role": "implementation-helper",
+                "path": "src/tim-sort.F90",
+                "line_start": 7434,
+                "line_end": 7468,
+                "module": "tim_sort_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE and generated defining source carry MIT notices. Review is scoped to the selected generated integer branch, not every generated kind or build dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/LICENSE",
+              "sha256": "796cacd5170dd9db33716dcaf15394f5411e1db3ebd1d9497250f8fbe5b5cf64"
+            },
+            {
+              "path": "src/tim-sort.F90",
+              "url": "https://github.com/suzuyuyuyu/fortran-timsort/blob/58785fe0d93ec6a0e75d9791bdd3eb43bd2eec71/src/tim-sort.F90",
+              "sha256": "df9ae81a36dc6627c9a99724130b7fb9ca544a7b66f0fb8bb46f028f1cc36964"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15889,12 +16241,88 @@
             ],
             "notes": "The README documents real(kind=8) ascending order by default and source edits for other kinds, comparators or direction. These alternatives are not presented as a ready-made generic runtime API.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The source expresses an active REAL(8) sort with insertion sort for lengths <=8, recursive quick partitioning for intermediate sizes, and heap sorting for lengths >=8192. N6a2b records that real-array sorting intent, with repair required rather than a successfully compilable API claim. Both heap-branch IF statements at lines 65 and 88 are missing a closing parenthesis. The heap indices are relative to array element 1 instead of beg; insertion uses a compound .AND. guard that does not guarantee short-circuit protection for arr(j) after j falls below beg. Values/order should not be relied upon until these findings are resolved and checked. No compiler or sort was run.",
+            "evidence": [
+              {
+                "path": "fsort.f90",
+                "url": "https://github.com/snljty/fsort/blob/cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0/fsort.f90",
+                "sha256": "4424b46903557d9978c9963433eef2a5ca1aa1e137cbf1ee0a3e7c28bfc8be5b"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/snljty/fsort/blob/cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0/README.md",
+                "sha256": "9d3ec85c0cb506662d2f12a9dfdc46e232115dfbe333698d156252fed42d8b91"
+              },
+              {
+                "path": "test.f90",
+                "url": "https://github.com/snljty/fsort/blob/cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0/test.f90",
+                "sha256": "b553801c2f7c09a031802a8c75c7679ccd77347cc9c07a21e8176bbab9737a56"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fsort",
+                "role": "public-entry-point",
+                "summary": "Public REAL(KIND=8) assumed-size array subroutine with inclusive default-integer beg/end indices. Intended ascending in-place sorting. The pinned source has apparent syntax errors and index/guard concerns; the usage is an interface sketch for repair work, not a ready-to-build example.",
+                "signature": "CALL fsort(arr, beg, end)",
+                "declarations": [
+                  {
+                    "path": "fsort.f90",
+                    "line_start": 15,
+                    "line_end": 17
+                  },
+                  {
+                    "path": "fsort.f90",
+                    "line_start": 32,
+                    "line_end": 38
+                  }
+                ],
+                "path": "fsort.f90",
+                "line_start": 32,
+                "line_end": 132,
+                "module": "fsort_mod",
+                "examples": [
+                  {
+                    "path": "test.f90",
+                    "line_start": 3,
+                    "line_end": 22
+                  }
+                ],
+                "usage": "use fsort_mod, only: fsort\nreal(kind=8) :: values(4)\nvalues = [3.0d0, 1.0d0, 4.0d0, 2.0d0]\n! Resolve the pinned source findings before compiling/using.\ncall fsort(values, 1, size(values))",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Not presented as a working driver: the two malformed heap IF statements prevent normal parsing even when another branch would execute. Repair and validate the compound insertion guard, recursive subranges and heap offsets. Numeric kind 8 is compiler dependent. No descending option exists in this interface; the README proposes editing source comparisons."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0",
+          "reviewed_on": "2026-11-05",
+          "notes": "No separately named license file appears in the pinned tree and no grant was identified in the reviewed README or defining module. Public source access and build instructions do not establish redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/snljty/fsort/blob/cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0/README.md",
+              "sha256": "9d3ec85c0cb506662d2f12a9dfdc46e232115dfbe333698d156252fed42d8b91"
+            },
+            {
+              "path": "fsort.f90",
+              "url": "https://github.com/snljty/fsort/blob/cd3a835eae7dfd65f6d2ad543a4a62f6d1f198f0/fsort.f90",
+              "sha256": "4424b46903557d9978c9963433eef2a5ca1aa1e137cbf1ee0a3e7c28bfc8be5b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15933,12 +16361,99 @@
             ],
             "notes": "The README documents the permutation convention and an author ordering/permutation test. Those tests have not been run for this catalog; stability and arbitrary-type support are not asserted.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "d77f88fb063944bade22b3f24ae297787434d8fc",
+            "reviewed_on": "2026-11-05",
+            "notes": "heap_sort builds a maximum heap by downward sifting, repeatedly swaps the root with the shrinking last element and sifts again. Data values are overwritten in ascending order, supporting active real sorting N6a2b. Optional permutation labels start as 1:N and follow the same swaps, so sorted(i)=original(perm(i)); this is also the relation tested in the author driver and is the inverse convention to the header formula sorted(perm(n))=unsorted(n). The size argument and permutation must match storage, C_SIZE_T/C_DOUBLE kinds must be respected, and index/size overflow and NaN ordering are not checked. No stability, performance or executed correctness claim is made.",
+            "evidence": [
+              {
+                "path": "heapsort.f90",
+                "url": "https://github.com/sag2021/heapsort/blob/d77f88fb063944bade22b3f24ae297787434d8fc/heapsort.f90",
+                "sha256": "a2fa15094f25dcfeac1cf3cdb3d3e950abf3025038bee643677953b9c521996a"
+              },
+              {
+                "path": "test.f90",
+                "url": "https://github.com/sag2021/heapsort/blob/d77f88fb063944bade22b3f24ae297787434d8fc/test.f90",
+                "sha256": "648bc64def84f2133469cd412f884cd9ee6e16f7b6476aea43e8bafb98139bb9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "heap_sort",
+                "role": "public-entry-point",
+                "summary": "Public in-place REAL(HEAP_SORT_REAL=C_DOUBLE) heapsort with INTEGER(HEAP_SORT_INT=C_SIZE_T) nsize and optional perm(nsize). The returned perm maps each sorted position to its original input position, not the reverse mapping printed in the source header.",
+                "signature": "CALL heap_sort(data_in, nsize [, perm])",
+                "declarations": [
+                  {
+                    "path": "heapsort.f90",
+                    "line_start": 59,
+                    "line_end": 69
+                  },
+                  {
+                    "path": "heapsort.f90",
+                    "line_start": 82,
+                    "line_end": 96
+                  }
+                ],
+                "path": "heapsort.f90",
+                "line_start": 82,
+                "line_end": 131,
+                "module": "heap_sort_module",
+                "examples": [
+                  {
+                    "path": "test.f90",
+                    "line_start": 14,
+                    "line_end": 47
+                  }
+                ],
+                "usage": "use heap_sort_module, only: heap_sort, HEAP_SORT_REAL, HEAP_SORT_INT\nreal(HEAP_SORT_REAL) :: values(4), original(4)\ninteger(HEAP_SORT_INT) :: order(4)\nvalues = [3.0_HEAP_SORT_REAL, 1.0_HEAP_SORT_REAL, &\n          4.0_HEAP_SORT_REAL, 2.0_HEAP_SORT_REAL]\noriginal = values\ncall heap_sort(values, int(size(values), HEAP_SORT_INT), order)\n! Intended relation: values == original(order).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the module integer kind for both nsize and perm; default INTEGER need not match. Provide finite values and matching array extents. Preserve original values if the permutation is needed later. The relation is inferred from paired swaps and the author test, not checked by running that test."
+              },
+              {
+                "procedure": "build_heap",
+                "role": "implementation-helper",
+                "path": "heapsort.f90",
+                "line_start": 135,
+                "line_end": 170,
+                "module": "heap_sort_module"
+              },
+              {
+                "procedure": "downshift",
+                "role": "implementation-helper",
+                "path": "heapsort.f90",
+                "line_start": 174,
+                "line_end": 331,
+                "module": "heap_sort_module"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "d77f88fb063944bade22b3f24ae297787434d8fc",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root BSD 3-Clause license agrees with the notice in the defining heapsort source. This review covers those notices, not a separate audit of all examples.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sag2021/heapsort/blob/d77f88fb063944bade22b3f24ae297787434d8fc/LICENSE",
+              "sha256": "4549c9620f4ebc2696cfa248061c390164295a7a0e6e74256f8f0b565b91685d"
+            },
+            {
+              "path": "heapsort.f90",
+              "url": "https://github.com/sag2021/heapsort/blob/d77f88fb063944bade22b3f24ae297787434d8fc/heapsort.f90",
+              "sha256": "a2fa15094f25dcfeac1cf3cdb3d3e950abf3025038bee643677953b9c521996a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15978,12 +16493,197 @@
             ],
             "notes": "The README identifies adaptation of Alan Miller code and includes sample ordering outputs. Author sample output is not a newly verified catalog driver or a performance comparison.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a1b",
+            "level": "source-reviewed",
+            "revision": "ae49eb1ba1fa8c1ac79a8e94ee33794df463b929",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public indexx real generic initializes indices, returns that identity permutation if ANY(ISNAN(xx)), and otherwise recursively quick-partitions indices with a small interchange-sort fallback. Values remain INTENT(IN); xx(order) is the intended ascending sequence. This supports passive internal real sorting N6a1b. The low-level public quick_sort instead expects caller-initialized valid indices and has no NaN guard. Equal-key stability is not promised. The integer overload converts to double-precision-valued keys and is outside this mapping; wide integer representability should not be inferred from it. No sort, compiler portability or million-element author example was executed.",
+            "evidence": [
+              {
+                "path": "qsort.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/qsort.f90",
+                "sha256": "283ca765fdcb6112941fb0e0ec46349ba2d3ad96b78d1d526f1e978d06091367"
+              },
+              {
+                "path": "kind.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/kind.f90",
+                "sha256": "30398fdd755a0a9546fcb0f2553f435c31d91aecab0e803915597588b5623017"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/README.md",
+                "sha256": "3c3acb0a4d052a6d5b9a8841326c17e1378c01a8669c09dd35f31a19f146af2f"
+              },
+              {
+                "path": "xqsort.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/xqsort.f90",
+                "sha256": "4a0b08332d9aa523b59d7b11b7f40db43b96ddb59ffac07adca1ba5599dd3d2b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "indexx",
+                "role": "public-entry-point",
+                "summary": "Public generic REAL(dp) function returning a default-integer ordering vector of SIZE(xx), leaving xx unchanged. dp=KIND(1.0d0). If any input is NaN, the function returns identity without an error flag rather than a sorted total order.",
+                "signature": "order = indexx(xx)",
+                "declarations": [
+                  {
+                    "path": "qsort.f90",
+                    "line_start": 4,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "qsort.f90",
+                    "line_start": 17,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "kind.f90",
+                    "line_start": 1,
+                    "line_end": 5
+                  }
+                ],
+                "path": "qsort.f90",
+                "line_start": 17,
+                "line_end": 27,
+                "module": "qsort_mod",
+                "examples": [
+                  {
+                    "path": "xqsort.f90",
+                    "line_start": 13,
+                    "line_end": 21
+                  }
+                ],
+                "usage": "use kind_mod, only: dp\nuse qsort_mod, only: indexx\nreal(dp) :: values(4), sorted(4)\ninteger :: order(4)\nvalues = [3.0_dp, 1.0_dp, 4.0_dp, 2.0_dp]\norder = indexx(values)\nsorted = values(order)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile kind.f90 before qsort.f90. The source uses ISNAN; check compiler support if requiring strict-standard compilation. Use finite inputs when expecting a sorted result. The low-level quick_sort requires initialized indices and does not supply the generic indexx NaN behavior. No stable-tie or integer-overload accuracy claim is made."
+              },
+              {
+                "procedure": "quick_sort_1",
+                "role": "implementation-helper",
+                "path": "qsort.f90",
+                "line_start": 50,
+                "line_end": 84,
+                "module": "qsort_mod"
+              },
+              {
+                "procedure": "interchange_sort",
+                "role": "implementation-helper",
+                "path": "qsort.f90",
+                "line_start": 86,
+                "line_end": 101,
+                "module": "qsort_mod"
+              }
+            ]
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "ae49eb1ba1fa8c1ac79a8e94ee33794df463b929",
+            "reviewed_on": "2026-11-05",
+            "notes": "quick_sort_in_place initializes an ordering vector, invokes the same internal index quicksort, then assigns list=list(order). This is an active real-array sort N6a2b, but uses O(N) automatic permutation storage rather than constant-extra-space in-place partitioning. Unlike indexx, this wrapper has no NaN check: NaN pivots can prevent scan termination before bounds are crossed. A finite-input precondition is necessary for the reviewed usage. Recursion, worst-case depth and equal-key stability were not tested. No output was generated for this catalog.",
+            "evidence": [
+              {
+                "path": "qsort.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/qsort.f90",
+                "sha256": "283ca765fdcb6112941fb0e0ec46349ba2d3ad96b78d1d526f1e978d06091367"
+              },
+              {
+                "path": "kind.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/kind.f90",
+                "sha256": "30398fdd755a0a9546fcb0f2553f435c31d91aecab0e803915597588b5623017"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/README.md",
+                "sha256": "3c3acb0a4d052a6d5b9a8841326c17e1378c01a8669c09dd35f31a19f146af2f"
+              },
+              {
+                "path": "xqsort.f90",
+                "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/xqsort.f90",
+                "sha256": "4a0b08332d9aa523b59d7b11b7f40db43b96ddb59ffac07adca1ba5599dd3d2b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "quick_sort_in_place",
+                "role": "public-entry-point",
+                "summary": "Public PURE REAL(dp) subroutine changing values to ascending order by allocating automatic index storage and gathering the result. The name describes overwriting the input, not O(1) auxiliary memory.",
+                "signature": "CALL quick_sort_in_place(list)",
+                "declarations": [
+                  {
+                    "path": "qsort.f90",
+                    "line_start": 29,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "kind.f90",
+                    "line_start": 1,
+                    "line_end": 5
+                  }
+                ],
+                "path": "qsort.f90",
+                "line_start": 29,
+                "line_end": 39,
+                "module": "qsort_mod",
+                "examples": [
+                  {
+                    "path": "xqsort.f90",
+                    "line_start": 13,
+                    "line_end": 21
+                  }
+                ],
+                "usage": "use kind_mod, only: dp\nuse qsort_mod, only: quick_sort_in_place\nreal(dp) :: values(4)\nvalues = [3.0_dp, 1.0_dp, 4.0_dp, 2.0_dp]\ncall quick_sort_in_place(values)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite non-NaN values. The indexx identity-return policy for NaNs does not apply here because this wrapper calls quick_sort directly. Automatic arrays scale with N and recursion needs sufficient stack/resources. Source review is not an executed sorting check."
+              },
+              {
+                "procedure": "quick_sort_1",
+                "role": "implementation-helper",
+                "path": "qsort.f90",
+                "line_start": 50,
+                "line_end": 84,
+                "module": "qsort_mod"
+              },
+              {
+                "procedure": "interchange_sort",
+                "role": "implementation-helper",
+                "path": "qsort.f90",
+                "line_start": 86,
+                "line_end": 101,
+                "module": "qsort_mod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; adapted-source attribution retained",
+          "spdx_expression": null,
+          "revision": "ae49eb1ba1fa8c1ac79a8e94ee33794df463b929",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE supplies an MIT grant. README attributes adaptation to Alan Miller qsort.f90; the reviewed module has no separate original grant. This finding records the root notice and adaptation provenance without auditing the linked original or asserting its terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/LICENSE",
+              "sha256": "dcd1724fcaa74c6373be2ef7a25ee4f7090cd9cf7099dd432cb972da83963643"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/README.md",
+              "sha256": "3c3acb0a4d052a6d5b9a8841326c17e1378c01a8669c09dd35f31a19f146af2f"
+            },
+            {
+              "path": "qsort.f90",
+              "url": "https://github.com/Beliavsky/Fortran-QuickSort/blob/ae49eb1ba1fa8c1ac79a8e94ee33794df463b929/qsort.f90",
+              "sha256": "283ca765fdcb6112941fb0e0ec46349ba2d3ad96b78d1d526f1e978d06091367"
+            }
+          ]
         }
       },
       "imports": {}
@@ -18671,12 +19371,193 @@
             ],
             "notes": "The README documents nonrecursive integer/real procedures and an allocation-free design. Its safety-critical and deterministic-resource claims are not treated as independent certification or a bound proved for every input.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "N6a2a",
+            "level": "source-reviewed",
+            "revision": "40275ee4ea92b09d4ded6af247ff3137a7647d93",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public quicksort generic dispatches the INTEGER overload to iterative range-stack processing and last-element Lomuto partitioning with <= comparisons. Values are sorted in place in ascending order. The stack is supplied by the caller, avoiding recursive calls and allocations in the core. push_pair silently ignores a range when two more stack slots do not fit, so an undersized stack can return partially unsorted data without a status flag; use the documented 2*N default-integer workspace. Last-element pivots retain quadratic worst cases for ordered/equal data; nonrecursive does not mean bounded linearithmic work. The other kind has its own mapping; no upstream sort/test or timing was run.",
+            "evidence": [
+              {
+                "path": "src/sorting_module.f90",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/src/sorting_module.f90",
+                "sha256": "adc767367b040c4fcae02a772ec2ed053e87c7b3e6da88ca4b96fa01b01390dc"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/README.md",
+                "sha256": "3a21e491ab40d5e7a6492d162b5ce0fff50174429a2fc3047c64f6228b993868"
+              },
+              {
+                "path": "test/run_tests.f90",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/test/run_tests.f90",
+                "sha256": "b5b67ecc664de4837594872e1555e3171128c3831f9189061cec7efec5183596"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "quicksort",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for default INTEGER values and a default-INTEGER work_stack. Both dummies are INTENT(INOUT); stack contents are scratch. For N>=2 use workspace of at least 2*N entries. Empty/singleton arrays return before stack use; there is no success/error output.",
+                "signature": "CALL quicksort(array, work_stack)",
+                "declarations": [
+                  {
+                    "path": "src/sorting_module.f90",
+                    "line_start": 8,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/sorting_module.f90",
+                    "line_start": 25,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/sorting_module.f90",
+                "line_start": 25,
+                "line_end": 55,
+                "module": "sorting_module",
+                "examples": [
+                  {
+                    "path": "test/run_tests.f90",
+                    "line_start": 26,
+                    "line_end": 42
+                  }
+                ],
+                "usage": "use sorting_module, only: quicksort\ninteger :: values(4)\ninteger :: stack(8)\nvalues = [3, 1, 4, 2]\ncall quicksort(values, stack)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide enough workspace: overflow is silently skipped rather than reported. The sketch uses the generic, not its private specific. Large 2*N allocation arithmetic needs caller checking; last-pivot degeneration can take quadratic time. No stable-tie or complexity guarantee was tested."
+              },
+              {
+                "procedure": "partition_int",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 92,
+                "line_end": 111,
+                "module": "sorting_module"
+              },
+              {
+                "procedure": "push_pair",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 137,
+                "line_end": 149,
+                "module": "sorting_module"
+              },
+              {
+                "procedure": "pop_pair",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 152,
+                "line_end": 161,
+                "module": "sorting_module"
+              }
+            ]
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "40275ee4ea92b09d4ded6af247ff3137a7647d93",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public quicksort generic dispatches the REAL overload to iterative range-stack processing and last-element Lomuto partitioning with <= comparisons. Values are sorted in place in ascending order. The stack is supplied by the caller, avoiding recursive calls and allocations in the core. push_pair silently ignores a range when two more stack slots do not fit, so an undersized stack can return partially unsorted data without a status flag; use the documented 2*N default-integer workspace. Last-element pivots retain quadratic worst cases for ordered/equal data; nonrecursive does not mean bounded linearithmic work. NaN handling is not defined for the default-REAL branch. The other kind has its own mapping; no upstream sort/test or timing was run.",
+            "evidence": [
+              {
+                "path": "src/sorting_module.f90",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/src/sorting_module.f90",
+                "sha256": "adc767367b040c4fcae02a772ec2ed053e87c7b3e6da88ca4b96fa01b01390dc"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/README.md",
+                "sha256": "3a21e491ab40d5e7a6492d162b5ce0fff50174429a2fc3047c64f6228b993868"
+              },
+              {
+                "path": "test/run_tests.f90",
+                "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/test/run_tests.f90",
+                "sha256": "b5b67ecc664de4837594872e1555e3171128c3831f9189061cec7efec5183596"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "quicksort",
+                "role": "public-entry-point",
+                "summary": "Public generic, shown for default REAL values and a default-INTEGER work_stack. Both dummies are INTENT(INOUT); stack contents are scratch. For N>=2 use workspace of at least 2*N entries. Empty/singleton arrays return before stack use; there is no success/error output.",
+                "signature": "CALL quicksort(array, work_stack)",
+                "declarations": [
+                  {
+                    "path": "src/sorting_module.f90",
+                    "line_start": 8,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/sorting_module.f90",
+                    "line_start": 60,
+                    "line_end": 62
+                  }
+                ],
+                "path": "src/sorting_module.f90",
+                "line_start": 60,
+                "line_end": 85,
+                "module": "sorting_module",
+                "examples": [
+                  {
+                    "path": "test/run_tests.f90",
+                    "line_start": 44,
+                    "line_end": 61
+                  }
+                ],
+                "usage": "use sorting_module, only: quicksort\nreal :: values(4)\ninteger :: stack(8)\nvalues = [3.0, 1.0, 4.0, 2.0]\ncall quicksort(values, stack)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide enough workspace: overflow is silently skipped rather than reported. The sketch uses the generic, not its private specific. Large 2*N allocation arithmetic needs caller checking; last-pivot degeneration can take quadratic time. Use finite non-NaN inputs; no total floating-point order is provided."
+              },
+              {
+                "procedure": "partition_real",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 114,
+                "line_end": 134,
+                "module": "sorting_module"
+              },
+              {
+                "procedure": "push_pair",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 137,
+                "line_end": 149,
+                "module": "sorting_module"
+              },
+              {
+                "procedure": "pop_pair",
+                "role": "implementation-helper",
+                "path": "src/sorting_module.f90",
+                "line_start": 152,
+                "line_end": 161,
+                "module": "sorting_module"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Informal README permission; no standard license identified",
+          "spdx_expression": null,
+          "revision": "40275ee4ea92b09d4ded6af247ff3137a7647d93",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README License section says \"Do whatever you want with it.\" No separately named LICENSE file appears in the pinned tree and no standard license/disclaimer was identified in the defining module. Retain the actual informal grant rather than assigning MIT/CC0 by inference.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/README.md",
+              "sha256": "3a21e491ab40d5e7a6492d162b5ce0fff50174429a2fc3047c64f6228b993868"
+            },
+            {
+              "path": "src/sorting_module.f90",
+              "url": "https://github.com/mustafa-ayyub/fortran-iterative-quicksort/blob/40275ee4ea92b09d4ded6af247ff3137a7647d93/src/sorting_module.f90",
+              "sha256": "adc767367b040c4fcae02a772ec2ed053e87c7b3e6da88ca4b96fa01b01390dc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31530,12 +32411,81 @@
             ],
             "notes": "The README identifies textbook exercises and FPM builds; the integration module documents quadrature and inherited rule tables. The broad quadrature mapping does not validate tolerances or imply that every textbook algorithm is implemented.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "5218aa8439405dd39fd9e1e2f7e3846850558a51",
+            "reviewed_on": "2026-11-05",
+            "notes": "simpson_integrator_vals integrates a vector of samples over a presumed uniformly spaced finite grid. Odd sample counts use composite Simpson 1/3; even counts use 1/3 up to the last four samples and a final 3/8 panel. H2a1b2 records nonautomatic quadrature from sampled data; no callback, adaptive error control or nonuniform-coordinate support is implied. At least three samples are needed for odd N and four for even N; the code does not validate these sizes, and N=1 divides by zero while small even counts address invalid elements. The routine returns only a scalar estimate and no error/status. Other integration, optimization and algebra routines remain outside this source review. No polynomial reference integral or upstream test was run.",
+            "evidence": [
+              {
+                "path": "src/integrate.F90",
+                "url": "https://github.com/JeffIrwin/numerical-analysis/blob/5218aa8439405dd39fd9e1e2f7e3846850558a51/src/integrate.F90",
+                "sha256": "3ae154dea4ff5e89e43fa842d76278e6c810753dc355d101fad8152758181dc3"
+              },
+              {
+                "path": "src/numerical-analysis.F90",
+                "url": "https://github.com/JeffIrwin/numerical-analysis/blob/5218aa8439405dd39fd9e1e2f7e3846850558a51/src/numerical-analysis.F90",
+                "sha256": "26729d82cbcc6c6a3fe98d7a2347d7c07314632269cca6a434d585856557ad45"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "simpson_integrator_vals",
+                "role": "public-entry-point",
+                "summary": "Public double-precision function in numa__integrate, re-exported by numa. Input yi is an assumed-shape vector of equally spaced function values including both endpoints; xmin/xmax are the corresponding interval endpoints. The number of samples selects the 1/3-only or mixed 1/3+3/8 rule.",
+                "signature": "area = simpson_integrator_vals(yi, xmin, xmax)",
+                "declarations": [
+                  {
+                    "path": "src/integrate.F90",
+                    "line_start": 51,
+                    "line_end": 61
+                  },
+                  {
+                    "path": "src/numerical-analysis.F90",
+                    "line_start": 17,
+                    "line_end": 30
+                  }
+                ],
+                "path": "src/integrate.F90",
+                "line_start": 51,
+                "line_end": 96,
+                "module": "numa__integrate",
+                "usage": "use numa__integrate, only: simpson_integrator_vals\ndouble precision :: y(5), area\n! Samples of x**2 at x=0, 0.25, 0.5, 0.75, 1.\ny = [0.0d0, 0.0625d0, 0.25d0, 0.5625d0, 1.0d0]\narea = simpson_integrator_vals(y, 0.0d0, 1.0d0)\n! Analytic reference is 1/3; no comparison was executed here.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the library with its preprocessing/include settings. Enforce a uniform grid and valid sample count yourself: no coordinate array, tolerance or status is supplied. Reversed endpoints change the sign algebraically; singular/discontinuous data and accuracy are not certified. Other integrator names in the same module do not inherit this review."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause; component notices retained",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "5218aa8439405dd39fd9e1e2f7e3846850558a51",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root LICENSE is BSD 3-Clause. The integration module attributes QUADPACK-derived rule tables and 3p/LICENSES records BSD notices for that material and SciPy. The reviewed sampled-Simpson path does not use those tables, but the containing source and distribution retain their notices; other bundled dependencies were not audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JeffIrwin/numerical-analysis/blob/5218aa8439405dd39fd9e1e2f7e3846850558a51/LICENSE",
+              "sha256": "7fd960eb0fa5410661d21df5c8f9371f5f224b7262ea79d063c6042551b9f083"
+            },
+            {
+              "path": "3p/LICENSES",
+              "url": "https://github.com/JeffIrwin/numerical-analysis/blob/5218aa8439405dd39fd9e1e2f7e3846850558a51/3p/LICENSES",
+              "sha256": "8a98844caabb3e2c3ce225dee1ec32018f50ef260a7a0aca6c48548aab5d1bea"
+            },
+            {
+              "path": "src/integrate.F90",
+              "url": "https://github.com/JeffIrwin/numerical-analysis/blob/5218aa8439405dd39fd9e1e2f7e3846850558a51/src/integrate.F90",
+              "sha256": "3ae154dea4ff5e89e43fa842d76278e6c810753dc355d101fad8152758181dc3"
+            }
+          ]
         }
       },
       "imports": {}
