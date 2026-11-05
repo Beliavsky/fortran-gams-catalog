@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 260 repositories now have 332 source-reviewed
+Reviewed on 2026-11-05. 268 repositories now have 344 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-253 repository cards now identify public routines and link their usage lines
+261 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 260 independently source-reviewed repositories now have an
+separately. All 268 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -284,6 +284,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ga_lib | `selection::selection_tournament`; `benchmark::solve` target-value search harness | MIT |
 | GARCH | `garch_mod::simulate_garch`, `obj_fun_mod::garch_sigma` | No explicit reuse grant identified |
 | EnKF_analysis | External scalar-observation `analysis`; `m_ensmean::ensmean`, `m_ensvar::ensvar` | MIT |
+| HiPPIS | `mod_adaptiveInterpolation::newtonPolyVal`, `mod_adaptiveInterpolation::divdiff`, `mod_adaptiveInterpolation::adaptiveInterpolation1D`, `mod_adaptiveInterpolation::adaptiveInterpolation2D` | No explicit reuse grant identified |
+| acepack | `supsmu` | Permissive Friedman notice; MIT package declaration |
+| SIGNAL | `signal::window_cos_`, `signal::apply_window_` | GNU GPL version 3 text |
+| leaps | `REGCF`, `CLEAR`, `INCLUD`, `TOLSET` | GPL-2.0-or-later (package declaration) |
+| mix | `ctrsc` | Unlimited (package declaration; no detailed grant reviewed) |
+| tweedie | `GaussAdaptive`, `GaussQuadrature` | GPL-2.0-or-later (package declaration) |
+| spam | `rowmeans`, `csrmsr` | Mixed package/component license declarations |
+| MCMC F90 | `mcmcrand::random_normal`, `mcmcrand::random_gamma` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -563,6 +571,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ga_lib](https://github.com/dacarnazzola/ga_lib) | G2i | Tournament parent selection and target-value evolutionary benchmark coordinator | Solver prints diagnostics rather than returning best point/status. Heterogeneous-bound initialization and concurrency semantics need follow-up. |
 | [GARCH](https://github.com/Beliavsky/garch) | L6a20; L10a2 | Gaussian GARCH(1,1) generation and observed-data conditional-volatility filtering | Both return standard deviations; initialization differs. Admissible parameters, nonempty inputs and cached RNG state matter. |
 | [EnKF_analysis](https://github.com/geirev/EnKF_analysis) | L10a2e; L1a1b | Selected scalar-observation ensemble Kalman update and per-state sample variance | Match real-8 caller/library/BLAS conventions. Analysis is not a full forecast/localization workflow; variance requires a supplied mean. |
+| [HiPPIS](https://github.com/ouermijudicael/HiPPIS) | E1b; E1a; E2a | Newton coefficients/evaluation, adaptive pieces and 2D tensor dispatch | Ascending distinct grids, minimum sizes and in-range queries required; preservation not validated. |
+| [acepack](https://github.com/vubiostat/acepack) | L8h | Weighted running-linear smoother dispatch and implementation | Periodic and terminal-tie indexing concerns; sketch selects strict increasing nonperiodic fixed-span data. |
+| [SIGNAL](https://github.com/i-a-morozov/SIGNAL) | L10a1d | Cosine-power taper generation and interleaved-complex taper application | Build parent/submodules consistently; no spectrum/leakage validation or all-dependency audit. |
+| [leaps](https://github.com/cran/leaps) | L8c1b1 | Raw-row orthogonal reduction and coefficient recovery | Not a full subset-search audit; design rows overwritten and rank/tolerance choices matter. |
+| [mix](https://github.com/cran/mix) | L1a1 | Observed-column means, divisor-N scales and in-place standardization | Exact missing sentinel; all-missing means undefined; cancellation possible. |
+| [tweedie](https://github.com/PeterKDunn/tweedie) | H2a2 | Fixed/adaptive finite quadrature for built-in inversion integrands | Requires initialized distribution globals; not a user-callback integrator or complete density audit. |
+| [spam](https://github.com/cran/spam) | L1a1a; D1b9 | Sparse-row arithmetic means and CSR-to-MSR conversion | Initialize output means; validate pointers and unique diagonals; mixed component terms. |
+| [MCMC F90](https://github.com/mjlaine/mcmcf90) | L6a14; L6a7 | Polar normal and Marsaglia-Tsang gamma variates | Gamma B is scale; cached normal state complicates reseeding/concurrency; no statistical test. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1084,3 +1100,10 @@ simulation from observed-return variance recurrence and return standard deviatio
 The GA coordinator targets a supplied objective value and returns printed diagnostics;
 its initialization and concurrent counters remain review limitations. All new
 calling sketches are uncompiled and unrun.
+
+The statistical/interpolation interfaces distinguish standalone numerical components
+from package-wide runtime dependencies. In particular, sparse mean outputs need
+initialization, gamma scale differs from rate, and Tweedie quadrature requires
+prepared distribution state. ACEPACK periodic and terminal-tie indexing concerns
+are recorded as source findings, with strictly increasing nonperiodic data in the
+calling sketch. None of these new sketches was compiled or run.

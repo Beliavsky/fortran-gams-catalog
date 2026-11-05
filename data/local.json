@@ -1866,12 +1866,174 @@
             ],
             "notes": "The README documents one-, two- and three-dimensional tensor-product mesh examples. This mapping is for interpolation, not every physical model in its demonstrations.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "33f3aee7d82e4d2125abc9524753678beb5411b6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public DIVDIFF builds the triangular table of Newton divided differences; NEWTONPOLYVAL evaluates supplied Newton coefficients by nested multiplication. These are univariate polynomial interpolation components, separate from adaptive positivity/boundedness selection. Require distinct finite abscissae, 0<=D<N and initialized coefficient entries: trailing unused triangular cells in TABLE are not assigned. No duplicate-node guard, condition estimate or numerical error bound is supplied. The sketch uses the fully defined first row of a degree-two divided-difference table.",
+            "evidence": [
+              {
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "url": "https://github.com/ouermijudicael/HiPPIS/blob/33f3aee7d82e4d2125abc9524753678beb5411b6/Fortran/Src/mod_adaptiveInterpolation.F90",
+                "sha256": "706575f5b962b55cee43eac59892b1567870c382c05b013d018a995119c73632"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "newtonPolyVal",
+                "role": "public-entry-point",
+                "summary": "Public module scalar Newton-polynomial evaluator; U holds Newton coefficients, not sampled y values.",
+                "signature": "CALL newtonPolyVal(X,U,D,XOUT,YOUT)",
+                "declarations": [
+                  {
+                    "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                    "line_start": 116,
+                    "line_end": 133
+                  },
+                  {
+                    "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                    "line_start": 28,
+                    "line_end": 32
+                  }
+                ],
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 116,
+                "line_end": 141,
+                "module": "mod_adaptiveInterpolation",
+                "usage": "use mod_adaptiveInterpolation, only: dp,divdiff,newtonPolyVal\nreal(dp) :: x(3),y(3),table(3,3),estimate\nx=[0.0_dp,1.0_dp,2.0_dp]; y=x*x\ncall divdiff(x,y,3,2,table)\ncall newtonPolyVal(x,table(1,:),2,0.5_dp,estimate)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Only valid triangular table entries may be read. The first row supplies all coefficients for this three-node polynomial. Noncontiguous TABLE(1,:) may require an array temporary. No interpolation residual or stability test was run."
+              },
+              {
+                "procedure": "divdiff",
+                "role": "public-entry-point",
+                "summary": "Public module divided-difference table builder. Trailing triangular storage is left undefined.",
+                "signature": "CALL divdiff(X,Y,N,D,TABLE)",
+                "declarations": [
+                  {
+                    "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                    "line_start": 76,
+                    "line_end": 99
+                  }
+                ],
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 76,
+                "line_end": 114,
+                "module": "mod_adaptiveInterpolation"
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "33f3aee7d82e4d2125abc9524753678beb5411b6",
+            "reviewed_on": "2026-11-05",
+            "notes": "ADAPTIVEINTERPOLATION1D constructs per-interval Newton polynomials using divided differences, expanding the stencil while the selected boundedness/positivity inequalities admit points, and evaluates at ordered output locations. INTERPOLATION_TYPE=1 selects data-bounded and 2 positivity-oriented constraints; DEG reports selected degrees. Require increasing distinct input/output coordinates, N>=3 (endpoint slopes read Y(3)), 1<=DEGREE<N and in-range queries for preservation claims. A header comment reverses input ordering, but source checks and interval comparisons require ascending order. Extrapolation explicitly loses the advertised preservation. The code may STOP on invalid coordinate ordering and does not return a success/status flag. This review covers stencil selection, interface and evaluation structure, not a proof that all bound conditions or floating-point corner cases preserve the advertised property.",
+            "evidence": [
+              {
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "url": "https://github.com/ouermijudicael/HiPPIS/blob/33f3aee7d82e4d2125abc9524753678beb5411b6/Fortran/Src/mod_adaptiveInterpolation.F90",
+                "sha256": "706575f5b962b55cee43eac59892b1567870c382c05b013d018a995119c73632"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "adaptiveInterpolation1D",
+                "role": "public-entry-point",
+                "summary": "Public module adaptive piecewise-polynomial routine with optional stencil, bound and degree outputs; no success/status argument.",
+                "signature": "CALL adaptiveInterpolation1D(X,Y,N,XOUT,YOUT,M,DEGREE, &\n     INTERPOLATION_TYPE,ST,EPS0,EPS1,DEG)",
+                "declarations": [
+                  {
+                    "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                    "line_start": 182,
+                    "line_end": 195
+                  }
+                ],
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 143,
+                "line_end": 659,
+                "module": "mod_adaptiveInterpolation",
+                "usage": "use mod_adaptiveInterpolation, only: dp,adaptiveInterpolation1D\n! Interface fragment: initialize sorted x(n),y(n),xout(m),yout(m),degrees(n-1).\ncall adaptiveInterpolation1D(x,y,n,xout,yout,m,degree,1,deg=degrees)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is an interface fragment requiring initialized arrays and valid dimensions, finite data and in-range sorted queries. No boundedness, positivity, extrapolation or runtime-bounds test was run."
+              },
+              {
+                "procedure": "newtonPolyVal",
+                "role": "implementation-helper",
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 116,
+                "line_end": 141,
+                "module": "mod_adaptiveInterpolation"
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "33f3aee7d82e4d2125abc9524753678beb5411b6",
+            "reviewed_on": "2026-11-05",
+            "notes": "ADAPTIVEINTERPOLATION2D first interpolates each grid column along x and then each intermediate row along y through the selected scalar 1D adaptive routine. V has shape (NX,NY), VOUT (MX,MY). It is tensor-product gridded interpolation, not scattered data, conservative remapping or a proof of multidimensional positivity. Default ST here is 3, unlike the scalar routine default 1; EPS0/EPS1 are forwarded. The 1D minimum-size/order requirements and invalid-order STOP behavior propagate to both passes. No status argument is available and this tensor dispatcher was not executed or numerically validated.",
+            "evidence": [
+              {
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "url": "https://github.com/ouermijudicael/HiPPIS/blob/33f3aee7d82e4d2125abc9524753678beb5411b6/Fortran/Src/mod_adaptiveInterpolation.F90",
+                "sha256": "706575f5b962b55cee43eac59892b1567870c382c05b013d018a995119c73632"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "adaptiveInterpolation2D",
+                "role": "public-entry-point",
+                "summary": "Public module two-pass gridded interpolation dispatcher, inheriting the scalar-routine input requirements.",
+                "signature": "CALL adaptiveInterpolation2D(X,Y,NX,NY,V,XOUT,YOUT,MX,MY, &\n     VOUT,DEGREE,INTERPOLATION_TYPE,ST,EPS0,EPS1)",
+                "declarations": [
+                  {
+                    "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                    "line_start": 1463,
+                    "line_end": 1475
+                  }
+                ],
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 1426,
+                "line_end": 1514,
+                "module": "mod_adaptiveInterpolation",
+                "usage": "use mod_adaptiveInterpolation, only: dp,adaptiveInterpolation2D\n! Initialized grid arrays and dimensions; validate coordinate order first.\ncall adaptiveInterpolation2D(x,y,nx,ny,v,xout,yout,mx,my, &\n     vout,degree,1,st=1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Both coordinate directions need valid ascending distinct grids and at least three nodes for the scalar endpoint-slope logic. Output arrays must match the tensor shapes. This fragment does not verify multidimensional preservation, conservation or all input failure cases."
+              },
+              {
+                "procedure": "adaptiveInterpolation1D",
+                "role": "implementation-helper",
+                "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+                "line_start": 143,
+                "line_end": 659,
+                "module": "mod_adaptiveInterpolation"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit reuse grant identified",
+          "spdx_expression": null,
+          "revision": "33f3aee7d82e4d2125abc9524753678beb5411b6",
+          "reviewed_on": "2026-11-05",
+          "notes": "No explicit license grant was identified in the reviewed README or module, and the pinned tree has no named LICENSE/COPYING file. Public source and publication references do not by themselves establish redistribution permission; bundled Extras have separate provenance not audited here.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/ouermijudicael/HiPPIS/blob/33f3aee7d82e4d2125abc9524753678beb5411b6/README.md",
+              "sha256": "41e0ecd48973921b3fd03346271408e8389b018634198cabbbf2c01f6eda074e"
+            },
+            {
+              "path": "Fortran/Src/mod_adaptiveInterpolation.F90",
+              "url": "https://github.com/ouermijudicael/HiPPIS/blob/33f3aee7d82e4d2125abc9524753678beb5411b6/Fortran/Src/mod_adaptiveInterpolation.F90",
+              "sha256": "706575f5b962b55cee43eac59892b1567870c382c05b013d018a995119c73632"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19643,12 +19805,97 @@
             ],
             "notes": "The README identifies the original Fortran kernels and modifications for double-precision R use. The relative advantages described for ACE/AVAS are not independently reproduced here.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8h",
+            "level": "source-reviewed",
+            "revision": "afe7b8d7987d0c3f8b153d97e78870ab39a034b1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected SUPSMU entry smooths ordered weighted observations with running local linear fits. Positive module SPAN selects the fixed-span path; zero invokes candidate spans, cross-validation residual smoothing and interpolated locally selected spans. It is an EDA smoother, not the complete ACE/AVAS transformation estimator. The sketch explicitly uses IPER=1 and fixed SPAN=0.5: the periodic branch in SMOOTH reads X(J) before correcting a negative wrapped index and needs repair/bounds checking before use. SUPSMU has no status output, divides by total weight for constant x and accesses quartile indices, so supply sufficiently many finite sorted data and positive total weights. Module control state is shared; no accuracy or smoothing-selection experiment was performed. SMOOTH also combines J<N with X(J+1)<=X(J) in a logical expression: Fortran does not guarantee short-circuit evaluation, so tied terminal abscissae can expose X(N+1). The sketch uses strictly increasing x; this is not a fix or bounds-safety proof.",
+            "evidence": [
+              {
+                "path": "src/supsmu.f90",
+                "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/src/supsmu.f90",
+                "sha256": "2917dfef11001bfc9cf4e7b0b3250cbab13e1741ed7ef778e68de08b877e7990"
+              },
+              {
+                "path": "src/smooth.f90",
+                "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/src/smooth.f90",
+                "sha256": "ab68528691d33135fd4c7359f21c61a6ac5a13c67b529c0e68b9bc075feedef3"
+              },
+              {
+                "path": "src/acedata.f90",
+                "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/src/acedata.f90",
+                "sha256": "e3d139880fe65762e601ea62f97f68a82484b759e03e7d5d842c75d845f89b77"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "supsmu",
+                "role": "public-entry-point",
+                "summary": "External double-precision weighted smoother controlled by the ACEDATA module. This sketch selects a nonperiodic fixed span.",
+                "signature": "CALL supsmu(N,X,Y,W,IPER,SMO,SCRATCH)",
+                "declarations": [
+                  {
+                    "path": "src/supsmu.f90",
+                    "line_start": 32,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "src/acedata.f90",
+                    "line_start": 66,
+                    "line_end": 85
+                  }
+                ],
+                "path": "src/supsmu.f90",
+                "line_start": 32,
+                "line_end": 101,
+                "usage": "use acedata, only: span\ninteger, parameter :: n=20\ninteger :: i\ndouble precision :: x(n),y(n),w(n),smo(n),scratch(n,7)\nexternal :: supsmu\ndo i=1,n\n  x(i)=dble(i); y(i)=x(i)**2\nenddo\nw=1.0d0; span=0.5d0\ncall supsmu(n,x,y,w,1,smo,scratch)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the selected IPER=1 branch; the periodic branch has an index-order finding recorded here. Choose n large enough for the requested smoothing window; no input checks protect short arrays. Module controls persist across calls. No residual, cross-validation or bounds-checking run was performed. Supply strictly increasing abscissae; the tied-abscissa loop also needs bounds review."
+              },
+              {
+                "procedure": "smooth",
+                "role": "implementation-helper",
+                "path": "src/smooth.f90",
+                "line_start": 20,
+                "line_end": 127
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Permissive Friedman notice; MIT package declaration",
+          "spdx_expression": null,
+          "revision": "afe7b8d7987d0c3f8b153d97e78870ab39a034b1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected source grants use/copy/modify/distribute/sell with copyright and permission notices and an as-is disclaimer. DESCRIPTION additionally declares MIT + file LICENSE. LICENSE.note records author clarification and references historical AVAS terms. This reports the selected source notice rather than reducing all historical components to one SPDX expression.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/DESCRIPTION",
+              "sha256": "a39445d966d4fe4bcfc74d9750f3678dc88263a4414073adc95c71a79bc94c37"
+            },
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/LICENSE",
+              "sha256": "c42a66c6b0263a21b71d3ec1bcfb2b38380db0254852b50c21ef5bb416a56685"
+            },
+            {
+              "path": "LICENSE.note",
+              "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/LICENSE.note",
+              "sha256": "5e81b3a3e67718a447d7025912cf361b237e92d378f5648b8bea79dde563d8c5"
+            },
+            {
+              "path": "src/supsmu.f90",
+              "url": "https://github.com/vubiostat/acepack/blob/afe7b8d7987d0c3f8b153d97e78870ab39a034b1/src/supsmu.f90",
+              "sha256": "2917dfef11001bfc9cf4e7b0b3250cbab13e1741ed7ef778e68de08b877e7990"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23807,12 +24054,108 @@
             ],
             "notes": "The README distinguishes Fortran code and Fortran/C examples from Wolfram-language files and lists FFTW/BLAS/LAPACK/ARPACK dependencies. Algorithm inventory and precision limits need more detailed review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a1d",
+            "level": "source-reviewed",
+            "revision": "12213aa901e7488541323432a7ae74d9f810123c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The signal module exposes cosine-power and Kaiser taper generators and APPLY_WINDOW for interleaved real/imaginary sequence storage. The selected sketch uses the integer-order cosine window, whose code samples a periodic endpoint-excluded grid and multiplies by 2**ORDER*(ORDER!)**2/(2*ORDER)!; it does not normalize each sampled array to unit sum. APPLY_WINDOW multiplies the same real weights into both components. Positive LENGTH, small nonnegative integer ORDER and finite inputs are caller requirements; high orders can overflow intermediate factors. Generic fractional-order and Kaiser branches depend on GSL gamma/Bessel interfaces and were not audited as equivalent parameter conventions. This mapping is data tapering, not a spectrum estimate or a review of all decomposition/FFTW/ARPACK paths.",
+            "evidence": [
+              {
+                "path": "src/window.f90",
+                "url": "https://github.com/i-a-morozov/SIGNAL/blob/12213aa901e7488541323432a7ae74d9f810123c/src/window.f90",
+                "sha256": "feb359e8e944c4da21cef28c9149bf520eed9d73a0cec5513618dd7822c6a79a"
+              },
+              {
+                "path": "src/process.f90",
+                "url": "https://github.com/i-a-morozov/SIGNAL/blob/12213aa901e7488541323432a7ae74d9f810123c/src/process.f90",
+                "sha256": "63d5f407fc452dd421299dd6149ee9f54cbdea096f89453a66cd2019cfa9ca71"
+              },
+              {
+                "path": "src/signal.f90",
+                "url": "https://github.com/i-a-morozov/SIGNAL/blob/12213aa901e7488541323432a7ae74d9f810123c/src/signal.f90",
+                "sha256": "710fea34e8b762434ce2cc257a1fa52a138e990b01b3f5f3fee1db0a79fc78e0"
+              },
+              {
+                "path": "src/signal.inc",
+                "url": "https://github.com/i-a-morozov/SIGNAL/blob/12213aa901e7488541323432a7ae74d9f810123c/src/signal.inc",
+                "sha256": "880314b9888b5b48f4ae6e539778e2cc9a7dd345396529f4ec7874768ef6fd58"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "window_cos_",
+                "role": "public-entry-point",
+                "summary": "Public separate module subroutine defined in submodule WINDOW, declared/exported by SIGNAL. Integer-order cosine-power taper.",
+                "signature": "CALL window_cos_(LENGTH,ORDER,WINDOW)",
+                "declarations": [
+                  {
+                    "path": "src/window.f90",
+                    "line_start": 14,
+                    "line_end": 20
+                  },
+                  {
+                    "path": "src/signal.f90",
+                    "line_start": 670,
+                    "line_end": 677
+                  },
+                  {
+                    "path": "src/signal.f90",
+                    "line_start": 1,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/window.f90",
+                "line_start": 14,
+                "line_end": 23,
+                "module": "signal",
+                "usage": "use signal, only: ik,rk,window_cos_,apply_window_\nreal(rk) :: window(8),input(16),output(16)\ninput=1.0_rk\ncall window_cos_(8_ik,1_ik,window)\ncall apply_window_(8_ik,window,input,output)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Input stores alternating real and imaginary components. Use distinct input/output buffers to respect INTENT contracts. Build the parent module and required submodules with preprocessing and the project numerical dependency configuration. No leakage, normalization or taper comparison was run."
+              },
+              {
+                "procedure": "apply_window_",
+                "role": "public-entry-point",
+                "summary": "Public module taper application for a complex sequence stored as 2*N real values.",
+                "signature": "CALL apply_window_(LENGTH,WINDOW,INPUT,OUTPUT)",
+                "declarations": [
+                  {
+                    "path": "src/process.f90",
+                    "line_start": 115,
+                    "line_end": 120
+                  },
+                  {
+                    "path": "src/signal.f90",
+                    "line_start": 522,
+                    "line_end": 532
+                  }
+                ],
+                "path": "src/process.f90",
+                "line_start": 115,
+                "line_end": 123,
+                "module": "signal"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GNU GPL version 3 text",
+          "spdx_expression": null,
+          "revision": "12213aa901e7488541323432a7ae74d9f810123c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains the GNU GPL version 3 text. This review does not infer an or-later option absent a separate operative grant, nor audit all external GSL/FFTW/BLAS/ARPACK dependency terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/i-a-morozov/SIGNAL/blob/12213aa901e7488541323432a7ae74d9f810123c/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37159,12 +37502,113 @@
             ],
             "notes": "The README identifies Alan Miller Fortran 77 routines and describes subset-size restrictions and rank-deficient predictor support. Exhaustive subset search is a documented option, not a claim that every available search heuristic returns the same optimum.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c1b1",
+            "level": "source-reviewed",
+            "revision": "64e219d7bfb29c0b5232182707d822c6ef825f45",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected AS274 pipeline CLEAR -> repeated INCLUD -> TOLSET -> REGCF accumulates weighted raw design rows into an orthogonal reduction and back-substitutes regression coefficients for the first NREQ variables. Intercepts must be supplied as a design column. INCLUD overwrites XROW; REGCF may zero D entries judged below tolerance. TOLSET uses a fixed 5e-10 threshold in this revision. IER checks dimensions but does not certify rank, finite inputs or fit quality. This is parameter estimation from raw rows, not a review of every exhaustive/forward/backward subset-selection path in the R package, inference or residual validation. Use nonnegative finite weights and adequate rank; preserve raw data for independent checks.",
+            "evidence": [
+              {
+                "path": "src/leaps.f",
+                "url": "https://github.com/cran/leaps/blob/64e219d7bfb29c0b5232182707d822c6ef825f45/src/leaps.f",
+                "sha256": "c8c28e846d1bdddaaee17398ec2a59d22467ec50becb9649b7417632dd14241c"
+              },
+              {
+                "path": "R/leaps.R",
+                "url": "https://github.com/cran/leaps/blob/64e219d7bfb29c0b5232182707d822c6ef825f45/R/leaps.R",
+                "sha256": "1a18944f5a5cd8fb0f953aa6741ae8736c71c166e396d548d9750e90776488b3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "REGCF",
+                "role": "public-entry-point",
+                "summary": "External double-precision coefficient extraction from the AS274 orthogonal state. Initialize and update state first; inspect IER after every stage.",
+                "signature": "CALL REGCF(NP,NRBAR,D,RBAR,THETAB,TOL,BETA,NREQ,IER)",
+                "declarations": [
+                  {
+                    "path": "src/leaps.f",
+                    "line_start": 1061,
+                    "line_end": 1072
+                  }
+                ],
+                "path": "src/leaps.f",
+                "line_start": 1061,
+                "line_end": 1104,
+                "usage": "integer :: ier,i\ndouble precision :: d(2),rbar(1),theta(2),sse,tol(2),work(2),beta(2),row(2)\nexternal :: clear,includ,tolset,regcf\ncall clear(2,1,d,rbar,theta,sse,ier)\nif(ier/=0) error stop \"CLEAR\"\ndo i=1,4\n  row=[1.0d0,dble(i)]\n  call includ(2,1,1.0d0,row,1.0d0+2.0d0*i,d,rbar,theta,sse,ier)\n  if(ier/=0) error stop \"INCLUD\"\nenddo\ncall tolset(2,1,d,rbar,tol,work,ier)\nif(ier/=0) error stop \"TOLSET\"\ncall regcf(2,1,d,rbar,theta,tol,beta,2,ier)\nif(ier/=0) error stop \"REGCF\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a full-rank coefficient pipeline fragment, not a checked regression driver. NRBAR needs NP*(NP-1)/2 entries. No subset search, residual or rank-deficient case was run. Link/build the relevant AS274 routine set; package-wide R entry points require their runtime."
+              },
+              {
+                "procedure": "CLEAR",
+                "role": "public-entry-point",
+                "summary": "Initialize the reduction arrays and residual sum of squares.",
+                "signature": "CALL CLEAR(NP,NRBAR,D,RBAR,THETAB,SSERR,IER)",
+                "declarations": [
+                  {
+                    "path": "src/leaps.f",
+                    "line_start": 190,
+                    "line_end": 197
+                  }
+                ],
+                "path": "src/leaps.f",
+                "line_start": 190,
+                "line_end": 222
+              },
+              {
+                "procedure": "INCLUD",
+                "role": "public-entry-point",
+                "summary": "Include one weighted design row; XROW is overwritten.",
+                "signature": "CALL INCLUD(NP,NRBAR,WEIGHT,XROW,YELEM,D,RBAR,THETAB,SSERR,IER)",
+                "declarations": [
+                  {
+                    "path": "src/leaps.f",
+                    "line_start": 1580,
+                    "line_end": 1594
+                  }
+                ],
+                "path": "src/leaps.f",
+                "line_start": 1580,
+                "line_end": 1648
+              },
+              {
+                "procedure": "TOLSET",
+                "role": "public-entry-point",
+                "summary": "Set coefficient/rank tolerances from the accumulated reduction.",
+                "signature": "CALL TOLSET(NP,NRBAR,D,RBAR,TOL,WORK,IER)",
+                "declarations": [
+                  {
+                    "path": "src/leaps.f",
+                    "line_start": 1205,
+                    "line_end": 1213
+                  }
+                ],
+                "path": "src/leaps.f",
+                "line_start": 1205,
+                "line_end": 1255
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later (package declaration)",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "64e219d7bfb29c0b5232182707d822c6ef825f45",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>= 2) and credits Thomas Lumley and Alan Miller. This is the package-level declaration, not an independent provenance determination for every AS274 component.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/leaps/blob/64e219d7bfb29c0b5232182707d822c6ef825f45/DESCRIPTION",
+              "sha256": "45f8ff538c82fad79dd7b5cb0eab19a23453b0b80970de8935d99ed29e07a7f0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37255,12 +37699,65 @@
             ],
             "notes": "DESCRIPTION gives the mixed-data estimation/imputation scope, and the repository contains a Fortran core. Individual distributional assumptions, missingness mechanisms and convergence diagnostics require further method/source review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1",
+            "level": "source-reviewed",
+            "revision": "c58906e60fca3fb4d9185f9127f25eef89f1a0f5",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external CTRSC routine centers and rescales each observed column while preserving entries exactly equal to MVCODE. It computes mean and standard deviation using sums and sums of squares and divisor COUNT, not COUNT-1; this can suffer cancellation. Zero-variance columns are centered and SDV is set to one. For all-missing columns SDV is one but XBAR is not assigned. No observation-mask tolerance, NaN handling, overflow protection or stable online recurrence is provided. This mapping covers the descriptive-statistics/standardization component, not EM, imputation or the entire mixed-data model.",
+            "evidence": [
+              {
+                "path": "src/mix.f",
+                "url": "https://github.com/cran/mix/blob/c58906e60fca3fb4d9185f9127f25eef89f1a0f5/src/mix.f",
+                "sha256": "057f9b3d6c7545eb3cae4ad9ea6ee2402350bdc85b435bc33b80261bd0ffd3f5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ctrsc",
+                "role": "public-entry-point",
+                "summary": "External in-place double-precision column standardization, with exact missing-value sentinel matching. Avoid reading XBAR for an all-missing column.",
+                "signature": "CALL ctrsc(X,N,P,XBAR,SDV,MVCODE)",
+                "declarations": [
+                  {
+                    "path": "src/mix.f",
+                    "line_start": 2,
+                    "line_end": 9
+                  }
+                ],
+                "path": "src/mix.f",
+                "line_start": 2,
+                "line_end": 39,
+                "usage": "double precision :: x(3,1),average(1),scale(1)\nexternal :: ctrsc\nx(:,1)=[1.0d0,2.0d0,3.0d0]\ncall ctrsc(x,3,1,average,scale,-999.0d0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. X is overwritten. Scale uses divisor N for fully observed data and is not the unbiased sample standard deviation. Supply finite observed values and a distinct exact missing sentinel. Do not treat untouched all-missing means as defined results; no standardization check was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Unlimited (package declaration; no detailed grant reviewed)",
+          "spdx_expression": null,
+          "revision": "c58906e60fca3fb4d9185f9127f25eef89f1a0f5",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION says License: Unlimited. The reviewed source contains no accompanying detailed grant; this records that declaration without translating it to a specific SPDX license or inferring a public-domain dedication.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/mix/blob/c58906e60fca3fb4d9185f9127f25eef89f1a0f5/DESCRIPTION",
+              "sha256": "08e63cee0f9c061aa3de14123d68ac3833bbc6cbe4d93e09a5fa1d82b1a3e0db"
+            },
+            {
+              "path": "src/mix.f",
+              "url": "https://github.com/cran/mix/blob/c58906e60fca3fb4d9185f9127f25eef89f1a0f5/src/mix.f",
+              "sha256": "057f9b3d6c7545eb3cae4ad9ea6ee2402350bdc85b435bc33b80261bd0ffd3f5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37763,12 +38260,96 @@
             ],
             "notes": "The README describes infinite-series and oscillatory-integral evaluation where closed forms are unavailable, with a Fortran source implementation. Supported parameter domains and tail accuracy depend on the routines; this is not an independently validated universal distribution evaluator.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2a2",
+            "level": "source-reviewed",
+            "revision": "bc1410a6c274959707a3dcc77be2212b9fe22621",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected finite-interval quadrature services evaluate the built-in Tweedie Fourier-inversion integrand, using symmetric tabulated Gaussian-Legendre nodes/weights. They do not accept a user callback. GaussAdaptive compares a whole-interval rule with two half-interval rules and refines the interval with largest estimated error, capped at 40 intervals, only for CpSmall and Cp<4/3; other regimes return a single fixed-rule value with OK true. OK is therefore not a general error certificate. The caller/package must initialize allocated Cmu/Cphi/Cy arrays, current distribution state and Integrands_MOD error state. Module globals prevent independent concurrent calls without state isolation. This classification intentionally stops above user-provided-integrand leaves; the complete density/CDF inversion, tail/error propagation and R runtime build were not audited.",
+            "evidence": [
+              {
+                "path": "src/GaussQuadrature.f90",
+                "url": "https://github.com/PeterKDunn/tweedie/blob/bc1410a6c274959707a3dcc77be2212b9fe22621/src/GaussQuadrature.f90",
+                "sha256": "d98910fe41ef384ab68f3f21ad3d0e154a163189b1f5a394b1349ee111ef73ca"
+              },
+              {
+                "path": "src/00tweedie_params.f90",
+                "url": "https://github.com/PeterKDunn/tweedie/blob/bc1410a6c274959707a3dcc77be2212b9fe22621/src/00tweedie_params.f90",
+                "sha256": "d3c449e114c3728084e78a2dc4ecc90d7fdeef29f9e471a8126e9e867d0a24e9"
+              },
+              {
+                "path": "src/Integrands.f90",
+                "url": "https://github.com/PeterKDunn/tweedie/blob/bc1410a6c274959707a3dcc77be2212b9fe22621/src/Integrands.f90",
+                "sha256": "3f12345b69c2f5af16a54d912742389a77fa4816bdcb2659d3ba4e421bdcfa21"
+              },
+              {
+                "path": "src/gaussianData.f90",
+                "url": "https://github.com/PeterKDunn/tweedie/blob/bc1410a6c274959707a3dcc77be2212b9fe22621/src/gaussianData.f90",
+                "sha256": "b3dfd9052b8ce244933d409f1f92f8f71e797e98448c231dc67bf84100135ca5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GaussAdaptive",
+                "role": "public-entry-point",
+                "summary": "External built-in-integrand integration service; OK uses LOGICAL(C_BOOL). The callable fragment assumes package state was initialized through its normal setup path.",
+                "signature": "CALL GaussAdaptive(I,A,B,ABSSCALE,AIMRERR,AREA,OK)",
+                "declarations": [
+                  {
+                    "path": "src/GaussQuadrature.f90",
+                    "line_start": 102,
+                    "line_end": 110
+                  },
+                  {
+                    "path": "src/GaussQuadrature.f90",
+                    "line_start": 123,
+                    "line_end": 135
+                  }
+                ],
+                "path": "src/GaussQuadrature.f90",
+                "line_start": 73,
+                "line_end": 205,
+                "usage": "use iso_c_binding, only: c_int,c_double,c_bool\n! Setup fragment: initialize Tweedie/Integrands module state first.\ninteger(c_int) :: i\nreal(c_double) :: a,b,abs_scale,aimrerr,area\nlogical(c_bool) :: ok\nexternal :: GaussAdaptive\ni=1; a=0.0_c_double; b=1.0_c_double\nabs_scale=0.0_c_double; aimrerr=1.0e-8_c_double\ncall GaussAdaptive(i,a,b,abs_scale,aimrerr,area,ok)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This cannot be run as a standalone general integrator: distribution arrays, current_phi, regime flags and error state are prerequisites. Use a<b, an allocated valid observation index and finite parameters. Inspect package error state as well as OK; no integral/density result was computed."
+              },
+              {
+                "procedure": "GaussQuadrature",
+                "role": "public-entry-point",
+                "summary": "Fixed symmetric Gaussian rule on a finite interval for the package integrand. No returned error estimate.",
+                "signature": "CALL GaussQuadrature(I,A,B,INTEGRAL_RESULT)",
+                "declarations": [
+                  {
+                    "path": "src/GaussQuadrature.f90",
+                    "line_start": 1,
+                    "line_end": 12
+                  }
+                ],
+                "path": "src/GaussQuadrature.f90",
+                "line_start": 1,
+                "line_end": 37
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later (package declaration)",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "bc1410a6c274959707a3dcc77be2212b9fe22621",
+          "reviewed_on": "2026-11-05",
+          "notes": "The package declares GPL (>=2). This records that declaration without auditing all derived numerical constants, helpers or the R-linked dependency stack.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/PeterKDunn/tweedie/blob/bc1410a6c274959707a3dcc77be2212b9fe22621/DESCRIPTION",
+              "sha256": "ace34b9d916be9593e33b0111b82bf692a9c882e79282eadf87a45e087dfdfbf"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38111,12 +38692,104 @@
             ],
             "notes": "DESCRIPTION identifies a deliberately restricted sparse storage format and MCMC-oriented design; the README records provenance of Fortran Cholesky code. Large-index scaling uses an extension package and is not assumed to be available in every configuration.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "93594ff359ffd4fd1caad6d55093e3ae3bf6be09",
+            "reviewed_on": "2026-11-05",
+            "notes": "ROWMEANS traverses compressed sparse rows and accumulates their stored values into the caller output. FLAG=1 divides by the number of stored entries in a nonempty row; other flags divide by NCL, including implicit zeros. RS MUST be initialized to zero by the caller. Stored explicit zeros count in the FLAG=1 denominator. Empty stored-only rows leave their initialized result unchanged; no size, column-count or pointer validation is performed. This is sparse-row arithmetic means, not covariance, missing-data handling or a numerically compensated reduction.",
+            "evidence": [
+              {
+                "path": "src/rowcolstats.f",
+                "url": "https://github.com/cran/spam/blob/93594ff359ffd4fd1caad6d55093e3ae3bf6be09/src/rowcolstats.f",
+                "sha256": "af4742e76ae809cf989159aa70dfce9a81b19988a30a0d6ba6b139845f8a54f3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rowmeans",
+                "role": "public-entry-point",
+                "summary": "External double-precision sparse-row mean service. Initialize RS and supply valid 1-based CSR row pointers.",
+                "signature": "CALL rowmeans(A,IA,NRW,NCL,FLAG,RS)",
+                "declarations": [
+                  {
+                    "path": "src/rowcolstats.f",
+                    "line_start": 49,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/rowcolstats.f",
+                "line_start": 49,
+                "line_end": 83,
+                "usage": "double precision :: a(3),means(2)\ninteger :: ia(3)\nexternal :: rowmeans\na=[2.0d0,4.0d0,6.0d0]; ia=[1,3,4]; means=0.0d0\ncall rowmeans(a,ia,2,3,0,means)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. FLAG=0 divides by all three columns, including implicit zeros. FLAG=1 instead averages stored entries and needs an explicit empty-row convention. Reusing a nonzero RS buffer changes the result. No sparse mean comparison was run."
+              }
+            ]
+          },
+          {
+            "code": "D1b9",
+            "level": "source-reviewed",
+            "revision": "93594ff359ffd4fd1caad6d55093e3ae3bf6be09",
+            "reviewed_on": "2026-11-05",
+            "notes": "CSRMSR converts a square 1-based CSR matrix to modified sparse-row storage with the diagonal in AO(1:N), AO(N+1) unused, and off-diagonal row pointers and columns sharing JAO. Missing diagonals become zero; duplicate diagonal entries are counted separately and the last value wins, so supply unique column indices per row rather than assuming duplicate summation. The code copies off-diagonal values backwards and then installs the pointers. There is no bounds/status checking. The sketch uses distinct input/output/work arrays and conservatively allocates N+NNZ+1 output entries. This is storage conversion, not a sparse solver or new factorization.",
+            "evidence": [
+              {
+                "path": "src/fromsparsekit.f",
+                "url": "https://github.com/cran/spam/blob/93594ff359ffd4fd1caad6d55093e3ae3bf6be09/src/fromsparsekit.f",
+                "sha256": "4a63bad26ceb14874eab4795b0291e288e800d92c434822759318e888a74582b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "csrmsr",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) CSR-to-MSR conversion. WK(N), IWK(N+1) are scratch. Use valid square-matrix indices and sufficient combined value/pointer storage.",
+                "signature": "CALL csrmsr(N,A,JA,IA,AO,JAO,WK,IWK)",
+                "declarations": [
+                  {
+                    "path": "src/fromsparsekit.f",
+                    "line_start": 656,
+                    "line_end": 663
+                  }
+                ],
+                "path": "src/fromsparsekit.f",
+                "line_start": 656,
+                "line_end": 764,
+                "usage": "real(8) :: a(3),ao(6),wk(2)\ninteger :: ja(3),ia(3),jao(6),iwk(3)\nexternal :: csrmsr\na=[2.0d0,1.0d0,3.0d0]; ja=[1,2,2]; ia=[1,3,4]\ncall csrmsr(2,a,ja,ia,ao,jao,wk,iwk)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Distinct buffers avoid relying on the historical in-place aliasing conventions described in comments. REAL(8) must match the implementation build. AO(N+1) is a storage gap, not a defined matrix entry. No round-trip conversion or sparse product was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Mixed package/component license declarations",
+          "spdx_expression": null,
+          "revision": "93594ff359ffd4fd1caad6d55093e3ae3bf6be09",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares LGPL-2 | BSD_3_clause + file LICENSE. inst/0LICENSE distinguishes GPL R code, PCx-derived factorization restrictions and LGPL SPARSKIT routines; LICENSE names ARPACK copyright holders. These component distinctions are retained rather than assigning one permissive license to the entire tree or resolving all historical filenames.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/spam/blob/93594ff359ffd4fd1caad6d55093e3ae3bf6be09/DESCRIPTION",
+              "sha256": "fb7b98f43bb8e3ae68a2f396a1d6ab57cc207e889baf4d4d60e70dd33abcd9c3"
+            },
+            {
+              "path": "inst/0LICENSE",
+              "url": "https://github.com/cran/spam/blob/93594ff359ffd4fd1caad6d55093e3ae3bf6be09/inst/0LICENSE",
+              "sha256": "a95a7a5648d8d16c962b9bfa5b36c3cf6f0bdd7635b631bfff27061683ae2a7d"
+            },
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/cran/spam/blob/93594ff359ffd4fd1caad6d55093e3ae3bf6be09/LICENSE",
+              "sha256": "ad5e3b965b21d5a4dae002e035aa7380338b4066c4e1b74a9836335d88e1f1dc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38253,12 +38926,137 @@
             ],
             "notes": "The README.org documents likelihood/prior callbacks, initialization files and optional conjugate variance updates. Its sum-of-squares interface represents minus twice the log likelihood; valid target specification and chain convergence remain the user responsibility and were not tested here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L6a14",
+            "level": "source-reviewed",
+            "revision": "59a264345b05bf1cecca7d15bbb4abf5a656dc2f",
+            "reviewed_on": "2026-11-05",
+            "notes": "Polar Box-Muller normal generation rejects radius outside (0,1), returns one deviate and caches the other. MU defaults to zero and SIGMA2 to one; the latter is variance and is square-rooted. Require nonnegative finite variance. Cached state is not cleared by a plain intrinsic RANDOM_SEED call and is shared across calls/threads. Distribution routines do not automatically call random_initialize. No normality, reproducibility or MCMC convergence test was performed.",
+            "evidence": [
+              {
+                "path": "mcmcrand.F90",
+                "url": "https://github.com/mjlaine/mcmcf90/blob/59a264345b05bf1cecca7d15bbb4abf5a656dc2f/mcmcrand.F90",
+                "sha256": "1252325a734d5817e3477e1046d7ee85783169288f66fc493932cb52afa5a69c"
+              },
+              {
+                "path": "mcmcprec.F90",
+                "url": "https://github.com/mjlaine/mcmcf90/blob/59a264345b05bf1cecca7d15bbb4abf5a656dc2f/mcmcprec.F90",
+                "sha256": "58dea0b76d5c4ee14b71a172b7f2ea8f97d142be97bfe7697b1acbdd56009ba3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "random_normal",
+                "role": "public-entry-point",
+                "summary": "Public module vector-valued random-variate function using intrinsic RANDOM_NUMBER through the selected helpers.",
+                "signature": "RN = random_normal(N,MU,SIGMA2)",
+                "declarations": [
+                  {
+                    "path": "mcmcrand.F90",
+                    "line_start": 60,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "mcmcprec.F90",
+                    "line_start": 21,
+                    "line_end": 33
+                  }
+                ],
+                "path": "mcmcrand.F90",
+                "line_start": 60,
+                "line_end": 83,
+                "module": "mcmcrand",
+                "usage": "use mcmcprec, only: dbl\nuse mcmcrand, only: random_normal\nreal(dbl) :: draws(8)\ndraws=random_normal(8,mu=2.0_dbl,sigma2=4.0_dbl)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the preprocessed .F90 modules in dependency order with consistent kinds. Seed the intrinsic generator as appropriate; module cached-normal state requires care when restarting a stream. Output fragments are not statistical validation and were not sampled for this catalog."
+              },
+              {
+                "procedure": "normal_bm",
+                "role": "implementation-helper",
+                "path": "mcmcrand.F90",
+                "line_start": 166,
+                "line_end": 190
+              }
+            ]
+          },
+          {
+            "code": "L6a7",
+            "level": "source-reviewed",
+            "revision": "59a264345b05bf1cecca7d15bbb4abf5a656dc2f",
+            "reviewed_on": "2026-11-05",
+            "notes": "Gamma generation uses Marsaglia-Tsang acceptance/rejection for shape>=1, multiplying the result by B: B is SCALE, not rate. For shape<1 the public routine samples shape+1 and multiplies by U**(1/A), so the private helper warning about its own shape<1 branch does not describe the selected public path. A and B default to one; require positive finite shape/scale and nonnegative N. No parameter checks, finite-time acceptance bound or distributional test is provided. This is random-variate generation, not a complete MCMC posterior sampler.",
+            "evidence": [
+              {
+                "path": "mcmcrand.F90",
+                "url": "https://github.com/mjlaine/mcmcf90/blob/59a264345b05bf1cecca7d15bbb4abf5a656dc2f/mcmcrand.F90",
+                "sha256": "1252325a734d5817e3477e1046d7ee85783169288f66fc493932cb52afa5a69c"
+              },
+              {
+                "path": "mcmcprec.F90",
+                "url": "https://github.com/mjlaine/mcmcf90/blob/59a264345b05bf1cecca7d15bbb4abf5a656dc2f/mcmcprec.F90",
+                "sha256": "58dea0b76d5c4ee14b71a172b7f2ea8f97d142be97bfe7697b1acbdd56009ba3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "random_gamma",
+                "role": "public-entry-point",
+                "summary": "Public module vector-valued random-variate function using intrinsic RANDOM_NUMBER through the selected helpers.",
+                "signature": "GR = random_gamma(N,A,B)",
+                "declarations": [
+                  {
+                    "path": "mcmcrand.F90",
+                    "line_start": 86,
+                    "line_end": 93
+                  },
+                  {
+                    "path": "mcmcprec.F90",
+                    "line_start": 21,
+                    "line_end": 33
+                  }
+                ],
+                "path": "mcmcrand.F90",
+                "line_start": 86,
+                "line_end": 111,
+                "module": "mcmcrand",
+                "usage": "use mcmcprec, only: dbl\nuse mcmcrand, only: random_gamma\nreal(dbl) :: draws(8)\ndraws=random_gamma(8,a=2.0_dbl,b=3.0_dbl)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the preprocessed .F90 modules in dependency order with consistent kinds. Seed the intrinsic generator as appropriate; module cached-normal state requires care when restarting a stream. Output fragments are not statistical validation and were not sampled for this catalog."
+              },
+              {
+                "procedure": "gammar_mt",
+                "role": "implementation-helper",
+                "path": "mcmcrand.F90",
+                "line_start": 120,
+                "line_end": 162
+              },
+              {
+                "procedure": "normal_bm",
+                "role": "implementation-helper",
+                "path": "mcmcrand.F90",
+                "line_start": 166,
+                "line_end": 190
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "59a264345b05bf1cecca7d15bbb4abf5a656dc2f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant names Marko Laine and includes its notice and warranty conditions. This records the library notice, not the terms of every optional BLAS, LAPACK or platform helper.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/mjlaine/mcmcf90/blob/59a264345b05bf1cecca7d15bbb4abf5a656dc2f/LICENSE.txt",
+              "sha256": "5f0be6a63b2c866d09f5d5ae9b500f1cf993cc98e12c96a330a6015a1f1654ff"
+            }
+          ]
         }
       },
       "imports": {}

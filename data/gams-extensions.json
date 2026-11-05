@@ -420,6 +420,48 @@
       "parent": "L6a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L8h": {
+      "label": "EDA (e.g., smoothing)",
+      "parent": "L8",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a1d": {
+      "label": "Taper",
+      "parent": "L10a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c": {
+      "label": "Multiple linear (i.e., y = b_0 + b_1 x_1 + ... + b_p x_p)",
+      "parent": "L8",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c1": {
+      "label": "Ordinary least squares",
+      "parent": "L8c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c1b": {
+      "label": "Parameter estimation (search also class L8c1a)",
+      "parent": "L8c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c1b1": {
+      "label": "Using raw data",
+      "parent": "L8c1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L6a7": {
+      "label": "Gamma, general (continuous, discrete), geometric",
+      "parent": "L6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
