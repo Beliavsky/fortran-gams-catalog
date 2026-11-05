@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 244 repositories now have 308 source-reviewed
+Reviewed on 2026-11-05. 252 repositories now have 320 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-237 repository cards now identify public routines and link their usage lines
+245 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 244 independently source-reviewed repositories now have an
+separately. All 252 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -268,6 +268,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | insitu_array | `insitu::insitu_Array%init`, `%t` | No explicit reuse grant identified |
 | MoA-Fortran | `mod_moa_take::moa_take`, `mod_moa_drop::moa_drop`; reexported by `moa` | BSD-3-Clause |
 | pseudo_rng_modules | `lfsr258::rand`, `set_seed`, `rand_arr`; `RNGutil::GCD64_` | GPL version 3 text; inherited RNG scope unresolved |
+| Fortran_rationals | `rationals::rational`, rational operators and component queries; `real`, `gcf`, `lcm` | MIT |
+| HDMod | `HDMod::hdual`, `hdexp`, `hdsin` (selected scalar automatic differentiation) | MIT |
+| compare | `compare::eq`, `setTol` | MIT |
+| fortran-approx | `approx::aeq`, `haeq` (elemental absolute/hybrid comparisons) | No explicit reuse grant identified |
+| em-fortranbox | `embox::normpdf`, `densitybox::normlogpdf` | No explicit project reuse grant identified |
+| ecgmm_fortran | `ecgmm::iterate`, `get_p` | No license grant identified in reviewed material |
+| twdtw | External `twdtwf90gt` legacy Fortran routine, with explicit boundary initialization | GPL-3.0-or-later |
+| timeseries | External `CalcAlphaBeta`, `mean`, exposed by module `timeseries` interfaces | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -531,6 +539,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [insitu_array](https://github.com/paulstryck/insitu_array) | D1b3 | In-place storage permutation and pointer remapping for transpose | Associated contiguous target storage required. Allocates an unused full-size flag array; no constant-workspace claim. |
 | [MoA-Fortran](https://github.com/wyphan/moa-fortran) | D1a11 | Fypp-generated pointer views for vector take/drop | Target lifetime matters; nonpositive drop has an off-by-one discrepancy, avoided by the sketch. |
 | [pseudo_rng_modules](https://github.com/pointedsphere/pseudo_rng_modules) | L6a21; B | Selected LFSR258 uniforms and Euclidean GCD utility | Shared 64-bit RNG state; endpoints not certified. GCD requires positive ascending inputs and otherwise can STOP. |
+| [Fortran_rationals](https://github.com/willklausler/fortran_rationals) | A2; A6a; B | Reduced finite-width rational arithmetic, continued-fraction conversion and integer GCF/LCM | Exact arithmetic is INT64-bounded; conversion may use a last-fitting convergent. Most-negative INT64 excluded from direct GCF/LCM usage. |
+| [HDMod](https://github.com/atmmod/hdmod) | H1 | Selected scalar hyper-dual chain rules for exponential/sine and first/mixed second derivatives | Seed convention matters. No whole-overload, Hessian-driver or numerical derivative validation. |
+| [compare](https://github.com/tcanich/compare) | A3a | Absolute-tolerance real/complex equality | REAL64 overload uses default-REAL tolerance; array equality reduces to one logical and is false for empty arrays. |
+| [fortran-approx](https://github.com/suzuyuyuyu/fortran-approx) | A3a | Elemental absolute and absolute-plus-relative comparisons | Arrays produce masks; explicit tolerances match input kind. Nonfinite semantics and overflow are not specially handled. |
+| [em-fortranbox](https://github.com/elmarmertens/em-fortranbox) | L5a1n | Scalar normal density and normal log density | sigma2 is variance. Whole-module Intel VSL/OpenMP and numerical dependencies remain; multivariate path excluded. |
+| [ecgmm_fortran](https://github.com/minzastro/ecgmm_fortran) | L4a1a; L5a1n | Fixed-count error-corrected scalar Gaussian-mixture updates and normal-density helper | No convergence status. Responsibility underflow/empty-component behavior needs care; f2py and explicit Fortran calls differ. |
+| [twdtw](https://github.com/vwmaus/twdtw) | L10d | Multichannel dynamic-time-warping costs with logistic cyclic-time penalty | Legacy sketch initializes boundaries and restricts M<=N for JB capacity. Callback entry has a separate boundary-intent discrepancy. |
+| [timeseries](https://github.com/rhandberg/timeseries) | L10a3a2; L1a1a | Weighted sine/cosine least-squares periodogram path and weighted mean | Seconds versus microhertz and global sumWeights matter. No fitted intercept, singular-design guard or automatic significance test. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1026,3 +1042,15 @@ expects six arguments (including a by-value breakdown threshold) and raw
 pointer-to-pointer buffers. The interfaces need reconciliation and a checked
 interop driver before promoting a usable Fortran calling example. This is a
 source finding, not a reproduced build/runtime failure.
+
+Rational arithmetic and real-to-rational conversion have separate scopes: exact
+finite-width arithmetic does not imply an exact binary/decimal conversion for
+every input. Hyper-dual usage spells out the two first-direction seeds and mixed
+seed. The comparison cards distinguish array reductions from elemental masks and
+record the actual tolerance kinds. Normal log-density arguments use variance,
+while error-corrected mixture fitting takes per-observation error widths. The
+legacy TWDTW sketch initializes boundary costs and limits candidate-buffer use;
+the C-bound callback path requires a separate intent correction. Spectral fitting
+requires the global weight sum to match the input weights and uses frequencies
+in microhertz with times in seconds. These are source-reviewed calling sketches,
+not newly compiled or numerically verified drivers.

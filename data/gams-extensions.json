@@ -396,6 +396,24 @@
       "parent": "C3",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "A6a": {
+      "label": "Type conversion",
+      "parent": "A6",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10d": {
+      "label": "Two multi-channel time series",
+      "parent": "L10",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a3a2": {
+      "label": "Periodogram analysis",
+      "parent": "L10a3a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

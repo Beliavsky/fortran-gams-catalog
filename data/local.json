@@ -22319,12 +22319,103 @@
             ],
             "notes": "The minimal README is supplemented by densitybox source interface evidence, including truncated-normal moment helpers. Companion BLAS/state-space/VSL modules are referenced; supported backends and the broader econometric inventory need further review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "887784175162d3a4dd07d8f3f6e016943239882e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected scalar elemental routines evaluate a standard-normal density and an arbitrary-mean normal log density. embox::normpdf uses exp(-0.5*(log(2*pi)+x**2)); densitybox::normlogpdf uses -0.5*(log(2*pi)+log(sigma2)+(x-mu)**2/sigma2). sigma2 is a strictly positive VARIANCE, not standard deviation. There is no domain/status check; invalid variance, tail underflow and arithmetic overflow remain caller concerns. These scalar paths do not establish correctness of the separate multivariate normal implementation or the wider Bayesian/state-space library. The enclosing modules require Intel VSL/OpenMP and additional module dependencies even though the selected scalar formulas use intrinsics. No density value was run or compared.",
+            "evidence": [
+              {
+                "path": "densitybox.f90",
+                "url": "https://github.com/elmarmertens/em-fortranbox/blob/887784175162d3a4dd07d8f3f6e016943239882e/densitybox.f90",
+                "sha256": "8771e667b91c2f6ae5b04b9dea296682a111eff8aa2851ebac64a42ac8564097"
+              },
+              {
+                "path": "embox.f90",
+                "url": "https://github.com/elmarmertens/em-fortranbox/blob/887784175162d3a4dd07d8f3f6e016943239882e/embox.f90",
+                "sha256": "70dd405e371b6170ee135f9a96655cb6ac01014c313d848023cbef74240930b6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "normpdf",
+                "role": "public-entry-point",
+                "summary": "Public elemental double-precision standard-normal density function.",
+                "signature": "density = normpdf(x)",
+                "declarations": [
+                  {
+                    "path": "embox.f90",
+                    "line_start": 1,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "embox.f90",
+                    "line_start": 123,
+                    "line_end": 129
+                  }
+                ],
+                "path": "embox.f90",
+                "line_start": 123,
+                "line_end": 131,
+                "module": "embox",
+                "usage": "use embox, only: normpdf\nuse densitybox, only: normlogpdf\ndouble precision :: density, log_density\ndensity=normpdf(0.5d0)\n! The third argument below is variance=4, not standard deviation=4.\nlog_density=normlogpdf(0.5d0,0.0d0,4.0d0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the compatible Intel VSL/OpenMP/module dependency stack or deliberately extract/adapt the scalar routines; this is not a standalone two-function build. Supply finite x/mu and positive finite variance. Multivariate normal formulas are outside this review."
+              },
+              {
+                "procedure": "normlogpdf",
+                "role": "public-entry-point",
+                "summary": "Public elemental Gaussian log density parameterized by mean and variance.",
+                "signature": "log_density = normlogpdf(x,mu,sigma2)",
+                "declarations": [
+                  {
+                    "path": "densitybox.f90",
+                    "line_start": 1,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "densitybox.f90",
+                    "line_start": 1111,
+                    "line_end": 1116
+                  }
+                ],
+                "path": "densitybox.f90",
+                "line_start": 1111,
+                "line_end": 1118,
+                "module": "densitybox"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit project reuse grant identified",
+          "spdx_expression": null,
+          "revision": "887784175162d3a4dd07d8f3f6e016943239882e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and selected modules do not provide an explicit project-wide reuse grant, and the pinned tree has no separately named LICENSE/COPYING file. Intel/BLAS dependencies also have their own terms; source availability is not recorded as public-domain status.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/elmarmertens/em-fortranbox/blob/887784175162d3a4dd07d8f3f6e016943239882e/README.md",
+              "sha256": "1df3e3d6a2f4cca9d4e967c0c28f42999ce8c430b70ac7d6dff12b9fbe9277db"
+            },
+            {
+              "path": "densitybox.f90",
+              "url": "https://github.com/elmarmertens/em-fortranbox/blob/887784175162d3a4dd07d8f3f6e016943239882e/densitybox.f90",
+              "sha256": "8771e667b91c2f6ae5b04b9dea296682a111eff8aa2851ebac64a42ac8564097"
+            },
+            {
+              "path": "embox.f90",
+              "url": "https://github.com/elmarmertens/em-fortranbox/blob/887784175162d3a4dd07d8f3f6e016943239882e/embox.f90",
+              "sha256": "70dd405e371b6170ee135f9a96655cb6ac01014c313d848023cbef74240930b6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22367,12 +22458,127 @@
             ],
             "notes": "The README documents a Fortran implementation and an iteration example with measurement errors. Convergence, model selection and equivalence to the paper or original Python implementation remain unverified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L4a1a",
+            "level": "source-reviewed",
+            "revision": "7cabe370df35cf61ec377dcd3ea508463c64d21a",
+            "reviewed_on": "2026-11-05",
+            "notes": "ecgmm::iterate performs a caller-selected number of error-corrected Gaussian-mixture updates for scalar observations with per-observation errors delta. Component densities use variance delta(j)**2+sigma(i)**2. Responsibilities feed new weights, error-weighted means and widths, with the width formula using the old mean in its residual as implemented. Use finite data/errors, normalized positive weights and strictly positive widths. Empty components and underflowed likelihood sums are not robustly guarded: the responsibility routine replaces a sufficiently large reciprocal sum with 1 rather than performing a log-sum-exp normalization. iterate has no convergence status or test; it simply applies the requested update count. Separate convergence/bootstrap paths and global-likelihood optimality are not claimed. No fit was compiled or run.",
+            "evidence": [
+              {
+                "path": "ecgmm.f90",
+                "url": "https://github.com/minzastro/ecgmm_fortran/blob/7cabe370df35cf61ec377dcd3ea508463c64d21a/ecgmm.f90",
+                "sha256": "889c7b76278068174cd54ade43ad234117ff989f768bbbccd481c987881d92e3"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/minzastro/ecgmm_fortran/blob/7cabe370df35cf61ec377dcd3ea508463c64d21a/README.md",
+                "sha256": "e0c02984fc2de339f4ee7bb22b9e564bfad3ffe7662ea158b4a401f61baa0b31"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "iterate",
+                "role": "public-entry-point",
+                "summary": "Module fixed-iteration driver. y/delta have length m; w/mu/sigma have length n and are overwritten. Fortran explicitly supplies m/n/iter, unlike the f2py convenience call.",
+                "signature": "CALL iterate(m,y,delta,n,w,mu,sigma,iter)",
+                "declarations": [
+                  {
+                    "path": "ecgmm.f90",
+                    "line_start": 80,
+                    "line_end": 87
+                  }
+                ],
+                "path": "ecgmm.f90",
+                "line_start": 80,
+                "line_end": 95,
+                "module": "ecgmm",
+                "usage": "use ecgmm, only: iterate\ndouble precision :: y(6),delta(6),w(2),mu(2),sigma(2)\ny=[-1.2d0,-1.0d0,-0.8d0,0.8d0,1.0d0,1.2d0]\ndelta=0.1d0\nw=[0.5d0,0.5d0]; mu=[-0.5d0,0.5d0]; sigma=[1.0d0,1.0d0]\ncall iterate(6,y,delta,2,w,mu,sigma,20)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the sorting and lfsr_mod dependencies used by the enclosing module. This fixed-count sketch does not claim convergence or statistically valid inference, and small-likelihood/empty-component problems remain. The selected iterate path is distinct from iterate_safe and bootstrap."
+              },
+              {
+                "procedure": "one_step",
+                "role": "implementation-helper",
+                "path": "ecgmm.f90",
+                "line_start": 53,
+                "line_end": 78,
+                "module": "ecgmm"
+              },
+              {
+                "procedure": "p_zyt",
+                "role": "implementation-helper",
+                "path": "ecgmm.f90",
+                "line_start": 32,
+                "line_end": 51,
+                "module": "ecgmm"
+              }
+            ]
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "7cabe370df35cf61ec377dcd3ea508463c64d21a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public get_p function evaluates a Gaussian density at y with mean mu and variance delta2 through direct exponential and square-root arithmetic. delta2 must be strictly positive; no input/status check or tail-stability guarantee exists. In the mixture algorithm this argument is measurement-error variance plus intrinsic component variance. This mapping is a single normal-density helper, not a normalized mixture-density or CDF function. No numerical value was verified.",
+            "evidence": [
+              {
+                "path": "ecgmm.f90",
+                "url": "https://github.com/minzastro/ecgmm_fortran/blob/7cabe370df35cf61ec377dcd3ea508463c64d21a/ecgmm.f90",
+                "sha256": "889c7b76278068174cd54ade43ad234117ff989f768bbbccd481c987881d92e3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "get_p",
+                "role": "public-entry-point",
+                "summary": "Public REAL*8 normal density helper; delta2 is variance.",
+                "signature": "density = get_p(y,delta2,mu)",
+                "declarations": [
+                  {
+                    "path": "ecgmm.f90",
+                    "line_start": 17,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "ecgmm.f90",
+                    "line_start": 26,
+                    "line_end": 29
+                  }
+                ],
+                "path": "ecgmm.f90",
+                "line_start": 26,
+                "line_end": 30,
+                "module": "ecgmm",
+                "usage": "use ecgmm, only: get_p\ndouble precision :: density\ndensity=get_p(0.5d0,4.0d0,0.0d0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply positive variance and compatible double precision. The enclosing module still imports sorting and lfsr_mod; tail underflow and invalid variances are not reported through an error flag."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed material",
+          "spdx_expression": null,
+          "revision": "7cabe370df35cf61ec377dcd3ea508463c64d21a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README and source name the implementer and algorithm paper but no explicit reuse grant; the pinned tree has no LICENSE/COPYING file. Paper citation and f2py availability do not themselves license redistribution.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/minzastro/ecgmm_fortran/blob/7cabe370df35cf61ec377dcd3ea508463c64d21a/README.md",
+              "sha256": "e0c02984fc2de339f4ee7bb22b9e564bfad3ffe7662ea158b4a401f61baa0b31"
+            },
+            {
+              "path": "ecgmm.f90",
+              "url": "https://github.com/minzastro/ecgmm_fortran/blob/7cabe370df35cf61ec377dcd3ea508463c64d21a/ecgmm.f90",
+              "sha256": "889c7b76278068174cd54ade43ad234117ff989f768bbbccd481c987881d92e3"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23785,12 +23991,311 @@
             ],
             "notes": "The README specifies int64 numerators/denominators and stopping on invalid arithmetic or overflow. Exact arithmetic within representable limits is not arbitrary-precision unbounded arithmetic.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "A2",
+            "level": "source-reviewed",
+            "revision": "ce260c0bb3131d8eab635f116f7815c13f12f874",
+            "reviewed_on": "2026-11-05",
+            "notes": "The rational type stores reduced INT64 numerator/denominator pairs with positive denominator. The selected integer constructors simplify with Euclidean GCF, reject zero denominators and the most-negative integer, and normalize signs. Rational addition cancels denominator common factors before checked integer products/sums; multiplication cancels cross factors before multiplying. These are exact finite-width rational operations, not arbitrary precision. Error paths use ERROR STOP and some representable final results can still encounter finite intermediate limits; this review does not prove completeness of overflow handling across every operator. Other intrinsic overloads, matrices, random rational generation and formatted I/O are outside this selected arithmetic review.",
+            "evidence": [
+              {
+                "path": "src/rationals.f90",
+                "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/src/rationals.f90",
+                "sha256": "0d7b032b2f7a33296dd4c3cc623c78985f8cf61c76ccae41f70f57945b24924a"
+              },
+              {
+                "path": "example/demo_arithmetic.f90",
+                "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/example/demo_arithmetic.f90",
+                "sha256": "4854b6d04a6eb3f2e4e7e1bee2dabe2a172fd0ef64bf5d8551fc282f6a299c64"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rational",
+                "role": "public-entry-point",
+                "summary": "Public generic integer-pair constructor; the selected overload takes two INT64 arguments. Private components are exposed through get_num/get_den queries.",
+                "signature": "q = rational(n, d)",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 36,
+                    "line_end": 47
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 60,
+                    "line_end": 74
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 138,
+                    "line_end": 143
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 429,
+                    "line_end": 438
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 429,
+                "line_end": 440,
+                "module": "rationals",
+                "usage": "use iso_fortran_env, only: int64\nuse rationals, only: rational, operator(+), operator(*)\ntype(rational) :: a,b,c\ninteger(int64) :: numerator, denominator\na=rational(1_int64,3_int64)\nb=rational(1_int64,6_int64)\nc=a+b\nnumerator=c%get_num()\ndenominator=c%get_den()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch selects the INT64 constructor and public generic operators. Arithmetic is bounded by finite integer representation; zero denominators and checked overflows terminate the process. No exact-result or overflow-boundary tests were run.",
+                "examples": [
+                  {
+                    "path": "example/demo_arithmetic.f90",
+                    "line_start": 1,
+                    "line_end": 24
+                  }
+                ]
+              },
+              {
+                "procedure": "operator(+)",
+                "role": "public-entry-point",
+                "summary": "Public rational-plus-rational operator, dispatched to a private implementation with denominator cancellation and checked arithmetic.",
+                "signature": "c = a + b",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 83,
+                    "line_end": 86
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 607,
+                    "line_end": 616
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 607,
+                "line_end": 628,
+                "module": "rationals"
+              },
+              {
+                "procedure": "operator(*)",
+                "role": "public-entry-point",
+                "summary": "Public rational multiplication operator with cross-factor cancellation; private implementation names are not separate user APIs.",
+                "signature": "c = a * b",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 93,
+                    "line_end": 96
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 680,
+                    "line_end": 692
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 680,
+                "line_end": 696,
+                "module": "rationals"
+              },
+              {
+                "procedure": "get_num",
+                "role": "public-entry-point",
+                "summary": "Returns the INT64 numerator.",
+                "signature": "n = q%get_num()",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 263,
+                    "line_end": 266
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 263,
+                "line_end": 267,
+                "module": "rationals",
+                "derived_type": "rational"
+              },
+              {
+                "procedure": "get_den",
+                "role": "public-entry-point",
+                "summary": "Returns the positive INT64 denominator.",
+                "signature": "d = q%get_den()",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 269,
+                    "line_end": 272
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 269,
+                "line_end": 273,
+                "module": "rationals",
+                "derived_type": "rational"
+              },
+              {
+                "procedure": "simplify",
+                "role": "implementation-helper",
+                "path": "src/rationals.f90",
+                "line_start": 896,
+                "line_end": 925,
+                "module": "rationals"
+              },
+              {
+                "procedure": "add_chk",
+                "role": "implementation-helper",
+                "path": "src/rationals.f90",
+                "line_start": 575,
+                "line_end": 588,
+                "module": "rationals"
+              },
+              {
+                "procedure": "mul_chk",
+                "role": "implementation-helper",
+                "path": "src/rationals.f90",
+                "line_start": 590,
+                "line_end": 601,
+                "module": "rationals"
+              }
+            ]
+          },
+          {
+            "code": "A6a",
+            "level": "source-reviewed",
+            "revision": "ce260c0bb3131d8eab635f116f7815c13f12f874",
+            "reviewed_on": "2026-11-05",
+            "notes": "The REAL64 rational constructor iterates continued-fraction convergents until conversion back to REAL64 equals the original absolute input, the fractional remainder vanishes, or the next convergent/reciprocal exceeds the finite INT64 bounds. It then restores the sign. Consequently this is a real-to-fraction conversion/approximation, not a promise of representing the exact binary rational or the originally intended decimal. If no round-tripping convergent fits, the last fitting convergent is retained. Nonfinite/out-of-range input reaches ERROR STOP. The reverse REAL overload divides the stored integer components in REAL64 and rounds normally. No round-trip or best-approximation experiment was performed.",
+            "evidence": [
+              {
+                "path": "src/rationals.f90",
+                "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/src/rationals.f90",
+                "sha256": "0d7b032b2f7a33296dd4c3cc623c78985f8cf61c76ccae41f70f57945b24924a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rational",
+                "role": "public-entry-point",
+                "summary": "Public generic REAL64-to-rational constructor, backed by a continued-fraction loop with finite-size checks.",
+                "signature": "q = rational(r)",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 138,
+                    "line_end": 143
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 449,
+                    "line_end": 457
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 449,
+                "line_end": 493,
+                "module": "rationals",
+                "usage": "use iso_fortran_env, only: real64\nuse rationals, only: rational, real\ntype(rational) :: q\nreal(real64) :: back\nq=rational(0.75_real64)\nback=real(q)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The literal already represents a floating-point value before conversion. Finite continued-fraction limits can produce a fallback approximation; do not infer an exact decimal interpretation or arbitrary-size rational result."
+              },
+              {
+                "procedure": "real",
+                "role": "public-entry-point",
+                "summary": "Public REAL overload returning REAL64 from the stored numerator/denominator ratio.",
+                "signature": "r = real(q)",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 546,
+                    "line_end": 549
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 546,
+                "line_end": 550,
+                "module": "rationals"
+              }
+            ]
+          },
+          {
+            "code": "B",
+            "level": "source-reviewed",
+            "revision": "ce260c0bb3131d8eab635f116f7815c13f12f874",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public integer gcf and lcm generics expose Euclidean greatest-common-factor calculation and divide-before-checked-multiply least-common-multiple calculation. GCF normalizes with ABS and defines zero cases, including gcf(0,0)=0; LCM returns zero if either input is zero. INT32 overloads compute via INT64 and reject results exceeding INT32. The direct INT64 GCF/LCM path applies ABS without guarding the most-negative representable INT64 input, which is excluded from this mapping usage. B is the available GAMS number-theory leaf; this is not primality or factorization software. No integer-result or boundary tests were run.",
+            "evidence": [
+              {
+                "path": "src/rationals.f90",
+                "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/src/rationals.f90",
+                "sha256": "0d7b032b2f7a33296dd4c3cc623c78985f8cf61c76ccae41f70f57945b24924a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gcf",
+                "role": "public-entry-point",
+                "summary": "Public generic integer GCF; selected implementation takes INT64 and returns a nonnegative INT64 factor for inputs whose absolute values are representable.",
+                "signature": "g = gcf(a,b)",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 49,
+                    "line_end": 52
+                  },
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 1086,
+                    "line_end": 1101
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 1086,
+                "line_end": 1111,
+                "module": "rationals",
+                "usage": "use iso_fortran_env, only: int64\nuse rationals, only: gcf, lcm\ninteger(int64) :: divisor, multiple\ndivisor=gcf(36_int64,48_int64)\nmultiple=lcm(36_int64,48_int64)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Exclude the most-negative INT64 value because ABS cannot represent its magnitude. LCM may terminate on overflow, and finite-width arithmetic is not a big-integer implementation."
+              },
+              {
+                "procedure": "lcm",
+                "role": "public-entry-point",
+                "summary": "Public generic integer LCM; selected INT64 path divides by the GCF before checked multiplication.",
+                "signature": "m = lcm(a,b)",
+                "declarations": [
+                  {
+                    "path": "src/rationals.f90",
+                    "line_start": 1055,
+                    "line_end": 1070
+                  }
+                ],
+                "path": "src/rationals.f90",
+                "line_start": 1055,
+                "line_end": 1072,
+                "module": "rationals"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "ce260c0bb3131d8eab635f116f7815c13f12f874",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Will Klausler and the defining module declares SPDX-License-Identifier: MIT. This records the reviewed project notice, not a correctness guarantee for arithmetic.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/LICENSE",
+              "sha256": "0cdecb84231b00a4ddd2b74e62eccf41fb1ca32593269f135e03c68dc6c1c294"
+            },
+            {
+              "path": "src/rationals.f90",
+              "url": "https://github.com/willklausler/fortran_rationals/blob/ce260c0bb3131d8eab635f116f7815c13f12f874/src/rationals.f90",
+              "sha256": "0d7b032b2f7a33296dd4c3cc623c78985f8cf61c76ccae41f70f57945b24924a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23829,12 +24334,100 @@
             ],
             "notes": "The brief README identifies hyper-dual-number calculations. Individual derivative interfaces, supported operations and numerical behavior need further source review; no complete automatic-differentiation framework is inferred.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "934f67d780e9341240eda42b2171360920d3eb0f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The hyperdual type stores value, two first-direction components and a mixed component. The selected hdual constructor copies all four seeds. hdexp and hdsin propagate first derivatives and the mixed second derivative by chain-rule formulas, including the incoming mixed seed. For a univariate x seeded as (x,1,1,0), dx1 and dx2 represent the first derivative and dx1x2 the second derivative of the selected smooth expression. This is operator/function-based automatic differentiation, not a finite-difference step-size method or a full Hessian driver. Only the scalar constructor, exponential and sine paths were inspected; thousands of other overloads, branch logic and nonsmooth/domain behavior are outside this review. Floating-point errors/overflow remain and no derivative check was run.",
+            "evidence": [
+              {
+                "path": "HDMod.f90",
+                "url": "https://github.com/atmmod/HDMod/blob/934f67d780e9341240eda42b2171360920d3eb0f/HDMod.f90",
+                "sha256": "f7d2ea24c59ae9ec93f908fc879e963d229acd1202fa661da47d1c9b0920515e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hdual",
+                "role": "public-entry-point",
+                "summary": "Public generic four-REAL(PRhyd) constructor; the four inputs are value, first seed, second seed and mixed seed.",
+                "signature": "q = hdual(x11,x12,x21,x22)",
+                "declarations": [
+                  {
+                    "path": "HDMod.f90",
+                    "line_start": 5,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "HDMod.f90",
+                    "line_start": 304,
+                    "line_end": 313
+                  }
+                ],
+                "path": "HDMod.f90",
+                "line_start": 304,
+                "line_end": 315,
+                "module": "HDMod",
+                "usage": "use HDMod, only: PRhyd, hyperdual, hdual, hdexp, hdsin\ntype(hyperdual) :: x,y\nx=hdual(0.5_PRhyd,1.0_PRhyd,1.0_PRhyd,0.0_PRhyd)\ny=hdexp(hdsin(x))\n! y%x is the value; y%dx1/y%dx2 are first derivatives.\n! y%dx1x2 is the second derivative for these univariate seeds.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This seed convention is specific to a univariate second derivative; different seeds represent different directional/mixed quantities. The direct public hdexp/hdsin routines are used here. No finite-difference, analytic-reference or full-overload audit was performed."
+              },
+              {
+                "procedure": "hdexp",
+                "role": "public-entry-point",
+                "summary": "Propagates value and first/mixed derivatives of EXP for a scalar hyperdual argument.",
+                "signature": "y = hdexp(q)",
+                "declarations": [
+                  {
+                    "path": "HDMod.f90",
+                    "line_start": 6738,
+                    "line_end": 6749
+                  }
+                ],
+                "path": "HDMod.f90",
+                "line_start": 6738,
+                "line_end": 6751,
+                "module": "HDMod"
+              },
+              {
+                "procedure": "hdsin",
+                "role": "public-entry-point",
+                "summary": "Propagates value and first/mixed derivatives of SIN for a scalar hyperdual argument.",
+                "signature": "y = hdsin(q)",
+                "declarations": [
+                  {
+                    "path": "HDMod.f90",
+                    "line_start": 6801,
+                    "line_end": 6814
+                  }
+                ],
+                "path": "HDMod.f90",
+                "line_start": 6801,
+                "line_end": 6816,
+                "module": "HDMod"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "934f67d780e9341240eda42b2171360920d3eb0f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice credits Atmospheric Modeling at Drexel and supplies the standard permission, notice-retention and warranty terms. This is a scoped license finding.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/atmmod/HDMod/blob/934f67d780e9341240eda42b2171360920d3eb0f/LICENSE",
+              "sha256": "f4bf5d2327d6b01e5e6459099848a67155b948aafa441c4dd2c4190cd677481c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23875,12 +24468,91 @@
             ],
             "notes": "The README describes absolute differences and an optional/default tolerance. Its approximate relations are not assumed to have all equivalence/order properties of exact arithmetic.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "A3a",
+            "level": "source-reviewed",
+            "revision": "0c13ee87ace6d302a4760acddfc303116617fd04",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected eq generic compares absolute differences with a tolerance, including default-real scalars, REAL64 scalars, default complex scalars and real arrays. Even the REAL64 overload takes a DEFAULT REAL tolerance; the default is 1e-8. Array overloads reduce to one logical and return false for size mismatch and also for two empty arrays. setTol returns its optional argument or the default; it does not change module state. There is no relative scaling or dedicated nonfinite/negative-tolerance validation; equal infinities can fail via infinity-minus-infinity. The complex ordering functions elsewhere compare real parts and are excluded from this equality mapping. No runtime comparison tests were performed.",
+            "evidence": [
+              {
+                "path": "src/lib/compare.f90",
+                "url": "https://github.com/tcanich/compare/blob/0c13ee87ace6d302a4760acddfc303116617fd04/src/lib/compare.f90",
+                "sha256": "823c73bdc2958cee511508a3511c88bac34413e9798dc49b2bf596825a3e1d59"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eq",
+                "role": "public-entry-point",
+                "summary": "Public absolute-tolerance equality generic; selected REAL64 scalar implementation still takes optional default-REAL t.",
+                "signature": "same = eq(r1,r2,t)",
+                "declarations": [
+                  {
+                    "path": "src/lib/compare.f90",
+                    "line_start": 1,
+                    "line_end": 18
+                  },
+                  {
+                    "path": "src/lib/compare.f90",
+                    "line_start": 64,
+                    "line_end": 68
+                  }
+                ],
+                "path": "src/lib/compare.f90",
+                "line_start": 64,
+                "line_end": 73,
+                "module": "compare",
+                "usage": "use iso_fortran_env, only: real64\nuse compare, only: eq\nlogical :: same\nsame=eq(1.0_real64,1.0_real64+1.0e-7_real64,t=1.0e-6)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The t literal intentionally has default REAL kind to match the actual dummy. Use finite values and a nonnegative absolute tolerance; this is not a relative/ULP comparator or a proof of equivalent computations."
+              },
+              {
+                "procedure": "setTol",
+                "role": "public-entry-point",
+                "summary": "Pure default-real selector function, not a persistent tolerance setter.",
+                "signature": "tol = setTol(t)",
+                "declarations": [
+                  {
+                    "path": "src/lib/compare.f90",
+                    "line_start": 42,
+                    "line_end": 49
+                  }
+                ],
+                "path": "src/lib/compare.f90",
+                "line_start": 42,
+                "line_end": 51,
+                "module": "compare"
+              },
+              {
+                "procedure": "r64_eq_arr",
+                "role": "implementation-helper",
+                "path": "src/lib/compare.f90",
+                "line_start": 107,
+                "line_end": 126,
+                "module": "compare"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "0c13ee87ace6d302a4760acddfc303116617fd04",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Tom Canich and supplies permission with standard notice and warranty terms. This records the reviewed root notice.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tcanich/compare/blob/0c13ee87ace6d302a4760acddfc303116617fd04/LICENSE",
+              "sha256": "e313c25cfbbdc18bf37ed821c33ce6a3f6c557794e3be01dc18452d25042963b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -23919,12 +24591,105 @@
             ],
             "notes": "The README documents elemental comparisons, precision variants and default tolerances. Choosing a tolerance remains application-dependent; approximate equality is not a certified error bound.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "A3a",
+            "level": "source-reviewed",
+            "revision": "23e6a461c6e6db03f01e31cf8ea135f17f5de95a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public elemental aeq and haeq generics implement absolute tolerance abs(a-b)<=tol and hybrid tolerance abs(a-b)<=atol+rtol*max(abs(a),abs(b)). Defaults are 1e-10 in each supported real kind. Array calls return elementwise logical masks, unlike the scalar array-reduction behavior of tcanich/compare. Explicit tolerances must match the argument kind; haeq exposes two-argument default or four-argument explicit forms. Negative tolerances, NaNs/infinities and subtraction/scaled-threshold overflow are not specially handled, so the mapping/sketch is limited to finite ordinary-range values and nonnegative tolerances. REAL128 overload declarations affect compiler support even for a REAL64-only user. No accuracy/equivalence test was performed.",
+            "evidence": [
+              {
+                "path": "src/approx.F90",
+                "url": "https://github.com/suzuyuyuyu/fortran-approx/blob/23e6a461c6e6db03f01e31cf8ea135f17f5de95a/src/approx.F90",
+                "sha256": "5fb6fe37b1a691b55e7a375b583f8d58bf089aaf0c6d968714291a8cca1260bc"
+              },
+              {
+                "path": "example/main.f90",
+                "url": "https://github.com/suzuyuyuyu/fortran-approx/blob/23e6a461c6e6db03f01e31cf8ea135f17f5de95a/example/main.f90",
+                "sha256": "26b9a3340c476324f45392293b6027c01ee4645839107beee911e9d0bdac636c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "aeq",
+                "role": "public-entry-point",
+                "summary": "Public elemental absolute-comparison generic; selected REAL64 explicit-tolerance overload uses three REAL64 inputs.",
+                "signature": "mask = aeq(a,b,tol)",
+                "declarations": [
+                  {
+                    "path": "src/approx.F90",
+                    "line_start": 19,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "src/approx.F90",
+                    "line_start": 165,
+                    "line_end": 169
+                  }
+                ],
+                "path": "src/approx.F90",
+                "line_start": 165,
+                "line_end": 170,
+                "module": "approx",
+                "usage": "use iso_fortran_env, only: real64\nuse approx, only: aeq, haeq\nreal(real64) :: a(2),b(2)\nlogical :: absolute_mask(2),hybrid_mask(2)\na=[1.0_real64,1.0e8_real64]\nb=a+[1.0e-9_real64,1.0_real64]\nabsolute_mask=aeq(a,b,1.0e-8_real64)\nhybrid_mask=haeq(a,b,1.0e-8_real64,1.0e-7_real64)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Elemental calls produce masks; use ALL/ANY explicitly for array-wide decisions. Absolute and relative tolerances have different meanings and must have the same real kind as the inputs. No special nonfinite semantics or transitive-equivalence guarantee is supplied.",
+                "examples": [
+                  {
+                    "path": "example/main.f90",
+                    "line_start": 3,
+                    "line_end": 30
+                  }
+                ]
+              },
+              {
+                "procedure": "haeq",
+                "role": "public-entry-point",
+                "summary": "Public elemental hybrid absolute-plus-relative equality generic; selected explicit REAL64 form takes both atol and rtol.",
+                "signature": "mask = haeq(a,b,atol,rtol)",
+                "declarations": [
+                  {
+                    "path": "src/approx.F90",
+                    "line_start": 57,
+                    "line_end": 63
+                  },
+                  {
+                    "path": "src/approx.F90",
+                    "line_start": 402,
+                    "line_end": 405
+                  }
+                ],
+                "path": "src/approx.F90",
+                "line_start": 402,
+                "line_end": 406,
+                "module": "approx"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit reuse grant identified",
+          "spdx_expression": null,
+          "revision": "23e6a461c6e6db03f01e31cf8ea135f17f5de95a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and defining source identify the author and institution but no explicit reuse grant; the pinned tree has no separately named LICENSE/COPYING file. Public access and attribution do not establish a redistribution license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/suzuyuyuyu/fortran-approx/blob/23e6a461c6e6db03f01e31cf8ea135f17f5de95a/README.md",
+              "sha256": "0572aaee52242bafbf922bbf1b5add23812d2a2fded47276532675ffc4f7095a"
+            },
+            {
+              "path": "src/approx.F90",
+              "url": "https://github.com/suzuyuyuyu/fortran-approx/blob/23e6a461c6e6db03f01e31cf8ea135f17f5de95a/src/approx.F90",
+              "sha256": "5fb6fe37b1a691b55e7a375b583f8d58bf089aaf0c6d968714291a8cca1260bc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25664,12 +26429,121 @@
             ],
             "notes": "The README distinguishes site-specific prebuilt installations from local source compilation. Performance claims and suitable OpenMP settings are not independently verified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a3a2",
+            "level": "source-reviewed",
+            "revision": "92fc61c0a5b014363544c4ccd762077c9e1ba43e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external CalcAlphaBeta routine forms weighted sine/cosine normal-equation sums at a requested frequency and solves the two-by-two system for alpha and beta. The spec program uses alpha**2+beta**2 as its raw power before output transformations. t is in seconds and nu in microhertz; twopi_micro incorporates 1e-6. The routine reads timeseries::sumWeights rather than computing SUM(w), so callers bypassing ImportData must set that global consistently. Equal array lengths, positive effective weight sum, finite nonnegative weights and a nonsingular sine/cosine design are preconditions; determinant division has no check/status. There is no fitted floating mean/intercept in this routine and no automatic significance test. This is a source-reviewed least-squares periodogram path, not an FFT or a new spectral accuracy/timing check.",
+            "evidence": [
+              {
+                "path": "src/timeseries.f90",
+                "url": "https://github.com/rhandberg/timeseries/blob/92fc61c0a5b014363544c4ccd762077c9e1ba43e/src/timeseries.f90",
+                "sha256": "67d19fc8cd7f66ded322a0bbf446e3741f3a309d838d8f3b55537475d9438b0c"
+              },
+              {
+                "path": "src/spec.f90",
+                "url": "https://github.com/rhandberg/timeseries/blob/92fc61c0a5b014363544c4ccd762077c9e1ba43e/src/spec.f90",
+                "sha256": "bc9215d0a78e753fc56f7b8c031a923cab458d42ded55f1aeac03ddb73c3554a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CalcAlphaBeta",
+                "role": "public-entry-point",
+                "summary": "External assumed-shape spectral-fit subroutine whose explicit interface is reexported by the timeseries module. Shared sumWeights must match the supplied weights.",
+                "signature": "CALL CalcAlphaBeta(t,f,w,nu,alpha,beta)",
+                "declarations": [
+                  {
+                    "path": "src/timeseries.f90",
+                    "line_start": 9,
+                    "line_end": 21
+                  },
+                  {
+                    "path": "src/timeseries.f90",
+                    "line_start": 30,
+                    "line_end": 36
+                  },
+                  {
+                    "path": "src/timeseries.f90",
+                    "line_start": 287,
+                    "line_end": 294
+                  }
+                ],
+                "path": "src/timeseries.f90",
+                "line_start": 287,
+                "line_end": 320,
+                "usage": "use kind_defs, only: dbl,twopi_micro\nuse timeseries, only: CalcAlphaBeta,sumWeights\nreal(dbl) :: t(4),f(4),w(4),nu,alpha,beta,power\nt=[0.0_dbl,250.0_dbl,500.0_dbl,750.0_dbl]\nnu=1000.0_dbl\nf=sin(twopi_micro*nu*t); w=1.0_dbl\nsumWeights=sum(w)\ncall CalcAlphaBeta(t,f,w,nu,alpha,beta)\npower=alpha**2+beta**2",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. USE timeseries supplies an interface to an external routine, not a type-bound/module implementation. The example has no offset; preprocess a mean as appropriate rather than assuming an intercept is fitted. Link the repository dependencies used by the full source. No spectral peak or normalization was checked.",
+                "examples": [
+                  {
+                    "path": "src/spec.f90",
+                    "line_start": 220,
+                    "line_end": 229
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "92fc61c0a5b014363544c4ccd762077c9e1ba43e",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external mean function returns SUM(f)/SIZE(f) or DOT_PRODUCT(f,w)/SUM(w) when weights are present. Its explicit assumed-shape interface is supplied by the timeseries module. There are no checks for empty input, equal vector lengths, zero total weight or nonfinite data. For a usual statistical weighted-mean interpretation, use finite nonnegative weights with positive sum. This routine computes its own denominator and does not depend on the global sumWeights needed by CalcAlphaBeta. No statistical or numerical check was run.",
+            "evidence": [
+              {
+                "path": "src/timeseries.f90",
+                "url": "https://github.com/rhandberg/timeseries/blob/92fc61c0a5b014363544c4ccd762077c9e1ba43e/src/timeseries.f90",
+                "sha256": "67d19fc8cd7f66ded322a0bbf446e3741f3a309d838d8f3b55537475d9438b0c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "External weighted/unweighted REAL(dbl) arithmetic mean, exposed through a module interface.",
+                "signature": "value = mean(f,w)",
+                "declarations": [
+                  {
+                    "path": "src/timeseries.f90",
+                    "line_start": 68,
+                    "line_end": 74
+                  },
+                  {
+                    "path": "src/timeseries.f90",
+                    "line_start": 323,
+                    "line_end": 334
+                  }
+                ],
+                "path": "src/timeseries.f90",
+                "line_start": 323,
+                "line_end": 335,
+                "usage": "use kind_defs, only: dbl\nuse timeseries, only: mean\nreal(dbl) :: f(3),w(3),value\nf=[1.0_dbl,2.0_dbl,4.0_dbl]\nw=[1.0_dbl,2.0_dbl,1.0_dbl]\nvalue=mean(f,w)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use nonempty matching arrays and a positive finite total weight. This external function is imported via the module interface; the normal full-source dependency/link requirements remain. No compensated summation or error bound is provided."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "92fc61c0a5b014363544c4ccd762077c9e1ba43e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Rasmus Handberg and supplies permission with notice-retention and warranty terms. This finding records the root notice, not every separately bundled legacy helper or external dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/rhandberg/timeseries/blob/92fc61c0a5b014363544c4ccd762077c9e1ba43e/LICENSE",
+              "sha256": "aecc46ea3dae62bae284fcc27c891deeb6606daf435e1c2de514b8c35303f22c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -25904,12 +26778,70 @@
             ],
             "notes": "The README distinguishes an R interface and Fortran kernels with flexible weighting. A similarity score is not a statistical proof of equivalence or a complete time-series forecasting model.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10d",
+            "level": "source-reviewed",
+            "revision": "d740a38151cc25b419683bb33c6234935ff34efc",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected legacy external twdtwf90gt routine aligns two multichannel time series by dynamic programming over Euclidean feature distances plus a logistic penalty on cyclic time differences. It takes the minimum cumulative cost from diagonal/horizontal/vertical predecessors, tracks start indices and reports best endpoint candidates. The first matrix column is accumulated separately without the LB exclusion used in later columns. XM is (M,D), YM is (N,D), with time in column 1. Callers must initialize CM first-row boundary costs and output buffers before the legacy call. JB is declared length N although as many as M endpoint groups may be written; this sketch restricts M<=N. Times must share a cycle representation with differences within CL. This is alignment/cost calculation, not automatic classification or an accuracy certificate. The separate callback BIND(C) routine marks CM INTENT(OUT) while reading boundary entries; that interface needs correction and is not the sketch path.",
+            "evidence": [
+              {
+                "path": "src/twdtwf90.f90",
+                "url": "https://github.com/vwmaus/twdtw/blob/d740a38151cc25b419683bb33c6234935ff34efc/src/twdtwf90.f90",
+                "sha256": "6e149d0aba1c3ec38fe756807cb81b4c9ff8a8134c40c4babd670e904109da45"
+              },
+              {
+                "path": "src/twdtwf90_wrapper.cpp",
+                "url": "https://github.com/vwmaus/twdtw/blob/d740a38151cc25b419683bb33c6234935ff34efc/src/twdtwf90_wrapper.cpp",
+                "sha256": "b11af7e1cca50fcd5aca745a535bc059bbc47c281a1e957ea813d7d3e6e0ad83"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "twdtwf90gt",
+                "role": "public-entry-point",
+                "summary": "External default-integer/double-precision legacy logistic-weight DTW routine, with caller-initialized (N+1,M) cost/direction/start matrices. No returned count/status identifies initialized JB entries; initialize unused slots to a sentinel.",
+                "signature": "CALL twdtwf90gt(XM,YM,CM,DM,VM,N,M,D,TW,LB,JB,CL)",
+                "declarations": [
+                  {
+                    "path": "src/twdtwf90.f90",
+                    "line_start": 159,
+                    "line_end": 170
+                  }
+                ],
+                "path": "src/twdtwf90.f90",
+                "line_start": 159,
+                "line_end": 260,
+                "usage": "integer, parameter :: n=3,m=3,d=3\ndouble precision :: xm(m,d),ym(n,d),cm(n+1,m),tw(2),lb,cl\ninteger :: dm(n+1,m),vm(n+1,m),jb(n)\nexternal :: twdtwf90gt\nxm(:,1)=[0.0d0,1.0d0,2.0d0]\nxm(:,2)=[0.0d0,1.0d0,0.0d0]; xm(:,3)=[1.0d0,0.0d0,1.0d0]\nym=xm; tw=[0.1d0,2.0d0]; cl=365.0d0; lb=cl\ncm=0.0d0; dm=-1; vm=0; jb=0\ncall twdtwf90gt(xm,ym,cm,dm,vm,n,m,d,tw,lb,jb,cl)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the legacy routine specifically: the callback/C-bound entry has a separate boundary-intent problem. The sketch sets explicit zero boundary costs and chooses M<=N to avoid the JB capacity issue. It does not validate path reconstruction, candidate counting, all cycle/boundary conventions or classification performance."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "d740a38151cc25b419683bb33c6234935ff34efc",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>= 3) and LICENSE.md supplies GPL version 3 text. This records the reviewed package terms, not all R/Rcpp dependency terms.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/vwmaus/twdtw/blob/d740a38151cc25b419683bb33c6234935ff34efc/DESCRIPTION",
+              "sha256": "06ea63d3dcd75bd04f1a51e20c8ffd7f387d0ed65e5c82435092b609dba23bc5"
+            },
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/vwmaus/twdtw/blob/d740a38151cc25b419683bb33c6234935ff34efc/LICENSE.md",
+              "sha256": "585e25ef8f5946a52bf2aed68d5becfc38be94a8663aa01c1b31d88aa57f1de3"
+            }
+          ]
         }
       },
       "imports": {}
