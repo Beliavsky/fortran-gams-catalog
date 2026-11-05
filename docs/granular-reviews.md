@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 300 repositories now have 392 source-reviewed
+Reviewed on 2026-11-05. 308 repositories now have 404 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-291 repository cards now identify public routines and link their usage lines
+299 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Nine further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT and main_Gaussian) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 300 independently source-reviewed repositories now have an
+separately. All 308 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -324,6 +324,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Contour 531 | `find_contours_reg_grid_m::find_contours_reg_grid` | GPL-3.0-only (root text) |
 | PFAPACK Rust bindings | `DSKTRF`, `DSKPFA` | LAPACK-derived notice; PFAPACK grant not separately identified |
 | Golden-section callback experiment | `goldenSectionSearch::gss` | No license identified |
+| EnsDAM | `ensdam_meanstd::ensemble_meanstd`, `ensdam_covariance::update_meancov_vector`, `ensdam_interp::grid1D_locate`, `ensdam_interp::grid1D_interp` | CeCILL-2.0 |
+| CohensdpLibrary | `hyg0f1`, `betacdf` | GPL-3 package declaration; numerical provenance separate |
+| IEEE classification helpers | `ieee_class_fortran::is_ieee_quiet_nan`, `ieee_class_fortran::set_ieee_quiet_nan` | MIT |
+| libsupermesh | `libsupermesh_tri_intersection::intersect_tris` | LGPL-2.1-only; bundled components separate |
+| polyhomocont | `polyhomocont__solve::solve` | MIT |
+| L-BFGS-B-NS | `setulb` | BSD-3-Clause declaration; referenced license file absent |
+| copa | `copa__sampler::run_sampler` | GPL-3.0-only root text; manifest placeholder |
+| MSOLV | `solver::solve_syst` | LGPL-3.0-only root; backend terms separate |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -643,6 +651,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Contour 531](https://github.com/lguez/contour_531) | Q | Regular-grid scalar isolines as polylines | Saved scratch state, unspecified orientation and default-real coordinates; geometry needs a separate renderer. |
 | [PFAPACK Rust bindings](https://github.com/duumbo/pfapack-sys-rs) | D2a1 | Pivoted real skew-symmetric congruence reduction and Pfaffian consumer | D2a1 covers only the related factorization subset; preserve input, query workspace and link numerical dependencies. |
 | [Golden-section callback experiment](https://github.com/huijunchen9260/gssfortran) | G1a1a | Derivative-free scalar golden-section search | Defaults to maximization; callback includes optional polymorphic data; no separate convergence status. |
+| [EnsDAM](https://github.com/brankart/ensdam) | L1a1a; L1a1b; L1c1b; E1a | Means, sample dispersion, incremental covariance and local linear interpolation | Initialize covariance states explicitly; wrapper MEANREF is uninitialized; distinguish weights, values and variance normalizations. |
+| [CohensdpLibrary](https://github.com/dcousin3/cohensdplibrary) | C11; L5a1b | Positive-real 0F1 limit series and beta-distribution CDF | 0F1 has no convergence status; beta wrapper merges errors and does not propagate every internal approximation status. |
+| [IEEE classification helpers](https://github.com/dscf-1224/ieee_class_fortran) | R2 | IEEE class predicates and quiet-NaN setter | Compiler kind/IEEE support required; no trap or signaling-NaN portability guarantee. |
+| [libsupermesh](https://github.com/firedrakeproject/libsupermesh) | P | Planar triangle intersection via half-plane clipping | Saved scratch requires serialization; use configured real kind; near-degenerate topology is unverified. |
+| [polyhomocont](https://github.com/evadevacstab/polyhomocont) | F2 | Polynomial-system total-degree homotopy continuation | Inspect failed paths/endgame statuses and residuals separately from driver setup status; counts are not certificates. |
+| [L-BFGS-B-NS](https://github.com/wilmerhenao/l-bfgs-b-ns) | G2h1a2 | Reverse-communication bounded limited-memory quasi-Newton optimization | Fork-specific work/state sizes; standard PGTOL/FACTR exits disabled; caller stopping logic required. |
+| [copa](https://github.com/thomasbiekoetter/copa) | L6b | Serial ensemble stretch-move sampling | At least two walkers and ten steps; validate ranges shape, prior support and external RNG setup. |
+| [MSOLV](https://github.com/tribo-pprime/msolv) | D2a4 | Real sparse direct-solver lifecycle dispatch | Backend formats/ownership and external libraries required; STOP errors, MPI ownership and cleanup allocations need review. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1204,3 +1220,11 @@ limited to inspected paths: random permutation probabilities, finite optimizatio
 budgets, moment definitions, real-kind build choices and shared state require
 particular care. The PFAPACK mapping covers a skew-symmetric related factorization,
 not a generic solver or QR decomposition.
+
+The IEEE-class, L-BFGS-B-NS, CoPA, polyhomocont, MSOLV, EnSDAM, libsupermesh
+and CohensdpLibrary cards now identify pinned interfaces, argument declarations
+and calling sketches. The sketches were not compiled or run. Findings include
+disabled standard stopping tests in L-BFGS-B-NS, the uninitialized reference mean
+in EnSDAM covariance, CoPA control/shape guards and separate continuation path
+statuses. Those limitations remain explicit rather than implying checked numerical
+results or complete algorithm/API audits.

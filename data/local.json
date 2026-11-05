@@ -28228,12 +28228,244 @@
             ],
             "notes": "The README distinguishes the Fortran library and Python interfaces and lists supporting modules. These utilities are not by themselves a complete forecasting model or verification of an assimilation system.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "f9e21be127b100811258ab5acc770f2fb11f9075",
+            "reviewed_on": "2026-11-05",
+            "notes": "The scalar-data ENSEMBLE_MEANSTD overload computes an ensemble mean using Welford-style incremental mean updates. The selected serial, unweighted branch requires at least two members. An optional standard deviation is sqrt(sum of squared anomalies/(N-1)); the weighted branch divides by the sum of weights instead and is not the same unbiased sample normalization. Arrays are REAL(KIND=8), and invalid sizes/too few members STOP. The selected raw-data summarization does not assume a Gaussian distribution, handle missing values, estimate standard errors or claim an MPI reduction audit. Source initializes accumulators before updates; no numerical cancellation, overflow or reference-data comparison was run.",
+            "evidence": [
+              {
+                "path": "src/EnsStat/meanstd.F90",
+                "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/EnsStat/meanstd.F90",
+                "sha256": "ad54f67f1053230d5293cff069b72341d1a6d584f864fc51401eda6094d93f57"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ensemble_meanstd",
+                "role": "public-entry-point",
+                "summary": "Public generic; the selected scalar-data overload takes ENS(:), scalar MEAN and optional scalar STD/WEIGHT(:).",
+                "signature": "CALL ensemble_meanstd(ENS,MEAN,STD,WEIGHT)",
+                "declarations": [
+                  {
+                    "path": "src/EnsStat/meanstd.F90",
+                    "line_start": 139,
+                    "line_end": 155
+                  }
+                ],
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 39,
+                "line_end": 41,
+                "module": "ensdam_meanstd",
+                "usage": "use ensdam_meanstd, only: ensemble_meanstd\nreal(kind=8) :: values(4),mean,sd\nvalues=[1d0,2d0,3d0,4d0]\ncall ensemble_meanstd(values,mean)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This chooses serial unweighted raw-data summarization. The generic also accepts vector-state ensembles with components in the first dimension. No statistic or error bound was verified."
+              },
+              {
+                "procedure": "ensemble_meanstd_variable",
+                "role": "implementation-helper",
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 139,
+                "line_end": 203,
+                "module": "ensdam_meanstd"
+              },
+              {
+                "procedure": "update_meanstd_variable",
+                "role": "implementation-helper",
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 300,
+                "line_end": 329,
+                "module": "ensdam_meanstd"
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "f9e21be127b100811258ab5acc770f2fb11f9075",
+            "reviewed_on": "2026-11-05",
+            "notes": "The scalar-data ENSEMBLE_MEANSTD overload computes an ensemble mean and sample standard deviation from incremental squared anomalies. The selected serial, unweighted branch requires at least two members. An optional standard deviation is sqrt(sum of squared anomalies/(N-1)); the weighted branch divides by the sum of weights instead and is not the same unbiased sample normalization. Arrays are REAL(KIND=8), and invalid sizes/too few members STOP. The selected raw-data summarization does not assume a Gaussian distribution, handle missing values, estimate standard errors or claim an MPI reduction audit. Source initializes accumulators before updates; no numerical cancellation, overflow or reference-data comparison was run.",
+            "evidence": [
+              {
+                "path": "src/EnsStat/meanstd.F90",
+                "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/EnsStat/meanstd.F90",
+                "sha256": "ad54f67f1053230d5293cff069b72341d1a6d584f864fc51401eda6094d93f57"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ensemble_meanstd",
+                "role": "public-entry-point",
+                "summary": "Public generic; the selected scalar-data overload takes ENS(:), scalar MEAN and optional scalar STD/WEIGHT(:).",
+                "signature": "CALL ensemble_meanstd(ENS,MEAN,STD,WEIGHT)",
+                "declarations": [
+                  {
+                    "path": "src/EnsStat/meanstd.F90",
+                    "line_start": 139,
+                    "line_end": 155
+                  }
+                ],
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 39,
+                "line_end": 41,
+                "module": "ensdam_meanstd",
+                "usage": "use ensdam_meanstd, only: ensemble_meanstd\nreal(kind=8) :: values(4),mean,sd\nvalues=[1d0,2d0,3d0,4d0]\ncall ensemble_meanstd(values,mean,sd)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This chooses serial unweighted raw-data summarization. STD is a sample standard deviation, not a standard error or the weighted population-normalized quantity. No statistic or error bound was verified."
+              },
+              {
+                "procedure": "ensemble_meanstd_variable",
+                "role": "implementation-helper",
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 139,
+                "line_end": 203,
+                "module": "ensdam_meanstd"
+              },
+              {
+                "procedure": "update_meanstd_variable",
+                "role": "implementation-helper",
+                "path": "src/EnsStat/meanstd.F90",
+                "line_start": 300,
+                "line_end": 329,
+                "module": "ensdam_meanstd"
+              }
+            ]
+          },
+          {
+            "code": "L1c1b",
+            "level": "source-reviewed",
+            "revision": "f9e21be127b100811258ab5acc770f2fb11f9075",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public UPDATE_MEANCOV_VECTOR incrementally updates a vector mean, scalar reference mean and accumulated centered cross-products using Welford-style paired updates. For unweighted sample covariance divide the accumulated cross-products by N-1 after N>=2 paired observations. All mutable accumulators must be explicitly initialized and MEMIDX is the one-based observation count, not an arbitrary identifier. The higher-level ENSEMBLE_COVARIANCE wrapper passes an uninitialized MEANREF to this updater; the mapping therefore presents the directly callable update interface with zero-initialized states rather than recommending that wrapper. It computes each vector component's covariance against one scalar reference, not automatically a complete covariance matrix. No positive-definiteness, unbiased weighted-estimator or missing-value claim is made; no covariance was checked by execution.",
+            "evidence": [
+              {
+                "path": "src/EnsStat/covariance.F90",
+                "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/EnsStat/covariance.F90",
+                "sha256": "001eee2af94ae8b7ece680b7b71474c4bd102b200d723590b03e0e3f897d5778"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "update_meancov_vector",
+                "role": "public-entry-point",
+                "summary": "Public vector/scalar incremental covariance accumulator; all mean/product arguments are mutable REAL(KIND=8).",
+                "signature": "CALL update_meancov_vector(VCT,VARREF,MEMIDX,MEAN,MEANREF,MPRODA)",
+                "declarations": [
+                  {
+                    "path": "src/EnsStat/covariance.F90",
+                    "line_start": 271,
+                    "line_end": 277
+                  },
+                  {
+                    "path": "src/EnsStat/covariance.F90",
+                    "line_start": 40,
+                    "line_end": 50
+                  }
+                ],
+                "path": "src/EnsStat/covariance.F90",
+                "line_start": 257,
+                "line_end": 296,
+                "module": "ensdam_covariance",
+                "usage": "use ensdam_covariance, only: update_meancov_vector\nreal(kind=8) :: values(2,3),reference(3),mean(2),meanref,products(2),cov(2)\ninteger :: j\nvalues=reshape([1d0,2d0,2d0,4d0,3d0,6d0],[2,3])\nreference=[1d0,3d0,5d0]\nmean=0d0; meanref=0d0; products=0d0\ndo j=1,3\n call update_meancov_vector(values(:,j),reference(j),j,mean,meanref,products)\nenddo\ncov=products/2d0",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This bypasses the wrapper initialization finding. Keep matching observation order, nonempty component vectors and consecutive counts; reset every accumulator when starting again. No covariance, translation sensitivity or high-level wrapper failure was reproduced."
+              },
+              {
+                "procedure": "update_meancov_variable",
+                "role": "implementation-helper",
+                "path": "src/EnsStat/covariance.F90",
+                "line_start": 346,
+                "line_end": 378,
+                "module": "ensdam_covariance"
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "f9e21be127b100811258ab5acc770f2fb11f9075",
+            "reviewed_on": "2026-11-05",
+            "notes": "GRID1D_LOCATE performs binary interval search on an ascending grid, and GRID1D_INTERP returns the local linear weight W=(X-GRID(KI))/(GRID(KI+1)-GRID(KI)). The caller forms (1-W)*Y(KI)+W*Y(KI+1); the routine returns a weight, not the interpolated value. Use at least two strictly increasing finite nodes and call the weight routine only after successful location. KI is unassigned on an out-of-range location failure. Distinct nodes avoid a zero denominator. Shared module LOCATED state means even this locator is not a pure/reentrant service. E1a records univariate piecewise-linear interpolation, without extending the claim to the separate curvilinear/spherical two-dimensional algorithms or extrapolation. No interpolation or endpoint behavior was run.",
+            "evidence": [
+              {
+                "path": "src/InterpTools/interp.f90",
+                "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/InterpTools/interp.f90",
+                "sha256": "07d43887743b75037c5e1b31b8a371bdf1e5495fb6e563dc6c009b29ad7b5553"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "grid1D_locate",
+                "role": "public-entry-point",
+                "summary": "Public logical locator with REAL(KIND=8) grid/query and output interval index.",
+                "signature": "FOUND = grid1D_locate(GRID,X,KI)",
+                "declarations": [
+                  {
+                    "path": "src/InterpTools/interp.f90",
+                    "line_start": 97,
+                    "line_end": 107
+                  }
+                ],
+                "path": "src/InterpTools/interp.f90",
+                "line_start": 97,
+                "line_end": 134,
+                "module": "ensdam_interp",
+                "usage": "use ensdam_interp, only: grid1D_locate,grid1D_interp\nreal(kind=8) :: grid(3),values(3),x,w,estimate\ninteger :: k\nlogical :: found\ngrid=[0d0,1d0,2d0]; values=[0d0,2d0,4d0]; x=0.5d0\nfound=grid1D_locate(grid,x,k)\nif (.not.found) error stop \"outside interpolation grid\"\ncall grid1D_interp(grid,x,k,w)\nestimate=(1d0-w)*values(k)+w*values(k+1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The locator supplies a cell index, including a valid final cell for an in-range upper endpoint by its binary search. Confirm endpoint and finite-value behavior on the target build. The grid must be strictly increasing; no extrapolation or interpolation accuracy was verified."
+              },
+              {
+                "procedure": "grid1D_interp",
+                "role": "public-entry-point",
+                "summary": "Public module subroutine returning the linear interpolation weight for a caller-supplied interval.",
+                "signature": "CALL grid1D_interp(GRID,X,KI,W)",
+                "declarations": [
+                  {
+                    "path": "src/InterpTools/interp.f90",
+                    "line_start": 180,
+                    "line_end": 192
+                  }
+                ],
+                "path": "src/InterpTools/interp.f90",
+                "line_start": 180,
+                "line_end": 194,
+                "module": "ensdam_interp"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CeCILL-2.0",
+          "spdx_expression": "CECILL-2.0",
+          "revision": "f9e21be127b100811258ab5acc770f2fb11f9075",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned English root agreement identifies version 2.0 dated 2006-09-05; inspected numerical modules explicitly invoke CeCILL. Legacy non-UTF8 license text is decoded as cp1252 before hashing, with source_encoding retained. MPI and other external libraries are outside this notice review.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/LICENSE.txt",
+              "sha256": "7e766f182f902958d4095f4526e73420b4c235780d020f1bd11cb46f0431bebe",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "src/EnsStat/meanstd.F90",
+              "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/EnsStat/meanstd.F90",
+              "sha256": "ad54f67f1053230d5293cff069b72341d1a6d584f864fc51401eda6094d93f57"
+            },
+            {
+              "path": "src/EnsStat/covariance.F90",
+              "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/EnsStat/covariance.F90",
+              "sha256": "001eee2af94ae8b7ece680b7b71474c4bd102b200d723590b03e0e3f897d5778"
+            },
+            {
+              "path": "src/InterpTools/interp.f90",
+              "url": "https://github.com/brankart/ensdam/blob/f9e21be127b100811258ab5acc770f2fb11f9075/src/InterpTools/interp.f90",
+              "sha256": "07d43887743b75037c5e1b31b8a371bdf1e5495fb6e563dc6c009b29ad7b5553"
+            }
+          ]
         }
       },
       "imports": {}
@@ -28661,12 +28893,121 @@
             ],
             "notes": "The README distinguishes Cohen dp from several other standardized mean differences. Its cross-design comparison claims depend on the stated definitions and assumptions; coverage is not independently reproduced.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C11",
+            "level": "source-reviewed",
+            "revision": "21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external HYG0F1 evaluates the confluent hypergeometric limit series 0F1(;A;Z), accumulating positive terms through logarithms of the rising factorial and ordinary factorial. The actual log formulation requires A>0 and Z>0 on the selected real branch; it does not implement general negative/complex arguments, analytic continuation or poles. It stops on an absolute term threshold 1e-15 or before iteration 1000, without returning a convergence flag or rigorous tail bound. Overflow, finite-precision loss and truncation are not diagnosed. This scoped mapping records the positive-real confluent limit function, not the separate Gauss 2F1 implementation or all special-function regimes in the package.",
+            "evidence": [
+              {
+                "path": "src/0F1.f90",
+                "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/src/0F1.f90",
+                "sha256": "db6295890c93a8a0bdb7259b4627458d5a24b5904499c1207b455be40de7acd0"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/DESCRIPTION",
+                "sha256": "9eb6905f31d8587b4bfe0b8e3fa079fab0fa876dabdb9be069bb6b5afc9495b0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hyg0f1",
+                "role": "public-entry-point",
+                "summary": "External double-kind real function; callers need an explicit return-type declaration or interface.",
+                "signature": "VALUE = hyg0f1(A,Z)",
+                "declarations": [
+                  {
+                    "path": "src/0F1.f90",
+                    "line_start": 7,
+                    "line_end": 17
+                  }
+                ],
+                "path": "src/0F1.f90",
+                "line_start": 7,
+                "line_end": 47,
+                "usage": "double precision,external :: hyg0f1\ndouble precision :: value\n! Positive A and Z select the inspected logarithmic series domain.\nvalue=hyg0f1(2d0,1d0)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No status indicates whether the term cutoff or iteration cap ended the sum. Do not use this sketch as evidence of general-argument 0F1 accuracy. No special-function value, overflow threshold or series-tail error was verified."
+              }
+            ]
+          },
+          {
+            "code": "L5a1b",
+            "level": "source-reviewed",
+            "revision": "21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b",
+            "reviewed_on": "2026-11-05",
+            "notes": "BETACDF returns the regularized incomplete beta ratio for positive shape parameters and X in [0,1], calling its BRATIO implementation and exposing IER. BRATIO switches by parameter/input regime between power series, continued fractions, recurrences and asymptotic routines; its lower/complementary result is selected to reduce cancellation. The wrapper returns the lower-tail W, collapses nonzero inner statuses to IER=1, and uses IER=3 for an out-of-range result. Several internal BGRAT calls use IERR1 without propagating it through the wrapper status, so IER=0 is not an independently established accuracy guarantee. The binomial part of the shared GAMS class is not claimed. Review covers wrapper validation and regime dispatch, not every approximation kernel or all tails.",
+            "evidence": [
+              {
+                "path": "src/BetaCDF.f90",
+                "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/src/BetaCDF.f90",
+                "sha256": "237a6cdeb112cbef0b7aed9699e097aabe0f816c8e43d345055b1e43a7988eb4"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/DESCRIPTION",
+                "sha256": "9eb6905f31d8587b4bfe0b8e3fa079fab0fa876dabdb9be069bb6b5afc9495b0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "betacdf",
+                "role": "public-entry-point",
+                "summary": "External real double-kind beta CDF; IER must be inspected before using the probability.",
+                "signature": "PROBABILITY = betacdf(X,P,Q,IER)",
+                "declarations": [
+                  {
+                    "path": "src/BetaCDF.f90",
+                    "line_start": 22,
+                    "line_end": 34
+                  }
+                ],
+                "path": "src/BetaCDF.f90",
+                "line_start": 1,
+                "line_end": 63,
+                "usage": "double precision,external :: betacdf\ndouble precision :: probability\ninteger :: status\nprobability=betacdf(0.5d0,2d0,3d0,status)\nif(status/=0) error stop \"beta CDF failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply positive finite shapes and a finite argument in [0,1]. The wrapper returns the lower tail; do not infer small upper-tail relative accuracy by subtraction from one. No beta probability, complementary-tail bound or error propagation case was checked."
+              },
+              {
+                "procedure": "bratio",
+                "role": "implementation-helper",
+                "path": "src/BetaCDF.f90",
+                "line_start": 66,
+                "line_end": 329
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3 package declaration; numerical provenance separate",
+          "spdx_expression": null,
+          "revision": "21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL-3 for the R package. The selected files credit Cousineau and DiDinato/Morris Algorithm 708; no separate full legacy numerical-component license reconciliation was performed. This records the package declaration without assuming that every bundled historical source has identical provenance.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/DESCRIPTION",
+              "sha256": "9eb6905f31d8587b4bfe0b8e3fa079fab0fa876dabdb9be069bb6b5afc9495b0"
+            },
+            {
+              "path": "src/0F1.f90",
+              "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/src/0F1.f90",
+              "sha256": "db6295890c93a8a0bdb7259b4627458d5a24b5904499c1207b455be40de7acd0"
+            },
+            {
+              "path": "src/BetaCDF.f90",
+              "url": "https://github.com/dcousin3/CohensdpLibrary/blob/21e9a3f878f632a145ca81b7c66ea4a6f6fbef5b/src/BetaCDF.f90",
+              "sha256": "237a6cdeb112cbef0b7aed9699e097aabe0f816c8e43d345055b1e43a7988eb4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29706,12 +30047,101 @@
             ],
             "notes": "The README lists tests/setters for zeros, infinities and NaN classes. These are representation helpers, not arbitrary floating-point exception recovery or verified-arithmetic algorithms.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "R2",
+            "level": "source-reviewed",
+            "revision": "2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public pure elemental IS_IEEE_QUIET_NAN generic accepts IEEE_CLASS_TYPE or supported real kinds, classifies real values through intrinsic IEEE_CLASS, and compares the class with IEEE_QUIET_NAN. The same source provides separate signaling-NaN, signed-zero and infinity predicates. R2 records floating-point class checking, not arithmetic, a sanitizer for all numerical errors or a portable trap handler. SET_IEEE_QUIET_NAN is a companion IEEE_VALUE setter. Actual support for real kinds and exceptional values depends on the compiler/platform; the generated module includes REAL128, while the Fypp template can configure kinds. IEEE exception behavior, including signaling values, must be checked on the target compiler. Source review covers the dispatch and selected real64/class implementations.",
+            "evidence": [
+              {
+                "path": "src/ieee_class_fortran.f90",
+                "url": "https://github.com/DSCF-1224/ieee_class_fortran/blob/2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd/src/ieee_class_fortran.f90",
+                "sha256": "d5a3c8e30af01b3e758b11832507efbbf131be2c5976cb5a28a328d0449f9884"
+              },
+              {
+                "path": "src/ieee_class_fortran.fypp",
+                "url": "https://github.com/DSCF-1224/ieee_class_fortran/blob/2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd/src/ieee_class_fortran.fypp",
+                "sha256": "a30e9dec7b6b6f3770f836ad19018c0203eacef0e1e3971fded96f8a5297529d"
+              },
+              {
+                "path": "src/ieee_class_fortran_common.fypp",
+                "url": "https://github.com/DSCF-1224/ieee_class_fortran/blob/2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd/src/ieee_class_fortran_common.fypp",
+                "sha256": "db04d23d55a1fb678a316631fe0f887c42bfd3847f1c5a97f10562dce09e3bdd"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/DSCF-1224/ieee_class_fortran/blob/2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd/README.md",
+                "sha256": "2bb515d9fb8ccb2bd7cebc033983623c0716e3c7a7c3f75383004aacd36f65c6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "is_ieee_quiet_nan",
+                "role": "public-entry-point",
+                "summary": "Public class predicate; real scalar/array actual arguments select elemental kind-specific implementations.",
+                "signature": "FLAG = is_ieee_quiet_nan(X)",
+                "declarations": [
+                  {
+                    "path": "src/ieee_class_fortran.f90",
+                    "line_start": 366,
+                    "line_end": 392
+                  }
+                ],
+                "path": "src/ieee_class_fortran.f90",
+                "line_start": 86,
+                "line_end": 91,
+                "module": "ieee_class_fortran",
+                "usage": "use iso_fortran_env, only: real64\nuse ieee_arithmetic, only: ieee_support_nan\nuse ieee_class_fortran, only: set_ieee_quiet_nan,is_ieee_quiet_nan\nreal(real64) :: x\nlogical :: flag\nif (.not.ieee_support_nan(0.0_real64)) error stop \"NaN unsupported\"\ncall set_ieee_quiet_nan(x)\nflag=is_ieee_quiet_nan(x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a generated/template configuration containing only supported real kinds. This example chooses a quiet NaN and does not test signaling-NaN exception behavior. No platform class, array-elemental or compiler optimization case was run."
+              },
+              {
+                "procedure": "set_ieee_quiet_nan",
+                "role": "public-entry-point",
+                "summary": "Public elemental IEEE_VALUE setter for supported real kinds.",
+                "signature": "CALL set_ieee_quiet_nan(X)",
+                "declarations": [
+                  {
+                    "path": "src/ieee_class_fortran.f90",
+                    "line_start": 588,
+                    "line_end": 594
+                  }
+                ],
+                "path": "src/ieee_class_fortran.f90",
+                "line_start": 136,
+                "line_end": 140,
+                "module": "ieee_class_fortran"
+              },
+              {
+                "procedure": "is_ieee_quiet_nan_real64",
+                "role": "implementation-helper",
+                "path": "src/ieee_class_fortran.f90",
+                "line_start": 386,
+                "line_end": 392,
+                "module": "ieee_class_fortran"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root contains the MIT grant and copyright notice. This review records the module/template repository notice without extending it to compiler intrinsic implementations.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/DSCF-1224/ieee_class_fortran/blob/2639a62c7dfc6dd249d56ba18f46ad8a9fcee1cd/LICENSE",
+              "sha256": "e2c2777ed1cf8e5d0c04c6bf33f09478d861dfefd874a39c7ccdbc55955b2188"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30187,12 +30617,102 @@
             ],
             "notes": "The brief README identifies parallel supermeshing and spatialindex requirements. Its CMake command specifically generates documentation; library build details and individual mesh-intersection algorithms need further review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "4ff425c9e668f6eb41b0603c17ec21ee5dc11f90",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public INTERSECT_TRIS generic clips one planar triangle against the three oriented half-planes of another with Sutherland-Hodgman-style clipping, then fan-triangulates the resulting convex polygon and drops tiny triangles by an area-spacing tolerance. It accepts real coordinate arrays (2,3) or TRI_TYPE values and returns up to TRI_BUF_SIZE=22 triangles with an explicit count. GET_LINES adjusts normals for vertex orientation. This is planar triangle intersection, not arbitrary nonconvex polygon clipping, a complete parallel supermesh build or certified exact predicates. Zero-area/near-degenerate inputs and floating-point tolerance effects require independent testing. The selected overloads and clip buffer use saved shared scratch and cannot be assumed thread-safe. Precision is configured through LIBSUPERMESH_PRECISION and the build/MPI setup, so callers must import REAL_KIND rather than assume double precision.",
+            "evidence": [
+              {
+                "path": "src/Triangle_Intersection.F90",
+                "url": "https://github.com/firedrakeproject/libsupermesh/blob/4ff425c9e668f6eb41b0603c17ec21ee5dc11f90/src/Triangle_Intersection.F90",
+                "sha256": "e9dcd071883e4dfc7467ca67c1ccebc1c1ab0e8a0d359b105e5fb5468c0630fa"
+              },
+              {
+                "path": "src/Precision.F90",
+                "url": "https://github.com/firedrakeproject/libsupermesh/blob/4ff425c9e668f6eb41b0603c17ec21ee5dc11f90/src/Precision.F90",
+                "sha256": "a6e11cb6086a1148c67d74e22ffb78c30de12908b3cc6e46a5abb3c28b910cd0"
+              },
+              {
+                "path": "src/libsupermesh.F90",
+                "url": "https://github.com/firedrakeproject/libsupermesh/blob/4ff425c9e668f6eb41b0603c17ec21ee5dc11f90/src/libsupermesh.F90",
+                "sha256": "ede8245bc40f2b24cbb9bb3c1f1255bae91306ce632c26ab91728ce07827b088"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "intersect_tris",
+                "role": "public-entry-point",
+                "summary": "Public triangle-intersection generic; this sketch selects real arrays and uses the fixed TRI_BUF_SIZE output capacity.",
+                "signature": "CALL intersect_tris(TRI_A,TRI_B,TRIS_C,N_TRIS_C)",
+                "declarations": [
+                  {
+                    "path": "src/Triangle_Intersection.F90",
+                    "line_start": 125,
+                    "line_end": 129
+                  },
+                  {
+                    "path": "src/Triangle_Intersection.F90",
+                    "line_start": 66,
+                    "line_end": 71
+                  },
+                  {
+                    "path": "src/Triangle_Intersection.F90",
+                    "line_start": 99,
+                    "line_end": 102
+                  }
+                ],
+                "path": "src/Triangle_Intersection.F90",
+                "line_start": 82,
+                "line_end": 84,
+                "module": "libsupermesh_tri_intersection",
+                "usage": "use libsupermesh_precision, only: real_kind\nuse libsupermesh_tri_intersection, only: intersect_tris,tri_buf_size\nreal(real_kind) :: a(2,3),b(2,3),pieces(2,3,tri_buf_size)\ninteger :: npieces\na(:,1)=[0.0_real_kind,0.0_real_kind]\na(:,2)=[1.0_real_kind,0.0_real_kind]\na(:,3)=[0.0_real_kind,1.0_real_kind]\nb=a\ncall intersect_tris(a,b,pieces,npieces)\n! Only PIECES(:,:,1:NPIECES) is defined as returned geometry.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the configured libsupermesh build including its MPI precision module. Serialize calls to the saved-buffer triangle path. The identical-triangle sketch is illustrative only; no area, orientation, degeneracy or intersection topology was checked."
+              },
+              {
+                "procedure": "intersect_tris_tri",
+                "role": "implementation-helper",
+                "path": "src/Triangle_Intersection.F90",
+                "line_start": 144,
+                "line_end": 185,
+                "module": "libsupermesh_tri_intersection"
+              },
+              {
+                "procedure": "clip_buf",
+                "role": "implementation-helper",
+                "path": "src/Triangle_Intersection.F90",
+                "line_start": 282,
+                "line_end": 335,
+                "module": "libsupermesh_tri_intersection"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-2.1-only; bundled components separate",
+          "spdx_expression": "LGPL-2.1-only",
+          "revision": "4ff425c9e668f6eb41b0603c17ec21ee5dc11f90",
+          "reviewed_on": "2026-11-05",
+          "notes": "Selected Fortran headers explicitly specify GNU LGPL version 2.1 and identify Fluidity-derived implementation provenance. The root COPYING separately discusses bundled third-party components; this is not a single-license finding for all C/C++ spatial indexes or XML support.",
+          "evidence": [
+            {
+              "path": "COPYING",
+              "url": "https://github.com/firedrakeproject/libsupermesh/blob/4ff425c9e668f6eb41b0603c17ec21ee5dc11f90/COPYING",
+              "sha256": "fd7001a685f9393a59ec9e47239765e863dc0caa12397150099a51087403c256"
+            },
+            {
+              "path": "src/Triangle_Intersection.F90",
+              "url": "https://github.com/firedrakeproject/libsupermesh/blob/4ff425c9e668f6eb41b0603c17ec21ee5dc11f90/src/Triangle_Intersection.F90",
+              "sha256": "e9dcd071883e4dfc7467ca67c1ccebc1c1ab0e8a0d359b105e5fb5468c0630fa"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30662,12 +31182,124 @@
             ],
             "notes": "The README describes total-degree projective paths, predictor/corrector tracking and a Cauchy endgame. Positive-dimensional components are not specially handled, and completeness or singular-endpoint behavior has not been independently verified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "9c4372d6079eeec5c9f867a233940b8de558ca35",
+            "reviewed_on": "2026-11-05",
+            "notes": "SOLVE builds a randomized total-degree homotopy with product(degrees) start paths, tracks in projective coordinates using an RK4 predictor and Newton corrector with adaptive step rejection, and optionally applies a Cauchy end game. The driver classifies finite/infinite and regular/singular endpoints, refines regular solutions and clusters duplicates. STATUS reports setup errors separately from RES%NFAILED, path statuses and end-game status: STATUS_OK alone does not mean all roots were obtained. Numerical residuals, condition estimates, winding/multiplicity counts and real-root tolerances are diagnostic approximations, not certified algebraic counts or proof of completeness. A custom POLY_SYSTEM must supply exact total degrees, evaluations and Jacobians; the default homogeneous evaluator loses accuracy near infinity, so sparse/direct homogeneous evaluation is preferable there. Source review covers construction/driver dispatch, selected tracker and endpoint classification, not every continuation/end-game kernel or a numerical root test.",
+            "evidence": [
+              {
+                "path": "src/solve.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/solve.f90",
+                "sha256": "9f951934b2d7c064c8d70e7266236b276d6e5eedbe7e3e9aaf932f81346c32c4"
+              },
+              {
+                "path": "src/polyhomocont.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/polyhomocont.f90",
+                "sha256": "f7e52805f0b4a7bfadb0d4b6378056bd54296b7c01398b5d522921dd7b58376a"
+              },
+              {
+                "path": "src/system.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/system.f90",
+                "sha256": "9527529b49c950bf52ade3f8b4b3cb82666c7b17acc80dbb1f7a9a92aa582890"
+              },
+              {
+                "path": "src/sparse.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/sparse.f90",
+                "sha256": "a0fe82e1f648738f18d8404fc815f8902db72011d9bbacc11e57543f1dfa0ea7"
+              },
+              {
+                "path": "src/homotopy.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/homotopy.f90",
+                "sha256": "a5b1ebe7f45337d7a482c9dd5eb41ae93deac8e903634c41cc282836a0c8e62d"
+              },
+              {
+                "path": "src/tracker.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/tracker.f90",
+                "sha256": "55600bad09bba35e60d605b333de0326fef7d39bef9d38be5699199b561a55ee"
+              },
+              {
+                "path": "src/endgame.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/src/endgame.f90",
+                "sha256": "fb482bbe71a70d074ce0ab9642b94366d0664a5cebf457094d2f5d3d81ef839c"
+              },
+              {
+                "path": "app/example.f90",
+                "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/app/example.f90",
+                "sha256": "aa551306d81002c13ce8d3e524dda891012b11a0752de87e96eaaf3d16f5b95a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public module driver re-exported by POLYHOMOCONT; output result contains per-path classifications and approximate solutions.",
+                "signature": "CALL solve(SYS,RES,STATUS,OPTIONS)",
+                "declarations": [
+                  {
+                    "path": "src/solve.f90",
+                    "line_start": 154,
+                    "line_end": 163
+                  },
+                  {
+                    "path": "src/solve.f90",
+                    "line_start": 121,
+                    "line_end": 149
+                  }
+                ],
+                "path": "src/solve.f90",
+                "line_start": 154,
+                "line_end": 215,
+                "module": "polyhomocont__solve",
+                "examples": [
+                  {
+                    "path": "app/example.f90",
+                    "line_start": 77,
+                    "line_end": 87
+                  }
+                ],
+                "usage": "use polyhomocont, only: wp,sparse_system,solve,solve_result,status_ok\ntype(sparse_system) :: sys\ntype(solve_result) :: res\ninteger :: status\ncall sys%init(2)\ncall sys%add_equation([1.0_wp,1.0_wp,-5.0_wp], &\n     reshape([2,0,0,2,0,0],[2,3]),status)\nif(status/=status_ok) error stop \"first polynomial invalid\"\ncall sys%add_equation([1.0_wp,-2.0_wp], &\n     reshape([1,1,0,0],[2,2]),status)\nif(status/=status_ok) error stop \"second polynomial invalid\"\ncall solve(sys,res,status)\n! Check STATUS, RES%NFAILED, duplicates, path/endgame status and residuals.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Adapted from the supplied circle/product example; no solutions were computed here. Total-degree path counts can grow rapidly with dimension/degree. A small residual or no failed paths alone is not a completeness certificate. Review singular/infinite paths and independent affine residuals before interpreting the output."
+              },
+              {
+                "procedure": "endpoint",
+                "role": "implementation-helper",
+                "path": "src/solve.f90",
+                "line_start": 217,
+                "line_end": 252,
+                "module": "polyhomocont__solve"
+              },
+              {
+                "procedure": "track_segment",
+                "role": "implementation-helper",
+                "path": "src/tracker.f90",
+                "line_start": 196,
+                "line_end": 264,
+                "module": "polyhomocont__tracker"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "9c4372d6079eeec5c9f867a233940b8de558ca35",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root supplies the MIT grant. The review records that notice for this implementation and does not certify the behavior of all homotopy, random or linear-algebra components.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/EVADEVacStab/polyhomocont/blob/9c4372d6079eeec5c9f867a233940b8de558ca35/LICENSE",
+              "sha256": "9a238d5e29885d6863f7b4d42fec402a96a7159136be89e28c7e48e80e10f898"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31180,12 +31812,77 @@
             ],
             "notes": "The setulb interface comments identify limited-memory bound-constrained optimization; the signature contains additional parameters relative to the original algorithm. No nonsmooth-convergence guarantee is inferred from the repository suffix or inherited original documentation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h1a2",
+            "level": "source-reviewed",
+            "revision": "46ca79fe7a2173ac21f59e68b49fa44298ee2f97",
+            "reviewed_on": "2026-11-05",
+            "notes": "SETULB exposes an extended reverse-communication limited-memory BFGS bound-constrained optimizer. TASK requests F and G at X, returns accepted iterates and eventually reports convergence, stop or error strings. NBD selects no/lower/both/upper bounds; The inherited FACTR/PGTOL documentation does not match this fork: both projected-gradient stopping checks are commented out and the relative-objective test is guarded by IF(.FALSE.). Callers must supply their own convergence and work-budget logic. The actual interface adds TAUX,NFG,JMAX,TAUD,NBISECT, uses ISAVE(47), DSAVE(30) and WA length 2*M*N+5*N+11*M*M+8*M+2*JMAX*N: the inherited shorter workspace comments are obsolete. The selected smooth path keeps NFG=0 to bypass the added stored-gradient convex-hull test; it still uses this fork's modified line search. Enabling that extension requires caller-managed gradient/point history as in the supplied driver and separate investigation: FREEX=1/INDCLOSE uses integer division before real assignment. This mapping does not establish nonsmooth convergence, global optimality or correctness of that extension. Driver/workspace partition, Cauchy/subspace and line-search dispatch were inspected, not every BLAS/LINPACK kernel.",
+            "evidence": [
+              {
+                "path": "lbfgsbNS.f90",
+                "url": "https://github.com/wilmerhenao/L-BFGS-B-NS/blob/46ca79fe7a2173ac21f59e68b49fa44298ee2f97/lbfgsbNS.f90",
+                "sha256": "91b4e2d5acdb5d9f39674574739d80da7b74b68cbf1481171db2721c551f6ac7"
+              },
+              {
+                "path": "DriverRosenbrockp.f90",
+                "url": "https://github.com/wilmerhenao/L-BFGS-B-NS/blob/46ca79fe7a2173ac21f59e68b49fa44298ee2f97/DriverRosenbrockp.f90",
+                "sha256": "4fca07709e19082e650acf64026e78059e8f7040e804866b869f5797e544426b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setulb",
+                "role": "public-entry-point",
+                "summary": "External double-precision optimizer with persistent reverse-communication state and fork-specific extra arguments.",
+                "signature": "CALL setulb(N,M,X,L,U,NBD,F,G,FACTR,PGTOL,WA,IWA, &\n     TASK,IPRINT,CSAVE,LSAVE,ISAVE,DSAVE,TAUX,NFG,JMAX,TAUD,NBISECT)",
+                "declarations": [
+                  {
+                    "path": "lbfgsbNS.f90",
+                    "line_start": 47,
+                    "line_end": 57
+                  }
+                ],
+                "path": "lbfgsbNS.f90",
+                "line_start": 47,
+                "line_end": 286,
+                "usage": "integer,parameter :: n=2,m=5,jmax=1\ninteger :: nbd(n),iwa(3*n),isave(47),nfg,nbisect,ncalls\ndouble precision :: x(n),lo(n),hi(n),f,g(n),dsave(30)\ndouble precision :: wa(2*m*n+5*n+11*m*m+8*m+2*jmax*n)\nlogical :: lsave(4)\ncharacter(60) :: task,csave\nx=0d0; lo=-2d0; hi=2d0; nbd=2\nwa=0d0; iwa=0; isave=0; dsave=0d0; lsave=.false.\nnfg=0; nbisect=0; task=\"START\"; csave=\"\"\ndo ncalls=1,1000\n call setulb(n,m,x,lo,hi,nbd,f,g,1d7,1d-6,wa,iwa, &\n      task,-1,csave,lsave,isave,dsave,1d-3,nfg,jmax,1d-6,nbisect)\n if(task(1:2)==\"FG\") then\n  call objective_and_gradient(x,f,g) ! supply a compatible procedure\n else if(task(1:5)==\"NEW_X\") then\n  if(dsave(13)<=1d-6) exit ! caller-side projected-gradient estimate\n  cycle\n else\n  exit\n endif\nenddo\n! Inspect TASK and independently check feasibility and projected gradient.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the fork with its BLAS/LINPACK/timer dependencies and supply the omitted objective procedure. Preserve all work/state arrays between calls. Keeping NFG zero deliberately disables the custom history-based termination path; this is not its author driver. Read TASK as a termination reason, not proof of optimality. No objective, convergence, workspace or line-search case was tested. The source disables its standard PGTOL/FACTR exits; the sketch limits reverse-communication calls and checks the returned projected-gradient estimate after NEW_X. Distinguish that caller exit from a solver convergence TASK and recompute the projected gradient independently."
+              },
+              {
+                "procedure": "mainlb",
+                "role": "implementation-helper",
+                "path": "lbfgsbNS.f90",
+                "line_start": 290,
+                "line_end": 1109
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause declaration; referenced license file absent",
+          "spdx_expression": null,
+          "revision": "46ca79fe7a2173ac21f59e68b49fa44298ee2f97",
+          "reviewed_on": "2026-11-05",
+          "notes": "Both inspected headers explicitly declare New/Modified/3-clause BSD and refer to an attached License.txt, which is absent from the pinned tree. The numerical file contains additional modifications. This records the declaration and missing full notice, without asserting that all component attribution/redistribution requirements were reconciled.",
+          "evidence": [
+            {
+              "path": "lbfgsbNS.f90",
+              "url": "https://github.com/wilmerhenao/L-BFGS-B-NS/blob/46ca79fe7a2173ac21f59e68b49fa44298ee2f97/lbfgsbNS.f90",
+              "sha256": "91b4e2d5acdb5d9f39674574739d80da7b74b68cbf1481171db2721c551f6ac7"
+            },
+            {
+              "path": "DriverRosenbrockp.f90",
+              "url": "https://github.com/wilmerhenao/L-BFGS-B-NS/blob/46ca79fe7a2173ac21f59e68b49fa44298ee2f97/DriverRosenbrockp.f90",
+              "sha256": "4fca07709e19082e650acf64026e78059e8f7040e804866b869f5797e544426b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -31927,12 +32624,93 @@
             ],
             "notes": "The README documents affine-invariant sampling, red-black and independent ensemble parallelism and chain storage. Despite Optimization in the expanded name, the reviewed interfaces establish sampling rather than a certified optimization solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6b",
+            "level": "source-reviewed",
+            "revision": "4a1f8b0433f828b7b4cd56fe10d87869bd450b59",
+            "reviewed_on": "2026-11-05",
+            "notes": "The serial RUN_SAMPLER implements an affine-invariant ensemble stretch proposal with a companion walker, stretch density proportional to 1/sqrt(z) on [1/2,2], and acceptance factor z**(NDIM-1)*exp(delta log posterior). LOG_PRIOR and LOG_LIKE callbacks supply scalar logs. RANGES initializes walkers only; the callbacks must enforce posterior support thereafter. CHAINS has shape (NDIM,NWALKERS,NSTEPS), LOG_PROBS (NWALKERS,NSTEPS). Require NWALKERS>=2 to avoid the distinct-partner loop hanging and NSTEPS>=10 because progress MOD uses integer NSTEPS/10. The inspected range-shape guard combines tests incorrectly, so the caller must enforce shape (2,NDIM). EVORTRAN supplies the RNG and must be initialized consistently with WP. The routine allocates the whole chain even if output is omitted; no burn-in, autocorrelation or effective-sample-size calculation is performed. This mapping covers the serial implementation, not the separate OpenMP samplers or a verified posterior sample.",
+            "evidence": [
+              {
+                "path": "src/sampler.f90",
+                "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/src/sampler.f90",
+                "sha256": "57c3e7f87b340a6d299c2f3400f318ab62485c22df692371061672399469f6b2"
+              },
+              {
+                "path": "src/config.F90",
+                "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/src/config.F90",
+                "sha256": "54c9f57cd443d0fadece108f1340ec8edbbb4785accb92fd3c797935daf05681"
+              },
+              {
+                "path": "test/standard_normal.f90",
+                "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/test/standard_normal.f90",
+                "sha256": "fa55f4570286e207998b5ddd0f6a5d35a806de86e8db7b684c99def916be6146"
+              },
+              {
+                "path": "fpm.toml",
+                "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/fpm.toml",
+                "sha256": "dc76f18c47eed7decdd7d3eefc349cf1dc89b54522a5863e6067db00eb1f5051"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "run_sampler",
+                "role": "public-entry-point",
+                "summary": "Public serial ensemble sampler with assumed-shape log-density callbacks and optional allocated outputs.",
+                "signature": "CALL run_sampler(NDIM,LOG_PRIOR,LOG_LIKE,NWALKERS,NSTEPS, &\n     RANGES,WALKERS,CHAINS,LOG_PROBS)",
+                "declarations": [
+                  {
+                    "path": "src/sampler.f90",
+                    "line_start": 14,
+                    "line_end": 30
+                  },
+                  {
+                    "path": "src/sampler.f90",
+                    "line_start": 34,
+                    "line_end": 46
+                  }
+                ],
+                "path": "src/sampler.f90",
+                "line_start": 34,
+                "line_end": 181,
+                "module": "copa__sampler",
+                "examples": [
+                  {
+                    "path": "test/standard_normal.f90",
+                    "line_start": 19,
+                    "line_end": 29
+                  }
+                ],
+                "usage": "use copa__config, only: wp\nuse copa__sampler, only: run_sampler\nuse evortran__prng_rand, only: initialize_rands\nreal(wp) :: ranges(2,2)\nreal(wp),allocatable :: chains(:,:,:),logs(:,:)\nranges(1,:)=-5.0_wp; ranges(2,:)=5.0_wp\ncall initialize_rands(mode=\"twister\",seed=1)\n! Supply LOG_PRIOR/LOG_LIKE(THETA(:),LOG_VALUE) with REAL(WP) dummies.\ncall run_sampler(2,log_prior,log_like,nwalkers=20,nsteps=100, &\n     ranges=ranges,chains=chains,log_probs=logs)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. These ranges set the initial ensemble; implement any actual bounds in LOG_PRIOR. Supply compatible callbacks and EVORTRAN dependencies. Guard overflow/NaN or infinite log-density differences as appropriate. No posterior moments, mixing, random reproducibility or acceptance diagnostic was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only root text; manifest placeholder",
+          "spdx_expression": null,
+          "revision": "4a1f8b0433f828b7b4cd56fe10d87869bd450b59",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GNU GPL version 3 text, whereas fpm.toml contains the placeholder license string \"license\". The external EVORTRAN/OpenMP dependencies have separate terms. This finding preserves that distinction rather than treating the manifest as an identified license expression.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/LICENSE",
+              "sha256": "b07087e0b97b23a20eb12f9a1048566449ae74c8b4439f3e8ef8019bd1e0332b"
+            },
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/thomasbiekoetter/copa/blob/4a1f8b0433f828b7b4cd56fe10d87869bd450b59/fpm.toml",
+              "sha256": "dc76f18c47eed7decdd7d3eefc349cf1dc89b54522a5863e6067db00eb1f5051"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37733,12 +38511,102 @@
             ],
             "notes": "The README distinguishes backend libraries, matrix formats and analysis/factorization reuse. Its configuration is motivated by shared-memory lubrication applications and uses sequential MUMPS; a wrapper does not independently implement or validate each backend algorithm.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "9d8e0030641f1c7f3a29e646ad9b1020ca058141",
+            "reviewed_on": "2026-11-05",
+            "notes": "SOLVE_SYST dispatches initialization, analysis, numerical factorization, solution and cleanup for real sparse general systems through MA48, SuperLU, MUMPS or UMFPACK wrappers. The selected UMFP path passes compressed-column pointers/row indices/values to symbolic and numeric factorization and solves A*x=b, with iterative refinement explicitly disabled. This is an orchestration layer, not an independent direct-solver implementation or proof of stability. MAT_SOLV contains backend storage, dimensions, sparse arrays, RHS and solution; the caller must use backend-compatible index base, kinds and allocation/ownership. CODE/MESS are marked unused, and several failures STOP instead of returning status. Cleanup unconditionally deallocates ELTPTR/ELTVAR even for assembled storage, so that allocation path needs review. The MUMPS branch initializes/finalizes MPI itself and fixes SYM=0. No symmetric-specialized or complex solver claim is inferred from the backends' wider capabilities. Source driver/UMFP dispatch were inspected; external backend kernels and dependent support modules were not audited.",
+            "evidence": [
+              {
+                "path": "src/mod_solver.f90",
+                "url": "https://github.com/TRIBO-Pprime/MSOLV/blob/9d8e0030641f1c7f3a29e646ad9b1020ca058141/src/mod_solver.f90",
+                "sha256": "d65a0ec95a2feff45bd623b7c89789927278c8f29c1a7ef88fef02d7aa67829f"
+              },
+              {
+                "path": "src/prg.f90",
+                "url": "https://github.com/TRIBO-Pprime/MSOLV/blob/9d8e0030641f1c7f3a29e646ad9b1020ca058141/src/prg.f90",
+                "sha256": "268fcfbc3941c13bcc62eac58c0e6c43c8d79b15bbdab3d7afd969f492653029"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/TRIBO-Pprime/MSOLV/blob/9d8e0030641f1c7f3a29e646ad9b1020ca058141/README.md",
+                "sha256": "cf3d2d13667f879a6dbc5c66cd8e548fcd44067dd6b2cef4c60cbb1938ddc11f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve_syst",
+                "role": "public-entry-point",
+                "summary": "Module lifecycle dispatcher taking mutable MAT_SOLV and a single step string. Each call returns after one matched action.",
+                "signature": "CALL solve_syst(MAT,STEP)",
+                "declarations": [
+                  {
+                    "path": "src/mod_solver.f90",
+                    "line_start": 126,
+                    "line_end": 135
+                  },
+                  {
+                    "path": "src/mod_solver.f90",
+                    "line_start": 64,
+                    "line_end": 92
+                  },
+                  {
+                    "path": "src/mod_solver.f90",
+                    "line_start": 105,
+                    "line_end": 109
+                  }
+                ],
+                "path": "src/mod_solver.f90",
+                "line_start": 126,
+                "line_end": 138,
+                "module": "solver",
+                "usage": "use solver, only: MAT_SOLV,UMFP,solve_syst\ntype(MAT_SOLV),target :: matrix\n! Prepare NN, SLV_T=UMFP and valid backend-compatible sparse arrays.\n! All supporting solver modules/libraries must be built and linked.\ncall solve_syst(matrix,\"ini\")\n! Fill MATRIX%B after INI, which allocates/initializes RHS and solution.\ncall solve_syst(matrix,\"ana\")\ncall solve_syst(matrix,\"fac\")\ncall solve_syst(matrix,\"sol\")\n! Inspect backend info and check the residual using the original matrix/RHS.\n! Review required ELTPTR/ELTVAR allocation before FRE/END cleanup.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is a lifecycle fragment; it does not construct a sparse matrix. Supply the documented index layout and native REAL(R8)/INTEGER(I4) support modules. STEP is not a sequence of actions: INI/ANA/FAC/SOL require separate calls. No backend solve, cleanup, MPI ownership or residual was tested."
+              },
+              {
+                "procedure": "analyse_solver",
+                "role": "implementation-helper",
+                "path": "src/mod_solver.f90",
+                "line_start": 222,
+                "line_end": 289,
+                "module": "solver"
+              },
+              {
+                "procedure": "solution_solver",
+                "role": "implementation-helper",
+                "path": "src/mod_solver.f90",
+                "line_start": 342,
+                "line_end": 407,
+                "module": "solver"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0-only root; backend terms separate",
+          "spdx_expression": null,
+          "revision": "9d8e0030641f1c7f3a29e646ad9b1020ca058141",
+          "reviewed_on": "2026-11-05",
+          "notes": "The repository supplies GNU LGPL version 3 text for the wrapper. MUMPS, SuperLU, UMFPACK and HSL have separate distribution/use terms and external dependencies; this review does not relicense or audit those components.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/TRIBO-Pprime/MSOLV/blob/9d8e0030641f1c7f3a29e646ad9b1020ca058141/LICENSE",
+              "sha256": "97628afebc60f026f5c2b25d7491c46a5c4ee61f693e7cfa07fbd2c03605979b"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/TRIBO-Pprime/MSOLV/blob/9d8e0030641f1c7f3a29e646ad9b1020ca058141/README.md",
+              "sha256": "cf3d2d13667f879a6dbc5c66cd8e548fcd44067dd6b2cef4c60cbb1938ddc11f"
+            }
+          ]
         }
       },
       "imports": {}
