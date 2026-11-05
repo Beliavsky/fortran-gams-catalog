@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 252 repositories now have 320 source-reviewed
+Reviewed on 2026-11-05. 260 repositories now have 332 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-245 repository cards now identify public routines and link their usage lines
+253 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Seven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG and ACFbyFFT) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 252 independently source-reviewed repositories now have an
+separately. All 260 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -276,6 +276,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ecgmm_fortran | `ecgmm::iterate`, `get_p` | No license grant identified in reviewed material |
 | twdtw | External `twdtwf90gt` legacy Fortran routine, with explicit boundary initialization | GPL-3.0-or-later |
 | timeseries | External `CalcAlphaBeta`, `mean`, exposed by module `timeseries` interfaces | MIT |
+| ODEPACK modernization | `M_odepack::DLSODE`, selected MF=10 Adams and MF=22 BDF paths | Declared public domain with LLNL notice |
+| NUFFT (biotrump mirror) | External `nufft1d1f90`, centered complex type-1 transform | BSD two-clause with FreeBSD views notice |
+| QD | `ddmodule` decimal assignment and double-double `operator(+)` | BSD-3-Clause root with additional LBNL notice |
+| MPFUN2020 | Variant-1 `mpreal`, `mpinit`, `operator(+)`, `exp`, normally imported through `MPMODULE` | BSD-style terms with contribution license-back clause |
+| FMPFR | `fmpfr_oper::fmpfr`, `operator(+)`, precision/rounding setters | MIT for src; dependency/build-tool terms separate |
+| ga_lib | `selection::selection_tournament`; `benchmark::solve` target-value search harness | MIT |
+| GARCH | `garch_mod::simulate_garch`, `obj_fun_mod::garch_sigma` | No explicit reuse grant identified |
+| EnKF_analysis | External scalar-observation `analysis`; `m_ensmean::ensmean`, `m_ensvar::ensvar` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -547,6 +555,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ecgmm_fortran](https://github.com/minzastro/ecgmm_fortran) | L4a1a; L5a1n | Fixed-count error-corrected scalar Gaussian-mixture updates and normal-density helper | No convergence status. Responsibility underflow/empty-component behavior needs care; f2py and explicit Fortran calls differ. |
 | [twdtw](https://github.com/vwmaus/twdtw) | L10d | Multichannel dynamic-time-warping costs with logistic cyclic-time penalty | Legacy sketch initializes boundaries and restricts M<=N for JB capacity. Callback entry has a separate boundary-intent discrepancy. |
 | [timeseries](https://github.com/rhandberg/timeseries) | L10a3a2; L1a1a | Weighted sine/cosine least-squares periodogram path and weighted mean | Seconds versus microhertz and global sumWeights matter. No fitted intercept, singular-design guard or automatic significance test. |
+| [ODEPACK modernization](https://github.com/jacobwilliams/odepack) | I1a1b; I1a2 | Selected Adams functional-iteration and stiff BDF finite-difference-Jacobian DLSODE modes | Array NEQ/RTOL/ATOL interface, continuation state/workspace and callback requirements; no complete kernel or accuracy audit. |
+| [NUFFT](https://github.com/biotrump/nufft) | J1a2 | Nonuniform-to-uniform complex type-1 Gaussian-gridding transform | Centered modes, positive-exponent IFLAG>=0 convention and 1/NJ scaling; precision request is not a verified accuracy bound. |
+| [QD](https://github.com/BL-highprecision/qd) | A3c | Selected double-double decimal input and addition through Fortran/C++ layers | Fixed two-double representation, 80-character input buffer, build-dependent addition branch and external ABI requirements. |
+| [MPFUN2020](https://github.com/jacobwilliams/mpfun2020) | A3c; C4b | Variant-1 multiword real construction/addition and exponential | Working precision is in words within a compiled digit capacity; initialize support and use consistently built variants/constants. |
+| [FMPFR](https://github.com/tkoenig1/fmpfr) | A3c | Selected allocated-object MPFR decimal construction and addition | Precision is in bits; initialize rounding explicitly. Existing result precision can persist; unallocated-component wrappers excluded. |
+| [ga_lib](https://github.com/dacarnazzola/ga_lib) | G2i | Tournament parent selection and target-value evolutionary benchmark coordinator | Solver prints diagnostics rather than returning best point/status. Heterogeneous-bound initialization and concurrency semantics need follow-up. |
+| [GARCH](https://github.com/Beliavsky/garch) | L6a20; L10a2 | Gaussian GARCH(1,1) generation and observed-data conditional-volatility filtering | Both return standard deviations; initialization differs. Admissible parameters, nonempty inputs and cached RNG state matter. |
+| [EnKF_analysis](https://github.com/geirev/EnKF_analysis) | L10a2e; L1a1b | Selected scalar-observation ensemble Kalman update and per-state sample variance | Match real-8 caller/library/BLAS conventions. Analysis is not a full forecast/localization workflow; variance requires a supplied mean. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1054,3 +1070,17 @@ the C-bound callback path requires a separate intent correction. Spectral fittin
 requires the global weight sum to match the input weights and uses frequencies
 in microhertz with times in seconds. These are source-reviewed calling sketches,
 not newly compiled or numerically verified drivers.
+
+The extended-precision cards distinguish fixed two-double QD storage, MPFUN
+working word counts bounded by build-time capacity, and FMPFR bit precision.
+They record wrapper dispatch/build requirements without implying complete
+backend arithmetic verification. FMPFR sketches explicitly initialize rounding
+and avoid wrappers that pass unallocated components to MPFR initialization.
+The ODEPACK review separates method flags and retains the modernization's array
+argument shapes and stateful continuation requirements. NUFFT records centered
+mode storage, normalization and transform sign. The EnKF example selects the
+single-observation update and real-8 ABI, while the GARCH examples separate
+simulation from observed-return variance recurrence and return standard deviations.
+The GA coordinator targets a supplied objective value and returns printed diagnostics;
+its initialization and concurrent counters remain review limitations. All new
+calling sketches are uncompiled and unrun.

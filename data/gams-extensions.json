@@ -414,6 +414,12 @@
       "parent": "L10a3a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L6a20": {
+      "label": "t distribution, time series, triangular",
+      "parent": "L6a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
