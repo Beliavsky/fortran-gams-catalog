@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 431 repositories now have 610 source-reviewed
+Reviewed on 2026-11-06. 434 repositories now have 620 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-417 repository cards now identify public routines and link their usage lines
+420 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 431 independently source-reviewed repositories now have an
+separately. All 434 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -456,6 +456,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | SOSIE | `MOD_AKIMA_1D::AKIMA_1D`, `MOD_AKIMA_2D::AKIMA_2D`, `MOD_MANIP::FIND_NEAREST_POINT` | GPL-3.0 license text; version-option grant not separately identified |
 | fsklearn | `Mod_Fsklearn_Essential::Neural_Network%Predict_One`, `Mod_Fsklearn_Essential::Decision_Tree%Predict_One`, `Mod_Fsklearn_Essential::Random_Forest%Predict_One` | BSD-3-Clause root notice |
 | coordinates grids and maps | `interp1D::interp_linear`, `interp1D::interp_spline`, `interp2D::interp_bilinear`, `loess::loess_smooth`, `gaussian_filter::filter_gaussian`, `gaussian_filter::gaussian_kernel`, `gaussian_filter::convolve`, `gaussian_filter::hgrad`, `polygons::create_polygon`, `polygons::point_in_polygon` | No project-wide grant identified; selected modules retain component provenance |
+| BaM | `BaM_tools::BaM_Fit` | GPL-3.0 root text; dependency terms separate |
+| freeCappuccino legacy snapshot | `dpcg`, `bicgstab`, `GaussSeidel` | GPL-3.0-only root notice |
+| NumX | `MCM`, `VARIAN`, `VOLAT`, `SKEWN`, `KURTOS`, `COVM`, `CORM`, `COVCOR`, `CORCOV`, `TENSORK`, `TENSORKK`, `getNormalPdf`, `GENNOR` | Apache-2.0 root text; selected RNG files retain conflicting proprietary notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -907,6 +910,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [SOSIE](https://github.com/brodeau/sosie) | E1a; E2a; P | Local Akima interpolation and regular-grid nearest-point lookup | Mixed precision, saved persistence/cache state, configuration dependencies and bounded geographic search. |
 | [fsklearn](https://github.com/zhoutengye/fsklearn) | L8e | Native prediction for neural-network, decision-tree and random-forest regressors | External training/export, build precision, mutable activations and defective softmax path. |
 | [coordinates grids and maps](https://github.com/alex-robinson/coordinates) | E1a; E2a; K5; J2; H1; P | Native linear/cubic and bilinear interpolation, smoothing, convolution, gradients and point containment | Mixed precision, optional-DX and boundary-index defects, missing/edge conventions and component provenance. |
+| [BaM](https://github.com/bam-tools/bam) | M1b | Configured Bayesian-model adaptive Metropolis sampling entry | External BMSL/miniDMSL sampler, loaded prior/model state, output files and warning/error contract. |
+| [freeCappuccino legacy snapshot](https://github.com/nikola-m/freecappuccino) | D2b4; D2a4 | Serial CSR conjugate gradients, BiCGStab and Gauss-Seidel | Shared mesh/control state, SPD/structure assumptions, cut-coupling limits and independent final residual checks. |
+| [NumX](https://github.com/alpgodev/numx) | L1a1a; L1a1b; L1a1c; L1c1b; L1c1; L5a1n; L6a14 | Raw-data means, dispersion, shape, covariance, higher co-moments and normal density/sampling | Estimator/status conventions, workspace sizing, precision loss, RNG return-kind mismatch and conflicting license notices. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1641,3 +1647,12 @@ regression prediction from external training, symmetric convolution from generic
 weighted correlation, and gradient magnitude from gradient components. Mixed
 precision, persistent flags/caches, missing-value/edge conventions and source
 defects remain explicit. These findings do not certify the implementations.
+
+NUMX, freeCappuccino and BaM have ten additional mappings and seventeen
+public entry-point annotations. Calling sketches were not compiled or run.
+Reviews separate descriptive statistics from inference, raw co-moments from
+standardized shape measures, SPD from general sparse solves and configured
+posterior sampling from a standalone density sampler. The NUMX normal-generator
+contract remains commented until its uniform-return-kind mismatch is repaired.
+Shared state, status limitations, residual checks and conflicting file-level
+license notices remain explicit. No implementation is certified by these mappings.

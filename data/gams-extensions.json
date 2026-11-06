@@ -852,6 +852,12 @@
       "parent": "H2a2a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "M1b": {
+      "label": "Continuous (Markov models)",
+      "parent": "M1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }
