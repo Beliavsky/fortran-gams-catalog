@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 444 repositories now have 665 source-reviewed
+Reviewed on 2026-11-06. 446 repositories now have 677 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-430 repository cards now identify public routines and link their usage lines
+432 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 444 independently source-reviewed repositories now have an
+separately. All 446 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -469,6 +469,8 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | AUTO-07p | `AE::AUTOAE`, `BVP::AUTOBV`, `MESH::ADAPT2`, `MESH::INTWTS`, `MESH::GENWTS`, `MESH::WINT` | BSD-3-Clause numerical core; optional plotting dependencies separately scoped |
 | Cedar | `BMG2_SymStd_restrict`, `BMG2_SymStd_interp_add` | BSD-3-Clause Cedar framework notices |
 | Dataplot | `MEAN`, `MEDIAN`, `SD`, `RANK`, `SORT`, `RANKCR`, `LINFIT`, `NORCDF`, `NORPDF`, `NORPPF`, `LOGCDF`, `LOGPDF`, `LOGPPF`, `LOGGAM`, `POICDF` | NIST public-domain notice for Dataplot; bundled notices retain their scope |
+| PFLARE | `pflare::PCRegister_PFLARE`, `pcair_shell::create_pc_air_shell`, `cf_splitting::compute_cf_splitting` | MIT PFLARE root notice |
+| ScaLAPACK | `PDGESV`, `PZGESV`, `PDPOSV`, `PZPOSV`, `PDTRTRS`, `PDGELS`, `PDSYEV`, `PZHEEV`, `PDGESVD`, `PDGBSV` | BSD-3-Clause-Open-MPI-style ScaLAPACK root notice |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -933,6 +935,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [AUTO-07p](https://github.com/auto-07p/auto-07p) | F2; I1b2; I1c; E1a; H1; H2a1b2 | Nonlinear algebraic/BVP continuation, mesh adaptation, interpolation, differentiation and sampled quadrature | Framework callbacks/state, collocation scaling, order/shape limits and distinct interpolation/quadrature nodes. |
 | [Cedar](https://github.com/cedar-framework/cedar) | D2e | Native BoxMG restriction and residual-dependent prolongation components | Explicit BIND(C)/VALUE interfaces, initialized weights/ghosts, in-place residual scaling and correction semantics. |
 | [Dataplot](https://github.com/usnistgov/dataplot) | L1a1a; L1a1b; N6a1b; N6a2b; L11; L8a1a1; L5a1n; L5a2n; L5a1l; L5a2l; C7a; L5a1p | Location/dispersion summaries, passive ranks and sorting, Spearman correlation, linear regression, normal/logistic/Poisson functions and log gamma | Promoted default-real ABI, common/output dependencies, inference/degeneracy limits, cutoff assignment defect and approximation/tail scope. |
+| [PFLARE](https://github.com/pflareproject/pflare) | D2a4; D2e | PETSc sparse-system preconditioner integration and algebraic coarse/fine partitioning | Registration/context lifecycle, host AIJ scope, PETSc error/convergence channels and returned global index sets. |
+| [ScaLAPACK](https://github.com/reference-scalapack/scalapack) | D2a1; D2c1; D2b1b; D2d1b; D2a3; D9a1; D4a1; D4a3; D6; D2a2 | Distributed real/complex general and positive-definite solves, triangular/banded solves, least squares, symmetric/Hermitian eigenproblems and SVD | Collective grids/descriptors, local workspaces, rank assumptions, nonunit diagonal-scan finding and distinct banded layout. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1719,3 +1723,15 @@ leaves CUTL99 unassigned; its full calling sketch is marked post-repair.
 Historical distribution approximations are distinguished from full-precision
 error-certified evaluations, including logistic-PDF overflow and large-rate
 Poisson normal dispatch. The root NIST notice remains scoped to its evidence.
+
+ScaLAPACK and PFLARE have twelve additional source-reviewed mappings and
+thirteen public entry-point annotations. Calling sketches were not compiled
+or run. ScaLAPACK reviews emphasize collective BLACS contexts, distributed
+descriptors, local storage/workspace queries and driver-level status limits.
+The triangular solve sketch selects the unit-diagonal path; the nonunit scan
+resets its diagonal offset and can miss later zeros within a block. The banded
+solver uses a distinct blocked layout and preallocated workspace. Optional SVD
+back-transform calls can overwrite an earlier DBDSQR status. PFLARE
+entries separate outer PETSc KSP solves from registered preconditioners and
+fine/coarse splitting services; GPU, convergence and all kernel internals
+remain outside the reviewed claims. Scoped license notices are preserved.

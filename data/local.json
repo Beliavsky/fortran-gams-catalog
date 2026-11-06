@@ -49709,13 +49709,208 @@
             ],
             "notes": "GitHub resolves the listed address to PFLAREProject/PFLARE. The README documents approximate inverses, AIR-family multigrids, splittings and Fortran/C/Python interfaces; scalability and GPU capabilities are upstream claims, not catalog benchmarks.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "bda31b8a17c4b1d7da9db4116e743ff645e3df16",
+            "reviewed_on": "2026-11-06",
+            "notes": "PFLARE supplies approximate-ideal-restriction multigrid and related preconditioners for PETSc sparse-system solves; it is not a complete replacement for the outer PETSc KSP solver. The public Fortran PCRegister_PFLARE entry registers air and pflareinv types. Selecting air on a PETSc KSP PC constructs a Fortran shell, builds the hierarchy through setup_air_pcmg and applies its underlying PETSc PCMG object. The selected usage assumes an initialized compatible real-scalar PETSc/MPI build, an assembled square host AIJ nonsymmetric A, compatible distributed vectors and a separately chosen outer Krylov method. Call registration before selecting the type when using this explicit path, check each PETSc ierr and KSP converged reason, then independently evaluate the unpreconditioned residual. Registration has no ierr dummy. Options choose strength splitting, transfer operators, approximate inverses, smoothers and coarse solves; this review traces registration/setup/application dispatch and does not certify every numerical method, GPU path, convergence rate, complex-scalar build or preconditioner reuse policy.",
+            "evidence": [
+              {
+                "path": "src/PFLARE.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/PFLARE.F90",
+                "sha256": "2d1142b29df2480a791b9a7fe664677e8707fb57b5591617f46ad8e3982dc956"
+              },
+              {
+                "path": "src/PCAIR_Shell.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/PCAIR_Shell.F90",
+                "sha256": "fa9e31c0c5b6ec10187271852b4a30a4872016f3f73f911d252ad0a2be0d7161"
+              },
+              {
+                "path": "src/PCAIR.c",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/PCAIR.c",
+                "sha256": "bdd657531c038554cedcf58ba9fba7e92b13f5b7391f490fba3f094be42bf822"
+              },
+              {
+                "path": "src/AIR_MG_Setup.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/AIR_MG_Setup.F90",
+                "sha256": "5df0ccd933ba28449fd45db37f35dda929551022fb2b3ac6be75a3d2e5db9d34"
+              },
+              {
+                "path": "docs/use_pflare.md",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/docs/use_pflare.md",
+                "sha256": "4911ec1edb80f38488ef9c091dfc2ab8104ad4537fda7abd72c81c689c86fb71"
+              },
+              {
+                "path": "tests/ex12f.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/tests/ex12f.F90",
+                "sha256": "73c336f9ba14ea31971a0e8c83723e51b43d412edf28ebbf42baf9030f5ff721"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PCRegister_PFLARE",
+                "role": "public-entry-point",
+                "summary": "Public Fortran registration of PETSc AIR and approximate-inverse preconditioner types.",
+                "signature": "CALL PCRegister_PFLARE()",
+                "declarations": [
+                  {
+                    "path": "src/PFLARE.F90",
+                    "line_start": 6,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/PFLARE.F90",
+                    "line_start": 40,
+                    "line_end": 52
+                  }
+                ],
+                "path": "src/PFLARE.F90",
+                "line_start": 40,
+                "line_end": 52,
+                "module": "pflare",
+                "examples": [
+                  {
+                    "path": "tests/ex12f.F90",
+                    "line_start": 90,
+                    "line_end": 125
+                  }
+                ],
+                "usage": "use pflare, only: PCRegister_PFLARE\n! After PetscInitialize, assembly of A/B/X, and creation of a PETSc KSP:\ncall PCRegister_PFLARE()\ncall KSPSetOperators(ksp,a,a,ierr)\n! Check IERR after every PETSc call. Select/configure the outer KSP.\ncall KSPGetPC(ksp,pc,ierr)\ncall PCSetType(pc,\"air\",ierr)\ncall KSPSetFromOptions(ksp,ierr)\ncall KSPSolve(ksp,b,x,ierr)\ncall KSPGetConvergedReason(ksp,reason,ierr)\n! Check IERR, REASON and the original-system residual independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-PETSc-object-initialization real host-AIJ fragment. All PETSc types/interfaces and error checks are required; the linked author test was inspected as usage evidence, not run for this catalog."
+              },
+              {
+                "procedure": "create_pc_air_shell",
+                "role": "public-entry-point",
+                "summary": "Public native shell construction for integrations that manage live AIR data explicitly.",
+                "signature": "CALL create_pc_air_shell(PC_AIR_DATA,PC)",
+                "declarations": [
+                  {
+                    "path": "src/PCAIR_Shell.F90",
+                    "line_start": 20,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/PCAIR_Shell.F90",
+                "line_start": 20,
+                "line_end": 57,
+                "module": "pcair_shell",
+                "usage": "use pcair_shell, only: create_pc_air_shell\n! Advanced native integration: PC comes from a live KSP, and PC_AIR_DATA\n! is a correctly initialized pc_air_multigrid_data object kept alive\n! throughout setup/apply/destroy. Prefer the registered air type normally.\ncall create_pc_air_shell(pc_air_data,pc)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Advanced post-data-initialization contract. The helper does not return its local ierr; honor PETSc lifecycle/context ownership and do not destroy shared data twice. No shell lifecycle or solve was executed."
+              },
+              {
+                "procedure": "C registration and construction dispatch",
+                "role": "implementation-helper",
+                "path": "src/PCAIR.c",
+                "line_start": 3840,
+                "line_end": 3895
+              },
+              {
+                "procedure": "shell setup and PCMG application callbacks",
+                "role": "implementation-helper",
+                "path": "src/PCAIR_Shell.F90",
+                "line_start": 175,
+                "line_end": 263
+              },
+              {
+                "procedure": "multigrid levels and transfer registration, not all hierarchy kernels",
+                "role": "implementation-helper",
+                "path": "src/AIR_MG_Setup.F90",
+                "line_start": 1060,
+                "line_end": 1105
+              }
+            ]
+          },
+          {
+            "code": "D2e",
+            "level": "source-reviewed",
+            "revision": "bda31b8a17c4b1d7da9db4116e743ff645e3df16",
+            "reviewed_on": "2026-11-06",
+            "notes": "CF_SPLITTING::compute_cf_splitting selects fine/coarse point sets for algebraic multigrid and returns PETSc IS objects containing global zero-based row indices. This is a linear-system associated partitioning operation, not a system solve or geometric mesh generator. The selected real host-AIJ usage chooses CF_PMISR_DDC: a strength-graph first pass dispatches PMISR, followed by a fixed number of diagonal-dominance cleanup passes and index-set rebuilding. Other modes include PMIS/aggregation/compatible relaxation with distinct threshold semantics; their full numerical kernels and device state are not certified here. Initialize PETSc/MPI, use a square assembled matrix with compatible row ownership, fresh output IS handles and valid mode/control values. Returned sets must be destroyed before replacing them. The native module routine has optional CR controls but no ierr/status output; internal PETSc errors are not uniformly forwarded, and unknown first-pass modes abort MPI. Review covers mode dispatch, ownership-index conversion and IS lifecycle; it does not establish optimal coarsening, deterministic random choices or solver convergence.",
+            "evidence": [
+              {
+                "path": "src/CF_Splitting.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/CF_Splitting.F90",
+                "sha256": "2f3a3fe71a5c75c15e8619c9182bc640527674286cb409aad87a7b9724efa430"
+              },
+              {
+                "path": "src/Pflare_Parameters.F90",
+                "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/Pflare_Parameters.F90",
+                "sha256": "2e132744c1eb53166e71d67429d1380fce93587cd04f5791bb2fe8e29868ae83"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "compute_cf_splitting",
+                "role": "public-entry-point",
+                "summary": "Public native algebraic coarse/fine partition selection returning PETSc index sets.",
+                "signature": "CALL compute_cf_splitting(INPUT_MAT,SKIP_SYMMETRIZE,STRONG_THRESHOLD, &\n MAX_LUBY_STEPS,CF_SPLITTING_TYPE,DDC_ITS,FRACTION_SWAP,IS_FINE,IS_COARSE, &\n [CR_INVERSE_TYPE,CR_POLY_ORDER,CR_INVERSE_SPARSITY_ORDER,CR_DIAG_SCALE_POLYS])",
+                "declarations": [
+                  {
+                    "path": "src/CF_Splitting.F90",
+                    "line_start": 255,
+                    "line_end": 282
+                  },
+                  {
+                    "path": "src/CF_Splitting.F90",
+                    "line_start": 1,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/CF_Splitting.F90",
+                "line_start": 255,
+                "line_end": 484,
+                "module": "cf_splitting",
+                "usage": "use cf_splitting, only: compute_cf_splitting,CF_PMISR_DDC\n! With matching PETSc module/includes and initialized host-AIJ INPUT_MAT,\n! declare STRENGTH/FRACTION as PetscReal and fresh IS_FINE/IS_COARSE.\nstrength=0.25; fraction=0.1\ncall compute_cf_splitting(input_mat,.false.,strength,20, &\n                          CF_PMISR_DDC,1,fraction,is_fine,is_coarse)\n! Returned IS indices are global and zero-based. Destroy both IS objects\n! with ISDestroy when finished; no native status dummy is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-PETSc-matrix-initialization selected PMISR/DDC host path. No splitting quality, reproducibility, PETSc error path or convergence property was tested."
+              },
+              {
+                "procedure": "strength-graph and first-pass dispatch",
+                "role": "implementation-helper",
+                "path": "src/CF_Splitting.F90",
+                "line_start": 90,
+                "line_end": 250
+              },
+              {
+                "procedure": "conversion from local markers to global PETSc indices",
+                "role": "implementation-helper",
+                "path": "src/CF_Splitting.F90",
+                "line_start": 33,
+                "line_end": 86
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
           "listed_repository": "https://github.com/stevendargaville/PFLARE"
+        },
+        "license": {
+          "label": "MIT PFLARE root notice",
+          "spdx_expression": "MIT",
+          "revision": "bda31b8a17c4b1d7da9db4116e743ff645e3df16",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root MIT text names Steven Dargaville. This scope covers the selected PFLARE interfaces and dispatch code; PETSc/MPI and optional Kokkos, solver and other third-party components retain their own notices. It is not a full dependency or binary-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/LICENSE",
+              "sha256": "91ffb68e5b46481ac7927d2793a9f58436a9c7407a3e60f0f231a0901e81f67a"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/README.md",
+              "sha256": "afcf1fc64bd7570a84f57cc1dd6cf28e25214721773ab8fb5537b2fad2bd03d3"
+            },
+            {
+              "path": "src/PFLARE.F90",
+              "url": "https://github.com/PFLAREProject/PFLARE/blob/bda31b8a17c4b1d7da9db4116e743ff645e3df16/src/PFLARE.F90",
+              "sha256": "2d1142b29df2480a791b9a7fe664677e8707fb57b5591617f46ad8e3982dc956"
+            }
+          ]
         }
       },
       "imports": {}
@@ -50293,12 +50488,381 @@
             ],
             "notes": "The README enumerates the supported problem families and precision variants and specifies MPI-only distributed execution. Availability differs by routine and arithmetic type; no blanket claim of all four precisions for every SVD routine is made.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. The selected real general square-system driver factors A with partial-pivoted LU, then calls the corresponding GETRS only after successful factorization. Local A stores factors, B is overwritten by the distributed solution, and local IPIV must accommodate LOCr(M_A)+MB_A entries and remain tied to A. Require block-aligned origin, square A blocks, matching A/B row block size and owning process row, and a common context. Positive INFO identifies an exactly zero U diagonal in the global submatrix, not a condition estimate or forward-error bound. The review covers driver checks and factor/solve dispatch rather than every distributed LU/communication kernel.",
+            "evidence": [
+              {
+                "path": "SRC/pdgesv.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdgesv.f",
+                "sha256": "af449dbfcce03beaba900d96954a2c41bf96ccbc8b9b4d74494de9784a2c5d9c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGESV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDGESV driver with local arrays and global descriptors.",
+                "signature": "CALL PDGESV(N,NRHS,A,IA,JA,DESCA,IPIV,B,IB,JB,DESCB,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdgesv.f",
+                    "line_start": 1,
+                    "line_end": 15
+                  }
+                ],
+                "path": "SRC/pdgesv.f",
+                "line_start": 1,
+                "line_end": 245,
+                "usage": "! After distribution of REAL A/B and allocation of local IPIV:\ncall PDGESV(n,nrhs,a,1,1,desca,ipiv,b,1,1,descb,info)\nif(info/=0) error stop \"distributed LU solve failed\"\n! Local B holds pieces of X; gather or compute a distributed residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. No factorization, solve, communication or residual was executed."
+              }
+            ]
+          },
+          {
+            "code": "D2c1",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. The selected complex general square-system driver factors A with partial-pivoted LU, then calls the corresponding GETRS only after successful factorization. Local A stores factors, B is overwritten by the distributed solution, and local IPIV must accommodate LOCr(M_A)+MB_A entries and remain tied to A. Require block-aligned origin, square A blocks, matching A/B row block size and owning process row, and a common context. Positive INFO identifies an exactly zero U diagonal in the global submatrix, not a condition estimate or forward-error bound. The review covers driver checks and factor/solve dispatch rather than every distributed LU/communication kernel.",
+            "evidence": [
+              {
+                "path": "SRC/pzgesv.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pzgesv.f",
+                "sha256": "4203f55b12ab60349d73f5159b8ea3c454e230ec551a39d1e503011a0ac1d38e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PZGESV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PZGESV driver with local arrays and global descriptors.",
+                "signature": "CALL PZGESV(N,NRHS,A,IA,JA,DESCA,IPIV,B,IB,JB,DESCB,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pzgesv.f",
+                    "line_start": 1,
+                    "line_end": 15
+                  }
+                ],
+                "path": "SRC/pzgesv.f",
+                "line_start": 1,
+                "line_end": 245,
+                "usage": "! After distribution of COMPLEX A/B and allocation of local IPIV:\ncall PZGESV(n,nrhs,a,1,1,desca,ipiv,b,1,1,descb,info)\nif(info/=0) error stop \"distributed LU solve failed\"\n! Local B holds pieces of X; gather or compute a distributed residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. No factorization, solve, communication or residual was executed."
+              }
+            ]
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. This real symmetric positive-definite driver reads only the UPLO-selected triangle, factors it through POTRF and calls POTRS only on factorization success. A is overwritten by the selected Cholesky factor and B by X. The selected lower-triangle path requires block-aligned origins, square A blocks, compatible A/B row blocking/ownership and an initialized common grid. Positive INFO reports a nonpositive leading principal minor; no full symmetry/Hermitian validation, pivoted indefinite solve or conditioning estimate is performed here. The complex path uses conjugate-transpose Cholesky factors, not a complex-symmetric factorization. Review is of the driver and dispatch, not a numerical audit of all POTRF/POTRS kernels.",
+            "evidence": [
+              {
+                "path": "SRC/pdposv.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdposv.f",
+                "sha256": "a0f2b80fc11ef67d591afdffb3348f06e565895c9d5722f08981f29d316a038a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDPOSV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDPOSV driver with local arrays and global descriptors.",
+                "signature": "CALL PDPOSV(UPLO,N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdposv.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "SRC/pdposv.f",
+                "line_start": 1,
+                "line_end": 264,
+                "usage": "! After distribution of a REAL SYMMETRIC positive-definite matrix:\ncall PDPOSV(\"L\",n,nrhs,a,1,1,desca,b,1,1,descb,info)\nif(info/=0) error stop \"distributed Cholesky solve failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Only the lower triangle is the selected input contract. No definiteness, solve or residual result was tested."
+              }
+            ]
+          },
+          {
+            "code": "D2d1b",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. This complex Hermitian positive-definite driver reads only the UPLO-selected triangle, factors it through POTRF and calls POTRS only on factorization success. A is overwritten by the selected Cholesky factor and B by X. The selected lower-triangle path requires block-aligned origins, square A blocks, compatible A/B row blocking/ownership and an initialized common grid. Positive INFO reports a nonpositive leading principal minor; no full symmetry/Hermitian validation, pivoted indefinite solve or conditioning estimate is performed here. The complex path uses conjugate-transpose Cholesky factors, not a complex-symmetric factorization. Review is of the driver and dispatch, not a numerical audit of all POTRF/POTRS kernels.",
+            "evidence": [
+              {
+                "path": "SRC/pzposv.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pzposv.f",
+                "sha256": "34ced21bd5d8e8a0c80d3d859fd5eda65752ee4ded1f06b057e58a4fb5455537"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PZPOSV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PZPOSV driver with local arrays and global descriptors.",
+                "signature": "CALL PZPOSV(UPLO,N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pzposv.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "SRC/pzposv.f",
+                "line_start": 1,
+                "line_end": 264,
+                "usage": "! After distribution of a COMPLEX HERMITIAN positive-definite matrix:\ncall PZPOSV(\"L\",n,nrhs,a,1,1,desca,b,1,1,descb,info)\nif(info/=0) error stop \"distributed Cholesky solve failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Only the lower triangle is the selected input contract. No definiteness, solve or residual result was tested."
+              }
+            ]
+          },
+          {
+            "code": "D2a3",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. PDTRTRS applies a distributed triangular solve through PDTRSM, selecting upper/lower, transpose and unit/nonunit diagonal conventions. The selected sketch uses lower, nontransposed, unit-diagonal input; diagonal entries are then implicit ones. A remains a triangular coefficient matrix and B is overwritten. Require matching block-aligned origins, square A blocks and compatible B row distribution. Important nonunit-path finding: the diagonal scan sets LL=IOFFA+LDA+1 repeatedly instead of advancing LL, so for blocks longer than two it can miss later zero diagonals. Do not rely on that scan as a complete nonsingularity check; repair it or validate diagonals independently before nonunit use. The unit-diagonal sketch bypasses the defective scan and does not establish numerical conditioning.",
+            "evidence": [
+              {
+                "path": "SRC/pdtrtrs.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdtrtrs.f",
+                "sha256": "95068e6068de2d8f36a5ecaea77bc386ccb1f4481cf38c6beebab0fc802be6b9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDTRTRS",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDTRTRS driver with local arrays and global descriptors.",
+                "signature": "CALL PDTRTRS(UPLO,TRANS,DIAG,N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdtrtrs.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "SRC/pdtrtrs.f",
+                "line_start": 1,
+                "line_end": 334,
+                "usage": "! After distributing a LOWER UNIT-triangular real matrix and B:\ncall PDTRTRS(\"L\",\"N\",\"U\",n,nrhs,a,1,1,desca,b,1,1,descb,info)\nif(info/=0) error stop \"distributed triangular solve failed\"\n! DIAG=U means diagonal values are mathematically one.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Selected unit-diagonal path only. No nonunit scan, triangular solve or residual was tested."
+              }
+            ]
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. PDGELS uses distributed QR for M>=N and LQ for M<N, applying orthogonal transformations and triangular solves for over/underdetermined systems. The selected TRANS=N, M>=N path is full-column-rank least squares. A and B are overwritten; B must have distributed global storage for MAX(M,N) rows even when the input RHS uses fewer rows. Query WORK with LWORK=-1 collectively and allocate each rank its returned local requirement. A/B need compatible row blocking/alignment/ownership for this selected tall case and a common context. Full rank is assumed: the driver uses PDTRSM without a rank-revealing step or explicit returned zero-pivot test, so INFO=0 does not certify rank, conditioning or a finite solution. Review covers driver scaling, QR/LQ and solve dispatch; no rank-deficient or minimum-norm accuracy is certified.",
+            "evidence": [
+              {
+                "path": "SRC/pdgels.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdgels.f",
+                "sha256": "219cdb8d56a5e1d53d27e34bc7b910977596bb60c9718e6635144ee169ee3384"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGELS",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDGELS driver with local arrays and global descriptors.",
+                "signature": "CALL PDGELS(TRANS,M,N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdgels.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "SRC/pdgels.f",
+                "line_start": 1,
+                "line_end": 591,
+                "usage": "double precision :: query(1)\ndouble precision,allocatable :: work(:)\n! Initialized distributed A/B; M>=N, independently established full rank:\ncall PDGELS(\"N\",m,n,nrhs,a,1,1,desca,b,1,1,descb,query,-1,info)\nif(info/=0) error stop \"PDGELS workspace query failed\"\nlwork=max(1,ceiling(query(1))); allocate(work(lwork))\ncall PDGELS(\"N\",m,n,nrhs,a,1,1,desca,b,1,1,descb,work,lwork,info)\nif(info/=0) error stop \"PDGELS failed\"\n! First N global rows of B contain coefficient vectors.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Workspace query and least-squares solve were not executed; INFO alone is not a rank check."
+              }
+            ]
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. PDSYEV computes the ordinary real-symmetric spectrum, optionally vectors, by distributed tridiagonal reduction followed by DSTEQR2 and back transformation. The selected JOBZ=V, UPLO=L path uses positive N, separate distributed Z with DESCZ=DESCA and all matrix origins (1,1); A is destroyed, W(N) is replicated and sorted ascending, and Z holds distributed eigenvector columns. Query local WORK collectively with LWORK=-1 before allocating it. The driver assumes homogeneous arithmetic and makes only limited interprocess eigenvalue comparisons; INFO=N+1 flags a detected mismatch, not a complete heterogeneity test. Positive INFO<=N reports tridiagonal nonconvergence. Review covers the driver and dispatch, not residual/orthogonality checks or all eigensolver kernels; arbitrary unequal A/Z offsets are outside the selected contract.",
+            "evidence": [
+              {
+                "path": "SRC/pdsyev.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdsyev.f",
+                "sha256": "81c9752c0bbd6033531c784d4bbb0e5b6c4b18d6427c0bf8416cefb087d74d35"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDSYEV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDSYEV driver with local arrays and global descriptors.",
+                "signature": "CALL PDSYEV(JOBZ,UPLO,N,A,IA,JA,DESCA,W,Z,IZ,JZ,DESCZ,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdsyev.f",
+                    "line_start": 1,
+                    "line_end": 16
+                  }
+                ],
+                "path": "SRC/pdsyev.f",
+                "line_start": 1,
+                "line_end": 580,
+                "usage": "double precision :: query(1)\ndouble precision,allocatable :: work(:)\n! N>=1; distribute A/Z with matching descriptors; allocate W(N) on all ranks.\ncall PDSYEV(\"V\",\"L\",n,a,1,1,desca,w,z,1,1,descz,query,-1,info)\nif(info/=0) error stop \"PDSYEV workspace query failed\"\nlwork=max(1,ceiling(query(1))); allocate(work(lwork))\ncall PDSYEV(\"V\",\"L\",n,a,1,1,desca,w,z,1,1,descz,work,lwork,info)\nif(info/=0) error stop \"PDSYEV failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Homogeneous-grid full-origin eigenvector fragment. No spectrum, orthogonality or residual was tested."
+              }
+            ]
+          },
+          {
+            "code": "D4a3",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. PZHEEV handles the ordinary complex-Hermitian problem through PZHETRD, ZSTEQR2 and a unitary back transformation. Although the purpose header says selected eigenvalues, the interface has no index/value selection arguments and this inspected path produces the full spectrum. The selected positive-N JOBZ=V, UPLO=L path uses matching A/Z descriptors at origin (1,1). A is destroyed, W(N) is real and replicated, and Z contains distributed complex eigenvectors. It needs separate COMPLEX*16 WORK and DOUBLE PRECISION RWORK; query both with lengths -1, check INFO and allocate from the complex workspace real part and real workspace query. Homogeneous arithmetic is assumed; limited comparisons can report INFO=N+1, and positive INFO<=N denotes eigensolver nonconvergence. This review does not certify arbitrary offsets, heterogeneous grids or all tridiagonal/unitary kernels.",
+            "evidence": [
+              {
+                "path": "SRC/pzheev.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pzheev.f",
+                "sha256": "ce9895a2f83ab581a0932c8ac75f88628978d7826e20e5e888bfa55bfa2181ef"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PZHEEV",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PZHEEV driver with local arrays and global descriptors.",
+                "signature": "CALL PZHEEV(JOBZ,UPLO,N,A,IA,JA,DESCA,W,Z,IZ,JZ,DESCZ, &\n WORK,LWORK,RWORK,LRWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pzheev.f",
+                    "line_start": 1,
+                    "line_end": 17
+                  }
+                ],
+                "path": "SRC/pzheev.f",
+                "line_start": 1,
+                "line_end": 637,
+                "usage": "complex(kind=kind(0d0)) :: query(1)\ndouble precision :: rquery(1)\ncomplex(kind=kind(0d0)),allocatable :: work(:)\ndouble precision,allocatable :: rwork(:)\n! N>=1; matching complex A/Z layouts at origin; replicated real W(N).\ncall PZHEEV(\"V\",\"L\",n,a,1,1,desca,w,z,1,1,descz,query,-1,rquery,-1,info)\nif(info/=0) error stop \"PZHEEV workspace query failed\"\nlwork=max(1,ceiling(real(query(1),kind(0d0))))\nlrwork=max(1,ceiling(rquery(1)))\nallocate(work(lwork),rwork(lrwork))\ncall PZHEEV(\"V\",\"L\",n,a,1,1,desca,w,z,1,1,descz, &\n            work,lwork,rwork,lrwork,info)\nif(info/=0) error stop \"PZHEEV failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Full-spectrum, homogeneous-grid fragment with separate complex/real workspaces. No eigenpair or residual was tested."
+              }
+            ]
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are collective ScaLAPACK Fortran drivers, not serial LAPACK calls with larger arrays. Initialize MPI/BLACS, put all participating ranks in the same valid process grid, construct consistent nine-integer type-1 block-cyclic descriptors and distribute the local column-major arrays with adequate local leading dimensions. Global indices are one-based; descriptors include global sizes, block sizes, source ranks and BLACS context, not a global matrix replicated at every rank. Match DOUBLE PRECISION/COMPLEX*16 and INTEGER ABI across ScaLAPACK, BLACS, PBLAS, BLAS/LAPACK and the caller, including any ILP64 choice. Selected sketches use full matrices at global origin (1,1), square blocks and compatible layouts; they omit the required distribution/setup and are not runnable standalone drivers. Negative INFO can encode a descriptor entry as -(argument*100+entry), and PXERBLA handling may abort rather than just return. PDGESVD reduces a distributed real rectangular matrix to bidiagonal form, calls DBDSQR and optionally back-transforms thin left/right singular vectors. JOBU/JOBVT accept V or N rather than serial DGESVD A/S conventions. A is destroyed; S(MIN(M,N)) is replicated in decreasing order, U has global shape (M,MIN(M,N)) and VT has (MIN(M,N),N), containing rows of V-transpose rather than columns of V. The selected sketch uses positive dimensions, matching block layouts and origins (1,1) for all arrays. Query local WORK collectively; even the query creates and releases temporary BLACS grids. Positive INFO can report bidiagonal nonconvergence or MIN(M,N)+1 for detected interprocess singular-value mismatch, so interpret the final status and check reconstruction/orthogonality independently. A further status-propagation limit is visible: DBDSQR failure is not checked before the optional back-transform calls reuse INFO, so a later successful call can overwrite that earlier failure status. Review covers driver workspace, reduction and dispatch, not every distributed/kernel path or arbitrary submatrix offset.",
+            "evidence": [
+              {
+                "path": "SRC/pdgesvd.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdgesvd.f",
+                "sha256": "e47e23525e51394c732daaaaff244c34b85465ad483985bc99ada1385a8d2a40"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGESVD",
+                "role": "public-entry-point",
+                "summary": "External distributed-memory PDGESVD driver with local arrays and global descriptors.",
+                "signature": "CALL PDGESVD(JOBU,JOBVT,M,N,A,IA,JA,DESCA,S,U,IU,JU,DESCU, &\n VT,IVT,JVT,DESCVT,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdgesvd.f",
+                    "line_start": 2,
+                    "line_end": 19
+                  }
+                ],
+                "path": "SRC/pdgesvd.f",
+                "line_start": 2,
+                "line_end": 641,
+                "usage": "double precision :: query(1)\ndouble precision,allocatable :: work(:)\n! M,N>=1; distribute A/U/VT, set valid matching descriptors and allocate S.\ncall PDGESVD(\"V\",\"V\",m,n,a,1,1,desca,s,u,1,1,descu, &\n             vt,1,1,descvt,query,-1,info)\nif(info/=0) error stop \"PDGESVD workspace query failed\"\nlwork=max(1,ceiling(query(1))); allocate(work(lwork))\ncall PDGESVD(\"V\",\"V\",m,n,a,1,1,desca,s,u,1,1,descu, &\n             vt,1,1,descvt,work,lwork,info)\nif(info/=0) error stop \"PDGESVD failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment, collective on every rank of the initialized BLACS grid. Match the linked integer/scalar ABI and preserve input copies for independent residual checks. Thin-vector full-origin fragment. No singular values, reconstruction, orthogonality or scaling performance was tested."
+              }
+            ]
+          },
+          {
+            "code": "D2a2",
+            "level": "source-reviewed",
+            "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+            "reviewed_on": "2026-11-06",
+            "notes": "PDGBSV is a distributed real general-banded solver using pivoted divide-and-conquer factorization through PDGBTRF and solve through PDGBTRS. Unlike the selected 2-D dense drivers, use its documented blocked one-dimensional matrix layout: A descriptor type 501 and B type 502 (or compatible documented type-1 descriptors). Initialize MPI/BLACS and compatible scalar/integer ABI; packed A needs LLD_A>=2*BWL+2*BWU+1, B needs its NB-based local row capacity, and IPIV at least NB entries. Require JA=IB and the noncyclic constraint P*NB>=MOD(JA-1,NB)+N; if spanning ranks, NB>=BWL+BWU+1. A factors differ from serial LAPACK band factors because of reordering; A/B are overwritten and pivot/work storage must follow this interface. Allocate the full documented WORK formula before entry: the driver forms WORK(1+WS_FACTOR) before lower-level calls and has no top-level LWORK=-1 query path. Positive INFO identifies a singular local/reduced partition, not necessarily the global diagonal-pivot convention used by GESV. Review covers driver layout, workspace slicing and factor/solve dispatch, not every banded kernel, arbitrary grid layout or condition estimate.",
+            "evidence": [
+              {
+                "path": "SRC/pdgbsv.f",
+                "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/SRC/pdgbsv.f",
+                "sha256": "f43eaebf426134f33d77415e1c1cc601e5ba5a365c47ae9f827b2f6e703b61a9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGBSV",
+                "role": "public-entry-point",
+                "summary": "External distributed real banded solve with packed storage and blocked noncyclic ownership.",
+                "signature": "CALL PDGBSV(N,BWL,BWU,NRHS,A,JA,DESCA,IPIV,B,IB,DESCB,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/pdgbsv.f",
+                    "line_start": 1,
+                    "line_end": 17
+                  },
+                  {
+                    "path": "SRC/pdgbsv.f",
+                    "line_start": 59,
+                    "line_end": 121
+                  },
+                  {
+                    "path": "SRC/pdgbsv.f",
+                    "line_start": 142,
+                    "line_end": 167
+                  }
+                ],
+                "path": "SRC/pdgbsv.f",
+                "line_start": 1,
+                "line_end": 456,
+                "usage": "double precision,allocatable :: work(:)\n! After valid 501/502 descriptor and packed-band distribution setup:\n! NB is the descriptor block size; JA=IB=1 in this selected fragment.\nlwork=(nb+bwu)*(bwl+bwu)+6*(bwl+bwu)*(bwl+2*bwu) &\n      +max(nrhs*(nb+2*bwl+4*bwu),1)\nallocate(work(lwork))\ncall PDGBSV(n,bwl,bwu,nrhs,a,1,desca,ipiv,b,1,descb,work,lwork,info)\nif(info/=0) error stop \"distributed band solve failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution blocked-band fragment. Check local capacities, integer overflow and noncyclic ownership restrictions before entry; do not use a -1 workspace query. No band factorization, solve or residual was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause-Open-MPI-style ScaLAPACK root notice",
+          "spdx_expression": "BSD-3-Clause-Open-MPI",
+          "revision": "684986536223624286c5532c2e069a5fa7c040f6",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned root has the three redistribution/endorsement clauses plus an additional third-party intellectual-property disclaimer, retained in the BSD-3-Clause-Open-MPI variant rather than ordinary BSD-3-Clause. University copyright notices and additional component notices remain applicable. This records the selected ScaLAPACK driver distribution, not a full audit of BLACS/MPI, PBLAS, BLAS/LAPACK or a vendor binary.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/LICENSE",
+              "sha256": "a1e742e31b6793e83cd36a98ed2db993ec291d0e4be79e9c0520c4d8aef7aa3a"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/Reference-ScaLAPACK/scalapack/blob/684986536223624286c5532c2e069a5fa7c040f6/README",
+              "sha256": "6e2e0abb22712ff6ba81fe6e5ef3f5701a94e8c5efb6f3e4f59a4ee5de0c4a77"
+            }
+          ]
         }
       },
       "imports": {}
