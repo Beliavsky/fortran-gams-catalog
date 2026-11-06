@@ -10928,12 +10928,109 @@
             ],
             "notes": "The README explicitly states that no version is supported, notes EMSOL dependence and describes compatibility edits. It targets a particular class of problems; general nonlinear-programming capability is not assumed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2h3b",
+            "level": "source-reviewed",
+            "revision": "32ede00787a65cb934356bd136f9b8a7f954f853",
+            "reviewed_on": "2026-11-05",
+            "notes": "FILTERSLP partitions real/integer workspaces and dispatches a legacy filter sequential-linear-programming method for the supported nonlinear model representation with two-sided variable/constraint bounds. SLP_MAIN obtains model function/gradient values, solves LP subproblems through EMSOL, compares objective/constraint-violation filter entries, and adjusts the trust region. It is a local nonlinear-programming method, not global optimization or a replacement for an arbitrary user-callback library. OBJFUN/CONFUN/GRADIENT operate on repository model/global state and packed USER/IUSER storage; bounds/scales/control COMMON blocks require initialization by the supplied driver. The broad equality/inequality nonlinear class is retained rather than asserting unsupported derivative-callback or Hessian options. IFAIL/RIFAIL and workspace exhaustion must be interpreted; allocated output arrays alone do not imply convergence. Review covers workspace dispatch and selected LP/filter/gradient paths, not EMSOL internals or all model-parser representations.",
+            "evidence": [
+              {
+                "path": "filtersl.f",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/filtersl.f",
+                "sha256": "990f3ee60be43b08bf70de4bc25411aa1279d472b45217ac7bda24161790850b"
+              },
+              {
+                "path": "slpmain.f",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/slpmain.f",
+                "sha256": "b80375058e212c7eea34495aa29deaee2c83c47da99629d7c634fe70b212d6c1"
+              },
+              {
+                "path": "gradient.f",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/gradient.f",
+                "sha256": "79430ced13f123d0b7840bc3e28888496e3f713eb04bac91cbcb1e2f1d89e5fc"
+              },
+              {
+                "path": "SLPCOMM.INC",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/SLPCOMM.INC",
+                "sha256": "af1fba2dd8f4a1f28b395c9c79ae3f01f0214abc6171def4eabc070d2772aaca"
+              },
+              {
+                "path": "slpdrive.f",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/slpdrive.f",
+                "sha256": "8ca2164527a814b6cb6921582cfc6483c6da040022be9d579e819444cfd18d92"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/README.md",
+                "sha256": "e1d28a639a862ac9a19e1d083805ebeacd94f1cd3ee30efa48b1b1362438b896"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "filterSLP",
+                "role": "public-entry-point",
+                "summary": "External model/workspace-dependent nonlinear-programming driver; requires initialized COMMON and EMSOL linkage.",
+                "signature": "CALL filterSLP(N,M,MAXA,MAXF,MXWK,MXIWK,IPRINT,IFAIL,RIFAIL,RHO, &\n     X,C,F,HC,BLO,BUP,S,WS,LWS,LAM,USER,IUSER,MAX_ITER,ISTAT,RSTAT, &\n     SV_T_FI,SE_MX_LP_IT,WR_MSG,STATUS,RESULT,OLDBND,DO_RNG)",
+                "declarations": [
+                  {
+                    "path": "filtersl.f",
+                    "line_start": 1,
+                    "line_end": 5
+                  },
+                  {
+                    "path": "filtersl.f",
+                    "line_start": 13,
+                    "line_end": 40
+                  }
+                ],
+                "path": "filtersl.f",
+                "line_start": 1,
+                "line_end": 117,
+                "usage": "external :: filterSLP\n! Use the supplied model/driver setup to initialize COMMON, USER/IUSER and bounds/scales.\n! Allocate exact workspace/output shapes from FILTERSLP and EMSOL requirements.\ncall filterSLP(n,m,maxa,maxf,mxwk,mxiwk,iprint,ifail,rifail,rho, &\n     x,c,f,hc,blo,bup,scales,ws,lws,lam,user,iuser,max_iter,istat,rstat, &\n     sv_t_fi,se_mx_lp_it,wr_msg,status,result,oldbnd,do_rng)\n! Interpret IFAIL/RIFAIL and independently check feasibility/stationarity.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-model-setup fragment; model callbacks are fixed repository interfaces, not extra actual arguments. Preserve build integer/real assumptions and include files; the README documents unsupported legacy status and EMSOL compilation considerations. No nonlinear solve, LP subproblem or feasibility measure was run."
+              },
+              {
+                "procedure": "slp_main",
+                "role": "implementation-helper",
+                "path": "slpmain.f",
+                "line_start": 1,
+                "line_end": 9
+              },
+              {
+                "procedure": "gradient",
+                "role": "implementation-helper",
+                "path": "gradient.f",
+                "line_start": 1,
+                "line_end": 114
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; EMSOL separate",
+          "spdx_expression": "MIT",
+          "revision": "32ede00787a65cb934356bd136f9b8a7f954f853",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms under ERGO copyright. README separately identifies EMSOL and legacy build requirements; this is not a license or ABI audit of the linked LP solver.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/LICENSE",
+              "sha256": "34bf2b626369a2b3e872d6007f8a3a142b6ddef7b2591a00f1928ac8b67a70fb"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ERGO-Code/FortranFilterSLP/blob/32ede00787a65cb934356bd136f9b8a7f954f853/README.md",
+              "sha256": "e1d28a639a862ac9a19e1d083805ebeacd94f1cd3ee30efa48b1b1362438b896"
+            }
+          ]
         }
       },
       "imports": {}
@@ -16869,12 +16966,118 @@
             ],
             "notes": "The README gives the library scope; Distribution_tools source documentation lists density, distribution, quantile, moment and sampling interfaces. Its parameterization uses standard deviations/scales rather than variance/squared-scale conventions in DMSL; individual routines remain unchecked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L4a1b2",
+            "level": "source-reviewed",
+            "revision": "97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3",
+            "reviewed_on": "2026-11-05",
+            "notes": "KDE estimates a univariate density by averaging scaled kernels at (u-X(i))/h and dividing by n*h. The inspected default Gaussian kernel uses the ordinary normal-density formula; uniform, triangular and other compact kernels are also dispatched. If H is omitted, the routine requests empirical standard deviation and applies the 1.06*std*n^(-1/5) bandwidth rule. Nonpositive bandwidth is rejected, but empty samples, NaN inputs and boundary bias are not comprehensively handled. The sketch supplies a positive bandwidth and nonempty finite sample. ERR/MESS distinguish fatal errors and warnings; no bandwidth choice, normalization or statistical optimality is certified. Review covers the public wrapper and kernel dispatch rather than the full statistics library.",
+            "evidence": [
+              {
+                "path": "src/EmpiricalStats_tools.f90",
+                "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/src/EmpiricalStats_tools.f90",
+                "sha256": "47eaea9cb80ba492b7907d38492059ed54baa13a550a8976350974d0ddb8629a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "KDE",
+                "role": "public-entry-point",
+                "summary": "Public optional-argument module univariate kernel density estimator using DMSL numeric kinds.",
+                "signature": "CALL KDE(KERNELID,U,X,H,OUT,ERR,MESS)",
+                "declarations": [
+                  {
+                    "path": "src/EmpiricalStats_tools.f90",
+                    "line_start": 559,
+                    "line_end": 564
+                  },
+                  {
+                    "path": "src/EmpiricalStats_tools.f90",
+                    "line_start": 23,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/EmpiricalStats_tools.f90",
+                "line_start": 532,
+                "line_end": 600,
+                "module": "EmpiricalStats_tools",
+                "usage": "use kinds_dmsl_kit, only: mrk,mik\nuse EmpiricalStats_tools, only: KDE\nreal(mrk) :: x(4),density\ninteger(mik) :: err\ncharacter(250) :: mess\nx=[0._mrk,0.5_mrk,1._mrk,1.5_mrk]\ncall KDE(u=0.75_mrk,x=x,h=0.4_mrk,out=density,err=err,mess=mess)\nif(err>0) error stop \"KDE failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build with the required DMSL kind/utility/statistics dependencies. This demonstrates explicit positive bandwidth with the default Gaussian kernel; it is not a validated density fit. No integral, sample result or boundary behavior was checked."
+              },
+              {
+                "procedure": "kernelfunk",
+                "role": "implementation-helper",
+                "path": "src/EmpiricalStats_tools.f90",
+                "line_start": 886,
+                "line_end": 966
+              }
+            ]
+          },
+          {
+            "code": "L13b",
+            "level": "source-reviewed",
+            "revision": "97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3",
+            "reviewed_on": "2026-11-05",
+            "notes": "PCA optionally centers/scales observation-row data, decomposes a cross-product covariance matrix or a transposed-data SVD, and returns eigenvalues, retained eigenvectors, projections and centering/scaling metadata in PCATYPE. X is overwritten when transformations are requested. STANDARD uses X-transpose*X/N whereas SVD scales by sqrt(N-1), so reported variances differ between these branches; they should not be treated as numerically identical implementations. A fixed absolute 1e-6 threshold defines numerical rank (on eigenvalues or singular values respectively), and NDim defaults to four. Zero-variance scaling and rank-deficient/boundary cases need validation. The selected sketch uses centering, no scaling and STANDARD with NDim=1. Review covers preprocessing/decomposition dispatch/projection, not the external DMSL eigensolver/SVD kernels, kernel PCA or a verified reconstruction.",
+            "evidence": [
+              {
+                "path": "src/DimReduction_tools.f90",
+                "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/src/DimReduction_tools.f90",
+                "sha256": "a26e64acc185f417872478d7d57c7b76497760d2e22d12eb58077abfc52e2532"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PCA",
+                "role": "public-entry-point",
+                "summary": "Public optional-argument module PCA interface with mutable data and allocatable result components.",
+                "signature": "CALL PCA(X,DOCENTER,DOSTD,OPTION,NDIM,FOLDER,PCARES,ERR,MESS)",
+                "declarations": [
+                  {
+                    "path": "src/DimReduction_tools.f90",
+                    "line_start": 23,
+                    "line_end": 30
+                  },
+                  {
+                    "path": "src/DimReduction_tools.f90",
+                    "line_start": 73,
+                    "line_end": 81
+                  }
+                ],
+                "path": "src/DimReduction_tools.f90",
+                "line_start": 45,
+                "line_end": 165,
+                "module": "DimReduction_tools",
+                "usage": "use kinds_dmsl_kit, only: mrk,mik\nuse DimReduction_tools, only: PCA,pcaType\ntype(pcaType) :: result\nreal(mrk) :: x(4,2)\ninteger(mik) :: err\ncharacter(250) :: mess\nx(:,1)=[0._mrk,1._mrk,2._mrk,3._mrk]\nx(:,2)=[0._mrk,1._mrk,1.5_mrk,3._mrk]\ncall PCA(x,DoCenter=.true.,DoStd=.false.,option=\"standard\",nDim=1, &\n     pcaRes=result,err=err,mess=mess)\nif(err/=0) error stop \"PCA failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Omitting FOLDER avoids optional result-file writes. Keep original X and account for N versus N-1 normalization when comparing implementations. Link compatible DMSL numeric/linear-algebra dependencies. No components, rank threshold, projections or variance values were tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license text; DMSL dependencies separate",
+          "spdx_expression": null,
+          "revision": "97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GPL version 3 text. The BMSL modules depend on DMSL numeric/linear-algebra utilities with separate provenance; this does not infer an or-later clause or audit all dependency grants.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/benRenard/BMSL/blob/97c70294fd4bb01219da5e7a2e0f9a6cf1ede2f3/README.md",
+              "sha256": "797a8fcd0afddb5787f3c316f68a11441919bdb9c7dc9a18963e87fa92834623"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21648,12 +21851,70 @@
             ],
             "notes": "The README lists Kaplan-Meier estimation, two-sample tests, correlations and censored regressions. The broad mapping does not validate assumptions or every method/configuration in the suite.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L15",
+            "level": "source-reviewed",
+            "revision": "c2b1e0d5405507c958a605aca4c7f8e58a8c69a4",
+            "reviewed_on": "2026-11-05",
+            "notes": "PLESTM forms a product-limit survival estimator from sorted uncensored/censored arrays, accumulates pointwise standard-error terms, and computes a mean and its error. The implementation first converts largest censored observations to detections until the tail is uncensored, mutating U, NU and NC and reporting ICHANGE/NCHANGE. This is an explicit tail convention, not an assumption-free estimate of an unidentified unrestricted mean. NTOT-sized arrays need spare space for moved observations; all-censored input is unsafe because U(NU) is read before NU is checked. Tied/small samples also expose loops reading U(I+K) before a bound test, and Fortran does not guarantee short-circuit evaluation. No recoverable status output certifies valid inputs. Higher-level ASURV wrappers handle censoring direction/data transformation separately. Review covers the product-limit implementation and tail conventions, not the complete interactive package or validation of survival inference.",
+            "evidence": [
+              {
+                "path": "asurv.f",
+                "url": "https://github.com/rsnemmen/asurv/blob/c2b1e0d5405507c958a605aca4c7f8e58a8c69a4/asurv.f",
+                "sha256": "14580c0cf6aff91fd63db68ae3cb50f9421497afdc57a2ea1e5246581fa4f8c5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PLESTM",
+                "role": "public-entry-point",
+                "summary": "External REAL*8 survival-estimator kernel with mutable detection/censor counts and no INFO argument.",
+                "signature": "CALL PLESTM(U,C,NU,NC,S,V,NTOT,SMEAN,SIGMA,ICHANGE,NCHANGE,L)",
+                "declarations": [
+                  {
+                    "path": "asurv.f",
+                    "line_start": 5957,
+                    "line_end": 5958
+                  },
+                  {
+                    "path": "asurv.f",
+                    "line_start": 5993,
+                    "line_end": 5995
+                  }
+                ],
+                "path": "asurv.f",
+                "line_start": 5957,
+                "line_end": 6122,
+                "usage": "external :: PLESTM\n! Prepare sorted transformed U/C arrays of length NTOT, NU>=1, NU+NC=NTOT.\n! S/V are REAL*8 arrays; L is integer workspace, all NTOT entries.\n! Preserve original data/counts and review the recorded tie/boundary issues first.\ncall PLESTM(u,c,nu,nc,s,v,ntot,mean,mean_error,ichange,nchange,ranks)\n! Check ICHANGE/NCHANGE before interpreting a mean based on tail conversions.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. A post-validation interface fragment, not a statistically checked survival example. Censoring direction must match the higher-level ASURV transformations. Repair/validate all-censored, tied-tail and small-sample bounds before use. No survival curve, mean or standard error was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root; historical component provenance retained",
+          "spdx_expression": null,
+          "revision": "c2b1e0d5405507c958a605aca4c7f8e58a8c69a4",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root grants MIT terms and credits Isobe, LaValley and Feigelson. The legacy source contains historical textbook/algorithm provenance and separate attributions; this records the root finding without claiming a full clearance of every inherited routine.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/rsnemmen/asurv/blob/c2b1e0d5405507c958a605aca4c7f8e58a8c69a4/LICENSE.txt",
+              "sha256": "1c6be53d1aac5a884c5438fc0c8dbc4e13d56492de2f6a02a00aa4f93d3d07ed"
+            },
+            {
+              "path": "asurv.f",
+              "url": "https://github.com/rsnemmen/asurv/blob/c2b1e0d5405507c958a605aca4c7f8e58a8c69a4/asurv.f",
+              "sha256": "14580c0cf6aff91fd63db68ae3cb50f9421497afdc57a2ea1e5246581fa4f8c5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -58679,12 +58940,165 @@
             ],
             "notes": "The README describes textbook-derived solvers, ICCG fill-in investigations and dated GPU tooling. This does not establish coverage of every algorithm in the cited textbook or verify current GPU compatibility.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "de1d9858da1ee4cb2e977ce7050f7926cdd3f17a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public dense Cholesky factorization builds the lower factor from the symmetric positive-definite input, followed by public forward and transposed-backward substitution helpers to solve a system. A%BW limits accessed off-diagonals; use a bandwidth covering the mathematical matrix. The code uses default REAL, calls plotting helpers inside arithmetic loops, and assumes Dense_Type allocation/grid/plot state has already been initialized. It does not pivot, verify symmetry/positive definiteness, or return an INFO status: negative square-root arguments or zero pivots are not a controlled failure protocol. The outer educational Cholesky demo constructs a discretized grid system rather than consuming arbitrary caller matrices. Review covers factor/substitution source paths, not a production solver API or validated residual.",
+            "evidence": [
+              {
+                "path": "Solvers_Mod.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod.f90",
+                "sha256": "fbbe47dcf68c80242582131f93360276da7da3bd93acdddb80d285e70a12597f"
+              },
+              {
+                "path": "Solvers_Mod/Dense/Cholesky_Factorization.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/Dense/Cholesky_Factorization.f90",
+                "sha256": "73a390cdb127ad0166bd4de3fb27998b63ad2a2caf2df8c47a14fbd6ea7b8e64"
+              },
+              {
+                "path": "Solvers_Mod/Dense/Forward_Substitution.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/Dense/Forward_Substitution.f90",
+                "sha256": "02211c7eb566be1685ceccb12cd25c629ca3b331a8985f192d0476076525dfff"
+              },
+              {
+                "path": "Solvers_Mod/Dense/Backward_Substitution.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/Dense/Backward_Substitution.f90",
+                "sha256": "fba2da74121df0de68875dc15a87e1bbb935882c35e10621a765b0961da589a5"
+              },
+              {
+                "path": "Dense_Mod.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Dense_Mod.f90",
+                "sha256": "77e3d7851c518d10815c9d6fe3992eeda0cd8baad8b9f5f30510ea38b39e2fde"
+              },
+              {
+                "path": "Dense_Mod/Allocate.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Dense_Mod/Allocate.f90",
+                "sha256": "9b06d956e5e1db03a7657bfec235314ba75a12314a2a92739d3ec1a44be4157e"
+              },
+              {
+                "path": "Matrix_Mod.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Matrix_Mod.f90",
+                "sha256": "fbca39d036f4b1243b7da319b059c125784d9f56e7088d27aa906163af297aab"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Solvers_Mod_Dense_Cholesky_Factorization",
+                "role": "public-entry-point",
+                "summary": "Public module factorization helper using project-specific Dense_Type and plotting state.",
+                "signature": "CALL Solvers_Mod_Dense_Cholesky_Factorization(L,A)\nCALL Solvers_Mod_Dense_Forward_Substitution(Y,L,B)\nCALL Solvers_Mod_Dense_Backward_Substitution(X,L,Y,T=.TRUE.)",
+                "declarations": [
+                  {
+                    "path": "Solvers_Mod/Dense/Cholesky_Factorization.f90",
+                    "line_start": 25,
+                    "line_end": 31
+                  },
+                  {
+                    "path": "Dense_Mod.f90",
+                    "line_start": 20,
+                    "line_end": 28
+                  }
+                ],
+                "path": "Solvers_Mod/Dense/Cholesky_Factorization.f90",
+                "line_start": 2,
+                "line_end": 82,
+                "module": "Solvers_Mod",
+                "usage": "use Solvers_Mod\n! Prepare allocated Dense_Type A/L, grid associations and plotting/IO state.\n! Set A%N/L%N, matrix bandwidths, and a positive-definite symmetric A%VAL.\n! Allocate default-REAL X/Y/B with matching lengths.\ncall Solvers_Mod_Dense_Cholesky_Factorization(l,a)\ncall Solvers_Mod_Dense_Forward_Substitution(y,l,b)\ncall Solvers_Mod_Dense_Backward_Substitution(x,l,y,t=.true.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment; compile the preprocessed parent module and its included files/dependencies. Plotting side effects make this more than a standalone factorization kernel. No definiteness, factorization, triangular solve or residual was checked."
+              },
+              {
+                "procedure": "Solvers_Mod_Dense_Forward_Substitution",
+                "role": "implementation-helper",
+                "path": "Solvers_Mod/Dense/Forward_Substitution.f90",
+                "line_start": 2,
+                "line_end": 84
+              },
+              {
+                "procedure": "Solvers_Mod_Dense_Backward_Substitution",
+                "role": "implementation-helper",
+                "path": "Solvers_Mod/Dense/Backward_Substitution.f90",
+                "line_start": 2,
+                "line_end": 92
+              }
+            ]
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "de1d9858da1ee4cb2e977ce7050f7926cdd3f17a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public unpreconditioned CG demonstration forms a sparse grid-discretization system, computes residual/search-direction updates and stops when the absolute residual norm falls below RES or N_ITER is exhausted. It is relevant to real symmetric sparse positive-definite systems, not a general nonsymmetric solver. The wrapper calls Discretize%On_Sparse_Matrix itself, replacing/allocating A/X/B; it then checks and deallocates A/X/B before returning, so these are not returned solution arrays for user consumption. The first P-transpose-A-P division has no initial-zero-residual or breakdown guard, and the beta denominator is floored at 1e-12. No INFO or achieved iteration count is returned; printed diagnostics and a post-solve check are the public result. Review covers this pedagogical CG path, not the incomplete-preconditioner variants or a proof the generated system is always SPD.",
+            "evidence": [
+              {
+                "path": "Solvers_Mod.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod.f90",
+                "sha256": "fbbe47dcf68c80242582131f93360276da7da3bd93acdddb80d285e70a12597f"
+              },
+              {
+                "path": "Solvers_Mod/Sparse/Cg_No_Prec.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/Sparse/Cg_No_Prec.f90",
+                "sha256": "fafb726d586b31ac8509bf74bf0e5643e87ec6202193f9d5906b0534f22ae7fd"
+              },
+              {
+                "path": "Sparse_Mod.f90",
+                "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Sparse_Mod.f90",
+                "sha256": "c5d336464503174f4d222f96a34ae411eabcd7ada3830a2e45440abbe5b5a01f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Solvers_Mod_Cg_No_Prec",
+                "role": "public-entry-point",
+                "summary": "Public module grid-driven CG demonstration; destroys its generated sparse matrix and solution buffers at completion.",
+                "signature": "CALL Solvers_Mod_Cg_No_Prec(GRID,A,X,B,N_ITER,RES)",
+                "declarations": [
+                  {
+                    "path": "Solvers_Mod/Sparse/Cg_No_Prec.f90",
+                    "line_start": 6,
+                    "line_end": 17
+                  }
+                ],
+                "path": "Solvers_Mod/Sparse/Cg_No_Prec.f90",
+                "line_start": 2,
+                "line_end": 141,
+                "module": "Solvers_Mod",
+                "usage": "use Solvers_Mod\n! GRID is loaded/configured; A is Sparse_Type, X/B allocatable default-REAL arrays.\n! The routine constructs its own system and deallocates A/X/B before returning.\ncall Solvers_Mod_Cg_No_Prec(grid,a,x,b,100,1.e-6)\n! Inspect printed residual diagnostics; X is not a returned solution buffer.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Do not use this wrapper as an arbitrary-matrix CG API. It performs discretization, global-workspace management, printing and cleanup. Initial convergence and denominator breakdown need review. No grid, solution or convergence behavior was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No standalone license identified",
+          "spdx_expression": null,
+          "revision": "de1d9858da1ee4cb2e977ce7050f7926cdd3f17a",
+          "reviewed_on": "2026-11-05",
+          "notes": "No standalone LICENSE/COPYING file appears in the pinned tree and no redistribution grant was identified in the reviewed solver readme or defining sources. Public educational source is not itself a permissive license grant.",
+          "evidence": [
+            {
+              "path": "Solvers_Mod/readme",
+              "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/readme",
+              "sha256": "66a26bc977290f888fcb90991bcd8e9c17e61243f08898036ea4f78b2e4cab18"
+            },
+            {
+              "path": "Solvers_Mod.f90",
+              "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod.f90",
+              "sha256": "fbbe47dcf68c80242582131f93360276da7da3bd93acdddb80d285e70a12597f"
+            },
+            {
+              "path": "Solvers_Mod/Dense/Cholesky_Factorization.f90",
+              "url": "https://github.com/Niceno/Visual-Fortran-Solvers/blob/de1d9858da1ee4cb2e977ce7050f7926cdd3f17a/Solvers_Mod/Dense/Cholesky_Factorization.f90",
+              "sha256": "73a390cdb127ad0166bd4de3fb27998b63ad2a2caf2df8c47a14fbd6ea7b8e64"
+            }
+          ]
         }
       },
       "imports": {}
@@ -59138,12 +59552,159 @@
             ],
             "notes": "The README documents Fortran/C/C++ kernels exposed through Python tooling, including reductions, robust summaries and rolling analysis. Reported speedups and cross-backend consistency were not reproduced; this is statistical computing rather than a general-purpose physical simulator.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4a1b1",
+            "level": "source-reviewed",
+            "revision": "73eff3bf5f9b764307bc2be2345e176f970ef58c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public SAFE-mode HPCS_MEDIAN/MAD/QUANTILE entries provide nonparametric location, dispersion and quantile summaries. They copy inputs, select order statistics by quickselect, average middle values for even-size medians, and interpolate quantiles with h=1+(n-1)*q. MAD is the raw median absolute deviation without a Gaussian consistency multiplier. SAFE mode propagates NaN with HPCS_SUCCESS rather than omitting it; callers must check both status and finiteness. Invalid n/q/mode returns do not promise an initialized numeric output, and NaN q is not rejected by ordinary range comparisons. Very large finite values can overflow middle-value averaging or interpolation differences. Explicit SAFE selection avoids the thread-local global mode; FAST/deterministic branches are not numerically validated here. Review covers public dispatch and SAFE calculations, not performance or rounding-error certification.",
+            "evidence": [
+              {
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_core_stats.f90",
+                "sha256": "8a31ae587b18e95f106918ecbb24a99936d74b0174f86626e21d593d3419828c"
+              },
+              {
+                "path": "src/fortran/hpcs_constants.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_constants.f90",
+                "sha256": "34d37197afb5d7b7894cbb3e4bfb32b15c315e4383999069f5fbc6a93da135fc"
+              },
+              {
+                "path": "src/fortran/hpcs_core_execution_mode.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_core_execution_mode.f90",
+                "sha256": "500cbb12d81d6aa71681631e2e46e285dc31391b03eee639ea54c6714ae8b43f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hpcs_median",
+                "role": "public-entry-point",
+                "summary": "Public C-interoperable module scalar-summary procedure; N/MODE passed by value in the binding.",
+                "signature": "CALL hpcs_median(X,N,MEDIAN,MODE,STATUS)\nCALL hpcs_mad(X,N,MAD,MODE,STATUS)\nCALL hpcs_quantile(X,N,Q,VALUE,MODE,STATUS)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/hpcs_core_stats.f90",
+                    "line_start": 65,
+                    "line_end": 72
+                  },
+                  {
+                    "path": "src/fortran/hpcs_core_stats.f90",
+                    "line_start": 295,
+                    "line_end": 302
+                  },
+                  {
+                    "path": "src/fortran/hpcs_core_stats.f90",
+                    "line_start": 534,
+                    "line_end": 542
+                  }
+                ],
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "line_start": 65,
+                "line_end": 93,
+                "module": "hpcs_core_stats",
+                "usage": "use iso_c_binding, only: c_int,c_double\nuse hpcs_constants, only: HPCS_MODE_SAFE,HPCS_SUCCESS\nuse hpcs_core_stats, only: hpcs_median,hpcs_mad,hpcs_quantile\nreal(c_double) :: x(5),median,mad,q75\ninteger(c_int) :: status\nx=[1d0,2d0,3d0,4d0,20d0]\ncall hpcs_median(x,5_c_int,median,HPCS_MODE_SAFE,status)\nif(status/=HPCS_SUCCESS) error stop \"median failed\"\ncall hpcs_mad(x,5_c_int,mad,HPCS_MODE_SAFE,status)\nif(status/=HPCS_SUCCESS) error stop \"MAD failed\"\ncall hpcs_quantile(x,5_c_int,0.75_c_double,q75,HPCS_MODE_SAFE,status)\nif(status/=HPCS_SUCCESS) error stop \"quantile failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Also check returned values for NaN/infinity: success includes missing-value propagation. Use the module interfaces rather than inventing a C by-reference layout. No summary, interpolation convention, mode comparison or overflow case was executed."
+              },
+              {
+                "procedure": "hpcs_median_safe",
+                "role": "implementation-helper",
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "line_start": 98,
+                "line_end": 158
+              },
+              {
+                "procedure": "hpcs_mad_safe",
+                "role": "implementation-helper",
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "line_start": 328,
+                "line_end": 393
+              },
+              {
+                "procedure": "hpcs_quantile_safe",
+                "role": "implementation-helper",
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "line_start": 568,
+                "line_end": 646
+              }
+            ]
+          },
+          {
+            "code": "L10a1c4",
+            "level": "source-reviewed",
+            "revision": "73eff3bf5f9b764307bc2be2345e176f970ef58c",
+            "reviewed_on": "2026-11-05",
+            "notes": "HPCS_ROLLING_MEDIAN applies a trailing nonlinear median filter to a one-dimensional sequence. The SAFE path fills the first WINDOW-1 outputs with quiet NaN, then copies each complete window and calls the SAFE scalar median. This is a nonlinear filter, not a symmetric linear moving average or a centered window. NaN within a window propagates into its output, and no missing-value omission or boundary padding is performed. Require 1<=WINDOW<=N and an N-element output. Inner status is not propagated after each median call; the valid-window path finally returns HPCS_SUCCESS. The implementation allocates/copies window buffers and is not an O(n) sliding-order-statistic method. Review covers SAFE dispatch/window semantics, not all rolling anomaly/MAD algorithms or performance.",
+            "evidence": [
+              {
+                "path": "src/fortran/hpcs_core_rolling.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_core_rolling.f90",
+                "sha256": "bb47a911c173b78cb0b3f2e1375f036c39950cd56b8bf8e8b83973066f5dac2b"
+              },
+              {
+                "path": "src/fortran/hpcs_core_stats.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_core_stats.f90",
+                "sha256": "8a31ae587b18e95f106918ecbb24a99936d74b0174f86626e21d593d3419828c"
+              },
+              {
+                "path": "src/fortran/hpcs_constants.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_constants.f90",
+                "sha256": "34d37197afb5d7b7894cbb3e4bfb32b15c315e4383999069f5fbc6a93da135fc"
+              },
+              {
+                "path": "src/fortran/hpcs_core_execution_mode.f90",
+                "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/src/fortran/hpcs_core_execution_mode.f90",
+                "sha256": "500cbb12d81d6aa71681631e2e46e285dc31391b03eee639ea54c6714ae8b43f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hpcs_rolling_median",
+                "role": "public-entry-point",
+                "summary": "Public module C-binding trailing median filter with explicit execution mode and output status.",
+                "signature": "CALL hpcs_rolling_median(X,N,WINDOW,Y,MODE,STATUS)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/hpcs_core_rolling.f90",
+                    "line_start": 58,
+                    "line_end": 67
+                  }
+                ],
+                "path": "src/fortran/hpcs_core_rolling.f90",
+                "line_start": 58,
+                "line_end": 88,
+                "module": "hpcs_core_rolling",
+                "usage": "use iso_c_binding, only: c_int,c_double\nuse hpcs_constants, only: HPCS_MODE_SAFE,HPCS_SUCCESS\nuse hpcs_core_rolling, only: hpcs_rolling_median\nreal(c_double) :: x(5),y(5)\ninteger(c_int) :: status\nx=[1d0,20d0,3d0,4d0,5d0]\ncall hpcs_rolling_median(x,5_c_int,3_c_int,y,HPCS_MODE_SAFE,status)\nif(status/=HPCS_SUCCESS) error stop \"rolling median failed\"\n! Y(1:2) are missing; Y(3:5) describe trailing three-point windows.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interpret leading missing values separately from later data-dependent NaN propagation. Match C_INT/C_DOUBLE and use N-element input/output storage. No filter output, boundary case or timing was tested."
+              },
+              {
+                "procedure": "hpcs_rolling_median_safe",
+                "role": "implementation-helper",
+                "path": "src/fortran/hpcs_core_rolling.f90",
+                "line_start": 93,
+                "line_end": 137
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0",
+          "spdx_expression": "Apache-2.0",
+          "revision": "73eff3bf5f9b764307bc2be2345e176f970ef58c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root contains Apache License 2.0. This scoped finding does not establish terms for external accelerated backends or numerical validation of any advertised execution mode.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/hpcseries/HPCSeriesCore/blob/73eff3bf5f9b764307bc2be2345e176f970ef58c/LICENSE",
+              "sha256": "01663e252f70b208246fa3dcf0673609c9e3d5b448df0fff74db2820733a3eb6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -61297,12 +61858,149 @@
             ],
             "notes": "The README documents Lagrange, serendipity and mapped infinite families, evaluated at points from the external fortran_cubatures package. Shape-function support is not a complete PDE solver or an independently checked cubature library. Invalid inputs stop the program; author test/compiler claims were not reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "724caede81540a0b171d2586f94b4da2fe0a4d15",
+            "reviewed_on": "2026-11-05",
+            "notes": "For the explicitly selected finite line element, SHAPEFUNC constructs nodal Lagrange polynomial basis functions and EVAL evaluates them at a requested reference coordinate. An interpolated value is the dot product of nodal data with returned basis values. This E1b mapping is restricted to the univariate polynomial case; it does not conflate reference-element shape functions with scattered-data mesh generation or global spline fitting. Node ordering can be permuted through NODES, so the sketch forms data from the returned COORDS instead of assuming a particular edge/interior order. SET requires a cubature object from the separate fortran_cubatures dependency; invalid setup can ERROR STOP. Review covers finite Lagrange line construction/evaluation, not every simplex/serendipity/infinite-element variant or an executed interpolation result.",
+            "evidence": [
+              {
+                "path": "src/shapefuncs.f90",
+                "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/src/shapefuncs.f90",
+                "sha256": "f9c4cbb3641d3a8dc69efcd2b8672b930930b2c31ab9f03ca83cded65e9f6e62"
+              },
+              {
+                "path": "fpm.toml",
+                "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/fpm.toml",
+                "sha256": "c88f230a3fd66420fb394aef80cb9e49c5a5416ec16c186c9f5bd649ad78e4b4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eval",
+                "role": "public-entry-point",
+                "summary": "Public type-bound reference-element basis/value/derivative evaluator; all result arrays are required.",
+                "signature": "SF = shapefunc(Q,ORDER,INFIN,FAMILY,NODES)\nCALL sf%eval(XI,FUNC,DERV,CURV)",
+                "declarations": [
+                  {
+                    "path": "src/shapefuncs.f90",
+                    "line_start": 238,
+                    "line_end": 246
+                  },
+                  {
+                    "path": "src/shapefuncs.f90",
+                    "line_start": 413,
+                    "line_end": 422
+                  },
+                  {
+                    "path": "src/shapefuncs.f90",
+                    "line_start": 215,
+                    "line_end": 221
+                  }
+                ],
+                "path": "src/shapefuncs.f90",
+                "line_start": 413,
+                "line_end": 442,
+                "module": "shapefuncs",
+                "derived_type": "shapefunc",
+                "usage": "use iso_fortran_env, only: real64\nuse cubatures, only: cubature,CUB_LIN\nuse shapefuncs, only: shapefunc\ntype(cubature) :: q\ntype(shapefunc) :: sf\nreal(real64),allocatable :: nodal(:),basis(:),derv(:,:),curv(:,:,:)\nreal(real64) :: value,first,second\nq=cubature(CUB_LIN,4)\nsf=shapefunc(q,2)\nallocate(nodal(sf%nnodes),basis(sf%nnodes),derv(1,sf%nnodes),curv(1,1,sf%nnodes))\nnodal=sf%coords(1,:)**2\ncall sf%eval([0.25_real64],basis,derv,curv)\nvalue=dot_product(nodal,basis)\nfirst=dot_product(nodal,derv(1,:))\nsecond=dot_product(nodal,curv(1,1,:))",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Finite line/polynomial example using the separate cubatures dependency and REAL64. Derivatives are with respect to reference XI, not automatically physical coordinates. No interpolation, node-order or partition-of-unity check was run."
+              },
+              {
+                "procedure": "lagrange",
+                "role": "implementation-helper",
+                "path": "src/shapefuncs.f90",
+                "line_start": 687,
+                "line_end": 706
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "724caede81540a0b171d2586f94b4da2fe0a4d15",
+            "reviewed_on": "2026-11-05",
+            "notes": "SHAPEFUNC%EVAL also returns analytic first and second derivatives of each basis function in reference coordinates. LAGRANGE propagates value/first/second derivatives through product factors; EVAL_PRODUCTS assembles mixed derivatives and applies the constant factor-coordinate chain rule, symmetrizing curvature. This is numerical evaluation of analytic basis derivatives, not finite-difference differentiation of an arbitrary callback. Physical-space gradients/Hessians require the appropriate geometric mapping, including extra terms for nonaffine maps; returning reference curvature does not perform that transformation. Infinite directions have singularities at XI=1. The selected sketch uses a finite line and differentiates an interpolated nodal polynomial. Review covers product/chain-rule formulas, not verified high-order conditioning, geometric Jacobians or all special element families.",
+            "evidence": [
+              {
+                "path": "src/shapefuncs.f90",
+                "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/src/shapefuncs.f90",
+                "sha256": "f9c4cbb3641d3a8dc69efcd2b8672b930930b2c31ab9f03ca83cded65e9f6e62"
+              },
+              {
+                "path": "example/demo_isoparametric.f90",
+                "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/example/demo_isoparametric.f90",
+                "sha256": "88c140bb256a65bd93a451d42d80d3503484506fb362278f1b0528166283c580"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eval",
+                "role": "public-entry-point",
+                "summary": "Public type-bound first/second reference-coordinate derivative output for constructed shape functions.",
+                "signature": "CALL sf%eval(XI,FUNC,DERV,CURV)",
+                "declarations": [
+                  {
+                    "path": "src/shapefuncs.f90",
+                    "line_start": 418,
+                    "line_end": 422
+                  },
+                  {
+                    "path": "src/shapefuncs.f90",
+                    "line_start": 201,
+                    "line_end": 204
+                  }
+                ],
+                "path": "src/shapefuncs.f90",
+                "line_start": 413,
+                "line_end": 442,
+                "module": "shapefuncs",
+                "derived_type": "shapefunc",
+                "usage": "use iso_fortran_env, only: real64\nuse cubatures, only: cubature,CUB_LIN\nuse shapefuncs, only: shapefunc\ntype(cubature) :: q\ntype(shapefunc) :: sf\nreal(real64),allocatable :: nodal(:),basis(:),derv(:,:),curv(:,:,:)\nreal(real64) :: value,first,second\nq=cubature(CUB_LIN,4)\nsf=shapefunc(q,2)\nallocate(nodal(sf%nnodes),basis(sf%nnodes),derv(1,sf%nnodes),curv(1,1,sf%nnodes))\nnodal=sf%coords(1,:)**2\ncall sf%eval([0.25_real64],basis,derv,curv)\nvalue=dot_product(nodal,basis)\nfirst=dot_product(nodal,derv(1,:))\nsecond=dot_product(nodal,curv(1,1,:))",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Reference-coordinate derivative sketch shared with the finite-line interpolation example. Do not interpret DERV/CURV as physical derivatives without transforming geometry. No analytic comparison, mapped Hessian or derivative consistency test was executed."
+              },
+              {
+                "procedure": "eval_products",
+                "role": "implementation-helper",
+                "path": "src/shapefuncs.f90",
+                "line_start": 444,
+                "line_end": 493
+              },
+              {
+                "procedure": "multiply",
+                "role": "implementation-helper",
+                "path": "src/shapefuncs.f90",
+                "line_start": 708,
+                "line_end": 719
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "724caede81540a0b171d2586f94b4da2fe0a4d15",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and FPM manifest declare MIT terms and credit Will Klausler. The cubature dependency has its own provenance and is not fully audited by this source-interface review.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/LICENSE",
+              "sha256": "0cdecb84231b00a4ddd2b74e62eccf41fb1ca32593269f135e03c68dc6c1c294"
+            },
+            {
+              "path": "fpm.toml",
+              "url": "https://github.com/willklausler/fortran_shapefuncs/blob/724caede81540a0b171d2586f94b4da2fe0a4d15/fpm.toml",
+              "sha256": "c88f230a3fd66420fb394aef80cb9e49c5a5416ec16c186c9f5bd649ad78e4b4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -67105,12 +67803,100 @@
             ],
             "notes": "The README documents derivative operators and illustrative test output with BLAS linkage. It is a derivative/testing resource, not evidence of a general training or classification package. Printed reference tests were not rerun, and finite-precision agreement was not independently checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "1c7ee0929555fae85f68de6e404eaa07d3e2b8cb",
+            "reviewed_on": "2026-11-05",
+            "notes": "NN_TL computes a Jacobian-vector product for the configured dense network while also returning the nonlinear output; NN_AD computes the transpose-Jacobian action on a supplied output seed. They apply analytic activation derivatives and ordinary/transposed BLAS GEMM through the layer sequence, recomputing nonlinear trajectories for the reverse path. Parameters are fixed module data; these interfaces differentiate inputs, not train weights or differentiate arbitrary Fortran source. Architecture constants in YONOGWDNN fix input/output sizes, width and hidden depth. Allocate/populate INPUT/HIDDEN/OUTPUT and batch-shaped bias arrays before any call; KLON must agree with storage. PARKIND1 selects NNP=DOUB in the inspected build. No argument-shape/status validation or derivative-accuracy certificate is exposed. Review covers the input tangent/adjoint paths and author setup contract, not execution of the supplied Taylor/dot-product tests.",
+            "evidence": [
+              {
+                "path": "nogwdnn_mod.F90",
+                "url": "https://github.com/samhatfield/nn_tl_ad/blob/1c7ee0929555fae85f68de6e404eaa07d3e2b8cb/nogwdnn_mod.F90",
+                "sha256": "9c75f87018104a68bdd74b0a0cede4571d7a5c107fe36de7b766d1b71219ebd5"
+              },
+              {
+                "path": "yonogwdnn.F90",
+                "url": "https://github.com/samhatfield/nn_tl_ad/blob/1c7ee0929555fae85f68de6e404eaa07d3e2b8cb/yonogwdnn.F90",
+                "sha256": "2eab9086438bea6e506ad9fc81a29b68ac593af16e28d492a4d3978c89b62327"
+              },
+              {
+                "path": "parkind1.F90",
+                "url": "https://github.com/samhatfield/nn_tl_ad/blob/1c7ee0929555fae85f68de6e404eaa07d3e2b8cb/parkind1.F90",
+                "sha256": "22903f81b813a3d1574df539dcc4d0b594ec941f48ba857c842f9730da621e8b"
+              },
+              {
+                "path": "main.F90",
+                "url": "https://github.com/samhatfield/nn_tl_ad/blob/1c7ee0929555fae85f68de6e404eaa07d3e2b8cb/main.F90",
+                "sha256": "1da81bac25fd272a92462651fcbc2a420e370b7eb77a6320984117dae8532a12"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "NN_TL",
+                "role": "public-entry-point",
+                "summary": "Public module batched tangent-linear input action and nonlinear output.",
+                "signature": "CALL NN_TL(KLON,X,DX,Y,DY)",
+                "declarations": [
+                  {
+                    "path": "nogwdnn_mod.F90",
+                    "line_start": 146,
+                    "line_end": 149
+                  },
+                  {
+                    "path": "yonogwdnn.F90",
+                    "line_start": 17,
+                    "line_end": 45
+                  }
+                ],
+                "path": "nogwdnn_mod.F90",
+                "line_start": 146,
+                "line_end": 222,
+                "module": "NOGWDNN_MOD",
+                "usage": "use PARKIND1, only: NNP\nuse YONOGWDNN, only: NINP,NOUT\nuse NOGWDNN_MOD, only: NN_TL,NN_AD\n! Allocate/populate all YONOGWDNN weights/biases with the same batch length.\n! X/DX(NINP,KLON), Y/DY/SEED(NOUT,KLON), GX(NINP,KLON), REAL(NNP).\ncall NN_TL(klon,x,dx,y,dy)\ncall NN_AD(klon,x,seed,gx)\n! Independently compare sum(SEED*DY) with sum(GX*DX).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment using fixed network weights and compatible BLAS precision/integers. This illustrates the intended tangent/transpose pairing but does not perform or pass an adjoint test. No Taylor remainder, derivative or batch-layout case was run."
+              },
+              {
+                "procedure": "NN_AD",
+                "role": "public-entry-point",
+                "summary": "Public module input transpose-Jacobian action; output cotangent is input-only.",
+                "signature": "CALL NN_AD(KLON,X,GRADY,GRADX)",
+                "declarations": [
+                  {
+                    "path": "nogwdnn_mod.F90",
+                    "line_start": 233,
+                    "line_end": 236
+                  }
+                ],
+                "path": "nogwdnn_mod.F90",
+                "line_start": 233,
+                "line_end": 304,
+                "module": "NOGWDNN_MOD",
+                "usage": "! With initialized fixed network parameters and matching REAL(NNP) arrays:\ncall NN_AD(klon,x,output_seed,input_cotangent)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Preserve the base X and parameter state used by the corresponding forward/TL call. The procedure recomputes trajectories and returns no convergence or consistency flag. No adjoint identity was checked."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "1c7ee0929555fae85f68de6e404eaa07d3e2b8cb",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice credits Sam Hatfield. The source also credits Matthew Chantry; BLAS has separate terms. This is a root-license finding, not a numerical verification.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/samhatfield/nn_tl_ad/blob/1c7ee0929555fae85f68de6e404eaa07d3e2b8cb/LICENSE.md",
+              "sha256": "862ba9ef5d7198642d121d1d6ad56bf5a53382672ff7da2a90513a4bdc6438fd"
+            }
+          ]
         }
       },
       "imports": {}
@@ -67199,12 +67985,131 @@
             ],
             "notes": "The README documents forward/derivative operations, Keras export and access to a parameter vector. Its design for OOPS does not establish a complete in-library assimilation or training system. Real64/int32 defaults, derivative consistency and exported-model equivalence were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "f4a61fad769d0d63bbd53a7666fcaf5fc255bd45",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public SequentialNeuralNetwork tangent-linear and adjoint bindings propagate perturbations/cotangents through sequential layers. Unlike an input-only Jacobian API, DP includes packed parameter perturbations and the adjoint returns both parameter and input cotangents. Dense layers pack biases first, followed by the reshaped weight matrix. Call APPLY_FORWARD for the same MEMBER and unchanged parameters/base input first: layer forward_input and activation state supply the linearization trajectory. APPLY_ADJOINT may overwrite the supplied DY; keep a copy for dot-product comparisons. Batch-member storage is mutable, and no automatic shape/member/status checks should be inferred. The inspected dense/tanh path supports a smooth derivative example; dropout modes and ReLU at zero need separate interpretation. Review covers sequential dispatch, dense chain-rule products and tanh derivative implementation, not the complete layer catalogue or executed consistency tests.",
+            "evidence": [
+              {
+                "path": "src/fnn_network_sequential.f90",
+                "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/src/fnn_network_sequential.f90",
+                "sha256": "4903cc4e6b80d9969d638e1fcd733dd6c58e749a5b75a2695505a58781c74ef8"
+              },
+              {
+                "path": "src/fnn_layer_dense.f90",
+                "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/src/fnn_layer_dense.f90",
+                "sha256": "b489efef0ed7a71a04199e090be4190774538a581c5c397e1d843fd1ec365574"
+              },
+              {
+                "path": "src/fnn_activation_tanh.f90",
+                "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/src/fnn_activation_tanh.f90",
+                "sha256": "717293055a7c41d81ce52a9a495411a8487dd48354812134613969a742dd8839"
+              },
+              {
+                "path": "src/fnn_common.f90",
+                "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/src/fnn_common.f90",
+                "sha256": "e7acd89de46345430f5b9b8c2d11fb34792511b7efb36b341e298f40f36cbb83"
+              },
+              {
+                "path": "test/test_3.f90",
+                "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/test/test_3.f90",
+                "sha256": "90864a81864dc22d8414669e045ff68d6b5d137a4df8de9014f4add5c8b006c4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "apply_tangent_linear",
+                "role": "public-entry-point",
+                "summary": "Public type-bound state-plus-parameter tangent action after a forward trajectory has been stored.",
+                "signature": "CALL network%apply_forward(TRAIN,MEMBER,X,Y)\nCALL network%apply_tangent_linear(MEMBER,DP,DX,DY)",
+                "declarations": [
+                  {
+                    "path": "src/fnn_network_sequential.f90",
+                    "line_start": 64,
+                    "line_end": 73
+                  },
+                  {
+                    "path": "src/fnn_network_sequential.f90",
+                    "line_start": 316,
+                    "line_end": 321
+                  },
+                  {
+                    "path": "src/fnn_layer_dense.f90",
+                    "line_start": 217,
+                    "line_end": 233
+                  }
+                ],
+                "path": "src/fnn_network_sequential.f90",
+                "line_start": 316,
+                "line_end": 339,
+                "module": "fnn_network_sequential",
+                "derived_type": "SequentialNeuralNetwork",
+                "usage": "use fnn_common, only: rk,ik\nuse fnn_network_sequential, only: SequentialNeuralNetwork,snn_fromfile\ntype(SequentialNeuralNetwork) :: network\n! A valid author-format dense/tanh model file and allocated matching arrays are required.\nnetwork=snn_fromfile(1_ik,\"model.txt\")\n! DP has network%get_num_parameters() entries; X/DX and Y/DY match input/output sizes.\ncall network%apply_forward(.false.,1_ik,x,y)\ncall network%apply_tangent_linear(1_ik,dp,dx,dy)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation fragment; model.txt is a prerequisite, not supplied by this sketch. Preserve the forward trajectory per member, match fnn_common RK/IK, and avoid overwriting that state before derivative calls. No model import, layer derivative or tangent test was run."
+              },
+              {
+                "procedure": "apply_adjoint",
+                "role": "public-entry-point",
+                "summary": "Public type-bound adjoint returning parameter/input cotangents and potentially modifying the output seed.",
+                "signature": "CALL network%apply_adjoint(MEMBER,DY,DP,DX)",
+                "declarations": [
+                  {
+                    "path": "src/fnn_network_sequential.f90",
+                    "line_start": 360,
+                    "line_end": 365
+                  },
+                  {
+                    "path": "src/fnn_layer_dense.f90",
+                    "line_start": 261,
+                    "line_end": 275
+                  }
+                ],
+                "path": "src/fnn_network_sequential.f90",
+                "line_start": 360,
+                "line_end": 383,
+                "module": "fnn_network_sequential",
+                "derived_type": "SequentialNeuralNetwork",
+                "usage": "! Following APPLY_FORWARD for this member; use distinct arrays for seeds/results.\nseed_copy=output_seed\ncall network%apply_adjoint(1_ik,seed_copy,parameter_cotangent,input_cotangent)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Output seed is INOUT; retain the original for an independent tangent/adjoint dot-product test. This is analytic chain-rule differentiation of the represented network, not a compiler AD service. No identity or parameter-packing case was executed."
+              },
+              {
+                "procedure": "dense_apply_tangent_linear",
+                "role": "implementation-helper",
+                "path": "src/fnn_layer_dense.f90",
+                "line_start": 217,
+                "line_end": 233
+              },
+              {
+                "procedure": "dense_apply_adjoint",
+                "role": "implementation-helper",
+                "path": "src/fnn_layer_dense.f90",
+                "line_start": 261,
+                "line_end": 275
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "f4a61fad769d0d63bbd53a7666fcaf5fc255bd45",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice credits Alban Farchi. This scoped finding does not clear external model data or every separately linked component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/cerea-daml/fnn/blob/f4a61fad769d0d63bbd53a7666fcaf5fc255bd45/LICENSE",
+              "sha256": "684c4fb04a05aa89b84f2830806e22135241826ac4de4fcd771edb21e848911f"
+            }
+          ]
         }
       },
       "imports": {}

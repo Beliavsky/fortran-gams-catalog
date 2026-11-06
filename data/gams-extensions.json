@@ -588,6 +588,30 @@
       "parent": "D2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L4a1b": {
+      "label": "Nonparametric analysis",
+      "parent": "L4a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1b2": {
+      "label": "Density function estimation",
+      "parent": "L4a1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L4a1b1": {
+      "label": "Estimates and tests regarding location (e.g., median), dispersion, and shape",
+      "parent": "L4a1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a1c4": {
+      "label": "Other",
+      "parent": "L10a1c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

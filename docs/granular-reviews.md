@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 332 repositories now have 440 source-reviewed
+Reviewed on 2026-11-05. 340 repositories now have 452 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-321 repository cards now identify public routines and link their usage lines
+329 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Eleven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV and TiktakGlobalSearch) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 332 independently source-reviewed repositories now have an
+separately. All 340 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -356,6 +356,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FortLearner | `mod_kmeans::kmeans%fit` | MIT with third-party notices |
 | KohonenF03 | `self_organized_map_utilities::external_train_map` | GPL-3.0 license text |
 | NN_MOD regressors | `NEURALNET_MOD::NEURALNET%BACKPROP`, `OPT_MOD::ADAM` | MIT |
+| Fortran FilterSLP | `filterSLP` | MIT root; EMSOL separate |
+| BMSL | `EmpiricalStats_tools::KDE`, `DimReduction_tools::PCA` | GPL-3.0 license text; DMSL dependencies separate |
+| ASURV | `PLESTM` | MIT root; historical component provenance retained |
+| Visual Fortran Solvers | `Solvers_Mod::Solvers_Mod_Dense_Cholesky_Factorization`, `Solvers_Mod::Solvers_Mod_Cg_No_Prec` | No standalone license identified |
+| HPCSeriesCore | `hpcs_core_stats::hpcs_median`, `hpcs_core_rolling::hpcs_rolling_median` | Apache-2.0 |
+| Fortran shape functions | `shapefuncs::shapefunc%eval` | MIT |
+| Neural-network tangent and adjoint tests | `NOGWDNN_MOD::NN_TL`, `NOGWDNN_MOD::NN_AD` | MIT |
+| Fortran Neural Network library | `fnn_network_sequential::SequentialNeuralNetwork%apply_tangent_linear`, `fnn_network_sequential::SequentialNeuralNetwork%apply_adjoint` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -707,6 +715,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FortLearner](https://github.com/naomatch/fortlearner) | L14a1b | Dense nonhierarchical K-means clustering | Integer constructor kinds, mutable global threading/RNG and iteration-state contracts need attention. |
 | [KohonenF03](https://github.com/khaors/kohonenf03) | L14a1b | Nonhierarchical self-organizing-map clustering | Fixed seed/Euclidean wrapper; scaled data, grid selectors and array dimensions matter. |
 | [NN_MOD regressors](https://github.com/thchang/nn_mod) | H1; G1b1b | Scalar-network backpropagation and gradient-supplied Adam minimization | Loss callback returns a derivative; gradient buffers overwrite parameters and success-status assignments need repair. |
+| [Fortran FilterSLP](https://github.com/ergo-code/fortranfilterslp) | G2h3b | Legacy filter sequential linear nonlinear programming | Repository model state, EMSOL and packed workspace; local method with two-sided constraints. |
+| [BMSL](https://github.com/benrenard/bmsl) | L4a1b2; L13b | Kernel density estimation and principal component analysis | DMSL dependency; mutable centered/scaled data and differing branch normalizations. |
+| [ASURV](https://github.com/rsnemmen/asurv) | L15 | Product-limit survival curve and mean/error calculations | Mutable censoring-tail convention; all-censored, tied and small samples require boundary review. |
+| [Visual Fortran Solvers](https://github.com/niceno/visual-fortran-solvers) | D2b1b; D2b4 | Dense SPD Cholesky and sparse symmetric CG demonstrations | Plotting/grid state; no controlled breakdown status; CG constructs and deallocates its system. |
+| [HPCSeriesCore](https://github.com/hpcseries/hpcseriescore) | L4a1b1; L10a1c4 | Median/MAD/quantile summaries and nonlinear rolling-median filtering | SAFE propagates NaN with success; trailing-window leading values are missing; explicit C value arguments. |
+| [Fortran shape functions](https://github.com/willklausler/fortran_shapefuncs) | E1b; H1 | Finite-line polynomial interpolation and analytic shape derivatives | Reference coordinates and node ordering; cubature dependency and physical derivative transformations. |
+| [Neural-network tangent and adjoint tests](https://github.com/samhatfield/nn_tl_ad) | H1 | Fixed-network input tangent-linear and adjoint operators | Global weights/batch biases and BLAS kinds; derivatives concern inputs rather than training parameters. |
+| [Fortran Neural Network library](https://github.com/cerea-daml/fnn) | H1 | Sequential-network state/parameter tangent and adjoint operators | Stored per-member forward trajectory and parameter packing; adjoint may overwrite output seeds. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1300,3 +1316,12 @@ from time integration, gradients from loss values, normalized Legendre values
 from classical unnormalized polynomials, and wrapper status from convergence.
 Collective/workspace/kind requirements, prototype state-contract limitations
 and component-specific licensing remain explicit.
+
+nn_tl_ad, FNN, Visual-Fortran-Solvers, ASURV, FortranFilterSLP, HPCSeriesCore,
+fortran_shapefuncs and BMSL now have pinned source interfaces and calling
+sketches. These sketches were not compiled or run. Review preserves the
+distinctions between input and parameter derivatives, reference and physical
+coordinates, raw MAD and scaled dispersion, and reusable kernels versus
+grid-driven demonstrations. Censoring-tail conventions, filter boundaries,
+normalization differences, and legacy workspace/dependency/status limits
+remain explicit.
