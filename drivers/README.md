@@ -35,6 +35,7 @@ separate check.
 | [FFTPack cross-correlation](fftpack-correlation/README.md) | L10b2a | 588 direct-sum comparisons across all four real/complex single/double overloads; raw unnormalized sums and legacy ABI limits |
 | [FFTPack signal operations](fftpack-signals/README.md) | J2; J4; J1a1 | 175 direct convolution, analytic-signal and direct-DFT comparisons; documented legacy ABI/bounds limits |
 | [FMM splines and quadrature](fmm-interpolation-quadrature/README.md) | E1a; E3a2; H2a1a1 | 499 spline values, 499 derivative vectors and 55 analytic integrals; full bounds instrumentation |
+| [system_dynamics math](system-dynamics-math/README.md) | L1a1a; L1a1b; D4a1 | 114 shared closed-form statistics datasets and 96 PSD eigensystems; legacy initialization and component-license limits |
 | [FMM scalar minimization](fmm-minimization/README.md) | G1a1a | 216 known-minimum comparisons for BrentMin/Fmin; separate probe reproduces missing exhaustion status |
 | [FMM SVD and ODE](fmm-svd-ode/README.md) | D6; I1a1a | 48 matrix-invariant cases and 211 analytic ODE states; documented continuation INTENT portability issue |
 | [Minila triangular systems](minila-triangular/README.md) | D2a3 | 108 diagonal/lower/upper systems with known solutions and scaled residuals; default REAL is 32-bit |

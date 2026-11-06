@@ -47079,19 +47079,276 @@
                 "line_end": 187
               }
             ]
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+            "reviewed_on": "2026-11-06",
+            "notes": "Location mapping: arithmetic and weighted means; AVEVAR also supplies a mean. The shared driver additionally checks sample variance under the separate L1a1b mapping. The public math::mean and avevar compute descriptive location/dispersion statistics. Unweighted mean uses SUM(A)/N; optional weights select DOT_PRODUCT(W,A)/SUM(W), despite a comment suggesting division by N. AVEVAR first computes the mean, accumulates squared deviations and their residual sum, and returns (SUM((A-AVE)**2)-SUM(A-AVE)**2/N)/(N-1), a corrected sample variance. DP=KIND(0D0). Empty input returns the module NaN; singleton AVEVAR divides by zero. Weight sizes, finite values and nonzero weight sum are not validated; signed weights are accepted mechanically. There is no missing-data policy, error estimate or negative-variance clamp. The checked contract is N>=2, ordinary finite arithmetic progressions and positive conforming weights. A complete main checks N=2..20, offsets 0 and 10, steps .25, 1 and 4 (114 cases), using closed-form mean, sample variance and weighted mean for W(I)=I. All outputs were finite and normalized errors <=2e-12; maximum 2.197555e-16. Huge offsets, cancellation, signed/zero-total weights, singleton/empty paths and overflow remain unchecked. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+            "evidence": [
+              {
+                "path": "src/lib/math.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/math.f90",
+                "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+              },
+              {
+                "path": "src/lib/types.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/types.f90",
+                "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+              },
+              {
+                "path": "src/lib/constants.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/constants.f90",
+                "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+              },
+              {
+                "path": "src/lib/utils.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/utils.f90",
+                "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "Public arithmetic or weighted mean. Weighted result is SUM(W*A)/SUM(W), not division by sample count. Caller supplies conforming weights and nonzero total weight.",
+                "signature": "VALUE = mean(A[,W])",
+                "declarations": [
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 235,
+                    "line_end": 236
+                  },
+                  {
+                    "path": "src/lib/types.f90",
+                    "line_start": 12,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lib/math.f90",
+                "line_start": 231,
+                "line_end": 252,
+                "module": "math",
+                "usage": "program statistics\n  use types, only: dp\n  use math, only: mean,avevar\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer :: n,i,io,is,count\n  real(dp) :: offset,step,a,v,m,wmean,expected_mean,expected_var,expected_weighted,e,maximum\n  real(dp), allocatable :: x(:),w(:)\n  maximum=0;count=0\n  do n=2,20\n    allocate(x(n),w(n))\n    w=[(real(i,dp),i=1,n)]\n    do io=0,1\n      offset=10.0_dp*io\n      do is=0,2\n        step=0.25_dp*4.0_dp**is\n        x=offset+step*w\n        expected_mean=offset+step*real(n+1,dp)/2\n        expected_var=step**2*real(n*(n+1),dp)/12\n        expected_weighted=offset+step*real(2*n+1,dp)/3\n        m=mean(x);wmean=mean(x,w)\n        call avevar(x,a,v)\n        if(.not.all(ieee_is_finite([m,wmean,a,v])))error stop 'Nonfinite statistics'\n        e=max(abs(m-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(a-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(wmean-expected_weighted)/max(1.0_dp,abs(expected_weighted)), &\n          abs(v-expected_var)/expected_var)\n        if(e>2e-12_dp)error stop 'Closed-form statistics mismatch'\n        maximum=max(maximum,e);count=count+1\n      end do\n    end do\n    deallocate(x,w)\n  end do\n  print '(a,i0)', 'Closed-form statistics cases: ',count\n  print '(a,es14.6)', 'Maximum normalized statistic error: ',maximum\n  print '(a)', 'PASS statistics'\nend program",
+                "usage_notes": "Complete main program compiled and run locally; 114 finite arithmetic-progression cases compare the two means, weighted mean and sample variance with independent closed forms at tolerance 2e-12. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+                "local_driver": {
+                  "path": "drivers/system-dynamics-math/statistics.f90",
+                  "sha256": "2b0a1654022da1272ca97fc1c627d59b5ad0deec068f9d303efb77cacf87923e",
+                  "runner": "drivers/system-dynamics-math/run.py",
+                  "runner_sha256": "a1c8879727ed2a9eef90f15ccf6897d5f974bbcc815b56a7127926a24a1f6ef5",
+                  "report": "drivers/system-dynamics-math/results.json",
+                  "report_sha256": "978b6d6aeb7681e970a6f9f28a7bf9b3d339eab62756a6f5325287afad8665ca",
+                  "readme": "drivers/system-dynamics-math/README.md",
+                  "check_name": "statistics_location"
+                }
+              },
+              {
+                "procedure": "avevar",
+                "role": "public-entry-point",
+                "summary": "Public mean and corrected two-pass sample variance with N-1 denominator. Require N>=2; singleton input divides by zero. Source carries a Numerical Recipes notice.",
+                "signature": "CALL avevar(A,AVE,VAR)",
+                "declarations": [
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 258,
+                    "line_end": 259
+                  },
+                  {
+                    "path": "src/lib/types.f90",
+                    "line_start": 12,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lib/math.f90",
+                "line_start": 256,
+                "line_end": 284,
+                "module": "math",
+                "usage": "program statistics\n  use types, only: dp\n  use math, only: mean,avevar\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer :: n,i,io,is,count\n  real(dp) :: offset,step,a,v,m,wmean,expected_mean,expected_var,expected_weighted,e,maximum\n  real(dp), allocatable :: x(:),w(:)\n  maximum=0;count=0\n  do n=2,20\n    allocate(x(n),w(n))\n    w=[(real(i,dp),i=1,n)]\n    do io=0,1\n      offset=10.0_dp*io\n      do is=0,2\n        step=0.25_dp*4.0_dp**is\n        x=offset+step*w\n        expected_mean=offset+step*real(n+1,dp)/2\n        expected_var=step**2*real(n*(n+1),dp)/12\n        expected_weighted=offset+step*real(2*n+1,dp)/3\n        m=mean(x);wmean=mean(x,w)\n        call avevar(x,a,v)\n        if(.not.all(ieee_is_finite([m,wmean,a,v])))error stop 'Nonfinite statistics'\n        e=max(abs(m-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(a-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(wmean-expected_weighted)/max(1.0_dp,abs(expected_weighted)), &\n          abs(v-expected_var)/expected_var)\n        if(e>2e-12_dp)error stop 'Closed-form statistics mismatch'\n        maximum=max(maximum,e);count=count+1\n      end do\n    end do\n    deallocate(x,w)\n  end do\n  print '(a,i0)', 'Closed-form statistics cases: ',count\n  print '(a,es14.6)', 'Maximum normalized statistic error: ',maximum\n  print '(a)', 'PASS statistics'\nend program",
+                "usage_notes": "Complete main program compiled and run locally; 114 finite arithmetic-progression cases compare the two means, weighted mean and sample variance with independent closed forms at tolerance 2e-12. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+                "local_driver": {
+                  "path": "drivers/system-dynamics-math/statistics.f90",
+                  "sha256": "2b0a1654022da1272ca97fc1c627d59b5ad0deec068f9d303efb77cacf87923e",
+                  "runner": "drivers/system-dynamics-math/run.py",
+                  "runner_sha256": "a1c8879727ed2a9eef90f15ccf6897d5f974bbcc815b56a7127926a24a1f6ef5",
+                  "report": "drivers/system-dynamics-math/results.json",
+                  "report_sha256": "978b6d6aeb7681e970a6f9f28a7bf9b3d339eab62756a6f5325287afad8665ca",
+                  "readme": "drivers/system-dynamics-math/README.md",
+                  "check_name": "statistics_location"
+                }
+              }
+            ]
+          },
+          {
+            "code": "D4a1",
+            "level": "source-reviewed",
+            "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+            "reviewed_on": "2026-11-06",
+            "notes": "Public math::eigencov computes a real symmetric covariance eigensystem: copies P to U, applies private Householder TRED2 and implicit QL TQLI, clips all negative eigenvalues to zero, sorts values and eigenvector columns descending through EIGSORT, and sets RANK=COUNT(D/=0). This D4a1 mapping is limited to finite symmetric positive-semidefinite matrices; clipping invalidates a general indefinite eigensystem claim. TRED2 reads the lower triangle; there is no symmetry or positive-semidefiniteness test. RANK is exact-zero counting, not a tolerance-based numerical rank. VERBOSE prints trace diagnostics without a convergence guarantee. QL iteration exhaustion uses STOP rather than a returned error code. Require N>=1, compatible default INTEGER, DP=KIND(0D0), and P/U(N,N), D(N). The complete main checks 96 matrices: N=1..8, diagonal known spectra, rank-one outer products, positive-definite Toeplitz and dense Gram+.25I families, each at scales 1e-8, 1 and 1e8. Independently calculated eigenpair residuals and trace errors normalized by matrix infinity norm, and orthogonality errors, must be <=2e-11. Maxima were 7.993606e-16, 8.162378e-16 and 2.109424e-15 respectively. Sorted nonnegative values, unchanged input, exact-zero count convention and known diagonal eigenvalues also passed. The rank test does not certify numerical rank of nearly zero eigenvalues. Zero matrices, indefinite/asymmetric input, QL failure, large dimensions, extreme scales, optimized builds and other compilers were not executed. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+            "evidence": [
+              {
+                "path": "src/lib/math.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/math.f90",
+                "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+              },
+              {
+                "path": "src/lib/types.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/types.f90",
+                "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+              },
+              {
+                "path": "src/lib/constants.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/constants.f90",
+                "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+              },
+              {
+                "path": "src/lib/utils.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/utils.f90",
+                "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eigencov",
+                "role": "public-entry-point",
+                "summary": "Public covariance eigensystem with descending eigenvalues. Negative eigenvalues are clipped and RANK uses exact-zero counting; no convergence status is returned. Intended for positive-semidefinite inputs only.",
+                "signature": "CALL eigencov(N,P,U,D,RANK,VERBOSE)",
+                "declarations": [
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 582,
+                    "line_end": 585
+                  },
+                  {
+                    "path": "src/lib/types.f90",
+                    "line_start": 12,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lib/math.f90",
+                "line_start": 578,
+                "line_end": 624,
+                "module": "math",
+                "usage": "program covariance_eigen\n  use types, only: dp\n  use math, only: eigencov\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer :: n,i,j,k,family,iscale,rank,cases\n  real(dp) :: scale,norma,residual,orthogonality,trace_error,maxres,maxorth,maxtrace\n  real(dp), allocatable :: a(:,:),p(:,:),u(:,:),d(:),gram(:,:),v(:)\n  maxres=0;maxorth=0;maxtrace=0;cases=0\n  do n=1,8\n    allocate(a(n,n),p(n,n),u(n,n),d(n),gram(n,n),v(n))\n    do family=1,4\n      a=0\n      select case(family)\n      case(1)\n        do i=1,n\n          a(i,i)=real(i,dp)\n        end do\n      case(2)\n        v=[(real(i,dp)/n,i=1,n)]\n        do i=1,n\n          a(:,i)=v*v(i)\n        end do\n      case(3)\n        do i=1,n\n          do j=1,n\n            a(i,j)=0.5_dp**abs(i-j)\n          end do\n        end do\n      case(4)\n        do i=1,n\n          do j=1,n\n            gram(i,j)=sin(real(i+2*j,dp))\n          end do\n        end do\n        a=matmul(transpose(gram),gram)\n        do i=1,n\n          a(i,i)=a(i,i)+0.25_dp\n        end do\n      end select\n      do iscale=-1,1\n        scale=10.0_dp**(8*iscale);p=scale*a\n        call eigencov(n,p,u,d,rank,.false.)\n        if(.not.all(ieee_is_finite(u)).or..not.all(ieee_is_finite(d)))error stop 'Nonfinite eigensystem'\n        if(any(p/=scale*a))error stop 'Input covariance changed'\n        if(any(d<0).or.rank/=count(d/=0))error stop 'Rank/nonnegative convention mismatch'\n        if(any(d(1:n-1)<d(2:n)))error stop 'Eigenvalues not descending'\n        norma=maxval(sum(abs(scale*a),dim=2))\n        residual=0\n        do k=1,n\n          residual=max(residual,maxval(abs(matmul(scale*a,u(:,k))-d(k)*u(:,k)))/norma)\n        end do\n        gram=matmul(transpose(u),u)\n        do i=1,n\n          gram(i,i)=gram(i,i)-1\n        end do\n        orthogonality=maxval(abs(gram))\n        trace_error=abs(sum(d)-sum([(scale*a(i,i),i=1,n)]))/norma\n        if(max(residual,orthogonality,trace_error)>2e-11_dp)error stop 'Eigensystem invariant failed'\n        if(family==1)then\n          if(maxval(abs(d-[(scale*real(n-i+1,dp),i=1,n)]))/norma>2e-11_dp)error stop 'Diagonal spectrum mismatch'\n        end if\n        maxres=max(maxres,residual);maxorth=max(maxorth,orthogonality);maxtrace=max(maxtrace,trace_error)\n        cases=cases+1\n      end do\n    end do\n    deallocate(a,p,u,d,gram,v)\n  end do\n  print '(a,i0)', 'Positive-semidefinite eigensystem cases: ',cases\n  print '(a,es14.6)', 'Maximum normalized eigenpair residual: ',maxres\n  print '(a,es14.6)', 'Maximum orthogonality error: ',maxorth\n  print '(a,es14.6)', 'Maximum normalized trace error: ',maxtrace\n  print '(a)', 'PASS covariance_eigen'\nend program",
+                "usage_notes": "Complete main program compiled and run locally; 96 positive-semidefinite systems pass independent eigenpair residual, orthogonality, trace and ordering checks. Negative clipping and exact-zero rank are documented limitations. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+                "local_driver": {
+                  "path": "drivers/system-dynamics-math/covariance_eigen.f90",
+                  "sha256": "4aff6fca34e1db9740d3a9000acdfe36d430514ea820a8360543b2958ff8b231",
+                  "runner": "drivers/system-dynamics-math/run.py",
+                  "runner_sha256": "a1c8879727ed2a9eef90f15ccf6897d5f974bbcc815b56a7127926a24a1f6ef5",
+                  "report": "drivers/system-dynamics-math/results.json",
+                  "report_sha256": "978b6d6aeb7681e970a6f9f28a7bf9b3d339eab62756a6f5325287afad8665ca",
+                  "readme": "drivers/system-dynamics-math/README.md",
+                  "check_name": "covariance_eigen"
+                }
+              },
+              {
+                "procedure": "symmetric Householder reduction with Numerical Recipes notice",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 628,
+                "line_end": 711
+              },
+              {
+                "procedure": "implicit QL iteration and STOP failure",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 715,
+                "line_end": 774
+              },
+              {
+                "procedure": "descending eigenvalue and vector-column sorting",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 778,
+                "line_end": 812
+              },
+              {
+                "procedure": "scaled hypotenuse helper with Numerical Recipes notice",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 816,
+                "line_end": 839
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dispersion mapping: corrected two-pass sample variance with N-1 denominator. Mean/weighted-mean functionality is separately classified L1a1a. The same 114 datasets support both mappings, not 228 distinct datasets. Location mapping: arithmetic and weighted means; AVEVAR also supplies a mean. The shared driver additionally checks sample variance under the separate L1a1b mapping. The public math::mean and avevar compute descriptive location/dispersion statistics. Unweighted mean uses SUM(A)/N; optional weights select DOT_PRODUCT(W,A)/SUM(W), despite a comment suggesting division by N. AVEVAR first computes the mean, accumulates squared deviations and their residual sum, and returns (SUM((A-AVE)**2)-SUM(A-AVE)**2/N)/(N-1), a corrected sample variance. DP=KIND(0D0). Empty input returns the module NaN; singleton AVEVAR divides by zero. Weight sizes, finite values and nonzero weight sum are not validated; signed weights are accepted mechanically. There is no missing-data policy, error estimate or negative-variance clamp. The checked contract is N>=2, ordinary finite arithmetic progressions and positive conforming weights. A complete main checks N=2..20, offsets 0 and 10, steps .25, 1 and 4 (114 cases), using closed-form mean, sample variance and weighted mean for W(I)=I. All outputs were finite and normalized errors <=2e-12; maximum 2.197555e-16. Huge offsets, cancellation, signed/zero-total weights, singleton/empty paths and overflow remain unchecked. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+            "evidence": [
+              {
+                "path": "src/lib/math.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/math.f90",
+                "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+              },
+              {
+                "path": "src/lib/types.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/types.f90",
+                "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+              },
+              {
+                "path": "src/lib/constants.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/constants.f90",
+                "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+              },
+              {
+                "path": "src/lib/utils.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/utils.f90",
+                "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "avevar",
+                "role": "public-entry-point",
+                "summary": "Public mean and corrected two-pass sample variance with N-1 denominator. Require N>=2; singleton input divides by zero. Source carries a Numerical Recipes notice.",
+                "signature": "CALL avevar(A,AVE,VAR)",
+                "declarations": [
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 258,
+                    "line_end": 259
+                  },
+                  {
+                    "path": "src/lib/types.f90",
+                    "line_start": 12,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lib/math.f90",
+                "line_start": 256,
+                "line_end": 284,
+                "module": "math",
+                "usage": "program statistics\n  use types, only: dp\n  use math, only: mean,avevar\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer :: n,i,io,is,count\n  real(dp) :: offset,step,a,v,m,wmean,expected_mean,expected_var,expected_weighted,e,maximum\n  real(dp), allocatable :: x(:),w(:)\n  maximum=0;count=0\n  do n=2,20\n    allocate(x(n),w(n))\n    w=[(real(i,dp),i=1,n)]\n    do io=0,1\n      offset=10.0_dp*io\n      do is=0,2\n        step=0.25_dp*4.0_dp**is\n        x=offset+step*w\n        expected_mean=offset+step*real(n+1,dp)/2\n        expected_var=step**2*real(n*(n+1),dp)/12\n        expected_weighted=offset+step*real(2*n+1,dp)/3\n        m=mean(x);wmean=mean(x,w)\n        call avevar(x,a,v)\n        if(.not.all(ieee_is_finite([m,wmean,a,v])))error stop 'Nonfinite statistics'\n        e=max(abs(m-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(a-expected_mean)/max(1.0_dp,abs(expected_mean)), &\n          abs(wmean-expected_weighted)/max(1.0_dp,abs(expected_weighted)), &\n          abs(v-expected_var)/expected_var)\n        if(e>2e-12_dp)error stop 'Closed-form statistics mismatch'\n        maximum=max(maximum,e);count=count+1\n      end do\n    end do\n    deallocate(x,w)\n  end do\n  print '(a,i0)', 'Closed-form statistics cases: ',count\n  print '(a,es14.6)', 'Maximum normalized statistic error: ',maximum\n  print '(a)', 'PASS statistics'\nend program",
+                "usage_notes": "Complete main program compiled and run locally; 114 finite arithmetic-progression cases compare the two means, weighted mean and sample variance with independent closed forms at tolerance 2e-12. Complete main compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Unmodified types/constants/utils/math modules use -fno-range-check -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow; main uses the same flags except -fno-range-check. The extra module flag accommodates constants.f90 zero-division NaN/infinity parameter initializers and is not a portability claim. Hashes, flags, warnings and successful results are under drivers/system-dynamics-math/. Only the named routines were executed; previous RK4/Akima source reviews are unchanged. Numerical Recipes notices in AVEVAR and eigen helpers leave component licensing unresolved; no upstream numerical source is bundled.",
+                "local_driver": {
+                  "path": "drivers/system-dynamics-math/statistics.f90",
+                  "sha256": "2b0a1654022da1272ca97fc1c627d59b5ad0deec068f9d303efb77cacf87923e",
+                  "runner": "drivers/system-dynamics-math/run.py",
+                  "runner_sha256": "a1c8879727ed2a9eef90f15ccf6897d5f974bbcc815b56a7127926a24a1f6ef5",
+                  "report": "drivers/system-dynamics-math/results.json",
+                  "report_sha256": "978b6d6aeb7681e970a6f9f28a7bf9b3d339eab62756a6f5325287afad8665ca",
+                  "readme": "drivers/system-dynamics-math/README.md",
+                  "check_name": "statistics_dispersion"
+                }
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
+        "notes": "Descriptive statistics and positive-semidefinite covariance eigenvectors have complete locally checked mains (114 shared statistical datasets and 96 eigensystem cases). Negative eigenvalues are clipped, rank uses exact-zero counting, and QL failure STOPs. The expanded review includes Numerical Recipes-marked components; their license terms remain unresolved alongside the root MIT notice. Earlier RK4/Akima source evidence remains unchanged and was not newly executed. Other routines, optimized builds and alternate compilers were not checked.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
         },
         "license": {
-          "label": "MIT root notice; selected original routines reviewed",
-          "spdx_expression": "MIT",
+          "label": "MIT root; Numerical Recipes-marked components unresolved",
+          "spdx_expression": null,
           "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
-          "reviewed_on": "2026-11-05",
-          "notes": "The root contains an MIT grant. The review selects the named RK4 and Akima interfaces; other sections of the large mathematics module explicitly reference Numerical Recipes and were not audited here. Do not infer that this scoped finding resolves all historical component provenance.",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root MIT grant is preserved. The expanded review now includes AVEVAR (line 284), TRED2 (711), TQLI (774) and PYTHAG (839), which carry explicit 1986-92 Numerical Recipes Software copyright notices in math.f90. This review does not establish permission to redistribute those historical implementations under MIT or another license; no Numerical Recipes terms are inferred from the root notice. The earlier RK4/Akima scope is retained as historical source evidence. Catalog mains are original; upstream numerical sources are not bundled.",
           "evidence": [
             {
               "path": "LICENSE",

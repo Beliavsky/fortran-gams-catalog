@@ -317,6 +317,17 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('fmm.f90#L3268-L3274', fmm)
             self.assertIn('fmm.f90#L3239-L3242', fmm)
             self.assertIn('ERRCODE is not set on iteration exhaustion', fmm)
+            dynamics = (destination/'projects/quimbp/system_dynamics/index.html').read_text(encoding='utf-8')
+            for name in ('statistics', 'covariance_eigen'):
+                self.assertIn('drivers/system-dynamics-math/'+name+'.f90', dynamics)
+                self.assertTrue((destination/'drivers/system-dynamics-math'/f'{name}.f90').is_file())
+            for artifact in ('run.py', 'README.md', 'results.json'):
+                self.assertTrue((destination/'drivers/system-dynamics-math'/artifact).is_file())
+            for code, procedure in [('L1a1a', 'mean'), ('L1a1b', 'avevar'), ('D4a1', 'eigencov')]:
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('math::'+procedure, class_page)
+            self.assertIn('math.f90#L582-L585', dynamics)
+            self.assertIn('Numerical Recipes-marked components unresolved', dynamics)
             minila = (destination/'projects/ghbrown/minila/index.html').read_text(encoding='utf-8')
             self.assertIn('drivers/minila-triangular/triangular.f90', minila)
             for procedure in ('diag_sub', 'fwd_sub', 'bck_sub'):

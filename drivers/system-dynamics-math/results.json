@@ -1,0 +1,164 @@
+{
+  "checked_at": "2026-11-06T23:30:03.711020+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings",
+  "checks": [
+    {
+      "name": "statistics_location",
+      "gams_code": "L1a1a",
+      "source": {
+        "path": "src/lib/math.f90",
+        "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+        "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+      },
+      "dependencies": [
+        {
+          "path": "src/lib/types.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+        },
+        {
+          "path": "src/lib/constants.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+        },
+        {
+          "path": "src/lib/utils.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+        }
+      ],
+      "driver": "statistics.f90",
+      "driver_sha256": "2b0a1654022da1272ca97fc1c627d59b5ad0deec068f9d303efb77cacf87923e",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-fno-range-check",
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\math.f90:1202:11:\n\n 1202 |   else if (sum.ne.0.d0) then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1129:6:\n\n 1129 |   if (aamax.eq.0.d0) stop  'singular matrix in ludcmp'\n      |      1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1164:5:\n\n 1164 |   if(a(j,j).eq.0.d0) a(j,j) = TINY\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:866:13:\n\n  866 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:898:13:\n\n  898 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:928:13:\n\n  928 |           if(g.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:957:11:\n\n  957 |         if(g.ne.0.0d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:983:15:\n\n  983 |             if((abs(rv1(l))+anorm).eq.anorm)  goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:984:15:\n\n  984 |             if((abs(w(nm))+anorm).eq.anorm)  goto 1\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:991:15:\n\n  991 |             if((abs(f)+anorm).eq.anorm) goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:831:5:\n\n  831 |   if(absb.eq.0.d0)then\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1048:15:\n\n 1048 |             if(z.ne.0.0d0)then\n      |               1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:729:23:\n\n  729 |           if (abs(e(m))+dd.eq.dd) goto 2\n      |                       1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:746:15:\n\n  746 |             if(r.eq.0.d0)then\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:641:13:\n\n  641 |           if(scale.eq.0.d0)then\n      |             1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:688:11:\n\n  688 |         if(d(i).ne.0.d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:610:13:\n\n  610 | rank = COUNT(D.NE.0)\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:539:10:\n\n  539 | real(dp) nn(1)\n      |          1~~~~\nWarning: Unused variable 'nn' declared at (1) [-Wunused-variable]\n",
+      "stdout": "Closed-form statistics cases: 114\nMaximum normalized statistic error:   2.197555E-16\nPASS statistics\n",
+      "stderr": ""
+    },
+    {
+      "name": "statistics_dispersion",
+      "gams_code": "L1a1b",
+      "source": {
+        "path": "src/lib/math.f90",
+        "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+        "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+      },
+      "dependencies": [
+        {
+          "path": "src/lib/types.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+        },
+        {
+          "path": "src/lib/constants.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+        },
+        {
+          "path": "src/lib/utils.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+        }
+      ],
+      "driver": "statistics.f90",
+      "driver_sha256": "2b0a1654022da1272ca97fc1c627d59b5ad0deec068f9d303efb77cacf87923e",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-fno-range-check",
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\math.f90:1202:11:\n\n 1202 |   else if (sum.ne.0.d0) then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1129:6:\n\n 1129 |   if (aamax.eq.0.d0) stop  'singular matrix in ludcmp'\n      |      1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1164:5:\n\n 1164 |   if(a(j,j).eq.0.d0) a(j,j) = TINY\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:866:13:\n\n  866 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:898:13:\n\n  898 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:928:13:\n\n  928 |           if(g.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:957:11:\n\n  957 |         if(g.ne.0.0d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:983:15:\n\n  983 |             if((abs(rv1(l))+anorm).eq.anorm)  goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:984:15:\n\n  984 |             if((abs(w(nm))+anorm).eq.anorm)  goto 1\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:991:15:\n\n  991 |             if((abs(f)+anorm).eq.anorm) goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:831:5:\n\n  831 |   if(absb.eq.0.d0)then\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1048:15:\n\n 1048 |             if(z.ne.0.0d0)then\n      |               1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:729:23:\n\n  729 |           if (abs(e(m))+dd.eq.dd) goto 2\n      |                       1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:746:15:\n\n  746 |             if(r.eq.0.d0)then\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:641:13:\n\n  641 |           if(scale.eq.0.d0)then\n      |             1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:688:11:\n\n  688 |         if(d(i).ne.0.d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:610:13:\n\n  610 | rank = COUNT(D.NE.0)\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:539:10:\n\n  539 | real(dp) nn(1)\n      |          1~~~~\nWarning: Unused variable 'nn' declared at (1) [-Wunused-variable]\n",
+      "stdout": "Closed-form statistics cases: 114\nMaximum normalized statistic error:   2.197555E-16\nPASS statistics\n",
+      "stderr": ""
+    },
+    {
+      "name": "covariance_eigen",
+      "gams_code": "D4a1",
+      "source": {
+        "path": "src/lib/math.f90",
+        "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+        "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+      },
+      "dependencies": [
+        {
+          "path": "src/lib/types.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+        },
+        {
+          "path": "src/lib/constants.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "e8234e44406cc6ac436f5c82bcf41f6650b16bc0e4e99dbfc75e5d1792e43824"
+        },
+        {
+          "path": "src/lib/utils.f90",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "sha256": "858ab9ad09a5796c5dd98e2181a6dea1d44c7084687d015b795cc6eeb5799425"
+        }
+      ],
+      "driver": "covariance_eigen.f90",
+      "driver_sha256": "4aff6fca34e1db9740d3a9000acdfe36d430514ea820a8360543b2958ff8b231",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-fno-range-check",
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\math.f90:1202:11:\n\n 1202 |   else if (sum.ne.0.d0) then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1129:6:\n\n 1129 |   if (aamax.eq.0.d0) stop  'singular matrix in ludcmp'\n      |      1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1164:5:\n\n 1164 |   if(a(j,j).eq.0.d0) a(j,j) = TINY\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:866:13:\n\n  866 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:898:13:\n\n  898 |           if(scale.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:928:13:\n\n  928 |           if(g.ne.0.0d0)then\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:957:11:\n\n  957 |         if(g.ne.0.0d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:983:15:\n\n  983 |             if((abs(rv1(l))+anorm).eq.anorm)  goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:984:15:\n\n  984 |             if((abs(w(nm))+anorm).eq.anorm)  goto 1\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:991:15:\n\n  991 |             if((abs(f)+anorm).eq.anorm) goto 2\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:831:5:\n\n  831 |   if(absb.eq.0.d0)then\n      |     1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:1048:15:\n\n 1048 |             if(z.ne.0.0d0)then\n      |               1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:729:23:\n\n  729 |           if (abs(e(m))+dd.eq.dd) goto 2\n      |                       1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:746:15:\n\n  746 |             if(r.eq.0.d0)then\n      |               1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:641:13:\n\n  641 |           if(scale.eq.0.d0)then\n      |             1\nWarning: Equality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:688:11:\n\n  688 |         if(d(i).ne.0.d0)then\n      |           1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:610:13:\n\n  610 | rank = COUNT(D.NE.0)\n      |             1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n<temporary>\\math.f90:539:10:\n\n  539 | real(dp) nn(1)\n      |          1~~~~\nWarning: Unused variable 'nn' declared at (1) [-Wunused-variable]\nC:\\python\\fortran-gams-catalog\\drivers\\system-dynamics-math\\covariance_eigen.f90:45:15:\n\n   45 |         if(any(p/=scale*a))error stop 'Input covariance changed'\n      |               1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\nC:\\python\\fortran-gams-catalog\\drivers\\system-dynamics-math\\covariance_eigen.f90:46:35:\n\n   46 |         if(any(d<0).or.rank/=count(d/=0))error stop 'Rank/nonnegative convention mismatch'\n      |                                   1\nWarning: Inequality comparison for REAL(8) at (1) [-Wcompare-reals]\n",
+      "stdout": "Positive-semidefinite eigensystem cases: 96\nMaximum normalized eigenpair residual:   7.993606E-16\nMaximum orthogonality error:   2.109424E-15\nMaximum normalized trace error:   8.162378E-16\nPASS covariance_eigen\n",
+      "stderr": ""
+    }
+  ]
+}

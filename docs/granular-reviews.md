@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 726 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 729 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -443,7 +443,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Delaunay Density Diagnostic | `DELSPARSE_MOD::DELAUNAYSPARSES` | MIT root notice; bundled BQPD has research-distribution terms |
 | Python BLS | `eebls` | MIT root notice |
 | Unstructured finite volume | `operation_conjugate_gradient::conjugate_gradient%solve`, `operation_gmres::gmres%solve`, `operation_diffusion::diffusion_stencil` | GPL-3.0 license file; no later-version election identified |
-| System Dynamics | `runge_kutta::rk4`, `math::akima` | MIT root notice; selected original routines reviewed |
+| System Dynamics | `runge_kutta::rk4`, `math::akima`, `::mean`, `::avevar`, `::eigencov` | MIT root; Numerical Recipes-marked components unresolved |
 | PyMC 2 historical implementation | `normcdf`, `poisson`, `exponweib_ppf` | AFL-3.0 root notice; bundled components have separate terms |
 | wvdecomp | `atrouswv` | LPPL notice; version not specified |
 | octree-mg | `m_multigrid::mg_fas_fmg`, `m_multigrid::mg_fas_vcycle`, `m_vlaplacian::vlaplacian_set_methods` | No explicit grant identified for selected multigrid modules |
@@ -966,6 +966,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
 | [FMM collection: real SVD](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | D6 | Householder/QR rectangular singular-value decomposition | 48 square/tall matrices; reconstruction, orthogonality, energy and selected known spectra; both vector flags true. |
 | [FMM collection: RKF45](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | I1a1a | Adaptive explicit nonstiff initial-value integration | 211 analytic-state comparisons at GNU -O0; preserved helper state has an INTENT(OUT) portability issue. |
+| [system_dynamics: means](https://github.com/quimbp/system_dynamics) | L1a1a | Arithmetic and optional weighted means | 114 closed-form datasets; conforming weights and nonzero weight sum required. |
+| [system_dynamics: sample variance](https://github.com/quimbp/system_dynamics) | L1a1b | Corrected two-pass variance with N-1 denominator | Same 114 datasets; N>=2, no missing-data handling; Numerical Recipes notice. |
+| [system_dynamics: covariance eigenvectors](https://github.com/quimbp/system_dynamics) | D4a1 | Householder/QL symmetric eigensystem | 96 PSD cases; negative eigenvalues clipped, exact-zero rank, STOP on QL failure. |
 | [FMM: scalar minimization](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | G1a1a | Derivative-free Brent search and Fmin wrapper | 216 checked normal cases; exhausted-budget probe reproduces missing failure status. |
 | [FFTPack: cross-correlation](https://github.com/keurfonluu/FFTPack) | L10b2a | Raw finite cross-correlations, real/complex KIND=4/8 | 588 direct-sum comparisons; conjugated second vector, symmetric maximum-length lag range; legacy ABI limits. |
 | [minila: direct triangular solves](https://github.com/ghbrown/minila) | D2a3 | Default-REAL diagonal, forward and backward substitution | 108 known-solution/scaled-residual checks; 32-bit REAL, correct structure and nonzero pivots required. |
@@ -1945,3 +1948,18 @@ successful normal cases. Full bounds checks and floating-point traps passed
 under GNU Fortran 17 O0 on Windows; no upstream source was modified.
 No endpoint/global/non-smooth guarantee, optimized-build certification or
 repair of the existing RKF45 continuation issue follows from these checks.
+
+system_dynamics now has [complete statistics and covariance-eigenproblem mains](../drivers/system-dynamics-math/README.md).
+L1a1a and L1a1b use the same 114 arithmetic-progression datasets for means,
+weighted means and corrected sample variance; they are shared checks rather
+than 228 distinct datasets. Maximum normalized statistic error was 2.197555e-16.
+D4a1 is limited to positive-semidefinite input: EIGENCOV clips negative values,
+sorts eigenpairs descending, uses exact-zero rank counting and STOPs on QL
+failure. All 96 diagonal/rank-one/Toeplitz/dense-Gram cases passed residual,
+orthogonality and trace checks. Module/main bounds checks and traps passed
+under GNU Fortran 17 O0 on Windows. Modules additionally need GNU
+-fno-range-check for the author's NaN/infinity constant initializers; no source
+was modified. The extended review includes explicit Numerical Recipes notices
+in AVEVAR/TRED2/TQLI/PYTHAG, so the license record now flags unresolved component
+terms alongside the root MIT notice. No upstream numerical code is bundled.
+Existing RK4/Akima source evidence remains unchanged and was not newly executed.
