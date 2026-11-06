@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 364 repositories now have 484 source-reviewed
+Reviewed on 2026-11-05. 372 repositories now have 495 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-352 repository cards now identify public routines and link their usage lines
+360 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 364 independently source-reviewed repositories now have an
+separately. All 372 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -388,6 +388,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | PaScaL TDMA | `PaScaL_TDMA_cuda::pascal_solver` | MIT |
 | OptimusPrime | `mod_optSA::opt_runSA` | No license identified |
 | PDFO | `BOBYQA`, `COBYLA` | BSD-3-Clause |
+| S2HAT | `s2hat_alm2map_mod::s2hat_alm2map` | GPL-2.0-or-later |
+| ODEPACK redistribution | `DLSODE` | No grant identified in selected redistribution documentation |
+| GPROPT | `GOLDENSECTION` | MIT |
+| HSSPACK | `HssCholSolver`, `DHSSMM` | No explicit license grant identified |
+| libdlfind | `dlf_lbfgs_step` | LGPL-3.0-or-later with retained L-BFGS attribution |
+| FM Algorithm 814 archive | `FMZM::GAMMA`, `FMZM::BETA` | No explicit license grant identified in reviewed distribution files |
+| Induced Smoothed Lasso | `islasso` | GPL-2.0-or-later |
+| tfQMRgpu | `tfqmrgpu::tfqmrgpu_bsrsv_complete` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -771,6 +779,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [PaScaL TDMA](https://github.com/mpmc-lab/pascal_tdma) | D2a2a | Batched real tridiagonal systems on GPU/MPI | Destructive device arrays, reusable plans, CUDA-aware MPI and no pivot/status guarantee. |
 | [OptimusPrime](https://github.com/rwatson54/optimusprime) | G2i | Bounded simulated annealing with a scalar objective callback | Clock reseeding, positive print interval, temperature degeneracy and heuristic termination. |
 | [PDFO](https://github.com/pdfo/pdfo) | G2h1a1; G2h3b1a | Bounded quadratic-model and nonlinear inequality-constrained derivative-free optimization | Modified BOBYQA/COBYLA signatures, named callbacks, mutable controls and explicit termination/feasibility results. |
+| [S2HAT](https://github.com/b3dcmb/s2hat) | J | Distributed scalar spherical-harmonic synthesis | Pointer layouts, MPI ownership/rings, selected FFT backend and scalar-only calling scope. |
+| [ODEPACK redistribution](https://github.com/cfinch/odepack) | I1a1b; I1a2 | Variable-order Adams and stiff BDF ODE initial-value integration | Method-specific workspaces/Jacobians, local error control and preserved continuation state. |
+| [GPROPT](https://github.com/iarlopes/gpropt) | G1a1a | Derivative-free one-dimensional golden-section minimization | Named external objective, fixed interval contraction and required unit-11 output setup. |
+| [HSSPACK](https://github.com/shengguolsg/hsspack) | D2b1b; D1b6 | Hierarchical SPD approximate solve and compressed matrix product | Compression controls, nonpropagated status, panel remainder defect and reversed timing. |
+| [libdlfind](https://github.com/digital-chemistry-laboratory/libdlfind) | G1b1b | Limited-memory BFGS direction generation from supplied gradients | External procedure/shared history, caller-side convergence/step control and curvature guards. |
+| [FM Algorithm 814 archive](https://github.com/toms-algo/814-fm-2001) | C7a; C7b | Real multiprecision complete gamma and beta functions | Historical FM modules, decimal-string inputs, shared precision/cache state and explicit scope. |
+| [Induced Smoothed Lasso](https://github.com/cran/islasso) | L8c | Induced-smoothed penalized Gaussian multiple-linear regression | R-hosted numerical helpers, input/output work arrays and masked factorization status. |
+| [tfQMRgpu](https://github.com/real-space/tfqmrgpu) | D2c4 | Complex block-sparse transpose-free QMR solves on GPU | Public square-block convenience API, compiled block support, prescribed X sparsity and residual/status caveats. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1399,3 +1415,13 @@ Intel/IMSL linkage from ordinary standalone calling interfaces. It records
 local adaptive tolerance rather than a global quadrature bound, derivative-free
 optimization termination rather than proof of optimality, and explicitly
 documents source status, counter and progress-reporting limitations.
+
+FM (TOMS 814), the cfinch ODEPACK redistribution, islasso, tfQMRgpu, GPopt,
+libdlfind, HSSPACK and S2HAT now have eleven additional pinned mappings
+with source calling sketches. These were not compiled or run. Method
+flags, public versus private wrappers, external versus module procedures,
+shared solver history and runtime dependencies are explicit. HSS status/panel/
+timing limitations, L-BFGS curvature and zero-gradient guards, and sparse
+GPU residual checks are retained alongside the usage lines. Spherical
+harmonic synthesis remains in broad J because this taxonomy has no
+dedicated spherical-harmonic leaf.

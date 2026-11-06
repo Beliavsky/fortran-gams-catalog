@@ -17166,12 +17166,107 @@
             ],
             "notes": "The README documents MPI and FFTW/HEALPix dependencies; the author Fortran example uses map2alm/alm2map interfaces. No runtime verification, pixelization coverage or transform-accuracy result is claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "985d64da2e2a79c4ef6f97c88e3bc04676fabf8b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public S2HAT_ALM2MAP module wrapper synthesizes scalar or polarized real maps on supported iso-latitude spherical pixelizations from distributed complex spherical harmonic coefficients. The selected no-precomputation scalar path builds associated-Legendre recurrences, accumulates harmonic coefficients in latitude, redistributes m/ring work with MPI and performs Fourier ring synthesis through the configured FFT backend. Spherical harmonic transforms do not have a dedicated more-specific class in the adopted GAMS tree, so broad J is retained rather than claiming a plain Cartesian FFT leaf. The calling fragment is scalar NSTOKES=1, PRECOMPUTE_PLMS=0 and native LDA=LMAX storage; m ownership/ring ranges/map sizes and pointer arrays must come from the matching setup routines. Polarization/spin derivative variants, transform round-trip accuracy and quadrature conventions are not verified by this review. No numerical status is returned; a missing FFT compile flag only prints WRONG fft FLAG in the dispatcher, so backend configuration is essential. Review covers public dispatch and selected scalar Legendre/ring synthesis paths, not the full distributed analysis API.",
+            "evidence": [
+              {
+                "path": "src/src_fortran/s2hat_alm2map.f90",
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/src/src_fortran/s2hat_alm2map.f90",
+                "sha256": "6b0fae2cd5e9d98a594b7609075fef8128052489c03cec71fe4ca539df420359"
+              },
+              {
+                "path": "src/src_fortran/s2hat_toolbox.F90",
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/src/src_fortran/s2hat_toolbox.F90",
+                "sha256": "ffe3282d41715197210ec456573ab78ceafb7529512c591b9c78f9521d19fe83"
+              },
+              {
+                "path": "src/src_fortran/s2hat_defs.f90",
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/src/src_fortran/s2hat_defs.f90",
+                "sha256": "4f3f58ac92429e3547264134967f05294e0d9292c615c398d5e0d8155a76cba5"
+              },
+              {
+                "path": "examples/s2hat_example.f90",
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/examples/s2hat_example.f90",
+                "sha256": "90fb7e8bf892cb778bcfe7fa0a9e2ecb85c9bedbeafe2cdc7be839d74b149a7d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/README.md",
+                "sha256": "141450ccab78b2a25c9ed7e8a90e22a318fa44be9f4ddfe129e7c98b6e4c5915"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "s2hat_alm2map",
+                "role": "public-entry-point",
+                "summary": "Public distributed spherical-harmonic synthesis wrapper using pointer-based native/HEALPix layouts.",
+                "signature": "CALL s2hat_alm2map(PRECOMPUTE_PLMS,PIXELIZATION,SCAN,LMAX,MMAX, &\n NMVALS,MVALS,NMAPS,NSTOKES,FIRST_RING,LAST_RING,MAP_SIZE,LOCAL_MAP, &\n LDA,LOCAL_ALMS,NPLM,LOCAL_PLMS,NUMPROCS,MYID,COMM)",
+                "declarations": [
+                  {
+                    "path": "src/src_fortran/s2hat_alm2map.f90",
+                    "line_start": 91,
+                    "line_end": 108
+                  }
+                ],
+                "path": "src/src_fortran/s2hat_alm2map.f90",
+                "line_start": 91,
+                "line_end": 108,
+                "module": "s2hat_alm2map_mod",
+                "usage": "use s2hat_alm2map_mod, only: s2hat_alm2map\n! After MPI/pixelization/scan setup and GET_LOCAL_DATA_SIZES/FIND_MVALUES:\n! LMAX>=1, NMAPS=1, NSTOKES=1, LDA=LMAX, PRECOMPUTE_PLMS=0.\n! Allocate REAL(kind=s2hat_dp), POINTER :: LOCAL_MAP(0:MAP_SIZE-1,1,1).\n! Allocate COMPLEX(kind=s2hat_dpc), POINTER :: LOCAL_ALMS(0:LMAX,0:NMVALS-1,1,1).\n! NPLM is INTEGER(s2hat_i8b); LOCAL_PLMS is a matching real pointer dummy.\n! Initialize finite coefficients and use compatible ring ranges/m ownership.\ncall s2hat_alm2map(0,pixelization,scan,lmax,lmax,nmvals,mvals,1,1, &\n first_ring,last_ring,map_size,local_map,lmax,local_alms, &\n nplm,local_plms,numprocs,myid,comm)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution/allocation scalar fragment; follow the pinned example setup with scalar layouts and initialize/nullify unused pointer dummies consistently. Build a matching MPI/pixelization and selected FFT backend configuration. This is synthesis, not a checked transform inverse or a spin/polarization example. No map, normalization, MPI or round-trip result was tested."
+              },
+              {
+                "procedure": "s2hat_alm2map_sc",
+                "role": "implementation-helper",
+                "path": "src/src_fortran/s2hat_alm2map.f90",
+                "line_start": 236,
+                "line_end": 254
+              },
+              {
+                "procedure": "scalar Legendre synthesis",
+                "role": "implementation-helper",
+                "path": "src/src_fortran/s2hat_alm2map.f90",
+                "line_start": 428,
+                "line_end": 457
+              },
+              {
+                "procedure": "s2hat_ring_synthesis",
+                "role": "implementation-helper",
+                "path": "src/src_fortran/s2hat_toolbox.F90",
+                "line_start": 2344,
+                "line_end": 2376
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "985d64da2e2a79c4ef6f97c88e3bc04676fabf8b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected synthesis source explicitly elects GPL version 2 or later and retains HEALPix contributor notices. FFT/MPI and other linked components retain separate terms; this is a scoped source license finding rather than a complete dependency audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/LICENSE",
+              "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+            },
+            {
+              "path": "src/src_fortran/s2hat_alm2map.f90",
+              "url": "https://github.com/B3Dcmb/s2hat/blob/985d64da2e2a79c4ef6f97c88e3bc04676fabf8b/src/src_fortran/s2hat_alm2map.f90",
+              "sha256": "6b0fae2cd5e9d98a594b7609075fef8128052489c03cec71fe4ca539df420359"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19538,12 +19633,172 @@
             ],
             "notes": "The maintainer explicitly says the numerical algorithms are unchanged. The prototype BOOST interface is incomplete; this repository is distinct from the separate ODEPACK modernization already cataloged.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1b",
+            "level": "source-reviewed",
+            "revision": "b0f54f4fc17a575858544741fe2be18925fc491a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The DLSODE MF=10 path integrates explicit first-order nonstiff ODE initial-value systems by variable-step/order Adams multistep methods with functional iteration. The driver initializes workspace/error weights, calls DSTODE for stepping and interpolates to TOUT for ITASK=1. DCFODE constructs the Adams coefficients up to order 12; adaptive order/step control and local error estimates are internal. RTOL/ATOL weight local error rather than bounding global solution error. ISTATE=1 initializes and ISTATE=2 continues a successful solve; preserve work arrays/state for continuation and inspect negative status codes before using output. COMMON-backed solver state is not an independent reentrant solver object. Review covers this nonstiff selection, driver/status dispatch and multistep coefficient/step paths; it does not classify MF=10 as a stiff or DAE method.",
+            "evidence": [
+              {
+                "path": "opkdmain.f",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opkdmain.f",
+                "sha256": "da31255ff43e3a13c2c0ccaed51c3cd260b8ac9d9082f34b8587c9007d9a2376"
+              },
+              {
+                "path": "opkda1.f",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opkda1.f",
+                "sha256": "861c7bc2c74172b9e26127fd1100e5900e87f47f876d97cdef1b87e580510e6b"
+              },
+              {
+                "path": "example/example.f95",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/example/example.f95",
+                "sha256": "1fd15f724ab1ba25f0aa018b9b406963ea6f914048e1843b4310f47f105e22fd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DLSODE",
+                "role": "public-entry-point",
+                "summary": "External double-precision variable-order Adams IVP driver; the method flag selects the nonstiff multistep branch.",
+                "signature": "CALL DLSODE(F,NEQ,Y,T,TOUT,ITOL,RTOL,ATOL,ITASK,ISTATE, &\n IOPT,RWORK,LRW,IWORK,LIW,JAC,10)",
+                "declarations": [
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 2,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 49,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 70,
+                    "line_end": 84
+                  }
+                ],
+                "path": "opkdmain.f",
+                "line_start": 2,
+                "line_end": 7,
+                "usage": "program ode_sketch\n external :: rhs,jac_dummy\n integer :: neq(1),state,iw(32)\n double precision :: y(1),t,tout,rtol(1),atol(1),rw(64)\n neq=[1]; state=1; iw=0; rw=0d0\n y=1d0; t=0d0; tout=1d0; rtol=1d-6; atol=1d-10\n call DLSODE(rhs,neq,y,t,tout,1,rtol,atol,1,state,0,rw,64,iw,32,jac_dummy,10)\n if(state/=2) error stop \"inspect DLSODE status\"\nend program\nsubroutine rhs(neq,t,y,ydot)\n integer :: neq(*)\n double precision :: t,y(*),ydot(*)\n ydot(1)=-1d0*y(1)\nend subroutine\nsubroutine jac_dummy(neq,t,y,ml,mu,pd,nrowpd)\n integer :: neq(*),ml,mu,nrowpd\n double precision :: t,y(*),pd(nrowpd,*)\n ! Not called by this selected method flag.\nend subroutine",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The scalar exponential-decay sketch uses array NEQ and default INTEGER/DOUBLE PRECISION legacy interfaces. JAC is an unused dummy for MF=10. Build the matching ODEPACK main/support files and use suitable legacy argument-compatibility compiler settings. No integration, tolerance or continuation case was tested."
+              },
+              {
+                "procedure": "DCFODE Adams coefficients",
+                "role": "implementation-helper",
+                "path": "opkda1.f",
+                "line_start": 47,
+                "line_end": 58
+              },
+              {
+                "procedure": "DSTODE",
+                "role": "implementation-helper",
+                "path": "opkda1.f",
+                "line_start": 630,
+                "line_end": 647
+              }
+            ]
+          },
+          {
+            "code": "I1a2",
+            "level": "source-reviewed",
+            "revision": "b0f54f4fc17a575858544741fe2be18925fc491a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The DLSODE MF=22 path solves stiff explicit first-order ODE IVPs using variable-order BDF and a full Jacobian estimated internally by finite differences. The driver partitions matrix workspace and dispatches through DSTODE/DPREPJ/DSOLSY; BDF coefficient generation is distinct from the Adams branch and supports order up to five. This selected entry is not a residual-form DAE solver, even though the broad GAMS I1a2 class also covers mixed algebraic-differential equations. MF=21 is the separate user-Jacobian variant and is not required by this sketch. Local tolerance control, convergence/error status, workspace preservation and shared COMMON-state limitations still apply. Review covers the stiff selection and driver/coefficient/step dispatch rather than every sparse/Krylov/rootfinding ODEPACK variant.",
+            "evidence": [
+              {
+                "path": "opkdmain.f",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opkdmain.f",
+                "sha256": "da31255ff43e3a13c2c0ccaed51c3cd260b8ac9d9082f34b8587c9007d9a2376"
+              },
+              {
+                "path": "opkda1.f",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opkda1.f",
+                "sha256": "861c7bc2c74172b9e26127fd1100e5900e87f47f876d97cdef1b87e580510e6b"
+              },
+              {
+                "path": "example/example.f95",
+                "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/example/example.f95",
+                "sha256": "1fd15f724ab1ba25f0aa018b9b406963ea6f914048e1843b4310f47f105e22fd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DLSODE",
+                "role": "public-entry-point",
+                "summary": "External double-precision stiff BDF IVP driver with internally differenced full Jacobian.",
+                "signature": "CALL DLSODE(F,NEQ,Y,T,TOUT,ITOL,RTOL,ATOL,ITASK,ISTATE, &\n IOPT,RWORK,LRW,IWORK,LIW,JAC,22)",
+                "declarations": [
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 2,
+                    "line_end": 7
+                  },
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 49,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "opkdmain.f",
+                    "line_start": 243,
+                    "line_end": 262
+                  }
+                ],
+                "path": "opkdmain.f",
+                "line_start": 2,
+                "line_end": 7,
+                "usage": "program ode_sketch\n external :: rhs,jac_dummy\n integer :: neq(1),state,iw(32)\n double precision :: y(1),t,tout,rtol(1),atol(1),rw(64)\n neq=[1]; state=1; iw=0; rw=0d0\n y=1d0; t=0d0; tout=1d0; rtol=1d-6; atol=1d-10\n call DLSODE(rhs,neq,y,t,tout,1,rtol,atol,1,state,0,rw,64,iw,32,jac_dummy,22)\n if(state/=2) error stop \"inspect DLSODE status\"\nend program\nsubroutine rhs(neq,t,y,ydot)\n integer :: neq(*)\n double precision :: t,y(*),ydot(*)\n ydot(1)=-1000d0*y(1)\nend subroutine\nsubroutine jac_dummy(neq,t,y,ml,mu,pd,nrowpd)\n integer :: neq(*),ml,mu,nrowpd\n double precision :: t,y(*),pd(nrowpd,*)\n ! Not called by this selected method flag.\nend subroutine",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch selects MF=22; it does not call JAC_DUMMY and does not demonstrate a DAE. Storage is sufficient for this one-equation example only, not arbitrary NEQ. Inspect ISTATE and retain local/global error distinctions. No stiff integration, Jacobian or residual result was run."
+              },
+              {
+                "procedure": "DCFODE BDF coefficients",
+                "role": "implementation-helper",
+                "path": "opkda1.f",
+                "line_start": 146,
+                "line_end": 172
+              },
+              {
+                "procedure": "DLSODE core dispatch",
+                "role": "implementation-helper",
+                "path": "opkdmain.f",
+                "line_start": 1522,
+                "line_end": 1538
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No grant identified in selected redistribution documentation",
+          "spdx_expression": null,
+          "revision": "b0f54f4fc17a575858544741fe2be18925fc491a",
+          "reviewed_on": "2026-11-05",
+          "notes": "README says the numerical code was redistributed without modification and retains original-author copyrights. No standalone LICENSE/COPYING or explicit redistribution grant was identified in the reviewed files. This scoped finding does not override any independently established upstream ODEPACK terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/README.md",
+              "sha256": "c3306d944aae963db4f1e5700fd5b64a7794ae534abcfbd0ccb01454f02dcfd2"
+            },
+            {
+              "path": "opks-sum.txt",
+              "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opks-sum.txt",
+              "sha256": "a53392f1b249a20c0d13a4b3af7497e4c5fa574396c99a699ec6bcc31c4a5ca2"
+            },
+            {
+              "path": "opkdmain.f",
+              "url": "https://github.com/cfinch/odepack/blob/b0f54f4fc17a575858544741fe2be18925fc491a/opkdmain.f",
+              "sha256": "da31255ff43e3a13c2c0ccaed51c3cd260b8ac9d9082f34b8587c9007d9a2376"
+            }
+          ]
         }
       },
       "imports": {}
@@ -19721,12 +19976,70 @@
             ],
             "notes": "The README describes a doctoral-assignment origin and an ifort-oriented Makefile needing adjustments for other environments. Compiler portability and each algorithm interface remain unchecked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1a1a",
+            "level": "source-reviewed",
+            "revision": "e5571ef610198283909cd489d5945edde4ae9906",
+            "reviewed_on": "2026-11-05",
+            "notes": "GOLDENSECTION performs derivative-free univariate interval reduction using golden-ratio interior points, evaluating a named external EVALFUNC1 rather than accepting a procedure argument. The user supplies ordered distinct endpoints and a fixed NITER; the routine returns four bracket/interior coordinates and function values, not a scalar minimizer or a status/accuracy estimate. GOLDENINT is a separate interactive file-writing wrapper that derives NITER from a requested relative interval contraction and chooses the smallest returned value. A unimodal finite objective over the supplied interval is required for usual interval-search interpretation; no multimodal global search guarantee is inferred. The kernel writes progress to Fortran unit 11 and does not reject zero-width/reversed bounds or invalid counts. Review covers the complete golden-section kernel/interface and the pinned sample objective, not all optimizers in GPopt.",
+            "evidence": [
+              {
+                "path": "src/golden_section/goldensection.f90",
+                "url": "https://github.com/iarlopes/GPROPT/blob/e5571ef610198283909cd489d5945edde4ae9906/src/golden_section/goldensection.f90",
+                "sha256": "778326c5d590ae786c3c334d66f9a631f2291b6c14ec426e50840d101940c870"
+              },
+              {
+                "path": "src/golden_section/goldenint.f90",
+                "url": "https://github.com/iarlopes/GPROPT/blob/e5571ef610198283909cd489d5945edde4ae9906/src/golden_section/goldenint.f90",
+                "sha256": "017376dd01e9b71d77743f871e7bb39728e725e1e5b574d5a94a2e88563ed52e"
+              },
+              {
+                "path": "src/evalfunc1.f90",
+                "url": "https://github.com/iarlopes/GPROPT/blob/e5571ef610198283909cd489d5945edde4ae9906/src/evalfunc1.f90",
+                "sha256": "70acf32c7096668199896eacd7f304c888b7c38cc88c8087e43be456a5edbe3c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GOLDENSECTION",
+                "role": "public-entry-point",
+                "summary": "External REAL(8) fixed-iteration golden-section minimization bracket kernel.",
+                "signature": "CALL GOLDENSECTION(XO,XF,F,NITER)",
+                "declarations": [
+                  {
+                    "path": "src/golden_section/goldensection.f90",
+                    "line_start": 4,
+                    "line_end": 17
+                  }
+                ],
+                "path": "src/golden_section/goldensection.f90",
+                "line_start": 4,
+                "line_end": 71,
+                "usage": "external :: GOLDENSECTION\nreal(8) :: endpoints(2),points(4),values(4)\ninteger :: best\nendpoints=[-2d0,2d0]\nopen(unit=11,file=\"golden.log\",status=\"replace\")\ncall GOLDENSECTION(endpoints,points,values,40)\nclose(11)\nbest=minloc(values,dim=1)\n! POINTS(BEST), VALUES(BEST) are the best of the four returned samples.\n! Link one external EVALFUNC1(X), returning REAL(8); the repo supplies an example.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a finite unimodal objective and distinct ascending endpoints. Replace the named external objective for another problem; it is not passed as a callback argument. Iteration count determines bracket contraction without an error/status result. No minimum, equal-value branch or interval case was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "e5571ef610198283909cd489d5945edde4ae9906",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant applies to the selected GPopt source. The finding does not replace any retained attribution in external routines or establish numerical correctness.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/iarlopes/GPROPT/blob/e5571ef610198283909cd489d5945edde4ae9906/LICENSE",
+              "sha256": "1cd1bbe606f80513a65a81e98f979a40ab642a71689af394ba109b922a955671"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22966,12 +23279,162 @@
             ],
             "notes": "The short README specifies specialized matrix forms and hierarchically semiseparable techniques. These component algorithms are not advertised as unrestricted dense eigensolver/SVD replacements.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2b1b",
+            "level": "source-reviewed",
+            "revision": "61a222115c41b83cad8deee501cb3f93818961a9",
+            "reviewed_on": "2026-11-05",
+            "notes": "HSSCHOLSOLVER solves a real dense symmetric positive-definite system through an approximate hierarchical semiseparable Cholesky representation, optionally refined by preconditioned CG. The caller supplies a dense matrix, block/rank/compression controls and one RHS vector, despite comments mentioning multiple RHSs. RS=S selects deterministic SVD compression and RS=R randomized compression; WPCG=N uses the approximate direct solve, Y the iterative refinement path. Selected construction code compresses tree blocks and applies local Cholesky/orthogonal transformations; SOLVECHOLSVD traverses the factor tree and applies triangular solves. INFO validates option flags but is not propagated from lower-level factorization/convergence/allocation failures (some allocation exits retain INFO=0). Thus INFO=0 is not a numerical solve certificate. Input A is copied internally and B overwritten; preserve original RHS and check a residual. Review covers the driver and selected construction/solve tree paths, not all low-rank kernels or an accuracy/scaling guarantee.",
+            "evidence": [
+              {
+                "path": "SRC/HssCholSolver.f90",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/SRC/HssCholSolver.f90",
+                "sha256": "da781c0eec6e6ae503ab32403fdbde47fefb06863ba879e032a110f7773f7553"
+              },
+              {
+                "path": "SRC/mat2hsssvd.f90",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/SRC/mat2hsssvd.f90",
+                "sha256": "e81d4f227c1f1f116895a8c8e5c7f764683a3f0dd7ddfa6ffd602b0ca26cbdf0"
+              },
+              {
+                "path": "TEST/testhsschol.f90",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/TEST/testhsschol.f90",
+                "sha256": "cf1735921dc4172b9e04b977fbab26807f00c641788f7bc10c01b49b1b1a6a97"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/README",
+                "sha256": "6956f9152efd3a5be7c2ab61f7c0558b0783add943ae2e5bce520dc7161f346c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "HssCholSolver",
+                "role": "public-entry-point",
+                "summary": "External dense SPD hierarchical approximate Cholesky/optional-PCG driver with one RHS.",
+                "signature": "CALL HssCholSolver(RS,WPCG,A,LDA,B,NI,TOL,PRANK,PP,TAU,MAXIT,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/HssCholSolver.f90",
+                    "line_start": 1,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "SRC/HssCholSolver.f90",
+                    "line_start": 26,
+                    "line_end": 54
+                  }
+                ],
+                "path": "SRC/HssCholSolver.f90",
+                "line_start": 1,
+                "line_end": 139,
+                "usage": "external :: HssCholSolver\ninteger :: n,ni,rank_cap,oversampling,maxit,info\ndouble precision :: tol,tau\n! Allocate/initialize DOUBLE PRECISION A(N,N), RHS(N), and preserve copies.\n! Use a sufficiently sized SPD matrix with compressible off-diagonal blocks.\nni=20; rank_cap=10; oversampling=5; maxit=30; tol=1d-8; tau=1d-12\ncall HssCholSolver(\"S\",\"N\",a,n,rhs,ni,tol,rank_cap,oversampling,tau,maxit,info)\nif(info/=0) error stop \"invalid HSS options\"\n! Independently validate the returned solution residual against original A/RHS.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation fragment using author-style block/rank controls. Link the complete HSSPACK/BLAS/LAPACK build; adapt controls to actual matrix size and structure. INFO does not carry all numerical failures or establish residual accuracy. No SPD solve, compression, randomized or PCG case was run."
+              },
+              {
+                "procedure": "mat2hsscholsvd",
+                "role": "implementation-helper",
+                "path": "SRC/mat2hsssvd.f90",
+                "line_start": 284,
+                "line_end": 300
+              },
+              {
+                "procedure": "solvecholsvd",
+                "role": "implementation-helper",
+                "path": "SRC/mat2hsssvd.f90",
+                "line_start": 553,
+                "line_end": 571
+              }
+            ]
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "61a222115c41b83cad8deee501cb3f93818961a9",
+            "reviewed_on": "2026-11-05",
+            "notes": "DHSSMM compresses a dense square real A into a hierarchical semiseparable representation, then traverses its low-rank factor tree to overwrite dense B with approximate A*B in column panels. FASTHSSMM applies upward/downward tree products with dense block multiplications. The wrapper assumes LDA=M=N and needs valid block/rank and panel sizes; this is not a general rectangular matrix product. The selected wrapper has concrete limitations: INFO is never assigned, the remainder-panel branch slices B rows instead of columns, and multiplication TIME(2) subtracts clocks in reverse order. The sketch therefore restricts K to a positive multiple of NCOL and does not interpret INFO or timing as validation. Compression tolerance controls internal approximations, not an independently measured product error. Review covers construction/product dispatch and selected tree multiply paths; it does not certify every compression kernel or OpenMP variant.",
+            "evidence": [
+              {
+                "path": "SRC/DHSSMM.f90",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/SRC/DHSSMM.f90",
+                "sha256": "46cf13f4e5c74a3f128c2531c8a415ba176fa26d7de3a6a475777d3b3f60e2ba"
+              },
+              {
+                "path": "SRC/ConstructHssd.f90",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/SRC/ConstructHssd.f90",
+                "sha256": "042fbe33d5de10dfdc577ca7dae4cd0e3c9cf9f219283dcf8f6b5d9f8b0d3f77"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/README",
+                "sha256": "6956f9152efd3a5be7c2ab61f7c0558b0783add943ae2e5bce520dc7161f346c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DHSSMM",
+                "role": "public-entry-point",
+                "summary": "External panel-wise approximate dense product through HSS compression, with restricted safe panel shape.",
+                "signature": "CALL DHSSMM(A,LDA,M,N,B,LDB,K,TOL,PRANK,NI,NCOL,TIME,INFO)",
+                "declarations": [
+                  {
+                    "path": "SRC/DHSSMM.f90",
+                    "line_start": 1,
+                    "line_end": 13
+                  }
+                ],
+                "path": "SRC/DHSSMM.f90",
+                "line_start": 1,
+                "line_end": 13,
+                "usage": "external :: DHSSMM\ninteger :: n,k,panel,ni,rank_cap,info\ndouble precision :: tol,times(2)\n! Allocate/initialize A(N,N), B(N,K), preserve copies, and choose N/block sizes.\npanel=20; k=40; ni=20; rank_cap=10; tol=1d-8; info=-999\n! B must already be allocated with K=40 columns; K is a multiple of PANEL.\ncall DHSSMM(a,n,n,n,b,n,k,tol,rank_cap,ni,panel,times,info)\n! INFO is not assigned, and TIMES(2) is reversed; validate A*B independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation fragment only. Use a square matrix and a positive panel size dividing K to avoid the reviewed remainder-slice defect. Build all HSSPACK dependencies; do not rely on unassigned INFO or the reversed timing. No product, compression error, remainder case or timing was tested."
+              },
+              {
+                "procedure": "fastHssmm",
+                "role": "implementation-helper",
+                "path": "SRC/ConstructHssd.f90",
+                "line_start": 926,
+                "line_end": 947
+              },
+              {
+                "procedure": "fastHssmm tree products",
+                "role": "implementation-helper",
+                "path": "SRC/ConstructHssd.f90",
+                "line_start": 1056,
+                "line_end": 1083
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "61a222115c41b83cad8deee501cb3f93818961a9",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected README/source identify HSSPACK and its algorithms/authors but no explicit permission grant was identified; the pinned root tree has no LICENSE/COPYING. Separately linked BLAS/LAPACK notices do not establish a license for the repository-specific HSS implementation.",
+          "evidence": [
+            {
+              "path": "README",
+              "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/README",
+              "sha256": "6956f9152efd3a5be7c2ab61f7c0558b0783add943ae2e5bce520dc7161f346c"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/README.md",
+              "sha256": "e65b1e0be9410f4bd0e6a77422c0f402269e343d04622bb92cd441730758de07"
+            },
+            {
+              "path": "SRC/HssCholSolver.f90",
+              "url": "https://github.com/shengguolsg/HSSPACK/blob/61a222115c41b83cad8deee501cb3f93818961a9/SRC/HssCholSolver.f90",
+              "sha256": "da781c0eec6e6ae503ab32403fdbde47fefb06863ba879e032a110f7773f7553"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24819,12 +25282,99 @@
             ],
             "notes": "The README documents a callback-driven geometry-optimization backend and examples with external electronic-structure code. Its interface is distinct from a standalone implementation of every DL-FIND optimization method.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G1b1b",
+            "level": "source-reviewed",
+            "revision": "4167998d16d8dac4a484ba9305f27d6325a7a28d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external DLF_LBFGS_STEP procedure supplies a limited-memory BFGS search step for smooth unconstrained multivariate optimization using caller positions and first derivatives. DLF_LBFGS_INIT allocates a selected shared instance/history; the step routine forms position/gradient differences and applies the two-loop inverse-Hessian recursion. The first step is normalized to length 0.02 and divides by the gradient norm without a zero-gradient guard. Later updates divide by y-transpose-s and y-transpose-y without safeguarding zero/invalid curvature, and a positive gradient-dot-step triggers direction inversion. This is a direction/update component, not a complete minimizer: the caller must evaluate energy/gradient, test convergence before the first/each call, choose acceptable new points and manage line/step control. Module LBFGS_MODULE stores history but the callable procedures are external, after END MODULE, so do not label the step as a module binding. Review covers step/init/destroy lifecycle and selected-instance state, not all DL-FIND coordinates, transition-state or chemistry workflows.",
+            "evidence": [
+              {
+                "path": "src/dlf_lbfgs.f90",
+                "url": "https://github.com/digital-chemistry-laboratory/libdlfind/blob/4167998d16d8dac4a484ba9305f27d6325a7a28d/src/dlf_lbfgs.f90",
+                "sha256": "9364e96b6880aa8e1e6e5ac0525951c9b8d2df8055637327fdc0e9d6b951624c"
+              },
+              {
+                "path": "src/dlf_global_module.f90",
+                "url": "https://github.com/digital-chemistry-laboratory/libdlfind/blob/4167998d16d8dac4a484ba9305f27d6325a7a28d/src/dlf_global_module.f90",
+                "sha256": "a6826391ae19519bbf5ea0c5985361907c9c0220a96d7d8e73e26b0f65deb246"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/digital-chemistry-laboratory/libdlfind/blob/4167998d16d8dac4a484ba9305f27d6325a7a28d/README.md",
+                "sha256": "94a415dbb9bfaea258331c41a452b43dd5a8b405f7837dca5cbd6ef1d655d336"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dlf_lbfgs_step",
+                "role": "public-entry-point",
+                "summary": "External RK-kind L-BFGS step generator with shared history and caller-supplied gradients.",
+                "signature": "CALL dlf_lbfgs_init(NVAR,NMEM)\nCALL dlf_lbfgs_step(X,G,STEP)\nCALL dlf_lbfgs_destroy()",
+                "declarations": [
+                  {
+                    "path": "src/dlf_lbfgs.f90",
+                    "line_start": 128,
+                    "line_end": 147
+                  },
+                  {
+                    "path": "src/dlf_lbfgs.f90",
+                    "line_start": 436,
+                    "line_end": 444
+                  },
+                  {
+                    "path": "src/dlf_lbfgs.f90",
+                    "line_start": 89,
+                    "line_end": 118
+                  }
+                ],
+                "path": "src/dlf_lbfgs.f90",
+                "line_start": 128,
+                "line_end": 279,
+                "usage": "use dlf_parameter_module, only: rk\nuse dlf_global, only: printl\nexternal :: dlf_lbfgs_init,dlf_lbfgs_step,dlf_lbfgs_destroy\nreal(rk) :: x(2),g(2),step(2)\nprintl=0; x=[1._rk,2._rk]; g=2._rk*x\n! Initialize the author DL-FIND allocation/runtime support before this fragment.\ncall dlf_lbfgs_init(2,5)\nif(sqrt(sum(g*g))>1.e-8_rk) call dlf_lbfgs_step(x,g,step)\n! A full optimizer must accept a new X, recompute G and guard curvature before\n! later calls; this fragment deliberately shows only the first direction.\ncall dlf_lbfgs_destroy()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the full matching DL-FIND module/support graph and BLAS ABI; LBFGS_MODULE holds state but these routines are external. Do not call at zero gradient, reuse unchanged points/gradients, or assume the returned step is a converged solution. No direction, line search, curvature or convergence case was tested."
+              },
+              {
+                "procedure": "dlf_lbfgs_init",
+                "role": "implementation-helper",
+                "path": "src/dlf_lbfgs.f90",
+                "line_start": 436,
+                "line_end": 526
+              },
+              {
+                "procedure": "dlf_lbfgs_destroy",
+                "role": "implementation-helper",
+                "path": "src/dlf_lbfgs.f90",
+                "line_start": 537,
+                "line_end": 603
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0-or-later with retained L-BFGS attribution",
+          "spdx_expression": "LGPL-3.0-or-later",
+          "revision": "4167998d16d8dac4a484ba9305f27d6325a7a28d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected source explicitly elects LGPL version 3 or later and retains the original Nocedal educational/commercial-use and citation notice. Preserve inherited attributions; this is not a license audit of every component listed in LICENSE_bundled.txt.",
+          "evidence": [
+            {
+              "path": "COPYING.LESSER",
+              "url": "https://github.com/digital-chemistry-laboratory/libdlfind/blob/4167998d16d8dac4a484ba9305f27d6325a7a28d/COPYING.LESSER",
+              "sha256": "a5681bf9b05db14d86776930017c647ad9e6e56ff6bbcfdf21e5848288dfaf1b"
+            },
+            {
+              "path": "src/dlf_lbfgs.f90",
+              "url": "https://github.com/digital-chemistry-laboratory/libdlfind/blob/4167998d16d8dac4a484ba9305f27d6325a7a28d/src/dlf_lbfgs.f90",
+              "sha256": "9364e96b6880aa8e1e6e5ac0525951c9b8d2df8055637327fdc0e9d6b951624c"
+            }
+          ]
         }
       },
       "imports": {}
@@ -27478,12 +28028,150 @@
             ],
             "notes": "The README identifies the historical Algorithm 814 distribution and explicitly links to a newer FM package. Routine aliasing cautions are documented; this archive is not represented as the latest release.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "C7a",
+            "level": "source-reviewed",
+            "revision": "b8125061c66feff7589588da57a124fa5671f29d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public FMZM GAMMA generic dispatches the real FM derived type to FMGAM, using configurable multiprecision arithmetic rather than machine-real GAMMA. The inspected core checks special/pole cases, caches nearby arguments, shifts to a larger argument, evaluates log-gamma/exponential and reverses the shift; negative noninteger arguments use reflection. Precision increases and retry logic respond to cancellation, subject to configured storage/exponent limits and global KFLAG diagnostics. The sketch restricts the domain to a positive real value, avoiding pole/reflection subtleties. FM_SET determines requested decimal precision; decimal strings avoid importing machine-precision literal rounding. Shared FMVALS scratch/caches and state mean ordinary concurrent calls need isolation. This is the pinned historical TOMS814 distribution, not a review of newer FM releases. Review covers the real generic and selected gamma paths, not every elementary or complex special function.",
+            "evidence": [
+              {
+                "path": "src/FM.f90",
+                "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/src/FM.f90",
+                "sha256": "9ed0a2b350846d4d8257d19eb31c2f2a22b23fd84657c123776966aa36e09f5a"
+              },
+              {
+                "path": "src/FMZM90.f90",
+                "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/src/FMZM90.f90",
+                "sha256": "35f5910761e513e34f1f23a45238c31443a3713738e3732b297726802fa52bbe"
+              },
+              {
+                "path": "test/SampleFM.f90",
+                "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/test/SampleFM.f90",
+                "sha256": "51afedfdc5e474e83f3ff73bf80d305a0a6bd2e943720c1d07669aa640edadf0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GAMMA",
+                "role": "public-entry-point",
+                "summary": "Public re-exported FMZM generic for a real multiprecision gamma value.",
+                "signature": "VALUE = GAMMA(X)",
+                "declarations": [
+                  {
+                    "path": "src/FMZM90.f90",
+                    "line_start": 7310,
+                    "line_end": 7315
+                  },
+                  {
+                    "path": "src/FM.f90",
+                    "line_start": 30342,
+                    "line_end": 30358
+                  },
+                  {
+                    "path": "src/FMZM90.f90",
+                    "line_start": 7384,
+                    "line_end": 7396
+                  }
+                ],
+                "path": "src/FMZM90.f90",
+                "line_start": 6574,
+                "line_end": 6576,
+                "module": "FMZM",
+                "usage": "use FMZM\ntype(FM) :: x,value\ncharacter(80) :: text\ncall FM_SET(60)\nx=TO_FM(\"0.5\")\nvalue=GAMMA(x)\n! Inspect the FM library diagnostic state before relying on the result.\ncall FM_FORM(\"F70.60\",value,text)\nprint *,trim(text)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the pinned FM/FMSAVE/FMZM module set with consistent configuration. Use decimal strings and precision/storage within package limits; requested digits are not an independent accuracy certificate. Avoid shared-state concurrent calls. No gamma, pole, reflection or precision result was tested."
+              },
+              {
+                "procedure": "FMGAM",
+                "role": "implementation-helper",
+                "path": "src/FM.f90",
+                "line_start": 30342,
+                "line_end": 30632
+              }
+            ]
+          },
+          {
+            "code": "C7b",
+            "level": "source-reviewed",
+            "revision": "b8125061c66feff7589588da57a124fa5671f29d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public FMZM BETA generic dispatches two real FM arguments to FMBETA. The core uses gamma ratios in one branch and exponentiated log-gamma combinations in another to handle large arguments, with special cases and cancellation retries under the shared precision/diagnostic state. The sketch uses positive parameters, where beta is the standard complete beta function; incomplete beta, complex continuation and probability-tail accuracy are not inferred. This mapping records a concrete complete-beta implementation in the historical FM distribution. It is not merely the presence of GAMMA in a README, and no runtime accuracy/overflow comparison was performed.",
+            "evidence": [
+              {
+                "path": "src/FM.f90",
+                "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/src/FM.f90",
+                "sha256": "9ed0a2b350846d4d8257d19eb31c2f2a22b23fd84657c123776966aa36e09f5a"
+              },
+              {
+                "path": "src/FMZM90.f90",
+                "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/src/FMZM90.f90",
+                "sha256": "35f5910761e513e34f1f23a45238c31443a3713738e3732b297726802fa52bbe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BETA",
+                "role": "public-entry-point",
+                "summary": "Public re-exported FMZM complete beta function for two real multiprecision arguments.",
+                "signature": "VALUE = BETA(A,B)",
+                "declarations": [
+                  {
+                    "path": "src/FMZM90.f90",
+                    "line_start": 7283,
+                    "line_end": 7288
+                  },
+                  {
+                    "path": "src/FM.f90",
+                    "line_start": 29206,
+                    "line_end": 29222
+                  }
+                ],
+                "path": "src/FMZM90.f90",
+                "line_start": 6562,
+                "line_end": 6564,
+                "module": "FMZM",
+                "usage": "use FMZM\ntype(FM) :: a,b,value\ncharacter(80) :: text\ncall FM_SET(60)\na=TO_FM(\"2.5\"); b=TO_FM(\"3.25\")\nvalue=BETA(a,b)\n! Inspect FM diagnostic state and any UNKNOWN/OVERFLOW result.\ncall FM_FORM(\"F70.60\",value,text)\nprint *,trim(text)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Positive real parameters only in this fragment. Match the pinned module/configuration and preserve precision limits/global-state requirements. This is complete BETA, not an incomplete-beta CDF or tail calculation. No beta value or cancellation case was run."
+              },
+              {
+                "procedure": "FMBETA",
+                "role": "implementation-helper",
+                "path": "src/FM.f90",
+                "line_start": 29206,
+                "line_end": 29584
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified in reviewed distribution files",
+          "spdx_expression": null,
+          "revision": "b8125061c66feff7589588da57a124fa5671f29d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected documentation/core identify the FM distribution and numerical interfaces but no explicit permission grant was identified in those files; the pinned tree has no standalone LICENSE/COPYING. Do not infer a blanket grant from the TOMS algorithm number or public repository access.",
+          "evidence": [
+            {
+              "path": "ReadMe",
+              "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/ReadMe",
+              "sha256": "d3deea009a65e9def86610f7f5d1439197a01a2e35e8c3ddf8d67c71a587c307"
+            },
+            {
+              "path": "Doc/ReadMe",
+              "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/Doc/ReadMe",
+              "sha256": "d3deea009a65e9def86610f7f5d1439197a01a2e35e8c3ddf8d67c71a587c307"
+            },
+            {
+              "path": "src/FM.f90",
+              "url": "https://github.com/ToMs-Algo/814-fm-2001/blob/b8125061c66feff7589588da57a124fa5671f29d/src/FM.f90",
+              "sha256": "9ed0a2b350846d4d8257d19eb31c2f2a22b23fd84657c123776966aa36e09f5a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -43850,12 +44538,94 @@
             ],
             "notes": "The README lists Gaussian, binomial, Poisson and Gamma families and a Fortran backend. Hypothesis-test validity, smoothing behavior and high-dimensional performance depend on statistical assumptions and were not checked for this catalog.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "b9b6819acb0bc5e4ee7d211c158c9e53d659ab48",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected ISLASSO entry estimates a weighted Gaussian multiple-linear regression with induced-smoothed lasso/elastic-net-style penalty terms. It precomputes X-transpose W X and X-transpose W(y-offset), alternates damped penalized coefficient solves and covariance/standard-error updates, and optionally adapts penalties/mixture parameters. This is penalized regression, not ordinary unpenalized least squares or a robust-loss mapping inferred from the lasso name. Starting coefficient/SE/covariance inputs and positive observation weights are part of the workflow. X, lambda, limits/tolerance and output arrays can be overwritten; STAND=0 avoids standardization in the sketch. CONV reports outer limit or numerical failure, but the initial DPOTRF status is overwritten by DPOTRS before inspection, so a failed factorization can be obscured; additional factorization validation is required. R interrupt/normal-density/CDF and trace helpers mean this is R-hosted code, not a standalone Fortran library. Review covers the Gaussian entry and penalty derivative routines, not the separate generalized-linear family/link paths or inferential coverage.",
+            "evidence": [
+              {
+                "path": "src/islasso.f90",
+                "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/src/islasso.f90",
+                "sha256": "04e8f20bed55ac23db16bca8b9aa13d0a6c2f3b226bdcfd901c69ca764a02fb6"
+              },
+              {
+                "path": "src/gradient_hessian.f90",
+                "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/src/gradient_hessian.f90",
+                "sha256": "950620528d9dc442650ebdf0a7e7c246c39656f64ce2a5b3e6c04ab9683d78f6"
+              },
+              {
+                "path": "src/auxiliary.f90",
+                "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/src/auxiliary.f90",
+                "sha256": "5a82ee04a9906a2c1e2fe4d4e262e13229fb1565f4445ebc5431ed1176615b10"
+              },
+              {
+                "path": "src/C_FORTRAN_interface.c",
+                "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/src/C_FORTRAN_interface.c",
+                "sha256": "82b3dc32ca4578f0d1f687f8876fe2f29014731758676432c7922d4b5f7c8d6c"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/DESCRIPTION",
+                "sha256": "53179e26f08cfcbf31ce720adfadc95f7b45e45252f85244f3b17512af0319f0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "islasso",
+                "role": "public-entry-point",
+                "summary": "External R-hosted penalized Gaussian regression kernel with explicit-array work/output arguments.",
+                "signature": "CALL islasso(X,Y,N,P,THETA,SE,COV,LAMBDA,ALPHA,PI,ESTPI, &\n ITMAX,ITMAXSE,TOL,SIGMA2,TRACE,ADAPTIVE,OFFSET,CONV,STAND,INTERCEPT, &\n ETA,MU,VARMU,MU_ETA_VAL,W,RES,DEV,WEIGHTS,HI,EDF,XTW,XTX,GRAD,HESS,INVH,PEN)",
+                "declarations": [
+                  {
+                    "path": "src/islasso.f90",
+                    "line_start": 1,
+                    "line_end": 13
+                  }
+                ],
+                "path": "src/islasso.f90",
+                "line_start": 1,
+                "line_end": 13,
+                "usage": "external :: islasso\ninteger,parameter :: n=6,p=2\ninteger :: i,itmax,itmaxse,conv\ndouble precision :: x(n,p),y(n),theta(p),se(p),cov(p,p),lambda(p),alpha,pi(p)\ndouble precision :: tol,sigma2,offset(n),eta(n),mu(n),varmu(n),mueta(n),w(n),res(n)\ndouble precision :: dev,weights(n),hi(p),edf,xtw(p,n),xtx(p,p),grad(p),hess(p,p),invh(p,p),pen(p)\n! Execute inside an initialized R process with all package numerical helpers linked.\nx(:,1)=1d0\ndo i=1,n\n x(i,2)=dble(i-1)\nend do\ny=1d0+2d0*x(:,2); theta=0d0; se=1d0; cov=0d0\ncov(1,1)=1d0; cov(2,2)=1d0; lambda=[0d0,0.1d0]\nalpha=1d0; pi=0.5d0; itmax=100; itmaxse=50; tol=1d-6\nsigma2=1d0; offset=0d0; weights=1d0\ncall islasso(x,y,n,p,theta,se,cov,lambda,alpha,pi,0, &\n itmax,itmaxse,tol,sigma2,0,0,offset,conv,0,1, &\n eta,mu,varmu,mueta,w,res,dev,weights,hi,edf,xtw,xtx,grad,hess,invh,pen)\nif(conv/=0) error stop \"penalized fit did not report success\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. R-hosted fragment with finite full-rank Gaussian data and positive starting SEs. The unpenalized first column is specified by LAMBDA(1)=0. Factorization status handling needs repair/validation before treating CONV=0 as sufficient; no coefficients, covariance or significance results were tested."
+              },
+              {
+                "procedure": "hessian_theta",
+                "role": "implementation-helper",
+                "path": "src/gradient_hessian.f90",
+                "line_start": 1,
+                "line_end": 24
+              },
+              {
+                "procedure": "gradient",
+                "role": "implementation-helper",
+                "path": "src/gradient_hessian.f90",
+                "line_start": 48,
+                "line_end": 68
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "b9b6819acb0bc5e4ee7d211c158c9e53d659ab48",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned R package DESCRIPTION specifies GPL (>=2). R and BLAS/LAPACK components are dependencies with their own notices; this review does not establish inference validity or a blanket grant for unrelated upstream tools.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/islasso/blob/b9b6819acb0bc5e4ee7d211c158c9e53d659ab48/DESCRIPTION",
+              "sha256": "53179e26f08cfcbf31ce720adfadc95f7b45e45252f85244f3b17512af0319f0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -60983,12 +61753,100 @@
             ],
             "notes": "The README documents complex block-sparse tfQMR solves, multiple right-hand sides and Fortran 90/77 entry points. CUDA implements the computational backend. Convergence, GPU availability and performance require individual testing and are not implied by this broad classification.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2c4",
+            "level": "source-reviewed",
+            "revision": "a87bfcdcd75a127628f38053c16aa041f47464c6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public TFQMRGPU_BSRSV_COMPLETE wrapper solves complex non-Hermitian sparse A*X=B using block-sparse row patterns for A, B and the allowed solution X. It delegates to a private rectangular helper that creates a GPU handle/plan, uploads block data, calls the transpose-free QMR core, downloads X and frees resources. The core performs two TFQMR half-steps with sparse multiplications and per-RHS residual/breakdown tracking. Solution sparsity is prescribed by the caller, so a restricted X pattern is not equivalent to an unrestricted dense solve. Block sizes must have been compiled into the CUDA backend. Fortran patterns are one-based; block transposition flags are n/t, not an arbitrary conjugate-transpose operator. ITERATIONS/RESIDUAL are input limits and output reports. Helper CheckError uses STOP on many failures despite an IERR argument; core completion can include breakdown-stopped RHSs, so verify the reported and independently computed residual even after a successful status. Review covers the square-block convenience API and selected recurrence/stopping paths, not all precisions or block configurations.",
+            "evidence": [
+              {
+                "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                "sha256": "4b5eec4f12db6f9be0a68b67afd342752ace0b244b7ca5f43dcf87bb7a43b07f"
+              },
+              {
+                "path": "tfQMRgpu/include/tfqmrgpu_core.hxx",
+                "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/tfQMRgpu/include/tfqmrgpu_core.hxx",
+                "sha256": "f6346fef9910eb7de9291e293c64144c98f31acf9f47764a3b6cdb281c61c967"
+              },
+              {
+                "path": "example/tfqmrgpu_Fortran_example.F90",
+                "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/example/tfqmrgpu_Fortran_example.F90",
+                "sha256": "b770487623a03ea1a18ec65ed32b0682ba80c189ec3c4acb24f034c35124c3e7"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/README.md",
+                "sha256": "2be914674842b058aac9eaf8a4b285fd831707056977159e6dc1901de553fa05"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "tfqmrgpu_bsrsv_complete",
+                "role": "public-entry-point",
+                "summary": "Public module double-complex block-sparse GPU solver convenience entry; the rectangular helper is private.",
+                "signature": "CALL tfqmrgpu_bsrsv_complete(MB,LDA,ROWPTRA,COLINDA,A,TRANSA, &\n ROWPTRX,COLINDX,X,TRANSX,ROWPTRB,COLINDB,B,TRANSB,ITERATIONS,RESIDUAL,UNIT,IERR)",
+                "declarations": [
+                  {
+                    "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                    "line_start": 7,
+                    "line_end": 19
+                  },
+                  {
+                    "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                    "line_start": 432,
+                    "line_end": 453
+                  }
+                ],
+                "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                "line_start": 432,
+                "line_end": 462,
+                "module": "tfqmrgpu",
+                "usage": "use tfqmrgpu, only: tfqmrgpu_bsrsv_complete\ninteger(kind=4),parameter :: bs=32\ninteger(kind=4) :: rowptr(2),colind(1),iterations,ierr,i\ncomplex(kind=8) :: a(bs,bs,1),b(bs,bs,1),x(bs,bs,1)\nreal(kind=8) :: residual\nrowptr=[1,2]; colind=[1]; a=(0d0,0d0); b=(1d0,0d0)\ndo i=1,bs\n a(i,i,1)=(2d0,0d0)\nend do\niterations=500; residual=1d-9; ierr=1\ncall tfqmrgpu_bsrsv_complete(1,bs,rowptr,colind,a,\"n\", &\n rowptr,colind,x,\"n\",rowptr,colind,b,\"n\",iterations,residual,6,ierr)\nif(ierr/=0.or.residual>1d-9) error stop \"inspect GPU solve\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Requires a compatible built CUDA C++ backend/GPU and Fortran interfaces with the pinned kind/ABI conventions and compiled 32-by-32 block support. Use separate A/B/X buffers and validate original-system residuals. STOP paths and breakdown semantics prevent treating IERR alone as a portable failure contract. No GPU solve, residual or runtime was tested."
+              },
+              {
+                "procedure": "tfqmrgpu_bsrsv_rectangular",
+                "role": "implementation-helper",
+                "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+                "line_start": 294,
+                "line_end": 317
+              },
+              {
+                "procedure": "TFQMR core half-steps",
+                "role": "implementation-helper",
+                "path": "tfQMRgpu/include/tfqmrgpu_core.hxx",
+                "line_start": 179,
+                "line_end": 246
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "a87bfcdcd75a127628f38053c16aa041f47464c6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and Fortran module identify MIT licensing. CUDA and third-party parsing/runtime components retain separate terms; this finding covers the inspected solver/interface source.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/LICENSE",
+              "sha256": "c14a10f03cf17b4998a35c49d19b6c92213c8d80362b7956cbeeee5c0c611dfe"
+            },
+            {
+              "path": "tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+              "url": "https://github.com/real-space/tfQMRgpu/blob/a87bfcdcd75a127628f38053c16aa041f47464c6/tfQMRgpu/include/tfqmrgpu_Fortran_module.F90",
+              "sha256": "4b5eec4f12db6f9be0a68b67afd342752ace0b244b7ca5f43dcf87bb7a43b07f"
+            }
+          ]
         }
       },
       "imports": {}
