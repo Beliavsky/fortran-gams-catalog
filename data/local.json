@@ -45475,9 +45475,184 @@
                 }
               }
             ]
+          },
+          {
+            "code": "E3c",
+            "level": "source-reviewed",
+            "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+            "reviewed_on": "2026-11-06",
+            "notes": "With ITYPE=2, CHEBEXPS constructs U mapping values at N ascending Chebyshev-root nodes to N ordinary Chebyshev-series coefficients, and V mapping coefficients back to nodal values. This is a dense basis change, not an FFT or a monomial-basis conversion. Tests use each T_k(x)=cos(k*acos(x)), k=0,...,N-1, to check that U returns the corresponding unit coefficient vector and V reconstructs its independently evaluated values. For N=2,4,8,16 all 60 coefficient/value cases passed, with maximum normalized error 3.275158e-15. Use default INTEGER and REAL*8 arrays with a compatible ABI, N>=2 and Chebyshev-root nodes on [-1,1]. There is no status or error-estimate result. The upstream source uses legacy length-one dummy arrays and internal work-array remapping; several helper declarations are smaller than the scratch regions actually used. The unmodified legacy object was compiled without bounds instrumentation, while each catalog main program retained bounds checks and floating-point traps. The numerical results do not certify modern Fortran conformance, full-file memory safety or every companion routine. The source is linked and downloaded at a pinned hash, not redistributed here; its existing scoped license absence finding remains. The complete catalog driver was compiled and run on Windows with GNU Fortran 17.0.0 20260510 (experimental); tolerance was 2e-11 for these finite tests.",
+            "evidence": [
+              {
+                "path": "src/chebexps.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/chebexps.f",
+                "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "chebexps",
+                "role": "public-entry-point",
+                "summary": "External legacy Chebyshev nodal/coefficient basis conversion.",
+                "signature": "CALL chebexps(ITYPE,N,X,U,V,WHTS)",
+                "declarations": [
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 12,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 26,
+                    "line_end": 49
+                  }
+                ],
+                "path": "src/chebexps.f",
+                "line_start": 12,
+                "line_end": 180,
+                "usage": "! Catalog-owned analytic checks of GAMS E3c using CHEBEXPS.\n! Upstream source is downloaded at a pinned revision; it is not bundled here.\nprogram basis\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n implicit none\n integer :: n,k,j,count\n real(real64), allocatable :: x(:),weights(:),u(:,:),v(:,:),a(:,:),d(:,:),w(:),ending(:),values(:),want(:),got(:)\n real(real64) :: error,maximum,endpoint\n real(real64), parameter :: tolerance=2.e-11_real64\n external :: chebexps,chebinmt\n maximum=0\n count=0\n do j=1,4\n   n=2**j\n   allocate(x(n),weights(n),u(n,n),v(n,n),a(n,n),d(n,n),w(3*n*n+2*n+50), &\n      ending(n),values(n),want(n),got(n))\n   call chebexps(2,n,x,u,v,weights)\n   do k=0,n-1\n     values=cos(real(k,real64)*acos(x))\n     got=matmul(u,values)\n     want=0;want(k+1)=1\n     call verify()\n     got=matmul(v,want)\n     want=values\n     call verify()\n   end do\n   deallocate(x,weights,u,v,a,d,w,ending,values,want,got)\n end do\n print '(a,i0)', 'Checked polynomial cases: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS basis'\ncontains\n subroutine verify()\n   if(.not.all(ieee_is_finite(got))) error stop 'nonfinite result'\n   error=maxval(abs(got-want))/max(1._real64,maxval(abs(want)))\n   maximum=max(maximum,error)\n   if(error>tolerance) error stop 'analytic polynomial mismatch'\n   count=count+1\n end subroutine\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unmodified upstream source object used -O0 -g -std=legacy -ffixed-line-length-none -ffpe-trap=invalid,zero,overflow, without bounds instrumentation because of its legacy dummy-array conventions. The main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Analytic polynomial cases require finite results and normalized maximum error <=2e-11; failure uses ERROR STOP. The derivative driver also requires endpoint error <=2e-11. Full source hashes, compiler warnings and per-source flags are saved in drivers/boxcode-spectral/. These configurations do not verify all source routines or general-data error estimates.",
+                "local_driver": {
+                  "path": "drivers/boxcode-spectral/basis.f90",
+                  "sha256": "c7fc0189d532156f0dd04f993fe5f7fdd325244f5e31210904411074cb3c65ca",
+                  "runner": "drivers/boxcode-spectral/run.py",
+                  "runner_sha256": "6dd0a87598782b9cd40d8be95e806ae79a6f2e6cf8877b386e4b0df2b8548942",
+                  "report": "drivers/boxcode-spectral/results.json",
+                  "report_sha256": "f06516357d674f48caaaa2afb852a5276f3e14234f614009ac21b007058c6c26",
+                  "readme": "drivers/boxcode-spectral/README.md",
+                  "check_name": "basis"
+                }
+              }
+            ]
+          },
+          {
+            "code": "E3a2",
+            "level": "source-reviewed",
+            "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+            "reviewed_on": "2026-11-06",
+            "notes": "With ITYPE=2, CHEBINMT constructs ADIFF so MATMUL(ADIFF,F) gives the derivatives of the degree-at-most-N-1 interpolating polynomial at the N Chebyshev-root nodes. Allocate ADIFF(N,N), AINTE(N,N), X/WHTS/ENDINTER(N) and W(3*N*N+2*N+50); AINTE is unassigned in this mode and must not be read. ENDINTER maps nodal values to the interpolating polynomial at x=1, outside the open set of root nodes. The helper transforms values to coefficients, differentiates the expansion and transforms back. The driver checks all monomial derivatives through degree N-1 for N=2,4,8,16 and independently checks endpoint evaluation against 1. All 30 derivative cases and 30 endpoint checks passed; maximum normalized derivative error was 8.668621e-13. Use default INTEGER and REAL*8 arrays with a compatible ABI, N>=2 and Chebyshev-root nodes on [-1,1]. There is no status or error-estimate result. The upstream source uses legacy length-one dummy arrays and internal work-array remapping; several helper declarations are smaller than the scratch regions actually used. The unmodified legacy object was compiled without bounds instrumentation, while each catalog main program retained bounds checks and floating-point traps. The numerical results do not certify modern Fortran conformance, full-file memory safety or every companion routine. The source is linked and downloaded at a pinned hash, not redistributed here; its existing scoped license absence finding remains. The complete catalog driver was compiled and run on Windows with GNU Fortran 17.0.0 20260510 (experimental); tolerance was 2e-11 for these finite tests.",
+            "evidence": [
+              {
+                "path": "src/chebexps.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/chebexps.f",
+                "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "chebinmt",
+                "role": "public-entry-point",
+                "summary": "External legacy Chebyshev interpolant derivative matrix construction.",
+                "signature": "CALL chebinmt(N,AINTE,ADIFF,X,WHTS,ENDINTER,ITYPE,W)",
+                "declarations": [
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 186,
+                    "line_end": 190
+                  },
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 200,
+                    "line_end": 226
+                  }
+                ],
+                "path": "src/chebexps.f",
+                "line_start": 186,
+                "line_end": 254,
+                "usage": "! Catalog-owned analytic checks of GAMS E3a2 using CHEBINMT.\n! Upstream source is downloaded at a pinned revision; it is not bundled here.\nprogram derivative\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n implicit none\n integer :: n,k,j,count\n real(real64), allocatable :: x(:),weights(:),u(:,:),v(:,:),a(:,:),d(:,:),w(:),ending(:),values(:),want(:),got(:)\n real(real64) :: error,maximum,endpoint\n real(real64), parameter :: tolerance=2.e-11_real64\n external :: chebexps,chebinmt\n maximum=0\n count=0\n do j=1,4\n   n=2**j\n   allocate(x(n),weights(n),u(n,n),v(n,n),a(n,n),d(n,n),w(3*n*n+2*n+50), &\n      ending(n),values(n),want(n),got(n))\n   call chebinmt(n,a,d,x,weights,ending,2,w)\n   do k=0,n-1\n     values=x**k\n     got=matmul(d,values)\n     want=0\n     if(k>0) want=real(k,real64)*x**(k-1)\n     call verify()\n     endpoint=dot_product(ending,values)\n     if(.not.ieee_is_finite(endpoint)) error stop 'nonfinite endpoint'\n     if(abs(endpoint-1._real64)>tolerance) error stop 'endpoint mismatch'\n   end do\n   deallocate(x,weights,u,v,a,d,w,ending,values,want,got)\n end do\n print '(a,i0)', 'Checked polynomial cases: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS derivative'\ncontains\n subroutine verify()\n   if(.not.all(ieee_is_finite(got))) error stop 'nonfinite result'\n   error=maxval(abs(got-want))/max(1._real64,maxval(abs(want)))\n   maximum=max(maximum,error)\n   if(error>tolerance) error stop 'analytic polynomial mismatch'\n   count=count+1\n end subroutine\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unmodified upstream source object used -O0 -g -std=legacy -ffixed-line-length-none -ffpe-trap=invalid,zero,overflow, without bounds instrumentation because of its legacy dummy-array conventions. The main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Analytic polynomial cases require finite results and normalized maximum error <=2e-11; failure uses ERROR STOP. The derivative driver also requires endpoint error <=2e-11. Full source hashes, compiler warnings and per-source flags are saved in drivers/boxcode-spectral/. These configurations do not verify all source routines or general-data error estimates.",
+                "local_driver": {
+                  "path": "drivers/boxcode-spectral/derivative.f90",
+                  "sha256": "9e8f248f32233a3a72e0983cf7ef4defd150638057ef977ac80cfe702dd3d34c",
+                  "runner": "drivers/boxcode-spectral/run.py",
+                  "runner_sha256": "6dd0a87598782b9cd40d8be95e806ae79a6f2e6cf8877b386e4b0df2b8548942",
+                  "report": "drivers/boxcode-spectral/results.json",
+                  "report_sha256": "f06516357d674f48caaaa2afb852a5276f3e14234f614009ac21b007058c6c26",
+                  "readme": "drivers/boxcode-spectral/README.md",
+                  "check_name": "derivative"
+                }
+              },
+              {
+                "procedure": "coefficient-space differentiation and conversion to nodal matrices",
+                "role": "implementation-helper",
+                "path": "src/chebexps.f",
+                "line_start": 260,
+                "line_end": 387
+              },
+              {
+                "procedure": "Chebyshev coefficient derivative recurrence",
+                "role": "implementation-helper",
+                "path": "src/chebexps.f",
+                "line_start": 505,
+                "line_end": 539
+              }
+            ]
+          },
+          {
+            "code": "E3a3",
+            "level": "source-reviewed",
+            "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+            "reviewed_on": "2026-11-06",
+            "notes": "With ITYPE=1, CHEBINMT constructs AINTE so MATMUL(AINTE,F) gives the integrated polynomial representation at each Chebyshev-root node, with lower-limit convention -1 in the selected checked regime. Allocate AINTE(N,N), ADIFF(N,N), X/WHTS/ENDINTER(N) and W(3*N*N+2*N+50); ADIFF is unassigned in this mode and must not be read. Integration raises the polynomial degree, but the nodal matrix retains only N coefficients; the omitted higher coefficient can affect data with degree N-1. The checked contract therefore restricts input polynomials to degree at most N-2, and does not claim exact integration of the highest interpolating degree or arbitrary-data error bounds. The driver compares against (x**(k+1)-(-1)**(k+1))/(k+1) for k=0,...,N-2 at N=2,4,8,16. All 26 polynomial cases passed, with maximum normalized error 4.451610e-16. This is integration of a fitted polynomial, not adaptive callback quadrature. Use default INTEGER and REAL*8 arrays with a compatible ABI, N>=2 and Chebyshev-root nodes on [-1,1]. There is no status or error-estimate result. The upstream source uses legacy length-one dummy arrays and internal work-array remapping; several helper declarations are smaller than the scratch regions actually used. The unmodified legacy object was compiled without bounds instrumentation, while each catalog main program retained bounds checks and floating-point traps. The numerical results do not certify modern Fortran conformance, full-file memory safety or every companion routine. The source is linked and downloaded at a pinned hash, not redistributed here; its existing scoped license absence finding remains. The complete catalog driver was compiled and run on Windows with GNU Fortran 17.0.0 20260510 (experimental); tolerance was 2e-11 for these finite tests.",
+            "evidence": [
+              {
+                "path": "src/chebexps.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/chebexps.f",
+                "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "chebinmt",
+                "role": "public-entry-point",
+                "summary": "External legacy Chebyshev interpolant integral matrix construction.",
+                "signature": "CALL chebinmt(N,AINTE,ADIFF,X,WHTS,ENDINTER,ITYPE,W)",
+                "declarations": [
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 186,
+                    "line_end": 190
+                  },
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 200,
+                    "line_end": 226
+                  }
+                ],
+                "path": "src/chebexps.f",
+                "line_start": 186,
+                "line_end": 254,
+                "usage": "! Catalog-owned analytic checks of GAMS E3a3 using CHEBINMT.\n! Upstream source is downloaded at a pinned revision; it is not bundled here.\nprogram integral\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n implicit none\n integer :: n,k,j,count\n real(real64), allocatable :: x(:),weights(:),u(:,:),v(:,:),a(:,:),d(:,:),w(:),ending(:),values(:),want(:),got(:)\n real(real64) :: error,maximum,endpoint\n real(real64), parameter :: tolerance=2.e-11_real64\n external :: chebexps,chebinmt\n maximum=0\n count=0\n do j=1,4\n   n=2**j\n   allocate(x(n),weights(n),u(n,n),v(n,n),a(n,n),d(n,n),w(3*n*n+2*n+50), &\n      ending(n),values(n),want(n),got(n))\n   call chebinmt(n,a,d,x,weights,ending,1,w)\n   ! Integrating degree N-1 needs N+1 coefficients; only degrees through N-2 are checked.\n   do k=0,n-2\n     values=x**k\n     got=matmul(a,values)\n     want=(x**(k+1)-real((-1)**(k+1),real64))/real(k+1,real64)\n     call verify()\n   end do\n   deallocate(x,weights,u,v,a,d,w,ending,values,want,got)\n end do\n print '(a,i0)', 'Checked polynomial cases: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS integral'\ncontains\n subroutine verify()\n   if(.not.all(ieee_is_finite(got))) error stop 'nonfinite result'\n   error=maxval(abs(got-want))/max(1._real64,maxval(abs(want)))\n   maximum=max(maximum,error)\n   if(error>tolerance) error stop 'analytic polynomial mismatch'\n   count=count+1\n end subroutine\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unmodified upstream source object used -O0 -g -std=legacy -ffixed-line-length-none -ffpe-trap=invalid,zero,overflow, without bounds instrumentation because of its legacy dummy-array conventions. The main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Analytic polynomial cases require finite results and normalized maximum error <=2e-11; failure uses ERROR STOP. The derivative driver also requires endpoint error <=2e-11. Full source hashes, compiler warnings and per-source flags are saved in drivers/boxcode-spectral/. These configurations do not verify all source routines or general-data error estimates.",
+                "local_driver": {
+                  "path": "drivers/boxcode-spectral/integral.f90",
+                  "sha256": "f04dcba0e0d0008f6653f07fbaf3af320315ae6eb476c1eaa78051c96f6f4d27",
+                  "runner": "drivers/boxcode-spectral/run.py",
+                  "runner_sha256": "6dd0a87598782b9cd40d8be95e806ae79a6f2e6cf8877b386e4b0df2b8548942",
+                  "report": "drivers/boxcode-spectral/results.json",
+                  "report_sha256": "f06516357d674f48caaaa2afb852a5276f3e14234f614009ac21b007058c6c26",
+                  "readme": "drivers/boxcode-spectral/README.md",
+                  "check_name": "integral"
+                }
+              },
+              {
+                "procedure": "coefficient-space integration and conversion to nodal matrices",
+                "role": "implementation-helper",
+                "path": "src/chebexps.f",
+                "line_start": 260,
+                "line_end": 387
+              },
+              {
+                "procedure": "Chebyshev integral recurrence and lower-limit adjustment",
+                "role": "implementation-helper",
+                "path": "src/chebexps.f",
+                "line_start": 448,
+                "line_end": 499
+              }
+            ]
           }
         ],
-        "notes": "The Chebyshev-node quadrature has a complete locally checked numerical driver with saved results and a documented legacy-bounds limitation. The Poisson wrapper remains source-reviewed only and uncompiled for this catalog. The earlier documentation and license findings remain available.",
+        "notes": "Chebyshev-node quadrature, nodal/coefficient basis conversion, interpolant differentiation and restricted-degree integration have complete locally checked drivers with saved results and documented legacy-bounds limitations. The Poisson wrapper remains source-reviewed only and uncompiled for this catalog. Earlier documentation and scoped license findings remain available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

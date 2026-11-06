@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 712 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 715 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -476,7 +476,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | FLAPWxHZ | `HIF_HZ::ZHZL1SA` | MIT FLAPWxHZ with retained contributor attribution |
 | ecTrans | `DIR_TRANS`, `INV_TRANS`, `EDIR_TRANS`, `EINV_TRANS` | Apache-2.0 ecTrans notices with ECMWF privileges/immunities statement |
 | Clawpack Riemann solvers | `rp1_ptwise` | BSD-3-Clause Clawpack Riemann solver notice |
-| Boxcode2D legacy wrapper | `lbfmm2d`, `chebexps` | No license grant identified in reviewed root and wrapper files |
+| Boxcode2D legacy wrapper | `lbfmm2d`, `chebexps`, `chebinmt` | No license grant identified in reviewed root and wrapper files |
 | NDSM | `NDSM_POISSON::solve_poisson_bvp`, `NDSM_INTERP::ninterp` | BSD-3-Clause NDSM source notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
@@ -955,6 +955,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [NDSM](https://github.com/sag2021/ndsm) | I2b1a1a | Rectangular two-dimensional homogeneous-Neumann Poisson multigrid | Checked manufactured solution on two grids, independent interior residual/gauge and refinement; serial binary64 and 64-bit index scope. |
 | [NDSM: piecewise-linear interpolation](https://github.com/sag2021/NDSM) | E1a | Uniform-grid scalar interpolation and end-cell extrapolation | Seven checked values, including a non-affine nodal table; 64-bit IT and nondefault coordinate bounds. |
 | [NDSM: multilinear interpolation](https://github.com/sag2021/NDSM) | E2a | Bilinear and trilinear interpolation on Cartesian grids | 150 checked cross-term polynomial values; unequal spacings and nonsquare grids; no arbitrary-data accuracy claim. |
+| [Boxcode2D: Chebyshev basis conversion](https://github.com/mrachh/boxcode2d-legacy) | E3c | Dense Chebyshev nodal/coefficient transforms | 60 checked unit-coefficient/value cases; no FFT-speed claim. |
+| [Boxcode2D: interpolant differentiation](https://github.com/mrachh/boxcode2d-legacy) | E3a2 | Spectral derivative matrix on Chebyshev-root nodes | 30 monomial derivatives plus 30 endpoint checks; legacy object has bounds instrumentation disabled. |
+| [Boxcode2D: interpolant integration](https://github.com/mrachh/boxcode2d-legacy) | E3a3 | Spectral integration of fitted polynomials | 26 checked monomial integrals; input restricted to degree N-2 because higher coefficients are truncated. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1830,3 +1833,17 @@ interpolation from a global fit. The function discards bracketing status and
 extrapolates without clipping. General nonuniform, repeated-node, decreasing,
 and high-dimensional cases remain unverified; source review and these finite
 numerical checks do not certify arbitrary-data accuracy.
+
+Three further Boxcode2D mappings have [complete checked spectral drivers](../drivers/boxcode-spectral/README.md):
+Chebyshev nodal/coefficient basis conversion (E3c), derivative evaluation
+(E3a2), and integration of fitted polynomials (E3a3). GNU Fortran 17.0.0
+20260510 (experimental) on Windows passed all 116 polynomial cases and
+30 additional endpoint checks at N=2,4,8,16. Maximum normalized errors were
+3.275158e-15, 8.668621e-13 and 4.451610e-16, below tolerance 2e-11.
+The unchanged legacy source object requires bounds instrumentation to be
+disabled; main programs retain bounds checks and floating-point traps.
+The integral matrix truncates to N coefficients, so exact-value checks and
+the supported polynomial claim stop at input degree N-2. No arbitrary-data
+accuracy, full-file memory safety, higher-order, threading or Poisson-solver
+verification follows from these finite checks. Upstream source remains
+linked rather than bundled under the existing scoped license finding.

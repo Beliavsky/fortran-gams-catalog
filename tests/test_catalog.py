@@ -265,6 +265,12 @@ class CatalogTests(unittest.TestCase):
                 self.assertIn('NDSM_INTERP::ninterp', class_page)
             self.assertTrue((destination/'drivers/ndsm-interpolation/results.json').is_file())
             self.assertTrue((destination/'drivers/boxcode-quadrature/moments.f90').is_file())
+            for name, code in [('basis', 'E3c'), ('derivative', 'E3a2'), ('integral', 'E3a3')]:
+                self.assertIn('drivers/boxcode-spectral/'+name+'.f90', box)
+                self.assertTrue((destination/'drivers/boxcode-spectral'/f'{name}.f90').is_file())
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('Boxcode2D', class_page)
+            self.assertTrue((destination/'drivers/boxcode-spectral/results.json').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)
