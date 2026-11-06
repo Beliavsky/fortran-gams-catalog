@@ -14680,12 +14680,216 @@
             ],
             "notes": "The README distinguishes scalar/vector interpolation and vector-component correction, with netCDF Fortran dependencies. The vector correction executable has a documented default ORCA-grid restriction.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "f59113007c8d546249936d3b06cd7d70b248028d",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public AKIMA_1D generic selects a vector path which extends data by two synthetic samples at each end, computes local Akima slopes and evaluates cubic Hermite polynomials between increasing source abscissae. Require matching array sizes, at least three distinct ordered valid source points and finite values; extension construction reads a third point. REAL(8) source/query arguments feed REAL(4) extended arrays, slopes and output. Without persistence flags, unlocated/out-of-range queries retain -6666.0. The optional missing sentinel is designed for contiguous missing boundaries, not arbitrary internal gaps; its boundary-index logic should be independently checked before use. L_SURF_PERSIST and L_BOTM_PERSIST are copied into initialized local logical variables that have implicit SAVE; omitting them after another call can retain previous settings. Set both explicitly to obtain predictable call behavior. Size mismatches STOP and no recoverable solver status is returned. The separate 3-D overload is not covered here.",
+            "evidence": [
+              {
+                "path": "src/mod_akima_1d.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_akima_1d.f90",
+                "sha256": "9b555e27006dcd0d451d94a1a45dd05b964beb38fdf261bceef65b2564903149"
+              },
+              {
+                "path": "src/mod_manip.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_manip.f90",
+                "sha256": "cad4e0cfc7ddcf0e3da4dca9d1349c3c7a75d6f48e91d1b0225488ea3d686e32"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "AKIMA_1D",
+                "role": "public-entry-point",
+                "summary": "Public Akima interpolation generic, selected mixed-precision 1-D vector overload.",
+                "signature": "CALL AKIMA_1D(VZ1,VF1,VZ2,VF2[,RMASK_VAL,L_SURF_PERSIST,L_BOTM_PERSIST])",
+                "declarations": [
+                  {
+                    "path": "src/mod_akima_1d.f90",
+                    "line_start": 14,
+                    "line_end": 21
+                  },
+                  {
+                    "path": "src/mod_akima_1d.f90",
+                    "line_start": 28,
+                    "line_end": 43
+                  }
+                ],
+                "path": "src/mod_akima_1d.f90",
+                "line_start": 28,
+                "line_end": 232,
+                "module": "MOD_AKIMA_1D",
+                "usage": "use MOD_AKIMA_1D, only: AKIMA_1D\nreal(8) :: x(4),y(4),q(2)\nreal(4) :: values(2)\nx=[0.d0,1.d0,2.d0,3.d0]; y=x*x; q=[0.5d0,1.5d0]\ncall AKIMA_1D(x,y,q,values,l_surf_persist=.false.,l_botm_persist=.false.)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No missing samples or extrapolation in this fragment. Set both persistence flags on every call; the implementation reduces intermediate precision. No interpolation or missing-boundary result was tested."
+              },
+              {
+                "procedure": "source extension, slope dispatch and cubic evaluation",
+                "role": "implementation-helper",
+                "path": "src/mod_akima_1d.f90",
+                "line_start": 90,
+                "line_end": 220
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "f59113007c8d546249936d3b06cd7d70b248028d",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public AKIMA_2D routine constructs local bicubic interpolants on a regular source grid using Akima first/mixed slopes, analytically assembled 16-coefficient polynomials and a cached source-cell mapping for targets. Source coordinates must be regular and distinct; target coordinates may be irregular without turning the source into scattered data. REAL(8) coordinates and internal polynomial arithmetic accompany REAL(4) fields/output. K_EW_PER controls nonperiodic (-1) or overlapping east-west periodic boundaries. The routine depends on MOD_CONF initialization (including I_ORCA_SRC and L_FIRST_CALL_INTERP_ROUTINE), MOD_MANIP boundary extensions and IO_EZCDF shape helpers; it is not self-contained. Saved IXY_POS assumes the same grid across calls. ICALL=1 sets a saved always-first-call mode, rebuilding/deallocating the map thereafter; it is not a temporary per-call switch. Targets outside the extended source range return zero, not a missing sentinel. No conservative-remapping, positivity or overshoot guarantee is supplied.",
+            "evidence": [
+              {
+                "path": "src/mod_akima_2d.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_akima_2d.f90",
+                "sha256": "52eed87a8c56a3455ca56b77803c5f85bc6131bd0c21712e64d52a33935ee93b"
+              },
+              {
+                "path": "src/mod_manip.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_manip.f90",
+                "sha256": "cad4e0cfc7ddcf0e3da4dca9d1349c3c7a75d6f48e91d1b0225488ea3d686e32"
+              },
+              {
+                "path": "src/mod_conf.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_conf.f90",
+                "sha256": "ddff5923ee9022a0e96651d5be91deef2ce1647e9e049020086dbf1086164da3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "AKIMA_2D",
+                "role": "public-entry-point",
+                "summary": "Regular-source-grid local bicubic Akima interpolation with saved mapping state.",
+                "signature": "CALL AKIMA_2D(K_EW_PER,X10,Y10,Z1,X20,Y20,Z2[,ICALL])",
+                "declarations": [
+                  {
+                    "path": "src/mod_akima_2d.f90",
+                    "line_start": 59,
+                    "line_end": 87
+                  },
+                  {
+                    "path": "src/mod_akima_2d.f90",
+                    "line_start": 38,
+                    "line_end": 47
+                  }
+                ],
+                "path": "src/mod_akima_2d.f90",
+                "line_start": 59,
+                "line_end": 239,
+                "module": "MOD_AKIMA_2D",
+                "usage": "use MOD_AKIMA_2D, only: AKIMA_2D\nuse MOD_CONF, only: i_orca_src,l_first_call_interp_routine\n! Initialize conforming regular source and target coordinate/field arrays.\ni_orca_src=0\nl_first_call_interp_routine=.true.\ncall AKIMA_2D(-1,xsrc,ysrc,field,xtrg,ytrg,result,icall=1)\n! ICALL=1 enables persistent map rebuilding; outside-domain output is zero.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-array/configuration-setup fragment. Build the full module dependencies, including NetCDF-linked helpers; do not assume independent concurrent contexts or unchanged-grid cache validity. No surface, cache or boundary result was tested."
+              },
+              {
+                "procedure": "slope and polynomial dispatch, cached location and evaluation",
+                "role": "implementation-helper",
+                "path": "src/mod_akima_2d.f90",
+                "line_start": 157,
+                "line_end": 237
+              },
+              {
+                "procedure": "local polynomial construction",
+                "role": "implementation-helper",
+                "path": "src/mod_akima_2d.f90",
+                "line_start": 249,
+                "line_end": 399
+              }
+            ]
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "f59113007c8d546249936d3b06cd7d70b248028d",
+            "reviewed_on": "2026-11-06",
+            "notes": "FIND_NEAREST_POINT maps each longitude/latitude target to source grid indices, with optional in/out target mask and dispatch by source regularity. The inspected regular-source FIND_NEAREST_EASY path estimates axis indices, scans a bounded +/-4-index neighborhood and minimizes the native spherical-distance calculation there. It is a grid-oriented nearest-point search, not an arbitrary-dimensional kd-tree or a certified global nearest neighbor for every folded or discontinuous longitude representation. Source extents must each be at least three because the regular path reads Xsrc(:,3) and Ysrc(3,:); use compatible finite degree-valued grids with overlapping latitude range and sensible target dimensions. Unprocessed points get -1 indices; inspect them before indexing fields. DISTANCE_2D uses a spherical radius from averaged Earth radii and clamps the acos dot product only above +1, not below -1. Dispatch/shape failures may STOP, the mask can change, and diagnostic output is printed. The alternate twisted-grid algorithm is outside this review.",
+            "evidence": [
+              {
+                "path": "src/mod_manip.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_manip.f90",
+                "sha256": "cad4e0cfc7ddcf0e3da4dca9d1349c3c7a75d6f48e91d1b0225488ea3d686e32"
+              },
+              {
+                "path": "src/mod_conf.f90",
+                "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_conf.f90",
+                "sha256": "ddff5923ee9022a0e96651d5be91deef2ce1647e9e049020086dbf1086164da3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "FIND_NEAREST_POINT",
+                "role": "public-entry-point",
+                "summary": "Public grid nearest-point dispatcher; selected regular-source neighborhood scan reviewed.",
+                "signature": "CALL FIND_NEAREST_POINT(XTRG,YTRG,XSRC,YSRC,JIP,JJP[,MASK_DOMAIN_TRG])",
+                "declarations": [
+                  {
+                    "path": "src/mod_manip.f90",
+                    "line_start": 834,
+                    "line_end": 852
+                  },
+                  {
+                    "path": "src/mod_manip.f90",
+                    "line_start": 48,
+                    "line_end": 54
+                  }
+                ],
+                "path": "src/mod_manip.f90",
+                "line_start": 834,
+                "line_end": 963,
+                "module": "MOD_MANIP",
+                "usage": "use MOD_MANIP, only: FIND_NEAREST_POINT\n! Initialize compatible REAL(8) longitude/latitude grid arrays in degrees.\n! Source has at least three points along each axis; outputs have target shape.\ncall FIND_NEAREST_POINT(xtrg,ytrg,xsrc,ysrc,ii,jj)\n! Ignore entries with II<1 or JJ<1 before gathering source values.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-grid-setup regular-source fragment with overlap. Neighborhood/global-nearest accuracy, longitude seams, antipodes and masked targets were not tested."
+              },
+              {
+                "procedure": "regular-source bounded-neighborhood search",
+                "role": "implementation-helper",
+                "path": "src/mod_manip.f90",
+                "line_start": 967,
+                "line_end": 1069
+              },
+              {
+                "procedure": "spherical distance implementation",
+                "role": "implementation-helper",
+                "path": "src/mod_manip.f90",
+                "line_start": 1509,
+                "line_end": 1573
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license text; version-option grant not separately identified",
+          "spdx_expression": null,
+          "revision": "f59113007c8d546249936d3b06cd7d70b248028d",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root ships the GNU GPL version 3 text and selected native Akima sources retain Brodeau/Brankart attribution. The inspected files do not give a separate version-option statement, so this finding does not infer an or-later grant. NetCDF and other linked components retain separate terms; no complete dependency-license audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/LICENSE",
+              "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/README.md",
+              "sha256": "be5e747e8d530e67b120bfb1a96e3b618fc7e05777b75c160b9ab5afe2815492"
+            },
+            {
+              "path": "src/mod_akima_1d.f90",
+              "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_akima_1d.f90",
+              "sha256": "9b555e27006dcd0d451d94a1a45dd05b964beb38fdf261bceef65b2564903149"
+            },
+            {
+              "path": "src/mod_akima_2d.f90",
+              "url": "https://github.com/brodeau/sosie/blob/f59113007c8d546249936d3b06cd7d70b248028d/src/mod_akima_2d.f90",
+              "sha256": "52eed87a8c56a3455ca56b77803c5f85bc6131bd0c21712e64d52a33935ee93b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44791,12 +44995,153 @@
             ],
             "notes": "The README restricts coverage to regression, explicitly excluding classification. Training calls Python/scikit-learn, while prediction is written in Fortran; unfinished vector/matrix prediction and later tests remain checklist items.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8e",
+            "level": "source-reviewed",
+            "revision": "cdac6492c93242e53eef4ca287a90c6bd74fc147",
+            "reviewed_on": "2026-11-06",
+            "notes": "The reviewed Fortran type-bound PREDICT_ONE entries evaluate previously trained nonlinear regression models: a neural network uses dense affine layers and activation callbacks, a decision tree follows feature-threshold comparisons, and a random forest averages tree outputs. The implementation is prediction, not native Fortran training or a particular least-squares/regularization optimizer; Python/scikit-learn training and serialization remain external. Require initialized model dimensions, allocated consistent coefficients/nodes, live activation pointers and positive tree_count. Neural predictions overwrite stored activation arrays, so sharing one object across simultaneous calls is not assumed safe. Precision is selected by preprocessing to numeric kind 4 or 8, single by default; PS is private, so caller data must match the build. Export helpers shift scikit-learn child/feature indices to one-based Fortran (leaf sentinel becomes -1), depend on historical scikit-learn attributes and write values with limited decimal formatting. Tree traversal is bounded by recorded maximum depth and does not validate malformed node links. Softmax is defective in this pin: it reads SUM(TMP) before TMP is assigned and returns a logistic expression instead of softmax. Restrict regression sketches to compatible validated models/activations (e.g. identity output); do not infer classification probabilities or current scikit-learn compatibility. Source review does not establish prediction accuracy or equivalence with training-library output.",
+            "evidence": [
+              {
+                "path": "src/mod_fsklearn_essential.f90",
+                "url": "https://github.com/zhoutengye/fsklearn/blob/cdac6492c93242e53eef4ca287a90c6bd74fc147/src/mod_fsklearn_essential.f90",
+                "sha256": "c5c67408d16ea43cab7ead7d7fe5937f5865d42c31db3c4546736814676c8dec"
+              },
+              {
+                "path": "tools/fsklearn_training.py",
+                "url": "https://github.com/zhoutengye/fsklearn/blob/cdac6492c93242e53eef4ca287a90c6bd74fc147/tools/fsklearn_training.py",
+                "sha256": "a65577d2d021c5b8520fe075855e28e0db5765e37431dca5fb2a0b9deee12067"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/zhoutengye/fsklearn/blob/cdac6492c93242e53eef4ca287a90c6bd74fc147/README.md",
+                "sha256": "318a1abdb822cccf80b83c9425f24de375ab459cfe63b33e5018fa062264b0ff"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Predict_One",
+                "role": "public-entry-point",
+                "summary": "Public type-bound prediction using dense affine layers and selected activation callbacks.",
+                "signature": "OUTPUT = MODEL%Predict_One(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 125,
+                    "line_end": 141
+                  },
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 726,
+                    "line_end": 734
+                  }
+                ],
+                "path": "src/mod_fsklearn_essential.f90",
+                "line_start": 726,
+                "line_end": 751,
+                "module": "Mod_Fsklearn_Essential",
+                "derived_type": "Neural_Network",
+                "usage": "use Mod_Fsklearn_Essential, only: Neural_Network\ntype(Neural_Network) :: model\n! Set model coefficient path/name and load a compatible export via Read_Coef,\n! or explicitly initialize every model dimension, allocation and activation.\n! INPUT/OUTPUT must use the configured PS real kind and declared model sizes.\noutput=model%Predict_One(input)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-model-setup fragment. Preprocess source consistently for the PS=4/8 choice; do not call on an uninitialized model or assume a modern scikit-learn export is compatible. No training, export, prediction or cross-language equality was tested."
+              },
+              {
+                "procedure": "Predict_One",
+                "role": "public-entry-point",
+                "summary": "Public type-bound prediction using threshold traversal to stored leaf outputs.",
+                "signature": "OUTPUT = MODEL%Predict_One(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 161,
+                    "line_end": 170
+                  },
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 753,
+                    "line_end": 761
+                  }
+                ],
+                "path": "src/mod_fsklearn_essential.f90",
+                "line_start": 753,
+                "line_end": 773,
+                "module": "Mod_Fsklearn_Essential",
+                "derived_type": "Decision_Tree",
+                "usage": "use Mod_Fsklearn_Essential, only: Decision_Tree\ntype(Decision_Tree) :: model\n! Set model coefficient path/name and load a compatible export via Read_Coef,\n! or explicitly initialize every model dimension, allocation and activation.\n! INPUT/OUTPUT must use the configured PS real kind and declared model sizes.\noutput=model%Predict_One(input)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-model-setup fragment. Preprocess source consistently for the PS=4/8 choice; do not call on an uninitialized model or assume a modern scikit-learn export is compatible. No training, export, prediction or cross-language equality was tested."
+              },
+              {
+                "procedure": "Predict_One",
+                "role": "public-entry-point",
+                "summary": "Public type-bound prediction using an unweighted mean of stored tree predictions.",
+                "signature": "OUTPUT = MODEL%Predict_One(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 174,
+                    "line_end": 183
+                  },
+                  {
+                    "path": "src/mod_fsklearn_essential.f90",
+                    "line_start": 775,
+                    "line_end": 783
+                  }
+                ],
+                "path": "src/mod_fsklearn_essential.f90",
+                "line_start": 775,
+                "line_end": 799,
+                "module": "Mod_Fsklearn_Essential",
+                "derived_type": "Random_Forest",
+                "usage": "use Mod_Fsklearn_Essential, only: Random_Forest\ntype(Random_Forest) :: model\n! Set model coefficient path/name and load a compatible export via Read_Coef,\n! or explicitly initialize every model dimension, allocation and activation.\n! INPUT/OUTPUT must use the configured PS real kind and declared model sizes.\noutput=model%Predict_One(input)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-model-setup fragment. Preprocess source consistently for the PS=4/8 choice; do not call on an uninitialized model or assume a modern scikit-learn export is compatible. No training, export, prediction or cross-language equality was tested."
+              },
+              {
+                "procedure": "activation implementations and defective softmax",
+                "role": "implementation-helper",
+                "path": "src/mod_fsklearn_essential.f90",
+                "line_start": 843,
+                "line_end": 883
+              },
+              {
+                "procedure": "tree reader and Fortran-indexed node fields",
+                "role": "implementation-helper",
+                "path": "src/mod_fsklearn_essential.f90",
+                "line_start": 584,
+                "line_end": 612
+              },
+              {
+                "procedure": "Python tree/forest coefficient export",
+                "role": "implementation-helper",
+                "path": "tools/fsklearn_training.py",
+                "line_start": 54,
+                "line_end": 105
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root notice",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "cdac6492c93242e53eef4ca287a90c6bd74fc147",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root has the three BSD redistribution/endorsement clauses attributed to Zhouteng Ye. This records the project notice for selected Fortran routines and export glue; Python/scikit-learn and other external dependencies retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/zhoutengye/fsklearn/blob/cdac6492c93242e53eef4ca287a90c6bd74fc147/LICENSE",
+              "sha256": "4740e801b1444d527edbd669fb136f82703e5a3c843759861195d64df50ee30e"
+            },
+            {
+              "path": "src/mod_fsklearn_essential.f90",
+              "url": "https://github.com/zhoutengye/fsklearn/blob/cdac6492c93242e53eef4ca287a90c6bd74fc147/src/mod_fsklearn_essential.f90",
+              "sha256": "c5c67408d16ea43cab7ead7d7fe5937f5865d42c31db3c4546736814676c8dec"
+            }
+          ]
         }
       },
       "imports": {}
@@ -76911,12 +77256,482 @@
             ],
             "notes": "The README documents points/grid/map types and Shepard weighting and says the implemented projection is currently oblique stereographic. Its broad mapping language is not treated as proof of every projection or conservative remapping method. NetCDF/NCIO dependencies and interpolation errors were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public INTERP_LINEAR generic implements adjacent-point piecewise-linear interpolation for scalar/vector queries; INTERP_SPLINE builds cubic piecewise-polynomial coefficients and evaluates them. Require equal nonempty X/Y lengths, finite strictly increasing distinct X and at least two points for the spline. Linear queries outside the interval clamp to endpoint values. Spline outside queries use reflection about the endpoint and a reflected value, rather than the same constant policy; farther outside reflected arguments may themselves leave the interval. The cubic helper solves a tridiagonal coefficient system with its own endpoint conditions, not a user-selectable natural/clamped boundary API. No status argument validates sorting, duplicate nodes or model error. The defining helper source credits an earlier Godunov interpolation implementation; component provenance remains scoped.",
+            "evidence": [
+              {
+                "path": "src/interp1D.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/interp1D.f90",
+                "sha256": "ad9b654c0b4876b82b5cff6c033a804efb1357f275c579dbde5a6179be3089ac"
+              },
+              {
+                "path": "src/coord_constants.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/coord_constants.f90",
+                "sha256": "30541db90ed7debbfc97ca05a31dc2d86f0243c98d25fe3f64435493d1bff757"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "interp_linear",
+                "role": "public-entry-point",
+                "summary": "Public generic for scalar or vector adjacent-point linear interpolation.",
+                "signature": "YOUT = interp_linear(X,Y,XOUT)",
+                "declarations": [
+                  {
+                    "path": "src/interp1D.f90",
+                    "line_start": 8,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/interp1D.f90",
+                    "line_start": 52,
+                    "line_end": 59
+                  },
+                  {
+                    "path": "src/interp1D.f90",
+                    "line_start": 86,
+                    "line_end": 94
+                  }
+                ],
+                "path": "src/interp1D.f90",
+                "line_start": 52,
+                "line_end": 84,
+                "module": "interp1D",
+                "usage": "use interp1D, only: interp_linear\ndouble precision :: x(3),y(3),value\nx=[0.d0,1.d0,2.d0]; y=[0.d0,2.d0,4.d0]\nvalue=interp_linear(x,y,0.5d0)\n! Out-of-range queries clamp to endpoint ordinates.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite sorted distinct abscissae and matching lengths; no status or residual check is returned."
+              },
+              {
+                "procedure": "interp_spline",
+                "role": "public-entry-point",
+                "summary": "Cubic spline construction/evaluation with reflected endpoint extrapolation.",
+                "signature": "YOUT = interp_spline(X,Y,XOUT)",
+                "declarations": [
+                  {
+                    "path": "src/interp1D.f90",
+                    "line_start": 159,
+                    "line_end": 168
+                  },
+                  {
+                    "path": "src/interp1D.f90",
+                    "line_start": 13,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/interp1D.f90",
+                "line_start": 159,
+                "line_end": 197,
+                "module": "interp1D",
+                "usage": "use interp1D, only: interp_spline\ndouble precision :: x(4),y(4),q(2),values(2)\nx=[0.d0,1.d0,2.d0,3.d0]; y=[0.d0,1.d0,4.d0,9.d0]\nq=[0.5d0,1.5d0]\nvalues=interp_spline(x,y,q)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. In-range fragment with at least two points. Do not infer natural boundary conditions, shape preservation or reliable remote extrapolation."
+              },
+              {
+                "procedure": "cubic coefficient solver",
+                "role": "implementation-helper",
+                "path": "src/interp1D.f90",
+                "line_start": 199,
+                "line_end": 288
+              },
+              {
+                "procedure": "private cubic evaluator",
+                "role": "implementation-helper",
+                "path": "src/interp1D.f90",
+                "line_start": 290,
+                "line_end": 342
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public INTERP_BILINEAR generic selects a double-precision rectangular tensor-grid path which brackets each query on two ordered coordinate axes, linearly combines four neighboring values and preserves a missing sentinel where interpolation is unavailable. Z is shaped (SIZE(X),SIZE(Y)); the reviewed overload returns (SIZE(XOUT),SIZE(YOUT)), with MASK on the output grid. Strictly increasing axes with at least two nodes and matching finite data are required. Queries equal to either extreme coordinate are marked outside by the <=/>= tests; only strictly interior points are interpolated. Any sentinel-valued corner prevents interpolation. FILL is accepted/stored but the filling block in this overload is commented out; it does not fill missing outputs. This is a source review of the gridded overload, not the separate paired-query or nearest-neighbor variants, scattered triangulation or conservative remapping.",
+            "evidence": [
+              {
+                "path": "src/interp2D.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/interp2D.f90",
+                "sha256": "ff60163be1160be4949c4fdf1a8fb5cb0ffae5221d73631beb7aa9390159c275"
+              },
+              {
+                "path": "src/coord_constants.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/coord_constants.f90",
+                "sha256": "30541db90ed7debbfc97ca05a31dc2d86f0243c98d25fe3f64435493d1bff757"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "interp_bilinear",
+                "role": "public-entry-point",
+                "summary": "Public bilinear generic, selected double-precision Cartesian-product query overload.",
+                "signature": "ZOUT = interp_bilinear(X,Y,Z,XOUT,YOUT[,MISSING_VALUE,MASK,FILL])",
+                "declarations": [
+                  {
+                    "path": "src/interp2D.f90",
+                    "line_start": 8,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/interp2D.f90",
+                    "line_start": 102,
+                    "line_end": 115
+                  }
+                ],
+                "path": "src/interp2D.f90",
+                "line_start": 102,
+                "line_end": 223,
+                "module": "interp2D",
+                "usage": "use coord_constants, only: dp\nuse interp2D, only: interp_bilinear\nreal(dp) :: x(2),y(2),z(2,2),q(1),out(1,1)\nx=[0._dp,1._dp]; y=x\nz=reshape([0._dp,1._dp,1._dp,2._dp],[2,2]); q=0.5_dp\nout=interp_bilinear(x,y,z,q,q)\n! Queries on outer grid edges return the missing sentinel in this overload.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Strictly interior query only. FILL has no active filling implementation here. No interpolation value, mask or missing-data behavior was executed."
+              }
+            ]
+          },
+          {
+            "code": "K5",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public LOESS_SMOOTH generic regularizes an irregular series onto a uniform grid, calls the native LOWESS local-linear smoother with two robustness iterations, then linearly maps the smoothed series back. It omits Y equal to the chosen missing sentinel, uses the minimum consecutive X spacing to allocate the uniform grid, and derives F from L, DX and grid size; require sorted distinct X, at least two points and a practical minimum spacing to avoid huge allocation. L is not simply a point-count window; the code uses (2*L+1) in both its availability gate and fraction formula. It prints L/F and returns the sentinel when its point-count gate fails. The double overload explicitly casts data/window to default real before computation; its output is not a full double-precision LOWESS calculation. The same repository offers FILTER_GAUSSIAN via normalized sampled Gaussian weights and reflected boundary patches. Explicitly supply positive DX: the float path starts with SIGMAP=SIGMAP and only assigns a value when DX is present, and the double wrapper evaluates REAL(DX) without a PRESENT guard. The double Gaussian overload also reduces the field to REAL(4). Kernel width must fit the convolution implementation; its four-pass fallback is not an unlimited large-kernel remedy. These are smoothing implementations, not uncertainty estimates, missing-NaN detection or a precision guarantee.",
+            "evidence": [
+              {
+                "path": "src/loess.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/loess.f90",
+                "sha256": "18dd27e8e000294c0ff048d562e388752c8eaa393e3592cfc21a5b794e6b0e5b"
+              },
+              {
+                "path": "src/gaussian_filter.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/gaussian_filter.f90",
+                "sha256": "bdb1f756ed8ee0a25fbbfe30dea19859d4505b7a99d3be28ec041c7435c90a7a"
+              },
+              {
+                "path": "src/coord_constants.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/coord_constants.f90",
+                "sha256": "30541db90ed7debbfc97ca05a31dc2d86f0243c98d25fe3f64435493d1bff757"
+              },
+              {
+                "path": "src/interp1D.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/interp1D.f90",
+                "sha256": "ad9b654c0b4876b82b5cff6c033a804efb1357f275c579dbde5a6179be3089ac"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "loess_smooth",
+                "role": "public-entry-point",
+                "summary": "Public LOWESS smoothing generic; selected double interface computes through default-real data.",
+                "signature": "YFIT = loess_smooth(X,Y,L[,MISSING_VALUE])",
+                "declarations": [
+                  {
+                    "path": "src/loess.f90",
+                    "line_start": 13,
+                    "line_end": 20
+                  },
+                  {
+                    "path": "src/loess.f90",
+                    "line_start": 24,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/loess.f90",
+                "line_start": 24,
+                "line_end": 42,
+                "module": "loess",
+                "usage": "use coord_constants, only: dp\nuse loess, only: loess_smooth\n! Sorted distinct X/Y arrays, at least two points, enough nonmissing data,\n! and a positive finite L giving a meaningful smoothing fraction:\nyfit=loess_smooth(x,y,l)\n! Double arguments are converted to single precision internally.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-data-setup fragment. Validate minimum spacing, uniform-grid memory and missing sentinel before use. No smoothing result or robustness property was tested."
+              },
+              {
+                "procedure": "filter_gaussian",
+                "role": "public-entry-point",
+                "summary": "Public Gaussian filter generic; pass DX explicitly and respect kernel-size constraints.",
+                "signature": "CALL filter_gaussian(VAR,SIGMA[,DX,MASK,TRUNCATE])",
+                "declarations": [
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 17,
+                    "line_end": 20
+                  },
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 280,
+                    "line_end": 286
+                  }
+                ],
+                "path": "src/gaussian_filter.f90",
+                "line_start": 280,
+                "line_end": 306,
+                "module": "gaussian_filter",
+                "usage": "use gaussian_filter, only: filter_gaussian\n! FIELD is REAL(8), sufficiently large in both dimensions for the kernel.\n! Always provide finite positive DX in this pinned implementation:\ncall filter_gaussian(field,1.d0,dx=1.d0)\n! FIELD is overwritten after an internal REAL(4) calculation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-array-setup fragment with explicit DX. Omitted DX is defective in this version. No filter result, fallback, conservation or mask behavior was tested."
+              },
+              {
+                "procedure": "gaussian_kernel",
+                "role": "public-entry-point",
+                "summary": "Allocate and normalize a sampled two-dimensional Gaussian kernel.",
+                "signature": "CALL gaussian_kernel(SIGMA,KERNEL[,TRUNCATE])",
+                "declarations": [
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 356,
+                    "line_end": 364
+                  }
+                ],
+                "path": "src/gaussian_filter.f90",
+                "line_start": 356,
+                "line_end": 397,
+                "module": "gaussian_filter",
+                "usage": "use gaussian_filter, only: gaussian_kernel\nreal,allocatable :: kernel(:,:)\ncall gaussian_kernel(1.0,kernel,truncate=3.0)\n! Require positive finite SIGMA and sensible nonnegative truncation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Kernel coordinates use a finite symmetric support and normalization by the sampled sum. No normalization or approximation error was measured."
+              },
+              {
+                "procedure": "LOWESS preprocessing and resampling",
+                "role": "implementation-helper",
+                "path": "src/loess.f90",
+                "line_start": 65,
+                "line_end": 140
+              },
+              {
+                "procedure": "native local weighted regression",
+                "role": "implementation-helper",
+                "path": "src/loess.f90",
+                "line_start": 372,
+                "line_end": 451
+              },
+              {
+                "procedure": "robustness residual reweighting",
+                "role": "implementation-helper",
+                "path": "src/loess.f90",
+                "line_start": 341,
+                "line_end": 370
+              },
+              {
+                "procedure": "Gaussian filter dispatch and optional-DX findings",
+                "role": "implementation-helper",
+                "path": "src/gaussian_filter.f90",
+                "line_start": 280,
+                "line_end": 352
+              }
+            ]
+          },
+          {
+            "code": "J2",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public CONVOLVE routine accumulates weighted two-dimensional patches after reflecting each side once. Its implementation multiplies weights in their stored orientation without reversing them: for general asymmetric weights this is a correlation-style operation; symmetric Gaussian weights implement the corresponding convolution. H2/J2-style scalar integral or Fourier transform APIs are not inferred from the name. Inputs, weights and outputs are REAL(4), output must match input shape and weights should have odd extents so patches conform. Each weight extent must be strictly less than the corresponding input extent+1 (checked with an assertion that can terminate). Without MASK it is a direct weighted patch sum. With MASK, excluded centers remain unchanged and weights of excluded neighbors are redistributed equally over included neighbors; this is not a general theorem of global field conservation. The kernel is not automatically normalized and no sentinel/NaN policy is provided.",
+            "evidence": [
+              {
+                "path": "src/gaussian_filter.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/gaussian_filter.f90",
+                "sha256": "bdb1f756ed8ee0a25fbbfe30dea19859d4505b7a99d3be28ec041c7435c90a7a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "convolve",
+                "role": "public-entry-point",
+                "summary": "Reflected-boundary weighted patch correlation; symmetric weights give convolution.",
+                "signature": "CALL convolve(INPUT,WEIGHTS,OUTPUT[,MASK])",
+                "declarations": [
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 438,
+                    "line_end": 453
+                  },
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 29,
+                    "line_end": 35
+                  }
+                ],
+                "path": "src/gaussian_filter.f90",
+                "line_start": 438,
+                "line_end": 524,
+                "module": "gaussian_filter",
+                "usage": "use gaussian_filter, only: convolve\nreal(4) :: field(5,5),weights(3,3),out(5,5)\nfield=1.0; weights=1.0/9.0\ncall convolve(field,weights,out)\n! Symmetric normalized odd-sized weights; no mask in this fragment.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Odd kernel smaller than the supported reflection extent. No output, boundary treatment or conservation property was tested."
+              },
+              {
+                "procedure": "single-reflection tiling",
+                "role": "implementation-helper",
+                "path": "src/gaussian_filter.f90",
+                "line_start": 400,
+                "line_end": 434
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "HGRAD returns the magnitude of a centered finite-difference horizontal gradient, not a two-component gradient array. Its private helpers divide by 2*DX and copy neighboring interior derivatives to boundaries. Require positive finite DX and at least three points in each direction. A concrete boundary-index defect is present: D_DX assigns DU(NY,:) rather than DU(NX,:), so nonsquare grids can leave the last row wrong or address beyond the first extent. Restrict the sketch to square grids or repair this before general rectangular use. NORM=.TRUE. divides by MAXVAL(ABS(DU)) without a zero guard, so constant fields may divide by zero. Review records the local stencil and its limitations, not a general nonuniform/curvilinear gradient, convergence study or corrected implementation.",
+            "evidence": [
+              {
+                "path": "src/gaussian_filter.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/gaussian_filter.f90",
+                "sha256": "bdb1f756ed8ee0a25fbbfe30dea19859d4505b7a99d3be28ec041c7435c90a7a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hgrad",
+                "role": "public-entry-point",
+                "summary": "Magnitude of a uniform-grid horizontal finite-difference gradient; square-grid restriction at this pin.",
+                "signature": "DU = hgrad(U0,DX[,NORM])",
+                "declarations": [
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 604,
+                    "line_end": 614
+                  },
+                  {
+                    "path": "src/gaussian_filter.f90",
+                    "line_start": 29,
+                    "line_end": 35
+                  }
+                ],
+                "path": "src/gaussian_filter.f90",
+                "line_start": 604,
+                "line_end": 629,
+                "module": "gaussian_filter",
+                "usage": "use gaussian_filter, only: hgrad\n! U is a finite REAL(4) square grid, at least 3 by 3.\n! The pinned D_DX boundary index needs repair before nonsquare-grid use.\nmagnitude=hgrad(u,dx=1.0,norm=.false.)\n! Avoid normalization of constant fields without adding a zero guard.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-data-setup fragment explicitly restricted to square grids. No derivative, boundary or zero-gradient behavior was executed."
+              },
+              {
+                "procedure": "centered differences and boundary-index defect",
+                "role": "implementation-helper",
+                "path": "src/gaussian_filter.f90",
+                "line_start": 551,
+                "line_end": 602
+              }
+            ]
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public CREATE_POLYGON and POINT_IN_POLYGON generics build a planar polygon from coordinate arrays and classify query points by parity of ray/edge intersections. The selected constructors assemble sequential edges closing the polygon; the query creates a default-real point and counts intersections over stored index pairs. Supply matching finite coordinate vectors, at least three sensible vertices and a valid simple polygon. The implementation perturbs a query Y equal to a vertex Y by a fixed EPS=1e-5, and slope/vertical-edge comparisons use floating-point thresholds. Consequently boundary/vertex inclusion, scale dependence and degenerate/self-intersecting polygons are not certified exact predicates. This is planar point containment, not spherical geometry, triangulation or polygon Boolean operations. Allocatable polygon components carry copied points/edge indices; the explicit FREE_POLYGON helper is private.",
+            "evidence": [
+              {
+                "path": "src/polygons.f90",
+                "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/polygons.f90",
+                "sha256": "5e038a2b9710d30fc9c508dee16d5e61013607662caa7328ae6a289c479983c5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "create_polygon",
+                "role": "public-entry-point",
+                "summary": "Public polygon constructor generic, selected REAL(4) coordinate-vector overload.",
+                "signature": "POL = create_polygon(XX,YY)",
+                "declarations": [
+                  {
+                    "path": "src/polygons.f90",
+                    "line_start": 23,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "src/polygons.f90",
+                    "line_start": 126,
+                    "line_end": 133
+                  },
+                  {
+                    "path": "src/polygons.f90",
+                    "line_start": 44,
+                    "line_end": 47
+                  }
+                ],
+                "path": "src/polygons.f90",
+                "line_start": 126,
+                "line_end": 165,
+                "module": "polygons",
+                "usage": "use polygons, only: polygon,create_polygon\ntype(polygon) :: pol\npol=create_polygon([0.0,1.0,1.0,0.0],[0.0,0.0,1.0,1.0])",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Finite matching coordinate vectors for a simple planar polygon; no topology validation was performed."
+              },
+              {
+                "procedure": "point_in_polygon",
+                "role": "public-entry-point",
+                "summary": "Public point-containment generic, selected scalar-coordinate/polygon overload.",
+                "signature": "INSIDE = point_in_polygon(X,Y,POL)",
+                "declarations": [
+                  {
+                    "path": "src/polygons.f90",
+                    "line_start": 34,
+                    "line_end": 47
+                  },
+                  {
+                    "path": "src/polygons.f90",
+                    "line_start": 255,
+                    "line_end": 263
+                  }
+                ],
+                "path": "src/polygons.f90",
+                "line_start": 255,
+                "line_end": 270,
+                "module": "polygons",
+                "usage": "use polygons, only: point_in_polygon\n! POL was initialized by the public constructor.\ninside=point_in_polygon(0.5,0.5,pol)\n! Boundary and vertex conventions require independent validation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-polygon-setup fragment with an interior query. No containment, edge or degeneracy case was executed."
+              },
+              {
+                "procedure": "ray-edge intersection with fixed perturbation",
+                "role": "implementation-helper",
+                "path": "src/polygons.f90",
+                "line_start": 182,
+                "line_end": 228
+              },
+              {
+                "procedure": "odd/even edge-count test",
+                "role": "implementation-helper",
+                "path": "src/polygons.f90",
+                "line_start": 231,
+                "line_end": 253
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No project-wide grant identified; selected modules retain component provenance",
+          "spdx_expression": null,
+          "revision": "9bb87cf86c94d80e20291d5432581a26d548da8e",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned root tree has no separately named LICENSE/COPYING file and the selected sources/README do not establish one project-wide grant. Interpolation credits a Godunov source, the Gaussian module references nicjhan/gaussian-filter and polygon code references Rosetta Code. Preserve these component origins and determine applicable upstream terms before redistribution; a source URL or public repository is not itself a permission grant.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/README.md",
+              "sha256": "6f3bf3be3ca0f441bb1f3d0c11c89bc6a52a197c5749e9a1b8611a24951a079e"
+            },
+            {
+              "path": "src/interp1D.f90",
+              "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/interp1D.f90",
+              "sha256": "ad9b654c0b4876b82b5cff6c033a804efb1357f275c579dbde5a6179be3089ac"
+            },
+            {
+              "path": "src/loess.f90",
+              "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/loess.f90",
+              "sha256": "18dd27e8e000294c0ff048d562e388752c8eaa393e3592cfc21a5b794e6b0e5b"
+            },
+            {
+              "path": "src/gaussian_filter.f90",
+              "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/gaussian_filter.f90",
+              "sha256": "bdb1f756ed8ee0a25fbbfe30dea19859d4505b7a99d3be28ec041c7435c90a7a"
+            },
+            {
+              "path": "src/polygons.f90",
+              "url": "https://github.com/alex-robinson/coordinates/blob/9bb87cf86c94d80e20291d5432581a26d548da8e/src/polygons.f90",
+              "sha256": "5e038a2b9710d30fc9c508dee16d5e61013607662caa7328ae6a289c479983c5"
+            }
+          ]
         }
       },
       "imports": {}

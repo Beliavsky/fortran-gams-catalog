@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 428 repositories now have 600 source-reviewed
+Reviewed on 2026-11-06. 431 repositories now have 610 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-414 repository cards now identify public routines and link their usage lines
+417 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 428 independently source-reviewed repositories now have an
+separately. All 431 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -453,6 +453,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | SciJIT | `quadpack_wrappers::dqags_wrapper`, `quadpack_wrappers::dqagi_wrapper`, `minpack_wrappers::hybrd_wrapper` | BSD-3-Clause wrappers; bundled QUADPACK/MINPACK notices apply |
 | SciJIT | `quadpack_wrappers::dqagp_wrapper`, `quadpack_wrappers::dqawo_wrapper`, `quadpack_wrappers::dqaws_wrapper`, `quadpack_wrappers::dqawc_wrapper`, `minpack_wrappers::lmdif_wrapper`, `minpack_wrappers::lmder1_wrapper`, `minpack_wrappers::lmstr1_wrapper`, `minpack_wrappers::enorm_wrapper`, `odepack_wrappers::lsoda_wrapper`, `odepack_wrappers::lsodar_wrapper`, `fitpack_wrappers::curfit_wrapper`, `fitpack_wrappers::splev_wrapper`, `fitpack_wrappers::splder_wrapper`, `fitpack_wrappers::splint_wrapper`, `fitpack_wrappers::regrid_wrapper`, `fitpack_wrappers::bispev_wrapper`, `fitpack_wrappers::dblint_wrapper` | BSD-3-Clause wrappers; bundled numerical-component notices apply |
 | ANN Fortran interface | `ANN_mod::ann_buildTree`, `ANN_mod::ann_kSearch`, `ANN_mod::ann_destroyTree` | LGPL-2.1-or-later upstream ANN notice; bridge scope not separately stated |
+| SOSIE | `MOD_AKIMA_1D::AKIMA_1D`, `MOD_AKIMA_2D::AKIMA_2D`, `MOD_MANIP::FIND_NEAREST_POINT` | GPL-3.0 license text; version-option grant not separately identified |
+| fsklearn | `Mod_Fsklearn_Essential::Neural_Network%Predict_One`, `Mod_Fsklearn_Essential::Decision_Tree%Predict_One`, `Mod_Fsklearn_Essential::Random_Forest%Predict_One` | BSD-3-Clause root notice |
+| coordinates grids and maps | `interp1D::interp_linear`, `interp1D::interp_spline`, `interp2D::interp_bilinear`, `loess::loess_smooth`, `gaussian_filter::filter_gaussian`, `gaussian_filter::gaussian_kernel`, `gaussian_filter::convolve`, `gaussian_filter::hgrad`, `polygons::create_polygon`, `polygons::point_in_polygon` | No project-wide grant identified; selected modules retain component provenance |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -901,6 +904,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [SciJIT](https://github.com/shmuel-gilbaum/scijit) | H2a1a1; H2a3a1; H2a4a1; F2 | Finite, semi-infinite and whole-line quadrature plus nonlinear-system binding | Callback ABI, workspace/status, conditional thread-private state and differing nested-call behavior. |
 | [SciJIT](https://github.com/shmuel-gilbaum/scijit) | H2a2a1; K1b1a1; K1b1a2; D1a3b; I1a1b; I1a2; E1a; H1; H2a2a2; E2a; H2b1 | Weighted quadrature, nonlinear least squares, norms, splines and ODE integration | Callback ABI/state, workspaces, modified spline signatures, status and representation-specific scope. |
 | [ANN Fortran interface](https://github.com/box-tools/ann-fortran) | P | Fortran/C++ kd-tree nearest-neighbor bridge | Caller-owned output buffers, zero-based indices, squared distances and unresolved allocation/cleanup defects. |
+| [SOSIE](https://github.com/brodeau/sosie) | E1a; E2a; P | Local Akima interpolation and regular-grid nearest-point lookup | Mixed precision, saved persistence/cache state, configuration dependencies and bounded geographic search. |
+| [fsklearn](https://github.com/zhoutengye/fsklearn) | L8e | Native prediction for neural-network, decision-tree and random-forest regressors | External training/export, build precision, mutable activations and defective softmax path. |
+| [coordinates grids and maps](https://github.com/alex-robinson/coordinates) | E1a; E2a; K5; J2; H1; P | Native linear/cubic and bilinear interpolation, smoothing, convolution, gradients and point containment | Mixed precision, optional-DX and boundary-index defects, missing/edge conventions and component provenance. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1627,3 +1633,11 @@ user-Jacobian least squares, norms, spline representation operations and
 Adams/BDF integration. Binding review does not certify every numerical backend.
 ANN-Fortran contracts remain commented post-repair sketches: the reviewed bridge
 has allocation/deallocation and public cleanup defects, with no execution check.
+
+Coordinates, SOSIE and FSKlearn have ten additional source-reviewed mappings
+and sixteen public entry-point annotations. Calling sketches were not compiled
+or run. Reviews distinguish gridded interpolation from scattered inputs, native
+regression prediction from external training, symmetric convolution from generic
+weighted correlation, and gradient magnitude from gradient components. Mixed
+precision, persistent flags/caches, missing-value/edge conventions and source
+defects remain explicit. These findings do not certify the implementations.
