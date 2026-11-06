@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 446 repositories now have 677 source-reviewed
+Reviewed on 2026-11-06. 448 repositories now have 688 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-432 repository cards now identify public routines and link their usage lines
+434 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 446 independently source-reviewed repositories now have an
+separately. All 448 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -471,6 +471,8 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Dataplot | `MEAN`, `MEDIAN`, `SD`, `RANK`, `SORT`, `RANKCR`, `LINFIT`, `NORCDF`, `NORPDF`, `NORPPF`, `LOGCDF`, `LOGPDF`, `LOGPPF`, `LOGGAM`, `POICDF` | NIST public-domain notice for Dataplot; bundled notices retain their scope |
 | PFLARE | `pflare::PCRegister_PFLARE`, `pcair_shell::create_pc_air_shell`, `cf_splitting::compute_cf_splitting` | MIT PFLARE root notice |
 | ScaLAPACK | `PDGESV`, `PZGESV`, `PDPOSV`, `PZPOSV`, `PDTRTRS`, `PDGELS`, `PDSYEV`, `PZHEEV`, `PDGESVD`, `PDGBSV` | BSD-3-Clause-Open-MPI-style ScaLAPACK root notice |
+| pyOpt | `solvopt`, `SLSQP`, `COBYLA`, `NNLS`, `LSEI`, `HFTI`, `LDP`, `H12` | MIT selected solver components; LGPL-3.0-or-later pyOpt framework |
+| fastSHT | `get_plm_recursive`, `map2fft`, `fft2map`, `t2alm`, `alm2t` | GPL-3.0 license text; HEALPix-derived recurrence provenance |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -937,6 +939,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Dataplot](https://github.com/usnistgov/dataplot) | L1a1a; L1a1b; N6a1b; N6a2b; L11; L8a1a1; L5a1n; L5a2n; L5a1l; L5a2l; C7a; L5a1p | Location/dispersion summaries, passive ranks and sorting, Spearman correlation, linear regression, normal/logistic/Poisson functions and log gamma | Promoted default-real ABI, common/output dependencies, inference/degeneracy limits, cutoff assignment defect and approximation/tail scope. |
 | [PFLARE](https://github.com/pflareproject/pflare) | D2a4; D2e | PETSc sparse-system preconditioner integration and algebraic coarse/fine partitioning | Registration/context lifecycle, host AIJ scope, PETSc error/convergence channels and returned global index sets. |
 | [ScaLAPACK](https://github.com/reference-scalapack/scalapack) | D2a1; D2c1; D2b1b; D2d1b; D2a3; D9a1; D4a1; D4a3; D6; D2a2 | Distributed real/complex general and positive-definite solves, triangular/banded solves, least squares, symmetric/Hermitian eigenproblems and SVD | Collective grids/descriptors, local workspaces, rank assumptions, nonunit diagonal-scan finding and distinct banded layout. |
+| [pyOpt](https://github.com/madebr/pyopt) | G1b2; G2h3b2; G2h3b1b; G2h3b1a; D9b1; D9a1; G2e1; D1b11 | Native nonsmooth/SQP/derivative-free optimization, constrained and rank-deficient least squares, minimum-distance QP and Householder transformations | Patched callback signatures, executable workspace requirements, status/output limitations and scoped component licenses. |
+| [fastSHT](https://github.com/liuhao-cn/fastsht) | C9; J1a1; J | Associated Legendre recurrence, ringwise real FFT and scalar spherical-harmonic analysis/synthesis | Shared state, CPU/MKL packing and normalization; allocator parameter bounds mismatch; unchecked post-initialization sketches. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1735,3 +1739,14 @@ back-transform calls can overwrite an earlier DBDSQR status. PFLARE
 entries separate outer PETSc KSP solves from registered preconditioners and
 fine/coarse splitting services; GPU, convergence and all kernel internals
 remain outside the reviewed claims. Scoped license notices are preserved.
+
+pyOpt and fastSHT have eleven additional source-reviewed mappings and
+fourteen public entry-point annotations (SOLVOPT appears in two problem classes).
+Calling sketches were not compiled or run. Native pyOpt interfaces differ
+from their original solver headers: callbacks and explicit work arrays follow
+the pinned executable calls. SLSQP workspace sizing follows the executable
+check; COBYLA output values are reevaluated after final vertex selection.
+The fastSHT CPU scope distinguishes raw ring FFTs from full spherical
+transforms and records an allocator bounds mismatch that requires correction
+before relying on initialization. These mappings do not certify numerical
+accuracy, arbitrary parameter regimes or complete dependency licensing.

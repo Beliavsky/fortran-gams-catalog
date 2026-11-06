@@ -56393,12 +56393,454 @@
             ],
             "notes": "The README documents problem/solver separation and interfaces to open and industrial optimizers. An interface framework does not imply that every backend is bundled, licensed identically or independently verified here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. The unconstrained path minimizes or maximizes general locally Lipschitz objectives using a modified Shor r-algorithm with space dilation and supplied gradients/subgradients or finite differences. The selected fragment minimizes with an analytic subgradient; it does not establish smooth Newton convergence or global optimality. The patched interface adds explicit B(N,N), twelve real N-vectors and IDX(N) work storage, plus output unit/file controls. The executable calls FUN(N,X,F), GRAD(N,X,G), FUNC(N,X,FC) and GRADC(N,X,GC); the header synopsis omits N and must not be copied literally. N must be at least two. OPTIONS has thirteen DOUBLE PRECISION entries: call SOPTIONS then set entry 5 to -1 for quiet operation without opening a file. Entry 9 is an iteration count or negative abnormal-stop code; the N<2 branch actually sets -1 despite the header listing -2. Output is not an optimality certificate.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/solvopt.f",
+                "sha256": "a93e65afea110beb3a9d790541e7cc84c231a5def8fb8ee2637524064606fef0"
+              },
+              {
+                "path": "pyOpt/pySOLVOPT/source/apprgrdn.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/apprgrdn.f",
+                "sha256": "64366bdcae459312000b97ae0cab50f0ae1b8c3b76f65d7d249c33b70b7f2451"
+              },
+              {
+                "path": "pyOpt/pySOLVOPT/source/soptions.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/soptions.f",
+                "sha256": "912b79f925faa8ccee049306d5853ae7b31d10f7ff4e31630fc7f8213faaad93"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solvopt",
+                "role": "public-entry-point",
+                "summary": "Patched native nonsmooth unconstrained local optimizer.",
+                "signature": "CALL solvopt(N,X,F,FUN,FLG,GRAD,OPTIONS,FLFC,FUNC,FLGC,GRADC, &\n B,G,G0,G1,GT,GC,Z,X1,XOPT,XREC,GREC,XX,DELTAX,IDX,IOUT,IFILE)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                    "line_start": 86,
+                    "line_end": 122
+                  }
+                ],
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 1,
+                "line_end": 1207,
+                "usage": "! Declare native work arrays: B(N,N), twelve DOUBLE PRECISION N-vectors\n! G,G0,G1,GT,GC,Z,X1,XOPT,XREC,GREC,XX,DELTAX and INTEGER IDX(N).\n! Provide external callbacks with N as their FIRST argument.\ncall soptions(options)\noptions(5)=-1d0\ncall solvopt(n,x,f,fun,.true.,grad,options,.false.,func,.true., &\n gradc,b,g,g0,g1,gt,gc,z,x1,xopt,xrec,grec,xx,deltax,idx,6,\"unused.log\")\nif(options(9)<0d0) error stop \"SOLVOPT abnormal stop\"\n! Independently check original objective and local stationarity.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Contract fragment after caller allocation and callback definition. No objective, constraint, iteration or residual was evaluated."
+              },
+              {
+                "procedure": "callback evaluation and penalty initialization",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 243,
+                "line_end": 377
+              },
+              {
+                "procedure": "adaptive constraint-penalty update",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 585,
+                "line_end": 638
+              },
+              {
+                "procedure": "termination and negative status paths",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 907,
+                "line_end": 1050
+              }
+            ]
+          },
+          {
+            "code": "G2h3b2",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. The constrained path combines the objective with an adaptive penalty on a scalar maximal constraint residual, using a supplied active-constraint gradient/subgradient or finite differences. FUNC must aggregate violations consistently with g(x)<=0; encode equality residuals explicitly if needed. This is not an array-of-constraints callback, nor a global method. Reevaluate the original objective and every constraint at returned X; F can include a penalty. The patched interface adds explicit B(N,N), twelve real N-vectors and IDX(N) work storage, plus output unit/file controls. The executable calls FUN(N,X,F), GRAD(N,X,G), FUNC(N,X,FC) and GRADC(N,X,GC); the header synopsis omits N and must not be copied literally. N must be at least two. OPTIONS has thirteen DOUBLE PRECISION entries: call SOPTIONS then set entry 5 to -1 for quiet operation without opening a file. Entry 9 is an iteration count or negative abnormal-stop code; the N<2 branch actually sets -1 despite the header listing -2. Output is not an optimality certificate.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/solvopt.f",
+                "sha256": "a93e65afea110beb3a9d790541e7cc84c231a5def8fb8ee2637524064606fef0"
+              },
+              {
+                "path": "pyOpt/pySOLVOPT/source/apprgrdn.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/apprgrdn.f",
+                "sha256": "64366bdcae459312000b97ae0cab50f0ae1b8c3b76f65d7d249c33b70b7f2451"
+              },
+              {
+                "path": "pyOpt/pySOLVOPT/source/soptions.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/source/soptions.f",
+                "sha256": "912b79f925faa8ccee049306d5853ae7b31d10f7ff4e31630fc7f8213faaad93"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solvopt",
+                "role": "public-entry-point",
+                "summary": "Patched native nonsmooth constrained local optimizer.",
+                "signature": "CALL solvopt(N,X,F,FUN,FLG,GRAD,OPTIONS,FLFC,FUNC,FLGC,GRADC, &\n B,G,G0,G1,GT,GC,Z,X1,XOPT,XREC,GREC,XX,DELTAX,IDX,IOUT,IFILE)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                    "line_start": 86,
+                    "line_end": 122
+                  }
+                ],
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 1,
+                "line_end": 1207,
+                "usage": "! Declare native work arrays: B(N,N), twelve DOUBLE PRECISION N-vectors\n! G,G0,G1,GT,GC,Z,X1,XOPT,XREC,GREC,XX,DELTAX and INTEGER IDX(N).\n! Provide external callbacks with N as their FIRST argument.\ncall soptions(options)\noptions(5)=-1d0\ncall solvopt(n,x,f,fun,.true.,grad,options,.true.,func,.true., &\n gradc,b,g,g0,g1,gt,gc,z,x1,xopt,xrec,grec,xx,deltax,idx,6,\"unused.log\")\nif(options(9)<0d0) error stop \"SOLVOPT abnormal stop\"\n! Independently check original objective and all constraint residuals.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Contract fragment after caller allocation and callback definition. No objective, constraint, iteration or residual was evaluated."
+              },
+              {
+                "procedure": "callback evaluation and penalty initialization",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 243,
+                "line_end": 377
+              },
+              {
+                "procedure": "adaptive constraint-penalty update",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 585,
+                "line_end": 638
+              },
+              {
+                "procedure": "termination and negative status paths",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySOLVOPT/source/solvopt.f",
+                "line_start": 907,
+                "line_end": 1050
+              }
+            ]
+          },
+          {
+            "code": "G2h3b1b",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. SLSQP implements smooth nonlinear equality/inequality constrained minimization with bounds, BFGS Hessian updates and SQP subproblems. Unlike the inherited reverse-communication header, this patched top-level routine loops internally, calling SLFUNC(M,MEQ,LA,N,F,C,X) and SLGRAD(M,MEQ,LA,N,F,C,G,A,X); MODE starts at zero and returns final status. Supply equality constraints first and remaining constraints as C>=0, XL/XU bounds, C(LA), G(N+1), A(LA,N+1), LA=MAX(1,M) for the selected contract. The executable workspace check uses 4*N1 where the copied header uses 3*N1; use the actual check at lines 201-210. Nonzero MODE includes infeasibility, rank/line-search/iteration failures or encoded insufficient workspace; zero reports stopping criteria, not global optimality. Review covers interface, callback loop, workspace checks and SQP update dispatch, not all nested constrained-LS/BLAS kernels.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySLSQP/source/slsqp.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/slsqp.f",
+                "sha256": "2c2b80bdf856f57b4f3272d52961d18a58373c3cd2a8a9f2e52780bd5770e4d6"
+              },
+              {
+                "path": "pyOpt/pySLSQP/source/slsqpb.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/slsqpb.f",
+                "sha256": "fd086a77e374bcb1dc360ab4fc25a5950f79eaa8ce67f520fea3cea498fb7f1b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SLSQP",
+                "role": "public-entry-point",
+                "summary": "Patched native callback-driven SQP driver; not the original reverse-communication signature.",
+                "signature": "CALL SLSQP(M,MEQ,LA,N,X,XL,XU,F,C,G,A,ACC,ITER, &\n IPRINT,IOUT,IFILE,MODE,W,L_W,JW,L_JW,NFUNC,NGRAD,SLFUNC,SLGRAD)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/slsqp.f",
+                    "line_start": 1,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "pyOpt/pySLSQP/source/slsqp.f",
+                    "line_start": 179,
+                    "line_end": 190
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/slsqp.f",
+                "line_start": 1,
+                "line_end": 295,
+                "usage": "! After allocating X/XL/XU(N), C(LA), G(N+1), A(LA,N+1), LA=max(1,M):\nn1=n+1; mineq=m-meq+2*n1\nlw=(3*n1+m)*(n1+1)+(n1-meq+1)*(mineq+2)+2*mineq &\n   +(n1+mineq)*(n1-meq)+2*meq+n1*n/2+2*m+3*n+4*n1+1\nljw=max(mineq,n1-meq)\nallocate(w(lw),jw(ljw))\nmode=0; iter=200; acc=1d-8\ncall SLSQP(m,meq,la,n,x,xl,xu,f,c,g,a,acc,iter, &\n -1,6,\"unused.log\",mode,w,lw,jw,ljw,nfunc,ngrad,slfunc,slgrad)\nif(mode/=0) error stop \"SLSQP did not report success\"\n! Reevaluate the original constraints and objective at X.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation callback contract. SLGRAD supplies objective gradient and constraint Jacobian, with the extra G/A column initialized; callback interfaces must exactly match the executable calls. Check workspace integer overflow and original-problem residuals. No solve or callback was run."
+              },
+              {
+                "procedure": "BFGS update, line search and least-squares subproblem dispatch",
+                "role": "implementation-helper",
+                "path": "pyOpt/pySLSQP/source/slsqpb.f",
+                "line_start": 1,
+                "line_end": 291
+              }
+            ]
+          },
+          {
+            "code": "G2h3b1a",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. COBYLA minimizes an objective under nonlinear inequalities CON>=0 by simplex interpolation and a decreasing trust-region radius without user derivatives. The mapping selects smooth objective/constraints without supplied derivatives; the routine does not enforce smoothness itself. Its pyOpt signature adds CALCFC first and status/count/unit/file/FF/GG arguments. CALCFC(N,M,X,F,CON) supplies values; encode bounds as constraints. Allocate W>=N*(3*N+2*M+11)+4*M+6 and IACT>=M+1, choose positive RHOBEG>=RHOEND and an evaluation budget. IFAIL=0 is normal radius termination, 1 evaluation limit and 2 damaging roundoff. FF/GG are set on each callback evaluation, but final selection can restore X from the best simplex vertex without refreshing those outputs; reevaluate F/CON at returned X. RHOEND does not guarantee accuracy or feasibility. This review covers the driver, interpolation/trust-region dispatch and output bookkeeping, not every TRSTLP numerical branch.",
+            "evidence": [
+              {
+                "path": "pyOpt/pyCOBYLA/source/cobyla.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pyCOBYLA/source/cobyla.f",
+                "sha256": "27a417f975c3d3dfa888065afe43f14ecc15bf111bc6b90f0c0895e3661aae90"
+              },
+              {
+                "path": "pyOpt/pyCOBYLA/source/cobylb.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pyCOBYLA/source/cobylb.f",
+                "sha256": "8d55866f1bcd6454b53c2fbd081beaeb820d6c3752e8b1098f801611cc1d9f6e"
+              },
+              {
+                "path": "pyOpt/pyCOBYLA/source/trstlp.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pyCOBYLA/source/trstlp.f",
+                "sha256": "062ea714c75f2982e9471b9b933d3672d15e9f4936f815f5661a3481a77e54ed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "COBYLA",
+                "role": "public-entry-point",
+                "summary": "Patched native derivative-free inequality-constrained minimizer.",
+                "signature": "CALL COBYLA(CALCFC,N,M,X,RHOBEG,RHOEND,IPRINT,MAXFUN, &\n W,IACT,IFAIL,NFVALS,IOUT,IFILE,FF,GG)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pyCOBYLA/source/cobyla.f",
+                    "line_start": 1,
+                    "line_end": 7
+                  }
+                ],
+                "path": "pyOpt/pyCOBYLA/source/cobyla.f",
+                "line_start": 1,
+                "line_end": 79,
+                "usage": "! Initialized DOUBLE PRECISION X(N), FF, GG(M); N>=1, M>=1.\nallocate(w(n*(3*n+2*m+11)+4*m+6),iact(m+1))\nmaxfun=2000\ncall COBYLA(calcfc,n,m,x,0.5d0,1d-7,0,maxfun, &\n w,iact,ifail,nfvals,6,\"unused.log\",ff,gg)\nif(ifail/=0) error stop \"COBYLA did not terminate normally\"\ncall calcfc(n,m,x,ff,gg)\n! Check GG>=-chosen_feasibility_tolerance independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide an external CALCFC with DOUBLE PRECISION values and matching integers. MAXFUN is overwritten with evaluation count. Reevaluate FF/GG after return; no trust-region solve, tolerance or output consistency was tested."
+              },
+              {
+                "procedure": "callback outputs and final best-vertex restoration",
+                "role": "implementation-helper",
+                "path": "pyOpt/pyCOBYLA/source/cobylb.f",
+                "line_start": 472,
+                "line_end": 488
+              },
+              {
+                "procedure": "trust-region linear subproblem",
+                "role": "implementation-helper",
+                "path": "pyOpt/pyCOBYLA/source/trstlp.f",
+                "line_start": 1,
+                "line_end": 80
+              }
+            ]
+          },
+          {
+            "code": "D9b1",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. NNLS solves nonnegative linear L2 least squares by an active/passive-set method, Householder updates and Givens rotations. A(MDA,N) and B(M) are overwritten, X(N)>=0 is the selected variable constraint, and W(N), Z(M), INDEX(N) are scratch. MODE=1 success, 2 invalid dimensions, 3 iteration count above 3*N. The same class also covers LSEI below, but NNLS has no equality/general inequality inputs. Preserve originals for residual and KKT checks; supplied legacy BLAS calls include zero-increment broadcasts. LSEI uses Householder null-space reduction for min ||E X-F|| with C X=D and G X>=H. Its selected contract requires 0<MC<N, ME>=N-MC, MG>=1, full row rank C and the reduced design assumptions; inputs are overwritten. Avoid the MC=N shortcut if inequalities need validation: it bypasses the inequality solve. The returned XNRM is combined with the equality-space solution norm in the constrained branch and should not be assumed to equal the original residual norm; compute that from saved E/F. MODE=1 is the native success code, with rank, compatibility and NNLS-limit failures otherwise. Workspace follows the source formula with L=N-MC; JW>=MAX(MG,L).",
+            "evidence": [
+              {
+                "path": "pyOpt/pySLSQP/source/nnls.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/nnls.f",
+                "sha256": "cfa22b7ca4eddc53d4e8a20fc4d5c50e62705c4c43bd1032876b452edf159135"
+              },
+              {
+                "path": "pyOpt/pySLSQP/source/lsei.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/lsei.f",
+                "sha256": "cbf10f01436d4cce86c7680dc84ca3e656cafad8eb3ccb269e7cd6003e34d84f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "NNLS",
+                "role": "public-entry-point",
+                "summary": "External native NNLS interface in the pinned pyOpt distribution.",
+                "signature": "CALL NNLS(A,MDA,M,N,B,X,RNORM,W,Z,INDEX,MODE)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/nnls.f",
+                    "line_start": 44,
+                    "line_end": 49
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/nnls.f",
+                "line_start": 1,
+                "line_end": 194,
+                "usage": "double precision :: a(3,2),b(3),x(2),rnorm,w(2),z(3)\ninteger :: ind(2),mode\na(:,1)=[1d0,0d0,1d0]; a(:,2)=[0d0,1d0,1d0]\nb=[1d0,2d0,3d0]\ncall NNLS(a,3,3,2,b,x,rnorm,w,z,ind,mode)\nif(mode/=1) error stop \"NNLS failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No nonnegativity, residual or KKT check was executed."
+              },
+              {
+                "procedure": "LSEI",
+                "role": "public-entry-point",
+                "summary": "Native equality/inequality constrained linear L2 least squares.",
+                "signature": "CALL LSEI(C,D,E,F,G,H,LC,MC,LE,ME,LG,MG,N,X,XNRM,W,JW,MODE)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/lsei.f",
+                    "line_start": 45,
+                    "line_end": 49
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/lsei.f",
+                "line_start": 1,
+                "line_end": 131,
+                "usage": "double precision :: c(1,2),d(1),e(2,2),f(2),g(1,2),h(1),x(2),xnrm,w(32)\ninteger :: jw(2),mode\nc=1d0; d=1d0; e=0d0; e(1,1)=1d0; e(2,2)=1d0\nf=[0.2d0,0.8d0]; g(1,:)=[1d0,0d0]; h=0d0\ncall LSEI(c,d,e,f,g,h,1,1,2,2,1,1,2,x,xnrm,w,jw,mode)\nif(mode/=1) error stop \"LSEI failed\"\n! Recompute original residual and equality/inequality errors from saved inputs.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The fragment uses MC=1<N=2, ME=2, MG=1 and oversized work arrays. Do not treat XNRM as an independently checked residual. No constrained fit or feasibility check was run."
+              }
+            ]
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. HFTI handles rank-deficient unconstrained linear L2 least squares through column-pivoted Householder reduction and a retained-rank minimum-norm completion. TAU is an absolute diagonal threshold, not a relative singular-value tolerance; KRANK is a computed pseudorank. A and B are overwritten; B first N rows hold solutions and RNORM(NB) residual norms. Require positive M/N, MDA>=M, MDB>=MAX(M,N), H/G/IP length N. There is no MODE or conditioning estimate. The sketch gives B an extra row to keep zero-length tail references within storage; choose TAU based on problem scaling, preserve originals and independently assess numerical rank/residuals.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySLSQP/source/hfti.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/hfti.f",
+                "sha256": "34014e7861860529d230d9f263c70f41492c93416c37491beca27f5a4be572a5"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "HFTI",
+                "role": "public-entry-point",
+                "summary": "External native HFTI interface in the pinned pyOpt distribution.",
+                "signature": "CALL HFTI(A,MDA,M,N,B,MDB,NB,TAU,KRANK,RNORM,H,G,IP)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/hfti.f",
+                    "line_start": 32,
+                    "line_end": 37
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/hfti.f",
+                "line_start": 1,
+                "line_end": 127,
+                "usage": "double precision :: a(3,2),b(4,1),rn(1),h(2),g(2)\ninteger :: ip(2),krank\na(:,1)=[1d0,2d0,3d0]; a(:,2)=2d0*a(:,1)\nb=0d0; b(1:3,1)=[1d0,2d0,3d0]\ncall HFTI(a,3,3,2,b,4,1,1d-10,krank,rn,h,g,ip)\n! B(1:2,1) holds the retained-rank solution; inspect KRANK and saved-input residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The rank-one example, pseudorank and minimum-norm result were not tested."
+              }
+            ]
+          },
+          {
+            "code": "G2e1",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. LDP solves the minimum-distance problem min 0.5*X^T X subject to G X>=H by forming a dual NNLS problem. This is a strictly convex quadratic objective with identity Hessian, not an arbitrary quadratic-programming interface. G(MG,N), H(M) are preserved; X(N), XNORM and first M workspace entries return the solution, norm and multipliers on MODE=1. W length is at least (M+2)*(N+1)+2*M, INDEX at least M; require N>=1, M>=1, MG>=M. MODE=2 is invalid N, 3 NNLS iteration limit, 4 incompatible constraints. Near degeneracy and floating-point feasibility must be assessed independently; no original residual or KKT certificate is returned.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySLSQP/source/ldp.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/ldp.f",
+                "sha256": "c3be819b48b51e18af1a7c520d86be051a529429607d20e6b15b14d12a88d31d"
+              },
+              {
+                "path": "pyOpt/pySLSQP/source/nnls.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/nnls.f",
+                "sha256": "cfa22b7ca4eddc53d4e8a20fc4d5c50e62705c4c43bd1032876b452edf159135"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LDP",
+                "role": "public-entry-point",
+                "summary": "External native LDP interface in the pinned pyOpt distribution.",
+                "signature": "CALL LDP(G,MG,M,N,H,X,XNORM,W,INDEX,MODE)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/ldp.f",
+                    "line_start": 37,
+                    "line_end": 42
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/ldp.f",
+                "line_start": 1,
+                "line_end": 97,
+                "usage": "double precision :: g(2,2),h(2),x(2),xn,w(16)\ninteger :: ind(2),mode\ng=0d0; g(1,1)=1d0; g(2,2)=1d0; h=[1d0,2d0]\ncall LDP(g,2,2,2,h,x,xn,w,ind,mode)\nif(mode/=1) error stop \"LDP failed\"\n! Check MATMUL(G,X)>=H and KKT conditions independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No quadratic solve, multiplier or feasibility check was executed."
+              }
+            ]
+          },
+          {
+            "code": "D1b11",
+            "level": "source-reviewed",
+            "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+            "reviewed_on": "2026-11-06",
+            "notes": "Native Fortran routines bundled with pyOpt, distinct from its Python API. Match default INTEGER and DOUBLE PRECISION ABI with the bundled helpers/BLAS; these files alone are not a complete solver build. H12 constructs (MODE=1) and/or applies (MODE=2) an elementary Householder reflection, represented by modified U and separate UP. LPIVOT<L1<=M with LPIVOT>=1 defines the pivot and tail. IUE strides U; ICE strides C elements; ICV strides vectors; NCV counts transformed vectors. No explicit dense Q is returned. Invalid/degenerate indices can return silently; a zero construction vector can leave UP undefined, so do not apply that undefined state. Selected sketch uses a nonzero vector and contiguous column-major C. Preserve U/UP when applying the same reflection again; there is no status output.",
+            "evidence": [
+              {
+                "path": "pyOpt/pySLSQP/source/h12.f",
+                "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/source/h12.f",
+                "sha256": "2df949a12da23855a0078d2ccd063b580042a6fab0fa5ea911083d23fa77d4c3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "H12",
+                "role": "public-entry-point",
+                "summary": "External native H12 interface in the pinned pyOpt distribution.",
+                "signature": "CALL H12(MODE,LPIVOT,L1,M,U,IUE,UP,C,ICE,ICV,NCV)",
+                "declarations": [
+                  {
+                    "path": "pyOpt/pySLSQP/source/h12.f",
+                    "line_start": 31,
+                    "line_end": 35
+                  }
+                ],
+                "path": "pyOpt/pySLSQP/source/h12.f",
+                "line_start": 1,
+                "line_end": 80,
+                "usage": "double precision :: u(3),up,c(3,2)\nu=[1d0,2d0,3d0]\nc(:,1)=[1d0,0d0,0d0]; c(:,2)=[0d0,1d0,0d0]\ncall H12(1,1,2,3,u,1,up,c,1,3,2)\n! U/UP now encode the reflection; C contains its application to two columns.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. No orthogonality, annihilation or stride behavior was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT selected solver components; LGPL-3.0-or-later pyOpt framework",
+          "spdx_expression": null,
+          "revision": "635f1209f82c22fd6fb4063fa8cb99778e8dcf9c",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root explicitly distinguishes the LGPL-3.0-or-later framework from separately licensed optimizers. The selected SOLVOPT, SLSQP and COBYLA component notices grant MIT-style terms and name their original authors and pyOpt modifiers. This is scoped component evidence, not a claim that all optimizers, every bundled BLAS/helper, Python wrappers or linked binaries share one license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/LICENSE",
+              "sha256": "5f47b349ad9dc91a40b859c53a2fdd3fb37b80a22a7f31afa7814338a87308c2"
+            },
+            {
+              "path": "pyOpt/pySOLVOPT/LICENSE",
+              "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySOLVOPT/LICENSE",
+              "sha256": "aea21c325851fb81110f639295a521d415be2f77de9bed41aec8a566e94df38d"
+            },
+            {
+              "path": "pyOpt/pySLSQP/LICENSE",
+              "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pySLSQP/LICENSE",
+              "sha256": "0a8d0c108b791ce8d76459e2552af522c8ffd8085fc8f823226f6405a4f119af"
+            },
+            {
+              "path": "pyOpt/pyCOBYLA/LICENSE",
+              "url": "https://github.com/madebr/pyOpt/blob/635f1209f82c22fd6fb4063fa8cb99778e8dcf9c/pyOpt/pyCOBYLA/LICENSE",
+              "sha256": "a5e569599fe2c67bd338104206b534c047340fe18653555ec6c5ee18cbf618f1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -77147,12 +77589,274 @@
             ],
             "notes": "The README describes a Fortran core and Python wrappers with CPU/GPU toolchain dependencies and default FP64 arithmetic. Reported throughput and hardware recommendations are author statements tied to dated configurations, not independent benchmarks; accuracy and current compiler compatibility were not tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "C9",
+            "level": "source-reviewed",
+            "revision": "3f77193a5bc9c4304cba10a02d22b074fc5a64a0",
+            "reviewed_on": "2026-11-06",
+            "notes": "Selected CPU-only Fortran backend, using shared saved sht_data_module state, REAL(8), INTEGER(4), MKL DFTI/BLAS and preprocessed source; GPU signatures/behavior differ. Initialize consistent HEALPix RING geometry (NPIX=12*NSIDE**2, NRING=4*NSIDE-1), simulation count, band limit, ring/phase tables and recurrence constants before these fragments. The pinned SHT_DATA_ALLOC declares PARAMS(1:5) but reads PARAMS(6) for IS_POL, an out-of-bounds read even if a caller passes six elements: correct that declaration before relying on initialization or bounds-checked execution. SHT_SET_DATA populates geometry and invokes ring, mapping, recurrence and GEMM setup. No routine below provides a general error/status channel; saved scratch state is not reentrant. These are post-initialization contracts, not standalone runnable examples. GET_PLM_RECURSIVE evaluates fixed-order normalized associated Legendre functions used by spherical harmonics. The selected scalar POL=0, NSIDE<=512 branch seeds sqrt(DIAG_FAC(M)/(4*pi))*(-sin(theta))**M via two extra degree slots and advances a three-term degree recurrence, extending southward by parity. PLM0 lower degree bound must be -2, 0<=M<=LMAX, and SET_LOCATIONS sets a valid I0 for that M. Output occupies active ring/degree locations, not a newly returned independent array. Higher-resolution safe-position tables and polarization-derived functions exist but are outside this selected normalization/recurrence contract. No orthogonality, underflow/overflow or accuracy verification was performed.",
+            "evidence": [
+              {
+                "path": "src/get_plm_recursive.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/get_plm_recursive.f90",
+                "sha256": "3286f68684cba6c55b1ca4cd79366a72c26dc81559c20ff02938cafdbe495fd2"
+              },
+              {
+                "path": "src/sht_data_module.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_module.f90",
+                "sha256": "f8b92e03c6a1ab98c40bf691c2fdf0912f8c39a4ef9bc558cfbee8d0149f54f1"
+              },
+              {
+                "path": "src/sht_data_init.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_init.f90",
+                "sha256": "c6864a3010ea47dece7d6bc715da84009859492c66a7cd410603eaccd4eb9e87"
+              },
+              {
+                "path": "src/sht_core.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_core.f90",
+                "sha256": "66c8090e3f45ad7895e4e582b79bc6577db8a4b07de4384ffda5dfcc6dfd10f1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "get_plm_recursive",
+                "role": "public-entry-point",
+                "summary": "External scalar associated-Legendre recurrence using initialized shared state.",
+                "signature": "CALL get_plm_recursive(POL,M)",
+                "declarations": [
+                  {
+                    "path": "src/get_plm_recursive.f90",
+                    "line_start": 17,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "src/sht_data_module.f90",
+                    "line_start": 70,
+                    "line_end": 99
+                  }
+                ],
+                "path": "src/get_plm_recursive.f90",
+                "line_start": 17,
+                "line_end": 136,
+                "usage": "! After correcting allocator bounds and fully initializing CPU scalar state:\n! Require NSIDE<=512 and 0<=M<=LMAX.\ncall set_locations(m)\ncall get_plm_recursive(0,m)\n! Read active PLM0 ring/degree entries from SHT_DATA_MODULE.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Stateful backend fragment, not a general-purpose Legendre API. Do not read skipped ring/degree entries as freshly computed values. No recurrence values were tested."
+              },
+              {
+                "procedure": "recurrence constants and normalization",
+                "role": "implementation-helper",
+                "path": "src/sht_data_init.f90",
+                "line_start": 383,
+                "line_end": 419
+              },
+              {
+                "procedure": "active-ring selection",
+                "role": "implementation-helper",
+                "path": "src/sht_core.f90",
+                "line_start": 183,
+                "line_end": 205
+              }
+            ]
+          },
+          {
+            "code": "J1a1",
+            "level": "source-reviewed",
+            "revision": "3f77193a5bc9c4304cba10a02d22b074fc5a64a0",
+            "reviewed_on": "2026-11-06",
+            "notes": "Selected CPU-only Fortran backend, using shared saved sht_data_module state, REAL(8), INTEGER(4), MKL DFTI/BLAS and preprocessed source; GPU signatures/behavior differ. Initialize consistent HEALPix RING geometry (NPIX=12*NSIDE**2, NRING=4*NSIDE-1), simulation count, band limit, ring/phase tables and recurrence constants before these fragments. The pinned SHT_DATA_ALLOC declares PARAMS(1:5) but reads PARAMS(6) for IS_POL, an out-of-bounds read even if a caller passes six elements: correct that declaration before relying on initialization or bounds-checked execution. SHT_SET_DATA populates geometry and invokes ring, mapping, recurrence and GEMM setup. No routine below provides a general error/status channel; saved scratch state is not reentrant. These are post-initialization contracts, not standalone runnable examples. MAP2FFT and FFT2MAP perform batched one-dimensional real Fourier transforms along HEALPix longitude rings, not a complete spherical transform. CPU MAP is (0:NPIX-1,1:NSIM), packed FFT is (1:NSIM,0:NPIX-1); MKL PERM packed storage is real, not an ordinary complex coefficient matrix. Ring lengths vary from 4 upward to 4*NSIDE, with distance/stride settings combining batching and transposition. Neither routine sets DFTI_FORWARD_SCALE or DFTI_BACKWARD_SCALE: raw forward/backward composition needs division by the respective ring length; the larger SHT supplies separate normalization factors. DFTI status is repeatedly overwritten and never checked/returned. Review covers descriptor setup, ring loops and dispatch, not MKL internals, round-trip accuracy or GPU paths.",
+            "evidence": [
+              {
+                "path": "src/compute_fft.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/compute_fft.f90",
+                "sha256": "e7bb475b61b88edfd84da64a57ffc415fb3396451d37e2568a355a81b0d33da0"
+              },
+              {
+                "path": "src/sht_data_module.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_module.f90",
+                "sha256": "f8b92e03c6a1ab98c40bf691c2fdf0912f8c39a4ef9bc558cfbee8d0149f54f1"
+              },
+              {
+                "path": "src/sht_data_init.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_init.f90",
+                "sha256": "c6864a3010ea47dece7d6bc715da84009859492c66a7cd410603eaccd4eb9e87"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "map2fft",
+                "role": "public-entry-point",
+                "summary": "External CPU ringwise real forward FFT via MKL.",
+                "signature": "CALL map2fft(MAP,FFT)",
+                "declarations": [
+                  {
+                    "path": "src/compute_fft.f90",
+                    "line_start": 71,
+                    "line_end": 79
+                  }
+                ],
+                "path": "src/compute_fft.f90",
+                "line_start": 71,
+                "line_end": 110,
+                "usage": "! Initialized CPU ring metadata; allocated REAL(8) MAP(0:NPIX-1,NSIM)\n! and FFT(NSIM,0:NPIX-1), filled MAP.\ncall map2fft(map,fft)\n! FFT uses MKL PERM packing and carries no spherical-harmonic indexing.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. CPU-only post-initialization contract. MKL errors are not returned; no transform or packed-layout check was run."
+              },
+              {
+                "procedure": "fft2map",
+                "role": "public-entry-point",
+                "summary": "External CPU ringwise real backward FFT via MKL.",
+                "signature": "CALL fft2map(FFT,MAP)",
+                "declarations": [
+                  {
+                    "path": "src/compute_fft.f90",
+                    "line_start": 226,
+                    "line_end": 238
+                  }
+                ],
+                "path": "src/compute_fft.f90",
+                "line_start": 226,
+                "line_end": 280,
+                "usage": "! Initialized CPU metadata and valid MKL PERM-packed FFT:\ncall fft2map(fft,map_back)\n! For a RAW FFT round trip, divide each ring by its own NFFT.\n! Do not apply that extra division blindly inside the full SHT pipeline.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The raw backward call leaves normalization to its caller. No round-trip or MKL failure behavior was tested."
+              }
+            ]
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "3f77193a5bc9c4304cba10a02d22b074fc5a64a0",
+            "reviewed_on": "2026-11-06",
+            "notes": "Selected CPU-only Fortran backend, using shared saved sht_data_module state, REAL(8), INTEGER(4), MKL DFTI/BLAS and preprocessed source; GPU signatures/behavior differ. Initialize consistent HEALPix RING geometry (NPIX=12*NSIDE**2, NRING=4*NSIDE-1), simulation count, band limit, ring/phase tables and recurrence constants before these fragments. The pinned SHT_DATA_ALLOC declares PARAMS(1:5) but reads PARAMS(6) for IS_POL, an out-of-bounds read even if a caller passes six elements: correct that declaration before relying on initialization or bounds-checked execution. SHT_SET_DATA populates geometry and invokes ring, mapping, recurrence and GEMM setup. No routine below provides a general error/status channel; saved scratch state is not reentrant. These are post-initialization contracts, not standalone runnable examples. T2ALM/ALM2T implement scalar spherical-harmonic analysis/synthesis by combining longitude FFTs, phase/alias mapping, associated-Legendre recurrences and DGEMM latitude sums. This is the integral-transform class J, not a claim that an SHT is simply a multidimensional Cartesian FFT. T uses real samples (0:NPIX-1,1:NSIM); ALM uses the project-specific real square packing (1:NSIM,0:LMAX,0:LMAX), not conventional complex triangular alm storage. T2ALM loops M, sets locations, computes PLM and maps FFT slices before the GEMM; ALM2T reverses this and zeros unused ring-frequency slots before inverse FFT. Analysis/synthesis on discretized rings is not promised to be an exact inverse; iterative and polarization interfaces require separate review. The review traces scalar CPU driver dispatch and packing/normalization structure, not all mapping/kernel paths or numerical reconstruction accuracy.",
+            "evidence": [
+              {
+                "path": "src/sht_main.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_main.f90",
+                "sha256": "9e229f395fa84dc80c7245224e667dce5cc27759f8165d742ca714bdb47fbccb"
+              },
+              {
+                "path": "src/sht_core.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_core.f90",
+                "sha256": "66c8090e3f45ad7895e4e582b79bc6577db8a4b07de4384ffda5dfcc6dfd10f1"
+              },
+              {
+                "path": "src/fft_mapping.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/fft_mapping.f90",
+                "sha256": "f389310d4e31cd1a58ad6a07f685170770597e29f863cc5e5cc69fd157c0e9d8"
+              },
+              {
+                "path": "src/get_plm_recursive.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/get_plm_recursive.f90",
+                "sha256": "3286f68684cba6c55b1ca4cd79366a72c26dc81559c20ff02938cafdbe495fd2"
+              },
+              {
+                "path": "src/compute_fft.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/compute_fft.f90",
+                "sha256": "e7bb475b61b88edfd84da64a57ffc415fb3396451d37e2568a355a81b0d33da0"
+              },
+              {
+                "path": "src/sht_data_module.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_module.f90",
+                "sha256": "f8b92e03c6a1ab98c40bf691c2fdf0912f8c39a4ef9bc558cfbee8d0149f54f1"
+              },
+              {
+                "path": "src/sht_data_init.f90",
+                "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/sht_data_init.f90",
+                "sha256": "c6864a3010ea47dece7d6bc715da84009859492c66a7cd410603eaccd4eb9e87"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "t2alm",
+                "role": "public-entry-point",
+                "summary": "External CPU scalar spherical-harmonic analysis.",
+                "signature": "CALL t2alm(T,ALM)",
+                "declarations": [
+                  {
+                    "path": "src/sht_main.f90",
+                    "line_start": 38,
+                    "line_end": 58
+                  }
+                ],
+                "path": "src/sht_main.f90",
+                "line_start": 38,
+                "line_end": 89,
+                "usage": "! After allocator repair and complete CPU scalar state initialization:\n! REAL(8) T(0:NPIX-1,NSIM), ALM(NSIM,0:LMAX,0:LMAX).\n! Fill samples in the initialized HEALPix RING order.\ncall t2alm(t,alm)\n! ALM is the project-specific REAL square packing.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization analysis fragment. No coefficient normalization, band-limit or quadrature error was measured."
+              },
+              {
+                "procedure": "alm2t",
+                "role": "public-entry-point",
+                "summary": "External CPU scalar spherical-harmonic synthesis.",
+                "signature": "CALL alm2t(ALM,T)",
+                "declarations": [
+                  {
+                    "path": "src/sht_main.f90",
+                    "line_start": 96,
+                    "line_end": 111
+                  }
+                ],
+                "path": "src/sht_main.f90",
+                "line_start": 96,
+                "line_end": 155,
+                "usage": "! Initialized CPU state matching the stored square-packed ALM:\ncall alm2t(alm,t_reconstructed)\n! Compare against original samples with a band-limit/quadrature-aware test.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization synthesis fragment, not a demonstrated exact inverse. No reconstruction, GPU or polarization path was tested."
+              },
+              {
+                "procedure": "CPU Legendre GEMM analysis",
+                "role": "implementation-helper",
+                "path": "src/sht_core.f90",
+                "line_start": 62,
+                "line_end": 89
+              },
+              {
+                "procedure": "CPU Legendre GEMM synthesis",
+                "role": "implementation-helper",
+                "path": "src/sht_core.f90",
+                "line_start": 141,
+                "line_end": 168
+              },
+              {
+                "procedure": "state setup and allocator bounds finding",
+                "role": "implementation-helper",
+                "path": "src/sht_data_init.f90",
+                "line_start": 2,
+                "line_end": 19
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license text; HEALPix-derived recurrence provenance",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "3f77193a5bc9c4304cba10a02d22b074fc5a64a0",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned root contains GNU GPL version 3 text; no later-version grant was established in these inspected files. The recurrence explicitly acknowledges HEALPix PLM_GEN origin. Preserve source/component notices and separately check MKL, optional GPU runtime and wrapper distribution terms; this is not a complete dependency or binary-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/LICENSE",
+              "sha256": "605e9047a563c5c8396ffb18232aa4304ec56586aee537c45064c6fb425e44ad"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/README.md",
+              "sha256": "c61eedfbfd78a18190a4a064d62b03b5b03c45ba3ca3619231dd344ae92ddee9"
+            },
+            {
+              "path": "src/get_plm_recursive.f90",
+              "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/src/get_plm_recursive.f90",
+              "sha256": "3286f68684cba6c55b1ca4cd79366a72c26dc81559c20ff02938cafdbe495fd2"
+            },
+            {
+              "path": "CMakeLists.txt",
+              "url": "https://github.com/liuhao-cn/fastSHT/blob/3f77193a5bc9c4304cba10a02d22b074fc5a64a0/CMakeLists.txt",
+              "sha256": "d7809414ffcf19db74034c5b576277ddb6b0e20196a4b4f37ac111be7c2f862c"
+            }
+          ]
         }
       },
       "imports": {}

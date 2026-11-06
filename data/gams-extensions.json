@@ -894,6 +894,12 @@
       "parent": "L5a2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "D1b11": {
+      "label": "Elementary reflection (Householder transformation)",
+      "parent": "D1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }
