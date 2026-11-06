@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 443 repositories now have 653 source-reviewed
+Reviewed on 2026-11-06. 444 repositories now have 665 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-429 repository cards now identify public routines and link their usage lines
+430 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 443 independently source-reviewed repositories now have an
+separately. All 444 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -468,6 +468,7 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ButterflyPACK | `d_BPACK_factor::d_BPACK_Factorization`, `d_BPACK_Solve_Mul::d_BPACK_Solution`, `z_BPACK_factor::z_BPACK_Factorization`, `z_BPACK_Solve_Mul::z_BPACK_Solution`, `d_BPACK_Solve_Mul::d_BPACK_Mult` | BSD-style root with additional enhancement-license clause |
 | AUTO-07p | `AE::AUTOAE`, `BVP::AUTOBV`, `MESH::ADAPT2`, `MESH::INTWTS`, `MESH::GENWTS`, `MESH::WINT` | BSD-3-Clause numerical core; optional plotting dependencies separately scoped |
 | Cedar | `BMG2_SymStd_restrict`, `BMG2_SymStd_interp_add` | BSD-3-Clause Cedar framework notices |
+| Dataplot | `MEAN`, `MEDIAN`, `SD`, `RANK`, `SORT`, `RANKCR`, `LINFIT`, `NORCDF`, `NORPDF`, `NORPPF`, `LOGCDF`, `LOGPDF`, `LOGPPF`, `LOGGAM`, `POICDF` | NIST public-domain notice for Dataplot; bundled notices retain their scope |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -931,6 +932,7 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ButterflyPACK](https://github.com/liuyangzhuan/butterflypack) | D2a1; D2c1; D1b4 | Real/complex general compressed solves and matrix-vector application | Precision-generated names/types, collective setup, local ordering, compression error and absent status outputs. |
 | [AUTO-07p](https://github.com/auto-07p/auto-07p) | F2; I1b2; I1c; E1a; H1; H2a1b2 | Nonlinear algebraic/BVP continuation, mesh adaptation, interpolation, differentiation and sampled quadrature | Framework callbacks/state, collocation scaling, order/shape limits and distinct interpolation/quadrature nodes. |
 | [Cedar](https://github.com/cedar-framework/cedar) | D2e | Native BoxMG restriction and residual-dependent prolongation components | Explicit BIND(C)/VALUE interfaces, initialized weights/ghosts, in-place residual scaling and correction semantics. |
+| [Dataplot](https://github.com/usnistgov/dataplot) | L1a1a; L1a1b; N6a1b; N6a2b; L11; L8a1a1; L5a1n; L5a2n; L5a1l; L5a2l; C7a; L5a1p | Location/dispersion summaries, passive ranks and sorting, Spearman correlation, linear regression, normal/logistic/Poisson functions and log gamma | Promoted default-real ABI, common/output dependencies, inference/degeneracy limits, cutoff assignment defect and approximation/tail scope. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1705,3 +1707,15 @@ evaluated at interior collocation nodes. Cedar transfer kernels require exact
 C-interoperable interfaces and initialized BoxMG hierarchy data; correction
 prolongation scales RES in place and includes residual terms. License findings
 preserve the ButterflyPACK enhancement clause and optional dependency scope.
+
+Dataplot has twelve additional source-reviewed mappings and fifteen public
+entry-point annotations spanning statistical summaries, ranking/sorting,
+Spearman correlation, straight-line fitting, distribution functions and
+positive-real log gamma. Calling sketches were not compiled or run. The
+reviewed Makefile promotes default REAL to eight bytes despite historical
+single-precision comments. Character status, shared output dependencies,
+workspace rules and degenerate-input conventions remain explicit. RANKCR
+leaves CUTL99 unassigned; its full calling sketch is marked post-repair.
+Historical distribution approximations are distinguished from full-precision
+error-certified evaluations, including logistic-PDF overflow and large-rate
+Poisson normal dispatch. The root NIST notice remains scoped to its evidence.

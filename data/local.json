@@ -47187,12 +47187,917 @@
             ],
             "notes": "The distribution introduction identifies the statistical and visualization system and points to separate installation guidance. Particular modeling procedures, supported current platforms and GUI prerequisites are not inferred from the general overview.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. MEAN returns an arithmetic mean using an explicit DOUBLE PRECISION sum; MEDIAN sorts into a distinct caller workspace and selects the middle observation or average middle pair. Inputs remain in their original order in the selected separate-buffer usage. Require N>=1 and MAXNXT>=N for MEDIAN. Singleton/constant inputs use direct early-return values, so the median workspace need not contain a sorted copy on those paths. IERROR is CHARACTER*4 NO/YES, not a logical/integer code; ignore result values after error. Summation is not compensated, and the even-median addition can overflow for extreme finite values. This mapping covers raw-data location summaries, not population inference, quantile conventions or a missing-data estimator.",
+            "evidence": [
+              {
+                "path": "src/dp42.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+                "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+                "source_encoding": "latin-1"
+              },
+              {
+                "path": "src/dp43.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+                "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "MEAN",
+                "role": "public-entry-point",
+                "summary": "External arithmetic sample mean with character status.",
+                "signature": "CALL MEAN(X,N,IWRITE,XMEAN,IBUGA3,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 2821,
+                    "line_end": 2821
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 2864,
+                    "line_end": 2876
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 2821,
+                "line_end": 2989,
+                "usage": "real :: x(4),average\ncharacter(4) :: ierr\nx=[1.0,2.0,4.0,8.0]\ncall MEAN(x,4,\"OFF\",average,\"OFF\",ierr)\nif(ierr/=\"NO\") error stop \"mean failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Complete-data fragment. No mean or summation error was tested."
+              },
+              {
+                "procedure": "MEDIAN",
+                "role": "public-entry-point",
+                "summary": "External sample median with caller-owned sorting workspace.",
+                "signature": "CALL MEDIAN(X,N,IWRITE,XTEMP,MAXNXT,XMED,IBUGA3,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 2990,
+                    "line_end": 2990
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 3038,
+                    "line_end": 3048
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 2990,
+                "line_end": 3166,
+                "usage": "real :: x(4),work(4),middle\ncharacter(4) :: ierr\nx=[1.0,2.0,4.0,8.0]\ncall MEDIAN(x,4,\"OFF\",work,4,middle,\"OFF\",ierr)\nif(ierr/=\"NO\") error stop \"median failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Separate data/work fragment. Workspace contents on early exits are not guaranteed; no median or sort was executed."
+              },
+              {
+                "procedure": "copy-sort dependency used by the median",
+                "role": "implementation-helper",
+                "path": "src/dp43.F90",
+                "line_start": 27672,
+                "line_end": 27983
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. SD computes the sample standard deviation using a two-pass explicit DOUBLE PRECISION mean and centered sum of squares, with variance divisor N-1 for nonconstant N>=2 data. It initializes XSD=0 and returns zero for singleton or constant data; the singleton convention does not make a one-observation sample variance estimable. N<1 sets IERROR=YES. There is no compensated summation, scaled sum-of-squares overflow protection or confidence interval. The returned default REAL matches the build flags, not an inherently single-precision interface.",
+            "evidence": [
+              {
+                "path": "src/dp43.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+                "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SD",
+                "role": "public-entry-point",
+                "summary": "External sample standard deviation with an N-1 variance divisor.",
+                "signature": "CALL SD(X,N,IWRITE,XSD,IBUGA3,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 14749,
+                    "line_end": 14749
+                  },
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 14791,
+                    "line_end": 14807
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp43.F90",
+                "line_start": 14749,
+                "line_end": 14934,
+                "usage": "real :: x(4),sample_sd\ncharacter(4) :: ierr\nx=[1.0,2.0,4.0,8.0]\ncall SD(x,4,\"OFF\",sample_sd,\"OFF\",ierr)\nif(ierr/=\"NO\") error stop \"standard deviation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Nonconstant four-observation fragment. No dispersion value or stability property was tested."
+              }
+            ]
+          },
+          {
+            "code": "N6a1b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. RANK returns real-valued ranks in the original observation order, assigning the average occupied rank to equal values, after sorting a separate XS workspace. This is passive ranking: X itself is not permuted, and tied midranks are not a permutation/pointer vector usable directly as integer subscripts. Require 1<=N<=MAXOBV, independent XR/XS buffers and finite complete X. Singleton/constant cases assign ranks directly; the constant case prints a warning even when IWRITE/IBUGA3 are OFF. The equality-based search has potentially quadratic work and no NaN/tie tolerance. IERROR is a character status. The inspected code is not a stable sort or general high-performance rank-vector guarantee.",
+            "evidence": [
+              {
+                "path": "src/dp43.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+                "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RANK",
+                "role": "public-entry-point",
+                "summary": "External passive midranks for real data, preserving original observation order.",
+                "signature": "CALL RANK(X,N,IWRITE,XR,XS,MAXOBV,IBUGA3,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 504,
+                    "line_end": 504
+                  },
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 623,
+                    "line_end": 634
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp43.F90",
+                "line_start": 504,
+                "line_end": 865,
+                "usage": "real :: x(4),ranks(4),sorted_work(4)\ncharacter(4) :: ierr\nx=[3.0,1.0,1.0,2.0]\ncall RANK(x,4,\"OFF\",ranks,sorted_work,4,\"OFF\",ierr)\nif(ierr/=\"NO\") error stop \"ranking failed\"\n! RANKS contains real midranks, not integer permutation indices.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Tied-data ranking fragment with separate buffers. No midrank, tie or ordering result was executed."
+              },
+              {
+                "procedure": "ascending real copy sort used by ranking",
+                "role": "implementation-helper",
+                "path": "src/dp43.F90",
+                "line_start": 27672,
+                "line_end": 27983
+              }
+            ]
+          },
+          {
+            "code": "N6a2b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. SORT copies X to Y, checks singleton/constant/already-sorted cases and applies a nonrecursive quicksort with small-partition insertion steps. The selected usage uses separate buffers, leaving X unchanged and returning ascending Y; the routine modifies the destination values and is therefore active sorting rather than passive ranking. Require positive N and finite data. Internal IL/IU stacks have 36 entries and are not runtime overflow checked; do not promote the historical header maximum-size discussion to a portable tested limit. No stability, NaN ordering, integer-array support or returned status argument is provided. Although old comments advertise same-array input/output, alias/conformance behavior was not checked; the calling sketch uses separate arrays.",
+            "evidence": [
+              {
+                "path": "src/dp43.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+                "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SORT",
+                "role": "public-entry-point",
+                "summary": "External ascending real copy sort with quicksort/insertion implementation.",
+                "signature": "CALL SORT(X,N,Y)",
+                "declarations": [
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 27672,
+                    "line_end": 27672
+                  },
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 27770,
+                    "line_end": 27786
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp43.F90",
+                "line_start": 27672,
+                "line_end": 27983,
+                "usage": "real :: x(4),sorted(4)\nx=[3.0,1.0,4.0,2.0]\ncall SORT(x,4,sorted)\n! X and SORTED are separate buffers; no status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Small finite-data copy-sort fragment. No sort, stability or same-buffer behavior was tested."
+              }
+            ]
+          },
+          {
+            "code": "L11",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. RANKCR computes Spearman rank correlation by ranking X/Y with midranks, then taking a centered Pearson correlation of the rank vectors. Require nonconstant finite paired data with N>=3, N<=MAXNXT and three distinct work arrays. N=1 or constant inputs return coefficient 1 as a historical warning convention while leaving other outputs incomplete; reject those cases yourself. The routine always derives p-values from a normal approximation scaled by SQRT(N-1); IRCRTA=NORM or N>30 selects normal critical cutoffs, otherwise small-sample lookup tables are used. This is not an exact permutation/tied-sample significance calculation. Source finding: CUTL99 is never assigned (CUTL95 is assigned twice), yet a later comparison reads CUTL99. Repair that assignment before relying on the complete interface or running with uninitialized-value checks. Check character IERROR and assess inference assumptions independently; the mapping records coefficient computation and approximate inference, not validated testing.",
+            "evidence": [
+              {
+                "path": "src/dp43.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+                "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/dp42.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+                "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+                "source_encoding": "latin-1"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RANKCR",
+                "role": "public-entry-point",
+                "summary": "External Spearman coefficient and approximate inference; lower-cutoff assignment needs repair.",
+                "signature": "CALL RANKCR(X,Y,N,IRCRTA,IWRITE,XTEMP,YTEMP,XTEMP2,MAXNXT, &\n XYRACR,STATCD,PVAL,PVALLT,PVALUT, &\n CUTU90,CUTU95,CTU975,CUTU99,CTU995,CTU999, &\n CUTL90,CUTL95,CTL975,CUTL99,CTL995,CTL999,IBUGA3,ISUBRO,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 1952,
+                    "line_end": 1956
+                  },
+                  {
+                    "path": "src/dp43.F90",
+                    "line_start": 2026,
+                    "line_end": 2064
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp43.F90",
+                "line_start": 1952,
+                "line_end": 2348,
+                "usage": "! Commented post-repair contract: assign CUTL99=-CUTU99 in RANKCR\n! before its later comparison. Declare all real outputs/work arrays\n! and CHARACTER(4) IERROR; validate N>=3 and nonconstant finite X/Y.\n! call RANKCR(x,y,n,\"NORM\",\"OFF\",wx,wy,work,maxn, &\n!   rho,statcd,pval,pvallt,pvalut, &\n!   cu90,cu95,cu975,cu99,cu995,cu999, &\n!   cl90,cl95,cl975,cl99,cl995,cl999,\"OFF\",\"CAT \",ierror)\n! Verify IERROR and interpret the normal approximation separately.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Commented post-repair full-interface contract. The pinned CUTL99 read is uninitialized; no coefficient, cutoff, p-value or repair was executed."
+              },
+              {
+                "procedure": "midrank dependency",
+                "role": "implementation-helper",
+                "path": "src/dp43.F90",
+                "line_start": 504,
+                "line_end": 865
+              },
+              {
+                "procedure": "normal approximation CDF",
+                "role": "implementation-helper",
+                "path": "src/dp42.F90",
+                "line_start": 14837,
+                "line_end": 14899
+              },
+              {
+                "procedure": "normal inverse for critical cutoffs",
+                "role": "implementation-helper",
+                "path": "src/dp42.F90",
+                "line_start": 18013,
+                "line_end": 18158
+              }
+            ]
+          },
+          {
+            "code": "L8a1a1",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. LINFIT computes an unweighted straight-line fit Y=ALPHA+BETA*X from centered sums, plus residual standard deviation/degrees of freedom, data correlation and coefficient standard errors/correlation. XRESDF is default REAL, not an integer output. The selected meaningful fit requires N>=3, finite complete data and nonzero predictor variation. The routine only rejects N<1; degenerate X silently produces BETA=0, and N<=2 yields zero residual variance by fallback, so IERROR=NO is not proof of identifiable coefficients or meaningful inference. Accumulations use default REAL (promoted by the reviewed build), without compensated/scaled arithmetic. The current signature does not return prediction/residual vectors despite the purpose comment. Error/status and debug context are CHARACTER*4; ISUBRO=NFIT activates diagnostics even if IBUGA3 is OFF.",
+            "evidence": [
+              {
+                "path": "src/dp40.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
+                "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LINFIT",
+                "role": "public-entry-point",
+                "summary": "External unweighted simple linear fit and scalar residual/uncertainty summaries.",
+                "signature": "CALL LINFIT(Y,X,N,ALPHA,BETA,XRESSD,XRESDF,CCXY,SDALPH,SDBETA, &\n CCALBE,ISUBRO,IBUGA3,IERROR)",
+                "declarations": [
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 45074,
+                    "line_end": 45077
+                  },
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 45102,
+                    "line_end": 45122
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp40.F90",
+                "line_start": 45074,
+                "line_end": 45296,
+                "usage": "real :: x(4),y(4),alpha,beta,ressd,resdf,corr,sda,sdb,cab\ncharacter(4) :: ierr\nx=[0.0,1.0,2.0,3.0]; y=[1.0,2.0,4.0,4.5]\ncall LINFIT(y,x,4,alpha,beta,ressd,resdf,corr,sda,sdb,cab, &\n            \"CAT \",\"OFF\",ierr)\nif(ierr/=\"NO\") error stop \"linear fit failed\"\n! Recompute residuals and verify predictor variation independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Nonconstant-predictor four-observation fragment. No fitted parameters, uncertainty or residual was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. NORCDF uses a fixed five-term polynomial in 1/(1+p*ABS(X)) multiplied by a normal density to approximate the standard normal CDF; NORPDF directly evaluates exp(-X**2/2)/SQRT(2*PI). The normal has mean zero and variance one; callers standardize other location/scale families themselves. Both use default REAL arguments and constants, with no INFO/error bound, NaN policy or accuracy-based precision selection. The CDF subtracts from one and mirrors negative X, so very small tail probabilities can be lost by cancellation; use a dedicated survival/log-tail routine when that is the quantity required. The PDF uses a short fixed PI literal. Promoting default REAL does not by itself turn these historical approximations/constants into a modern full-precision distribution library.",
+            "evidence": [
+              {
+                "path": "src/dp42.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+                "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+                "source_encoding": "latin-1"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "NORCDF",
+                "role": "public-entry-point",
+                "summary": "External historical standard normal CDF approximation.",
+                "signature": "CALL NORCDF(X,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 14837,
+                    "line_end": 14837
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 14882,
+                    "line_end": 14895
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 14837,
+                "line_end": 14899,
+                "usage": "real :: z,cdf\nz=0.75\ncall NORCDF(z,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Moderate standardized argument fragment. No distribution value, tail accuracy or error bound was tested."
+              },
+              {
+                "procedure": "NORPDF",
+                "role": "public-entry-point",
+                "summary": "External standard normal density with fixed PI constant.",
+                "signature": "CALL NORPDF(X,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 15712,
+                    "line_end": 15712
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 15757,
+                    "line_end": 15767
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 15712,
+                "line_end": 15770,
+                "usage": "real :: z,density\nz=0.75\ncall NORPDF(z,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Moderate standardized argument fragment. No density or normalization integral was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a2n",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. NORPPF approximates the standard normal quantile using a rational function of SQRT(-2*LOG(MIN(P,1-P))) and sign symmetry, with an explicit zero result at P=0.5. Require finite 0<P<1 in the argument kind used by the library; rounded endpoints are invalid. Invalid P prints through Dataplot support and returns without assigning PPF: there is no separate error flag or endpoint infinity convention. The fixed coefficients and absence of a Newton correction or returned error bound limit what can be inferred from the interface. This mapping covers the inverse standard normal distribution, not empirical quantiles or normal order-statistic expectations.",
+            "evidence": [
+              {
+                "path": "src/dp42.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+                "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+                "source_encoding": "latin-1"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "NORPPF",
+                "role": "public-entry-point",
+                "summary": "External rational standard normal quantile approximation on the open unit interval.",
+                "signature": "CALL NORPPF(P,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 18013,
+                    "line_end": 18013
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 18102,
+                    "line_end": 18113
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 18013,
+                "line_end": 18158,
+                "usage": "real :: probability,z\nprobability=0.9\nif(probability<=0.0.or.probability>=1.0) error stop \"invalid probability\"\ncall NORPPF(probability,z)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Interior probability fragment. No quantile, inverse round trip or tail error was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a1l",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. LOGCDF evaluates the standard logistic CDF with a sign split: EXP(X)/(1+EXP(X)) for negative X and 1/(1+EXP(-X)) otherwise. LOGPDF evaluates EXP(X)/(1+EXP(X))**2 without that sign split. Thus the CDF avoids positive exponential overflow, while the PDF can overflow internally or produce invalid ratios for sufficiently large positive X even though the mathematical density is tiny. Require finite moderate arguments for the selected PDF sketch. No status, error bound, log-density or location/scale arguments are supplied. These are logistic functions on the whole real line, not lognormal functions despite the LOG prefix.",
+            "evidence": [
+              {
+                "path": "src/dp40.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
+                "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LOGCDF",
+                "role": "public-entry-point",
+                "summary": "External standard logistic CDF with a sign-aware exponential formula.",
+                "signature": "CALL LOGCDF(X,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 49411,
+                    "line_end": 49411
+                  },
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 49445,
+                    "line_end": 49458
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp40.F90",
+                "line_start": 49411,
+                "line_end": 49461,
+                "usage": "real :: x,cdf\nx=0.75\ncall LOGCDF(x,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Moderate standard-logistic fragment. No CDF, tail or overflow result was tested."
+              },
+              {
+                "procedure": "LOGPDF",
+                "role": "public-entry-point",
+                "summary": "External standard logistic density with an unscaled exponential formula.",
+                "signature": "CALL LOGPDF(X,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 49920,
+                    "line_end": 49920
+                  },
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 49954,
+                    "line_end": 49964
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp40.F90",
+                "line_start": 49920,
+                "line_end": 49967,
+                "usage": "real :: x,density\nx=0.75\ncall LOGPDF(x,density)\n! Large positive X requires a numerically safer reformulation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Moderate argument fragment. Large-positive-argument overflow is a source finding, not a reproduced runtime failure; no density was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a2l",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. LOGPPF returns the standard logistic quantile LOG(P/(1-P)) for finite 0<P<1. The result is a log-odds transform for the standard logistic family, not a lognormal quantile. Invalid probabilities print a diagnostic and return with PPF unassigned; there is no INFO output or endpoint infinity convention. The explicit ratio can overflow near an endpoint in a finite argument kind, and no LOG1P-based cancellation/tail treatment or error estimate is provided. Check probabilities before calling and scale/shift separately for a nonstandard logistic distribution.",
+            "evidence": [
+              {
+                "path": "src/dp40.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
+                "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LOGPPF",
+                "role": "public-entry-point",
+                "summary": "External standard logistic inverse CDF on the open unit interval.",
+                "signature": "CALL LOGPPF(P,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 49968,
+                    "line_end": 49968
+                  },
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 50023,
+                    "line_end": 50043
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp40.F90",
+                "line_start": 49968,
+                "line_end": 50046,
+                "usage": "real :: probability,x\nprobability=0.75\nif(probability<=0.0.or.probability>=1.0) error stop \"invalid probability\"\ncall LOGPPF(probability,x)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Interior standard-logistic quantile fragment. No inverse round trip or endpoint behavior was tested."
+              }
+            ]
+          },
+          {
+            "code": "C7a",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. LOGGAM evaluates natural LOG(GAMMA(X)) for positive real X. It shifts X upward to at least 10 while accumulating a recurrence product, then uses a fixed Stirling/Bernoulli asymptotic expansion through the inverse seventeenth power and subtracts LOG of the recurrence product. The dummy X/ALG use implicit default REAL while intermediates/constants are explicitly DOUBLE PRECISION; match the build rather than interpreting every argument as explicitly DOUBLE PRECISION. Nonpositive input prints a diagnostic and returns ALG unassigned. There is no negative-argument reflection/sign output, complex support, machine-range adaptation, returned truncation bound or status code. This is a historical approximation selected by source inspection, not a replacement recommendation for the compiler LOG_GAMMA intrinsic.",
+            "evidence": [
+              {
+                "path": "src/dp40.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
+                "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "LOGGAM",
+                "role": "public-entry-point",
+                "summary": "External positive-real log-gamma recurrence plus fixed asymptotic expansion.",
+                "signature": "CALL LOGGAM(X,ALG)",
+                "declarations": [
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 48631,
+                    "line_end": 48631
+                  },
+                  {
+                    "path": "src/dp40.F90",
+                    "line_start": 48666,
+                    "line_end": 48682
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp40.F90",
+                "line_start": 48631,
+                "line_end": 48716,
+                "usage": "real :: x,log_gamma_value\nx=2.5\nif(x<=0.0) error stop \"positive argument required\"\ncall LOGGAM(x,log_gamma_value)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Positive moderate argument fragment with default-real dummies. No recurrence, special-function accuracy or intrinsic comparison was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a1p",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "These external numeric routines belong to Dataplot and use implicit default REAL/INTEGER arguments unless explicitly declared otherwise, plus CHARACTER*4 controls/status where present. The inspected src/Makefile sets -fdefault-real-8 and -fdefault-double-8: callers must use that same ABI, not infer four-byte arguments from old single-precision comments. Include DPCOP2.INC consistently and initialize the Dataplot output/common environment; OFF controls suppress selected feedback/debug paths, but errors and some warnings still call DPWRST. Link the required Dataplot support, not just an isolated monolithic source file. No missing/NaN policy or independently packaged stable library API is inferred. POICDF returns a Poisson cumulative probability through a positive-term finite recurrence for 0<ALAMBA<500, and dispatches to a normal approximation at rates >=500. The selected sketch uses a nonnegative integral-valued default REAL count and a moderate positive rate. The recurrence evaluates exp(-lambda)*SUM(lambda**j/j!,j=0..k) indirectly through an even chi-square degree count; it is not an adaptive summation with a reported accuracy target. Nonintegral counts are warned about then converted with INT(X+0.0001), so do not infer a general floor convention for arbitrary real X. ALAMBA<=0 prints an error and returns zero, so the degenerate rate-zero distribution is not implemented by that input path. Negative X also returns zero with a warning. There is no scalar status/error bound; count conversion and 2*(1+count) must fit the integer kind. The large-rate branch uses (k-lambda)/SQRT(lambda) without a visible continuity correction; the called ANORM kernel is outside this selected recurrence review. Intermediate overflow/underflow and extreme-tail accuracy were not tested.",
+            "evidence": [
+              {
+                "path": "src/dp42.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+                "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+                "source_encoding": "latin-1"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "POICDF",
+                "role": "public-entry-point",
+                "summary": "External Poisson CDF with a moderate-rate finite recurrence and large-rate normal dispatch.",
+                "signature": "CALL POICDF(X,ALAMBA,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 42643,
+                    "line_end": 42643
+                  },
+                  {
+                    "path": "src/dp42.F90",
+                    "line_start": 42752,
+                    "line_end": 42761
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp42.F90",
+                "line_start": 42643,
+                "line_end": 42864,
+                "usage": "real :: count,rate,cdf\ncount=3.0; rate=2.5\n! Selected recurrence path: integral COUNT>=0 and 0<RATE<500.\ncall POICDF(count,rate,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the Dataplot build ABI (the reviewed Makefile promotes default REAL to eight bytes), initialize its output/common environment and link support dependencies. Moderate-rate integer-count fragment. No Poisson probability, approximation error, tail or large-rate result was executed."
+              },
+              {
+                "procedure": "large-rate normal-CDF dispatch, not a review of ANORM",
+                "role": "implementation-helper",
+                "path": "src/dp42.F90",
+                "line_start": 17675,
+                "line_end": 17743
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "NIST public-domain notice for Dataplot; bundled notices retain their scope",
+          "spdx_expression": "NIST-PD",
+          "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned root explicitly says Dataplot is distributed under the NIST Public Domain Notice and references https://spdx.org/licenses/NIST-PD.html; README identifies Dataplot as trademarked but not copyrighted. Selected routines retain James Filliben/NIST attribution. This scope records those notices, not a declaration that every bundled contributed algorithm, graphics backend or dependency has identical terms. Preserve separate component notices and trademarks; no complete provenance/license audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/LICENSE.txt",
+              "sha256": "c1bff52b1b352f2cbcda5a8df1a597a27b1974ae77814058c014eb86f78b7adc"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/README.md",
+              "sha256": "54eee9d62f20863f1968d6c013212e69d0146971ef21c2cf3028618c5d9f31ac"
+            },
+            {
+              "path": "src/dp42.F90",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp42.F90",
+              "sha256": "70063abf018fae1d1981b165b9984fd500ce75ed017bc5eafa052f17215343d1",
+              "source_encoding": "latin-1"
+            },
+            {
+              "path": "src/dp43.F90",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp43.F90",
+              "sha256": "17dfb3db0bfd5d5f15fd28cf144f129bedd1809ad3e5958eac630d682596102f",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "src/dp40.F90",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
+              "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+            }
+          ]
         }
       },
       "imports": {}
