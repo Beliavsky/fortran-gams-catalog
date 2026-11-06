@@ -4,6 +4,7 @@ const excludeFpm = document.getElementById('exclude-fpm');
 const sourceReviewed = document.getElementById('source-reviewed');
 const license = document.getElementById('license');
 const licenseReviewed = document.getElementById('license-reviewed');
+const legacyGams = document.getElementById('legacy-gams');
 if (excludeFpm) {
   const query = document.getElementById('query');
   const collection = document.getElementById('collection');
@@ -23,15 +24,18 @@ if (excludeFpm) {
   if (sourceReviewed) sourceReviewed.checked = params.get('source_reviewed') === '1';
   if (license && ['permissive', 'weak-copyleft', 'strong-copyleft', 'custom-mixed', 'unclear'].includes(params.get('license'))) license.value = params.get('license');
   if (licenseReviewed) licenseReviewed.checked = params.get('license_reviewed') === '1';
+  if (legacyGams) legacyGams.checked = params.get('legacy_gams') === '1';
   function update() {
     const sourceOnly = Boolean(sourceReviewed?.checked);
     const licenseOnly = license?.value || '';
     const reviewedLicenseOnly = Boolean(licenseReviewed?.checked);
+    const includeLegacy = Boolean(legacyGams?.checked);
     const terms = (query?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
     let count = 0;
     for (const card of cards) {
       const search = sourceOnly ? card.dataset.sourceSearch : card.dataset.search;
       card.hidden = !((!sourceOnly || card.dataset.sourceMatch === 'true') &&
+        (includeLegacy || card.dataset.legacy !== 'true') &&
         (!licenseOnly || card.dataset.license === licenseOnly) &&
         (!reviewedLicenseOnly || card.dataset.licenseReviewed === 'true') &&
         terms.every(term => search.includes(term)) &&
@@ -42,12 +46,14 @@ if (excludeFpm) {
       for (const section of card.querySelectorAll('[data-source-mappings]')) section.hidden = !sourceOnly;
     }
     const matches = document.getElementById('matches');
-    if (matches) matches.textContent = `${count} of ${cards.length} repositories shown`;
+    const total = cards.filter(card => includeLegacy || card.dataset.legacy !== 'true').length;
+    if (matches) matches.textContent = `${count} of ${total} ${includeLegacy ? 'entries' : 'repositories'} shown`;
     for (const label of classCounts) {
       const key = sourceOnly ? (excludeFpm.checked ? 'sourceWithoutFpm' : 'sourceCount') :
         (excludeFpm.checked ? 'withoutFpm' : 'classCount');
       const licenseKey = [licenseOnly, Number(reviewedLicenseOnly), Number(sourceOnly), Number(excludeFpm.checked)].join('|');
-      const count = label.dataset.licenseCounts ? (JSON.parse(label.dataset.licenseCounts)[licenseKey] || 0) : label.dataset[key];
+      let count = label.dataset.licenseCounts ? (JSON.parse(label.dataset.licenseCounts)[licenseKey] || 0) : Number(label.dataset[key]);
+      if (includeLegacy && !sourceOnly && !reviewedLicenseOnly && (!licenseOnly || licenseOnly === 'unclear')) count += Number(label.dataset.legacyCount || 0);
       label.textContent = `(${count})`;
     }
     for (const {link, url: original} of navigation) {
@@ -60,13 +66,16 @@ if (excludeFpm) {
       else target.searchParams.delete('license');
       if (reviewedLicenseOnly) target.searchParams.set('license_reviewed', '1');
       else target.searchParams.delete('license_reviewed');
+      if (includeLegacy) target.searchParams.set('legacy_gams', '1');
+      else target.searchParams.delete('legacy_gams');
       link.href = target.href;
     }
     const url = new URL(location.href);
     for (const [name, value] of [['q', query?.value.trim() || ''], ['collection', collection?.value || ''],
                                  ['exclude_fpm', excludeFpm.checked ? '1' : ''],
                                  ['source_reviewed', sourceOnly ? '1' : ''],
-                                 ['license', licenseOnly], ['license_reviewed', reviewedLicenseOnly ? '1' : '']]) {
+                                 ['license', licenseOnly], ['license_reviewed', reviewedLicenseOnly ? '1' : ''],
+                                 ['legacy_gams', includeLegacy ? '1' : '']]) {
       if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
     }
     history.replaceState(null, '', url);
@@ -78,5 +87,6 @@ if (excludeFpm) {
   sourceReviewed?.addEventListener('change', update);
   license?.addEventListener('change', update);
   licenseReviewed?.addEventListener('change', update);
+  legacyGams?.addEventListener('change', update);
   update();
 }

@@ -50,6 +50,35 @@ an available permissive option qualifies under Permissive. Scoped prose,
 unrecognized terms, and license exceptions remain Custom or mixed until
 explicitly supported. A missing SPDX identifier alone does not mean unlicensed.
 
+Select **Include original GAMS/Netlib entries** to add an optional historical
+source-available collection to searches and GAMS category pages. It is off by
+default and shareable with `?legacy_gams=1`. The initial pilot lists nine
+double-precision QUADPACK entry points from the Netlib index, which supplies
+their GAMS codes. NIST's dynamic pages returned HTTP 403 during setup; these
+are Netlib-derived records, not a retrieved copy of NIST's module database.
+
+Each imported entry links its source, original GAMS classes, import provenance,
+retrieval date, source/index checksums, and related modernized GitHub projects.
+Related implementations are not assumed identical. These entries have not been
+independently source-reviewed, compiled or checked here, and their licenses
+remain unreviewed. Both review-only filters exclude them; the Unclear license
+filter includes them when the collection is enabled. Proprietary references
+such as IMSL and NAG are outside this pilot.
+
+The collection stays in `data/imports/gams-netlib.json` and is published
+separately as `legacy-gams.json`; it never overwrites our repository reviews or
+changes `catalog.json`. Refresh it explicitly with:
+
+```powershell
+python ximport_gams.py
+```
+
+The refresh checks source availability and expected Fortran entry-point names,
+then validates the complete snapshot before replacing it. It does not compile
+the routines or download their dependencies. Normal site builds remain offline.
+Without JavaScript, these optional entries remain hidden on listings; their
+individual detail pages can still be opened directly.
+
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
 Detailed numerical-method reviews include source-linked

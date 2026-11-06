@@ -3,6 +3,7 @@ import argparse
 from html import escape
 import json
 from licenses import license_group, license_reviewed, LICENSE_GROUPS
+from legacy_gams import load as load_legacy, listing_records
 from pathlib import Path
 import shutil
 from urllib.parse import quote
@@ -21,6 +22,8 @@ def link(url, text):
 
 
 def project_path(project):
+    if project.get('legacy_gams'):
+        return 'legacy/'+project['id'].split(':', 1)[1]+'/'
     return 'projects/' + quote(project['id'][7:], safe='/') + '/'
 
 
@@ -82,7 +85,10 @@ def license_html(project, detailed=False):
 def build(destination, root=ROOT):
     destination, root = Path(destination), Path(root)
     tree, projects, merged = assemble(root)
-    reviewed_codes = {p['id']: source_codes(p) for p in projects}
+    legacy = load_legacy(root, tree, {p['id'] for p in projects})
+    legacy_entries = listing_records(legacy)
+    all_entries = projects + legacy_entries
+    reviewed_codes = {p['id']: source_codes(p) for p in all_entries}
     destination.mkdir(parents=True, exist_ok=True)
     for asset in ('catalog.css', 'search.js'):
         shutil.copy2(root/'assets'/asset, destination/asset)
@@ -102,6 +108,7 @@ def build(destination, root=ROOT):
     (destination/'.nojekyll').touch()
     (destination/'catalog.json').write_text(json.dumps(merged, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'taxonomy.json').write_text(json.dumps(tree, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
+    (destination/'legacy-gams.json').write_text(json.dumps(legacy, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     shutil.copy2(root/'docs/review-policy.md', destination/'review-policy.md')
     shutil.copy2(root/'docs/local-reviews.md', destination/'local-reviews.md')
 
@@ -125,7 +132,9 @@ def build(destination, root=ROOT):
 <div class="build-filter"><label class="checkbox-label">License <select id="license" aria-describedby="license-filter-help">
 <option value="">All licenses</option>{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in LICENSE_GROUPS.items())}</select></label>
 <label class="checkbox-label"><input type="checkbox" id="license-reviewed"> Reviewed license evidence only</label>
-<span class="muted" id="license-filter-help">Recorded terms, not a guarantee of compatibility. Check component and dependency notices.</span></div></header>
+<span class="muted" id="license-filter-help">Recorded terms, not a guarantee of compatibility. Check component and dependency notices.</span></div>
+<div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
+<span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
 {link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
@@ -149,9 +158,18 @@ def build(destination, root=ROOT):
     def listing(items, prefix, code=None):
         controls = '''<form class="search" role="search"><label>Find software <input id="query" name="q" type="search" placeholder="Name, author, topic or procedure"></label>
 <label>Collection <select id="collection" name="collection"><option value="">All repositories</option><option value="independent">Independent reviews</option><option value="imported">Playground imports</option></select></label><button type="submit">Search</button></form>
-<p id="matches" aria-live="polite"></p><noscript>All entries are listed below. Use your browser’s Find command to search this page.</noscript>'''
+<p id="matches" aria-live="polite"></p><noscript>Repository entries are listed below. Use your browser’s Find command to search. Optional GAMS/Netlib listings require JavaScript.</noscript>'''
         cards = []
         for p in items:
+            if p.get('legacy_gams'):
+                search = ' '.join([p['procedure'], p['library'], p['description'], *p['codes'], *(tree[c]['label'] for c in p['codes'])])
+                cards.append(f'''<article hidden data-legacy="true" data-search="{e(search.lower())}" data-source-search="" data-source-match="false" data-license="unclear" data-license-reviewed="false" data-collection="legacy" data-fpm="false">
+<h2>{link(prefix+project_path(p), p['procedure']+' — '+p['library'])}</h2>
+<p>{e(p['description'])}</p><p class="status">Imported GAMS/Netlib classification; not independently reviewed or compiled.</p>
+<p>{link(p['source_url'], 'Fortran source')} · {e(p['precision'])} precision · License not yet reviewed</p>
+<p>{' · '.join(link(prefix+'classes/'+c+'/', c) for c in p['codes'])}</p>
+<p>{link(prefix+project_path(p), 'Provenance, source checksum and related modernizations')}</p></article>''')
+                continue
             repo = p['repository']
             codes = p['codes']
             search = ' '.join([p['name'], p['description'], repo['owner'], p['owner_label'],
@@ -213,8 +231,9 @@ def build(destination, root=ROOT):
             without_fpm = sum(not supports_fpm(p) for p in members)
             reviewed = [p for p in members if any(belongs(tree, k, c) for k in reviewed_codes[p['id']])]
             counts = license_counts(members, {p['id'] for p in reviewed})
+            legacy_count = sum(any(belongs(tree, k, c) for k in p['codes']) for p in legacy_entries)
             rows.append('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
-                        f' <span class="muted" data-license-counts="{e(json.dumps(counts))}" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
+                        f' <span class="muted" data-legacy-count="{legacy_count}" data-license-counts="{e(json.dumps(counts))}" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
         return '<ul class="classes">'+''.join(rows)+'</ul>'
 
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'
@@ -223,9 +242,9 @@ def build(destination, root=ROOT):
          '<p>Browse by problem below, or '+link('projects/', 'search all repositories')+'. '
          'New independent entries begin with pinned documentation reviews. Source mappings and local drivers can be added as they are checked.</p>'
          '<h2>Main GAMS classes</h2>'+class_links(None, ''))
-    page('projects', 'Fortran repositories', '<h1>Fortran repositories</h1>'+listing(projects, '../'))
+    page('projects', 'Fortran repositories', '<h1>Fortran repositories</h1>'+listing(all_entries, '../'))
     for code, info in tree.items():
-        subset = [p for p in projects if any(belongs(tree, c, code) for c in p['codes'])]
+        subset = [p for p in all_entries if any(belongs(tree, c, code) for c in p['codes'])]
         crumbs = ' / '.join(link('../../classes/'+c+'/', c) for c in reversed(lineage(tree, code)[1:]))
         intro = '<nav aria-label="Breadcrumb">'+link('../../','All classes')+' / '+crumbs+'</nav>'
         intro += '<h1>'+e(code+' — '+info['label'])+'</h1><p>Includes explicitly mapped descendants. Driver links below match this class or a narrower problem.</p>'
@@ -233,6 +252,32 @@ def build(destination, root=ROOT):
                            'Original GAMS classification at NIST')+'</p>'
         page('classes/'+code, code+' — '+info['label'], intro+class_links(code, '../../')+
              (listing(subset, '../../', code) if subset else '<p>No repository is mapped here yet.</p>'))
+    page('legacy', 'GAMS/Netlib source-available pilot', '<h1>GAMS/Netlib source-available pilot</h1>'
+         '<p>Enable <strong>Include original GAMS/Netlib entries</strong> above to browse these optional records. '
+         'This pilot contains nine double-precision QUADPACK entry points. The GAMS codes and descriptions '
+         'come from the '+link('https://netlib.org/quadpack/', 'Netlib QUADPACK index')+'. '
+         'NIST dynamic pages returned HTTP 403 during setup; no NIST module records were retrieved.</p>'
+         '<p>Source links were fetched and checksummed when this snapshot was created. These entries have '
+         'not been independently source-reviewed, compiled or numerically checked here. Source availability '
+         'does not establish permission to reuse it. No IMSL or NAG references are included.</p>'
+         '<p>Existing repository reviews remain separate. Related modernizations may change interfaces, '
+         'precision, dependencies and licensing; their existence does not verify the original routine.</p>'
+         '<p>'+link('../legacy-gams.json', 'Download the separate import snapshot')+'</p>'+listing(legacy_entries, '../'))
+    for item in legacy_entries:
+        prefix = '../../../'
+        body = '<h1>'+e(item['procedure']+' — '+item['library'])+'</h1><p>'+e(item['description'])+'</p>'
+        body += '<p class="status">Imported GAMS/Netlib classification; not independently reviewed or compiled.</p>'
+        body += '<p>'+link(item['source_url'], 'Download Fortran source')+' · Double precision · Source available</p>'
+        body += '<p>License not yet reviewed. Availability of source is not a reuse grant.</p>'
+        body += '<h2>Recorded GAMS classes</h2><ul>'+''.join('<li>'+link(prefix+'classes/'+c+'/', c+' — '+tree[c]['label'])+' · '+link('https://gams.nist.gov/cgi-bin/serve.cgi/Class/'+c, 'Original GAMS class')+'</li>' for c in item['codes'])+'</ul>'
+        body += '<h2>Import provenance</h2><p>Classification and description: '+link(item['index_url'], 'Netlib QUADPACK index')+'</p>'
+        body += '<p>Retrieved '+e(item['retrieved_at'])+'. Checksums use UTF-8 text normalized to LF line endings.</p>'
+        body += '<p>Source SHA-256: <code>'+e(item['source_sha256'])+'</code></p><p>Index SHA-256: <code>'+e(item['index_sha256'])+'</code></p>'
+        body += '<p>The original source can change at its URL; this checksum identifies the retrieved version. '
+        body += 'A single routine may require additional sources; the download is not a complete standalone program.</p>'
+        body += '<h2>Related modernized projects</h2><p>These are related implementations, not identical copies or evidence of source equivalence.</p><ul>'
+        body += ''.join('<li>'+link(prefix+'projects/'+ident[7:]+'/', ident[7:])+'</li>' for ident in item.get('related_projects', []))+'</ul>'
+        page(project_path(item).rstrip('/'), item['procedure']+' — GAMS/Netlib', body)
     for p in projects:
         prefix = '../../../'
         repo = p['repository']

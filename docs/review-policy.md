@@ -115,6 +115,18 @@ driver references. This catalog owns independent repository reviews. Shared
 metadata can move here later, one field at a time, with explicit ownership to avoid
 two competing editable copies. The feed retains its taxonomy/source provenance.
 
+## Historical GAMS/Netlib imports
+
+Historical GAMS/Netlib records are a separate discovery collection, hidden by
+default. A downloaded source file and matching entry-point name establish the
+recorded availability check, not an independent source review or a numerical
+test. The pilot imports GAMS codes from Netlib because NIST dynamic pages were
+inaccessible during setup; preserve this provenance rather than claiming a
+direct NIST module import. License and source-review filters must retain these
+distinctions. Modernized related projects do not inherit or confer verification,
+source equivalence, or license terms. The separate import snapshot can be
+refreshed without altering local classifications or the playground feed.
+
 ## Drivers
 
 Keep new standalone programs in `drivers/`, with build/run instructions, pinned

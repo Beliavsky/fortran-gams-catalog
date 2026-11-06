@@ -156,3 +156,44 @@ vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),licenseHome);
 assert.equal(license.value,'permissive'); assert.equal(licenseReviewed.checked,true);
 assert.equal(classCount.textContent,'(1)');
 console.log('License filters: restored state, combined exclusions, counts, and navigation passed.');
+
+const legacyToggle = {checked:false,addEventListener:(event,handler)=>legacyToggle.handler=handler};
+const legacyCard = {dataset:{legacy:'true',search:'dqags quadpack quadrature',sourceSearch:'',sourceMatch:'false',
+  license:'unclear',licenseReviewed:'false',collection:'legacy',fpm:'false'},querySelectorAll:()=>[]};
+cards.push(legacyCard);
+classCount.dataset.legacyCount = '1';
+classCount.dataset.licenseCounts = JSON.stringify({...JSON.parse(classCount.dataset.licenseCounts), 'unclear|0|0|0':1});
+license.value=''; query.value=''; collection.value='';
+const legacyContext = {...licensed,
+  document:{...licensed.document,
+    getElementById:id=>id === 'legacy-gams' ? legacyToggle : licensed.document.getElementById(id)},
+  location:{href:'https://example.org/catalog/projects/',search:''}};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),legacyContext);
+assert.equal(legacyCard.hidden,true);
+assert.equal(matches.textContent,'3 of 3 repositories shown');
+legacyToggle.checked=true; legacyToggle.handler();
+assert.equal(legacyCard.hidden,false);
+assert.equal(matches.textContent,'4 of 4 entries shown');
+assert.equal(classCount.textContent,'(4)');
+assert.equal(saved.searchParams.get('legacy_gams'),'1');
+assert.equal(new URL(links[0].href).searchParams.get('legacy_gams'),'1');
+license.value='permissive'; license.handler(); assert.equal(legacyCard.hidden,true);
+license.value='unclear'; license.handler(); assert.equal(legacyCard.hidden,false);
+assert.equal(classCount.textContent,'(2)');
+licenseReviewed.checked=true; licenseReviewed.handler(); assert.equal(legacyCard.hidden,true);
+assert.equal(classCount.textContent,'(1)');
+licenseReviewed.checked=false; sourceReviewed.checked=true; sourceReviewed.handler(); assert.equal(legacyCard.hidden,true);
+assert.equal(classCount.textContent,'(0)');
+sourceReviewed.checked=false; license.value=''; collection.value='independent'; collection.handler();
+assert.equal(legacyCard.hidden,true);
+collection.value=''; excludeFpm.checked=true; excludeFpm.handler();
+assert.equal(legacyCard.hidden,false); assert.equal(classCount.textContent,'(2)');
+query.value='dqags'; query.handler(); assert.equal(matches.textContent,'1 of 4 entries shown');
+legacyToggle.checked=false; legacyToggle.handler();
+assert.equal(legacyCard.hidden,true);
+assert.equal(saved.searchParams.has('legacy_gams'),false);
+assert.equal(new URL(links[0].href).searchParams.has('legacy_gams'),false);
+legacyContext.location={href:'https://example.org/catalog/projects/?legacy_gams=1',search:'?legacy_gams=1'};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),{...legacyContext});
+assert.equal(legacyToggle.checked,true); assert.equal(legacyCard.hidden,false);
+console.log('Legacy GAMS: hidden default, URL restore, search, combined filters, counts and navigation passed.');

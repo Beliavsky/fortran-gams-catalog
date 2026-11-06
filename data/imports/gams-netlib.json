@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "classification_source": "GAMS codes recorded by the Netlib QUADPACK index",
+    "nist_import_status": "NIST dynamic pages returned HTTP 403 during pilot setup; no NIST module records were retrieved.",
+    "review_status": "Imported classification; not independently reviewed or compiled",
+    "license_status": "Not reviewed; source availability does not establish reuse permission",
+    "scope": "Nine double-precision QUADPACK entry points; no proprietary references"
+  },
+  "entries": [
+    {
+      "id": "netlib:quadpack/dqag",
+      "library": "QUADPACK",
+      "procedure": "DQAG",
+      "description": "1D globally adaptive integrator using Gauss-Kronrod quadrature, oscillating integrand",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a1a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqag.f",
+      "source_sha256": "625267148a1282a43ae348282cd8ff2bc794103eef4ed02c6e6f296a097d6809",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqags",
+      "library": "QUADPACK",
+      "procedure": "DQAGS",
+      "description": "1D globally adaptive integrator using interval subdivision and extrapolation",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a1a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqags.f",
+      "source_sha256": "53642bc1c5a0d83a3d2f4ce4d05355ceb6198ea4ae86dab3ddb532a4c671490c",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqagi",
+      "library": "QUADPACK",
+      "procedure": "DQAGI",
+      "description": "1D globally adaptive integrator, infinite intervals",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a3a1",
+        "H2a4a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqagi.f",
+      "source_sha256": "b95b73b8e101efd13ff4f815538eb5ce22ccccdb9f5f9aa3781de8059949d85f",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqagp",
+      "library": "QUADPACK",
+      "procedure": "DQAGP",
+      "description": "1D globally adaptive integrator, singularities or discontinuities",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a2a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqagp.f",
+      "source_sha256": "d6486bfe67fcceff8aaf56a6c4e4509b1f511f6c1a251885b00ee01db8119417",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqawo",
+      "library": "QUADPACK",
+      "procedure": "DQAWO",
+      "description": "1D integration of cos(omega*x)*f(x) or sin(omega*x)*f(x) over a finite interval, adaptive subdivision with extrapolation",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a2a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqawo.f",
+      "source_sha256": "8f539df18583f18174d67faada656668be39a6a27289d342fb64702135bbc3d0",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqaws",
+      "library": "QUADPACK",
+      "procedure": "DQAWS",
+      "description": "1D integration of functions with powers and or logs over a finite interval",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a2a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqaws.f",
+      "source_sha256": "70fbe1e22555656294a6920b96caadd569e41f693cc786e8070080845c3c227a",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqawc",
+      "library": "QUADPACK",
+      "procedure": "DQAWC",
+      "description": "compute Cauchy principal value of f(x)/(x-c) over a finite interval",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a2a1",
+        "J4"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqawc.f",
+      "source_sha256": "39b517b9035ba275f96914dc8f22c1b50b9a949f4e9908c32665d2157fedc504",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqawf",
+      "library": "QUADPACK",
+      "procedure": "DQAWF",
+      "description": "Fourier sine/cosine transform for user supplied interval a to infinity",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a3a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqawf.f",
+      "source_sha256": "57cdbfc874ff9968127280ba0d2040102d02e0a30999f090c47b0bceeec38f47",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    },
+    {
+      "id": "netlib:quadpack/dqng",
+      "library": "QUADPACK",
+      "procedure": "DQNG",
+      "description": "1D non-adaptive automatic integrator",
+      "language": "Fortran",
+      "precision": "double",
+      "gams_codes": [
+        "H2a1a1"
+      ],
+      "availability": "source-available",
+      "source_url": "https://netlib.org/quadpack/dqng.f",
+      "source_sha256": "6bf53c95855a25712d4189b15b01bf898b12d5ed5f68429b14ae31022c954a13",
+      "index_url": "https://netlib.org/quadpack/",
+      "index_sha256": "8995824f768b05083daa62e67f2201483fabdfacc898eaa0234c061120ac0a36",
+      "retrieved_at": "2026-11-06T17:08:40.185491+00:00",
+      "related_projects": [
+        "github:jacobwilliams/quadpack",
+        "github:nshaffer/modern_quadpack"
+      ]
+    }
+  ]
+}
