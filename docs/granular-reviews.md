@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 410 repositories now have 552 source-reviewed
+Reviewed on 2026-11-05. 416 repositories now have 564 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-396 repository cards now identify public routines and link their usage lines
+402 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 410 independently source-reviewed repositories now have an
+separately. All 416 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -434,6 +434,12 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | LIBPARABOL / sippp | `SOLVERS::GMRES`, `RUNGE_KUTTA::runge_kutta_step` | No explicit license grant identified |
 | Gaussian Mixture ARMA-GARCH prototype | `MODELS::ARMA%residuals`, `MODELS::ARMA_GARCH%variances` | No explicit project license grant identified |
 | meshf | `delaunay2::bowyer_watson2` | AGPL-3.0 |
+| ARPREC | `mprealmod::operator(+)`, `quadts`, `initqts` | Modified BSD/LBNL notices with additional terms |
+| DLA-Future Fortran Interface | `dlaf_fortran::dlaf_pdsyevd`, `dlaf_fortran::dlaf_pdsygvd` | BSD-3-Clause |
+| ELPA | `elpa_api::elpa_t%eigenvectors_double` | LGPL-3.0 |
+| forSISL | `Curve_Interrogation::s1850` | Custom forSISL license plus separately licensed SISL |
+| Powell optimization archive | `BOBYQA`, `COBYLA`, `LINCOA`, `NEWUOA`, `GETMIN` | LGPL-2.1-or-later for the five reviewed solver folders |
+| ARPACK PARPACK modernization | `znaupd`, `zneupd` | No explicit license grant identified for the adaptation |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -863,6 +869,12 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [LIBPARABOL / sippp](https://github.com/nschloe/sippp) | D2a4; I2a1a | Operator GMRES and one-dimensional parabolic implicit Runge-Kutta stepping | Right preconditioning, fixed tolerances, callback contracts, persistent correction and absent returned solver status. |
 | [Gaussian Mixture ARMA-GARCH prototype](https://github.com/saveriocolla90/fortran90-gaussian-mixture-arma-garch) | L10a2; L10a2d | Supplied-parameter ARMA residual and GARCH variance recursions | Squared-residual input, initialized component metadata, limited stability predicate and no fitting/forecast guarantee. |
 | [meshf](https://github.com/ofgn/meshf) | P | Incremental planar Delaunay triangulation | Positive initial orientation, possible initialization hang, quad-kind predicates and development scope. |
+| [ARPREC](https://github.com/bl-highprecision/arprec) | A3c; H2a2a1 | Multiword real arithmetic and endpoint-singular tanh-sinh quadrature | C++ bridge, compiled/global precision, mixed-precision callback ABI, shared tables and non-certifying warning/status returns. |
+| [DLA-Future Fortran Interface](https://github.com/eth-cscs/dla-future-fortran) | D4a1; D4b1 | Real symmetric and symmetric-definite distributed eigenproblem bindings | External backend scope, host buffers, descriptor restrictions, C integer ABI and runtime setup. |
+| [ELPA](https://github.com/marekandreas/elpa) | D4a1 | Distributed real-double symmetric eigenvectors through the configured object API | Full-matrix input, full local Q storage, replicated eigenvalues and native one/two-stage dispatch. |
+| [forSISL](https://github.com/rweed/forsisl) | P | Spline-curve line/plane intersection binding | External SISL implementation, unresolved pointer/overlap-copy defects, stale outputs and scoped custom notices. |
+| [Powell optimization archive](https://github.com/ralna/mjdp_software) | G2h1a1; G2h3b1a; G2h2a1; G1b1a; G2h2a2 | Original BOBYQA, COBYLA, LINCOA, NEWUOA and TOLMIN optimization entries | Local search scope, callback/workspace contracts, COBYLA default precision, internal LINCOA relaxation and TOLMIN status meanings. |
+| [ARPACK PARPACK modernization](https://github.com/kingjgod/arpack_parpack) | D4a4 | Adapted complex implicitly restarted Arnoldi reverse communication | Persistent-state INTENT attributes need review, exact kind/workspace contract and separate extraction. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1551,3 +1563,14 @@ the standalone finite-element workflow. ElliFEM is a program entry rather than
 a callable solver; source-defined parameters, mesh data, dense storage and file
 operations remain explicit. No project-wide grant is inferred from a bundled
 dependency license, and numerical correctness is not inferred from source review.
+
+The Powell optimization archive, DLA-Future-Fortran, ELPA, ARPACK_PARPACK,
+forSISL and ARPREC have twelve additional pinned source-reviewed mappings.
+Their calling sketches were not compiled or run. Reviews distinguish original
+solver interfaces from external bindings, default-real versus double-precision
+callbacks, linear-constraint relaxation, first-order stopping, distributed
+storage/runtime setup and multiword precision state. ARPACK adaptation
+persistence concerns and forSISL pointer/overlap-copy defects remain explicit.
+The tanh-sinh review records mixed-precision bounds/callbacks and the fact that
+a returned approximation with zero shared error status need not meet its target.
+Folder-specific and custom license notices remain scoped to the reviewed code.

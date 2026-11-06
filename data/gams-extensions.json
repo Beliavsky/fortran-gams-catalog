@@ -786,6 +786,12 @@
       "parent": "I2a1",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "G2h2a2": {
+      "label": "User provides first derivatives",
+      "parent": "G2h2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
