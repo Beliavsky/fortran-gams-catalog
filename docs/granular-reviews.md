@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 721 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 723 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -105,7 +105,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
 | fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
 | FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding) | Bundled GPL notice without version; wrapper terms unresolved |
-| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8` | MIT root; inherited source provenance recorded separately |
+| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8`, `::SVD`, `::RKF45` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
 | PyIntegral | External `GaussLegendreQuadrature` (tabulated-data integration) | Custom noncommercial terms; redistribution requires permission |
@@ -964,6 +964,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FMM collection: cubic splines](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | E1a | FMM and natural cubic construction with value evaluation | 499 analytic polynomial/piecewise checks; distinct endpoint conditions, nonuniform knots and extrapolation. |
 | [FMM collection: spline derivatives](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | E3a2 | Value and first/second/third derivatives of fitted cubics | 499 checked output vectors; right-hand third derivative at an interior natural-spline knot. |
 | [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
+| [FMM collection: real SVD](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | D6 | Householder/QR rectangular singular-value decomposition | 48 square/tall matrices; reconstruction, orthogonality, energy and selected known spectra; both vector flags true. |
+| [FMM collection: RKF45](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | I1a1a | Adaptive explicit nonstiff initial-value integration | 211 analytic-state comparisons at GNU -O0; preserved helper state has an INTENT(OUT) portability issue. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1884,3 +1886,19 @@ values. Error estimates are not certified bounds; cached interval indices and
 persistent resource-limit state constrain concurrency/history claims. Other
 textbook algorithms and their earlier source reviews remain separate, and the
 root MIT/inherited-source license finding is unchanged.
+
+Two further FMM mappings have [complete checked SVD and ODE drivers](../drivers/fmm-svd-ode/README.md):
+real rectangular SVD (D6) and explicit RKF45 initial-value integration (I1a1a).
+All 48 square/tall matrix cases passed reconstruction, orthogonality, energy
+and selected analytic-spectrum checks; maximum errors were 6.661338e-16,
+1.110223e-15 and 8.889787e-16. All 211 analytic ODE states passed, including
+forward/backward continuation, 176 one-step returns, initial equal-time output
+and explicit tolerance adjustment/recovery. Maximum normalized state error was
+8.110344e-10 with 2,507 callbacks. The unmodified module and mains used GNU
+Fortran 17.0.0 20260510 (experimental), Windows, -O0, bounds checks and floating-
+point traps. RKF45 helper state has INTENT(OUT) declarations despite retained-
+value reads on continuation: this is an unresolved portability issue, and the
+recorded passing run is not portable or optimized continuation verification.
+SVD flags/shapes outside the stated contract, extreme scales, other recovery
+paths and other compilers remain unverified. Existing source/license findings
+are unchanged and the numerical source is not bundled.

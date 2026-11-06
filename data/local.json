@@ -62877,9 +62877,182 @@
                 "line_end": 2466
               }
             ]
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "b850d06d29e348a803feaba58c0b68a8fdd5c5f1",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public SVD generic implements a real rectangular singular-value decomposition through Householder bidiagonalization and QR iteration, with optional left/right vectors. The checked contract uses positive dimensions M>=N, separate A(M,N), W(N), U(M,N), V(N,N) buffers and both vector selectors true. A is preserved; singular values are nonnegative but not sorted. Reconstruct A as U*diag(W)*transpose(V), and pair each column with its corresponding unsorted W. U is scratch even when MATU is false; the source only guards U dimensions conditionally, so do not infer that a dummy-sized U is sufficient when vectors are disabled. IERR=0 is normal, negative statuses indicate some undersized output buffers, and a positive index reports nonconvergence after the iteration limit. Wide/empty cases, output aliasing, disabled-vector flags, extreme dynamic range and every error-return path were not executed. The complete main checks 48 square/tall matrices: N=1..4 and M=N or N+2, with diagonal known spectra, dense matrices, zero/rank-one cases and dense matrices scaled by 1e-30 or 1e30. It independently verifies unchanged input, finite nonnegative singular values, reconstruction, orthogonality, scaled Frobenius energy and selected analytic spectra. Maximum scaled reconstruction, orthogonality and relative energy errors were 6.661338e-16, 1.110223e-15 and 8.889787e-16, below 5e-11. Use the public generic with the selected DP=SELECTED_REAL_KIND(10,50) double-precision interface, binary64 on the recorded compiler. DP is private, so the catalog main declares the same kind selection. The complete unmodified module and main were compiled and run with GNU Fortran 17.0.0 20260510 (experimental), Windows, at -O0 with bounds checks and invalid/zero/overflow traps. No source repair or permissive argument-mismatch flag was used. These finite tests do not establish every input regime, optimized-build behavior, other compilers or single precision. Existing root MIT/inherited-source license findings remain scoped; no upstream numerical source is bundled.",
+            "evidence": [
+              {
+                "path": "fmm.f90",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/fmm.f90",
+                "sha256": "f2c3d0c63b0e126cd093df644f9720e16e50b8eb56e5219a418a5b9e4c634a10"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/README.md",
+                "sha256": "9c075ca9db3582d6871c897940ae656c9ac7d4a6c860889cc91f08ad464fdd76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SVD",
+                "role": "public-entry-point",
+                "summary": "Public real SVD generic; checked square/tall double-precision cases with both vector outputs enabled.",
+                "signature": "CALL SVD(A,W,MATU,U,MATV,V,IERR)",
+                "declarations": [
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3372,
+                    "line_end": 3403
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 95,
+                    "line_end": 97
+                  }
+                ],
+                "path": "fmm.f90",
+                "line_start": 95,
+                "line_end": 97,
+                "module": "ForsytheMalcolmMoler",
+                "usage": "! GAMS D6: SVD checked by reconstruction, orthogonality and known spectra.\nprogram check_svd\n use ForsytheMalcolmMoler, only: SVD\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n implicit none\n integer,parameter :: dp=selected_real_kind(10,50)\n integer :: n,m,extra,kind,i,j,k,status,count\n real(dp),allocatable :: a(:,:),original(:,:),u(:,:),v(:,:),w(:),scaled(:,:),gram(:,:)\n real(dp) :: scale,residual,orthogonality,energy,maximum,maximum_orth,maximum_energy,known\n real(dp),parameter :: tolerance=5.e-11_dp\n maximum=0;maximum_orth=0;maximum_energy=0;count=0\n do n=1,4\n  do extra=0,2,2\n   m=n+extra\n   allocate(a(m,n),original(m,n),u(m,n),v(n,n),w(n),scaled(m,n),gram(n,n))\n   do kind=1,6\n    a=0\n    select case(kind)\n    case(1)\n     do i=1,n\n      a(i,i)=i\n     end do\n    case(2,5,6)\n     do j=1,n\n      do i=1,m\n       a(i,j)=sin(real(3*i+2*j,dp))+0.3_dp*cos(real(i*j,dp))\n       if(i==j) a(i,j)=a(i,j)+2\n      end do\n     end do\n     if(kind==5) a=a*1.e-30_dp\n     if(kind==6) a=a*1.e30_dp\n    case(3)\n     a=0\n    case(4)\n     do j=1,n\n      do i=1,m\n       a(i,j)=real(i,dp)*real(j,dp)\n      end do\n     end do\n    end select\n    original=a\n    call SVD(a,w,.true.,u,.true.,v,status)\n    if(status/=0) error stop 'SVD status'\n    if(any(a/=original)) error stop 'SVD modified input'\n    if(.not.all(ieee_is_finite(w)) .or. any(w<0)) error stop 'SVD spectrum'\n    if(.not.all(ieee_is_finite(u)) .or. .not.all(ieee_is_finite(v))) error stop 'SVD vectors'\n    scale=maxval(abs(original));if(scale==0) scale=1\n    do j=1,n\n     scaled(:,j)=u(:,j)*(w(j)/scale)\n    end do\n    residual=maxval(abs(matmul(scaled,transpose(v))-original/scale))\n    gram=matmul(transpose(u),u)\n    do i=1,n\n     gram(i,i)=gram(i,i)-1\n    end do\n    orthogonality=maxval(abs(gram))\n    gram=matmul(transpose(v),v)\n    do i=1,n\n     gram(i,i)=gram(i,i)-1\n    end do\n    orthogonality=max(orthogonality,maxval(abs(gram)))\n    energy=abs(sum((w/scale)**2)-sum((original/scale)**2))/max(1._dp,sum((original/scale)**2))\n    if(kind==1) then\n     ! Singular values need not be sorted; compare their power sums with the known diagonal.\n     do k=1,3\n      known=sum([(real(i,dp)**k,i=1,n)])\n      if(abs(sum(w**k)-known)>tolerance*max(1._dp,known)) error stop 'diagonal spectrum'\n     end do\n    else if(kind==3) then\n     if(maxval(abs(w))>tolerance) error stop 'zero spectrum'\n    else if(kind==4) then\n     known=sqrt(sum([(real(i,dp)**2,i=1,m)])*sum([(real(j,dp)**2,j=1,n)]))\n     if(abs(maxval(w)-known)>tolerance*known) error stop 'rank-one spectrum'\n     if(sum(w)-maxval(w)>tolerance*known) error stop 'rank-one null spectrum'\n    end if\n    if(max(residual,orthogonality,energy)>tolerance) error stop 'SVD invariant'\n    maximum=max(maximum,residual);maximum_orth=max(maximum_orth,orthogonality);maximum_energy=max(maximum_energy,energy)\n    count=count+1\n   end do\n   deallocate(a,original,u,v,w,scaled,gram)\n  end do\n end do\n print '(a,i0)', 'Checked SVD matrices: ',count\n print '(a,es14.6)', 'Maximum scaled reconstruction error: ',maximum\n print '(a,es14.6)', 'Maximum orthogonality error: ',maximum_orth\n print '(a,es14.6)', 'Maximum relative energy error: ',maximum_energy\n print '(a)', 'PASS svd'\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The full upstream module and main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Saved pinned source/driver hashes, warnings, flags and numerical results are under drivers/fmm-svd-ode/. SVD checks use scaled reconstruction, vector orthogonality and energy tolerances of 5e-11. ODE checks require finite analytic states within 5e-8 and expected status/time/progress outputs. The ODE helper continuation INTENT(OUT) declarations are a known portability caveat: passing -O0 checks do not establish defined portable continuation behavior. No optimization, broad error-recovery or full-module numerical certification follows from these tests.",
+                "local_driver": {
+                  "path": "drivers/fmm-svd-ode/svd.f90",
+                  "sha256": "24aadad60c121d005cb19cc2a7c918564cbe9436f96c975bd693137b9b47225c",
+                  "runner": "drivers/fmm-svd-ode/run.py",
+                  "runner_sha256": "94671d73a6dca8bbd9dfe4b155113110ff1760276b5694de125317e5c82d28df",
+                  "report": "drivers/fmm-svd-ode/results.json",
+                  "report_sha256": "e1c09d764121b279bbb19a662075387ad5c9aca09d7faa572d54ff7e168a3b5b",
+                  "readme": "drivers/fmm-svd-ode/README.md",
+                  "check_name": "svd"
+                }
+              },
+              {
+                "procedure": "shape guards and bidiagonal reduction",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 3372,
+                "line_end": 3530
+              },
+              {
+                "procedure": "left/right vector accumulation",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 3531,
+                "line_end": 3610
+              },
+              {
+                "procedure": "QR iteration, sign adjustment and failure status",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 3611,
+                "line_end": 3729
+              }
+            ]
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "b850d06d29e348a803feaba58c0b68a8fdd5c5f1",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public RKF45 generic integrates explicit nonstiff initial-value ODE systems with a Fehlberg fourth/fifth-order Runge-Kutta pair and adaptive step control. Provide Y(NEQN), WORK(3+6*NEQN), IWORK(5), mutable T/TOUT/RELERR, a nonnegative ABSERR, and an exact-kind callback F(T,Y,YP) using assumed-shape input/output vectors. Initialize IFLAG=1 for interval output or -1 for one-step mode; preserve work arrays and returned state for continuation. Status 2 means TOUT was reached, -2 means an accepted single step, and 3 adjusts an overly small relative tolerance and requires a subsequent call; statuses 4..8 and misuse of recovery state need separate handling and can lead to STOP. This is not a stiff solver, global-error certificate or event locator. IMPORTANT PORTABILITY CAVEAT: RkfsDouble declares preserved H, NFE, KOP and some saved tolerance arguments INTENT(OUT), yet continuation paths read retained values before redefining them. Entry makes such dummy values undefined under Fortran semantics; successful GNU -O0 runs do not establish portable or optimized continuation correctness. No repair was applied. The driver checks scalar exponential decay and a harmonic oscillator forward/backward, eight interval outputs per trajectory, 176 accepted one-step returns, initial equal-time requests, and explicit status-3 tolerance recovery. All 211 analytic-state comparisons passed, with 2507 callback evaluations and maximum normalized error 8.110344e-10 below 5e-8. Normal controls were RELERR=1e-9 and ABSERR=1e-11; the single status-3 case intentionally starts RELERR=0. Stiffness, resource-limit recovery, concurrency and optimized builds remain unverified. Use the public generic with the selected DP=SELECTED_REAL_KIND(10,50) double-precision interface, binary64 on the recorded compiler. DP is private, so the catalog main declares the same kind selection. The complete unmodified module and main were compiled and run with GNU Fortran 17.0.0 20260510 (experimental), Windows, at -O0 with bounds checks and invalid/zero/overflow traps. No source repair or permissive argument-mismatch flag was used. These finite tests do not establish every input regime, optimized-build behavior, other compilers or single precision. Existing root MIT/inherited-source license findings remain scoped; no upstream numerical source is bundled.",
+            "evidence": [
+              {
+                "path": "fmm.f90",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/fmm.f90",
+                "sha256": "f2c3d0c63b0e126cd093df644f9720e16e50b8eb56e5219a418a5b9e4c634a10"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/README.md",
+                "sha256": "9c075ca9db3582d6871c897940ae656c9ac7d4a6c860889cc91f08ad464fdd76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RKF45",
+                "role": "public-entry-point",
+                "summary": "Public explicit ODE integrator; GNU -O0 tests pass, but continuation helper INTENT(OUT) declarations leave a portability issue.",
+                "signature": "CALL RKF45(F,Y,T,TOUT,RELERR,ABSERR,IFLAG,WORK,IWORK)",
+                "declarations": [
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 2608,
+                    "line_end": 2626
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 75,
+                    "line_end": 77
+                  }
+                ],
+                "path": "fmm.f90",
+                "line_start": 75,
+                "line_end": 77,
+                "module": "ForsytheMalcolmMoler",
+                "usage": "! GAMS I1a1a: RKF45 continuation and one-step modes against analytic IVPs.\nprogram check_ode\n use ForsytheMalcolmMoler, only: RKF45\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n implicit none\n integer,parameter :: dp=selected_real_kind(10,50)\n integer :: problem,direction,mode,j,iflag,iw(5),calls,count,steps,evaluations\n real(dp),allocatable :: y(:),work(:),expected(:)\n real(dp) :: t,tout,relative,previous,error,maximum\n maximum=0;count=0;steps=0;evaluations=0\n do problem=1,2\n  allocate(y(problem),work(3+6*problem),expected(problem))\n  do direction=-1,1,2\n   do mode=1,2\n    y=0;y(1)=1;work=0;iw=0;t=0;relative=1.e-9_dp\n    iflag=1;if(mode==2) iflag=-1\n    if(mode==1) then\n     do j=1,8\n      tout=direction*0.25_dp*j\n      call RKF45(rhs,y,t,tout,relative,1.e-11_dp,iflag,work,iw)\n      if(iflag/=2 .or. t/=tout) error stop 'RKF45 interval status'\n      call verify()\n     end do\n    else\n     tout=direction*2._dp\n     do calls=1,10000\n      previous=t\n      call RKF45(rhs,y,t,tout,relative,1.e-11_dp,iflag,work,iw)\n      if(iflag/=-2 .and. iflag/=2) error stop 'RKF45 step status'\n      if(direction*(t-previous)<=0) error stop 'RKF45 no directional progress'\n      call verify()\n      steps=steps+1\n      if(iflag==2) exit\n     end do\n     if(iflag/=2 .or. t/=tout) error stop 'RKF45 step target'\n    end if\n   end do\n  end do\n  ! Initial zero-length request is allowed and must preserve the initial state.\n  y=0;y(1)=1;work=0;iw=0;t=0;tout=0;relative=1.e-9_dp;iflag=1\n  call RKF45(rhs,y,t,tout,relative,1.e-11_dp,iflag,work,iw)\n  if(iflag/=2 .or. t/=0) error stop 'RKF45 initial equal-time request'\n  call verify()\n  deallocate(y,work,expected)\n end do\n ! Explicitly check the documented too-small-relative-tolerance recovery.\n problem=1;allocate(y(1),work(9),expected(1))\n y=1;work=0;iw=0;t=0;tout=1;relative=0;iflag=1\n call RKF45(rhs,y,t,tout,relative,1.e-11_dp,iflag,work,iw)\n if(iflag/=3 .or. relative<=0 .or. t/=0) error stop 'RKF45 tolerance adjustment'\n call RKF45(rhs,y,t,tout,relative,1.e-11_dp,iflag,work,iw)\n if(iflag/=2 .or. t/=tout) error stop 'RKF45 tolerance recovery'\n call verify()\n print '(a,i0)', 'Analytic ODE state comparisons: ',count\n print '(a,i0)', 'Accepted one-step returns: ',steps\n print '(a,i0)', 'Derivative evaluations: ',evaluations\n print '(a,es14.6)', 'Maximum normalized solution error: ',maximum\n print '(a)', 'PASS ode'\ncontains\n subroutine rhs(time,state,derivative)\n  real(dp),intent(in) :: time,state(:)\n  real(dp),intent(out) :: derivative(:)\n  evaluations=evaluations+1\n  if(problem==1) then\n   derivative=-state\n  else\n   derivative(1)=state(2);derivative(2)=-state(1)\n  end if\n end subroutine\n subroutine verify()\n  if(.not.ieee_is_finite(t) .or. .not.all(ieee_is_finite(y))) error stop 'nonfinite ODE result'\n  if(problem==1) then\n   expected=exp(-t)\n  else\n   expected=[cos(t),-sin(t)]\n  end if\n  error=maxval(abs(y-expected))/max(1._dp,maxval(abs(expected)))\n  maximum=max(maximum,error)\n  if(error>5.e-8_dp) error stop 'ODE analytic mismatch'\n  count=count+1\n end subroutine\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The full upstream module and main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Saved pinned source/driver hashes, warnings, flags and numerical results are under drivers/fmm-svd-ode/. SVD checks use scaled reconstruction, vector orthogonality and energy tolerances of 5e-11. ODE checks require finite analytic states within 5e-8 and expected status/time/progress outputs. The ODE helper continuation INTENT(OUT) declarations are a known portability caveat: passing -O0 checks do not establish defined portable continuation behavior. No optimization, broad error-recovery or full-module numerical certification follows from these tests.",
+                "local_driver": {
+                  "path": "drivers/fmm-svd-ode/ode.f90",
+                  "sha256": "4feb8485c75a6c2a0e0e917078dc1926d41ee41763aca9752c1d590c95c60ef4",
+                  "runner": "drivers/fmm-svd-ode/run.py",
+                  "runner_sha256": "94671d73a6dca8bbd9dfe4b155113110ff1760276b5694de125317e5c82d28df",
+                  "report": "drivers/fmm-svd-ode/results.json",
+                  "report_sha256": "e1c09d764121b279bbb19a662075387ad5c9aca09d7faa572d54ff7e168a3b5b",
+                  "readme": "drivers/fmm-svd-ode/README.md",
+                  "check_name": "ode"
+                }
+              },
+              {
+                "procedure": "F",
+                "role": "callback",
+                "path": "fmm.f90",
+                "line_start": 2608,
+                "line_end": 2616
+              },
+              {
+                "procedure": "workspace partition and public state interface",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 2469,
+                "line_end": 2645
+              },
+              {
+                "procedure": "continuation dummy declarations with intent caveat",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 2648,
+                "line_end": 2685
+              },
+              {
+                "procedure": "state checks and tolerance adjustment",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 2716,
+                "line_end": 2817
+              },
+              {
+                "procedure": "adaptive acceptance, statuses and state updates",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 2819,
+                "line_end": 2958
+              },
+              {
+                "procedure": "Fehlberg stage formula",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 2961,
+                "line_end": 3045
+              }
+            ]
           }
         ],
-        "notes": "Cubic spline construction/evaluation, spline derivatives and finite-interval adaptive quadrature have complete locally checked drivers with saved numerical results. The original Brent root review remains source evidence and its calling sketch was not newly executed. Other textbook algorithms, single precision, concurrent use and resource-limit paths retain their separate unverified scope; existing source-provenance and license findings remain available.",
+        "notes": "Selected spline, quadrature, real SVD and explicit ODE configurations have complete locally checked drivers and saved results. The RKF45 continuation helper has an INTENT(OUT) state-retention issue: passing GNU -O0 tests is not portable continuation verification. The earlier Brent root calling sketch was not newly executed. Other textbook routines, optimized/single-precision/concurrent use and untested recovery paths retain separate scope; inherited-source/license findings remain available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

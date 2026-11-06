@@ -295,6 +295,13 @@ class CatalogTests(unittest.TestCase):
                 class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
                 self.assertIn('ForsytheMalcolmMoler::'+procedure, class_page)
             self.assertTrue((destination/'drivers/fmm-interpolation-quadrature/results.json').is_file())
+            for name, code, procedure in [('svd', 'D6', 'SVD'), ('ode', 'I1a1a', 'RKF45')]:
+                self.assertIn('drivers/fmm-svd-ode/'+name+'.f90', fmm)
+                self.assertTrue((destination/'drivers/fmm-svd-ode'/f'{name}.f90').is_file())
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('ForsytheMalcolmMoler::'+procedure, class_page)
+            self.assertIn('continuation helper INTENT(OUT)', fmm)
+            self.assertTrue((destination/'drivers/fmm-svd-ode/results.json').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)
