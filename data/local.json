@@ -8469,9 +8469,98 @@
                 "line_end": 399
               }
             ]
+          },
+          {
+            "code": "L10b2a",
+            "level": "source-reviewed",
+            "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public fftpack::xcorr generic implements finite zero-extended cross-correlation using inverse FFT of FFT(X)*CONJG(FFT(Y)). It pads to a power of two at least 2*MAX(NX,NY)-1 and rearranges the result to lags 1-MAX(NX,NY) through MAX(NX,NY)-1. At lag K the convention is SUM_J X(J+K)*CONJG(Y(J)) over valid indices. Unequal lengths still return the symmetric maximum-length lag range, including zero tails. This is an uncentered unnormalized cross-product sum: no mean subtraction, variance normalization or overlap-count division is performed. Real overloads discard the numerically negligible imaginary roundoff of the complex result; single overloads compute through the double-complex path then round the output. All four KIND=4/8 real/complex overloads are exercised by the complete driver for both lengths 1..7 and three patterns (dense trigonometric vectors, endpoint impulses, zero first signal): 588 direct-sum comparisons. Maximum normalized binary64 error was 3.717673e-16 and binary32 error 5.062557e-8, below tolerances 2e-12 and 2e-6. Single inputs are rounded before constructing independent references. GNU Fortran 17.0.0 20260510 (experimental), Windows, compiled and ran the main at O0 with bounds checks and invalid/zero/overflow traps. The unmodified FFTPACK backend was built with -fallow-argument-mismatch and without bounds instrumentation; implicit external real/complex storage conventions remain a portability and full-memory-safety limitation. The wrapper ignores IERR and rebuilds workspaces. Positive small lengths and ordinary finite data are the checked contract; empty arrays, large sizes, extreme amplitudes, optimized builds and other compilers were not checked. This mapping is for two-series cross-correlations (L10b2a), not correlation coefficients, spectral estimation or statistical significance.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+                "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+              },
+              {
+                "path": "src/fftpack5.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+                "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/README.md",
+                "sha256": "d396849d2553a4c2e1e825e991118e7807dd8c8f20c8f3181a572301926f5a15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "xcorr",
+                "role": "public-entry-point",
+                "summary": "Public generic for raw finite cross-correlation of real or complex vectors, with single and double overloads. Output index K+MAX(NX,NY) represents lag K; complex Y is conjugated.",
+                "signature": "R = xcorr(X,Y)",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 995,
+                    "line_end": 998
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 1009,
+                    "line_end": 1011
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 1017,
+                    "line_end": 1019
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 1025,
+                    "line_end": 1027
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 140,
+                    "line_end": 144
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 140,
+                "line_end": 144,
+                "module": "fftpack",
+                "usage": "﻿program correlation\n  use fftpack, only: xcorr\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer :: nx, ny, n, pattern, i, j, lag, count\n  complex(kind=8), allocatable :: x(:), y(:), reference(:), z(:)\n  real(kind=8), allocatable :: r(:), real_reference(:)\n  complex(kind=4), allocatable :: xs(:), ys(:), zs(:)\n  real(kind=4), allocatable :: rs(:)\n  real(kind=8) :: scale, error, max_double, max_single\n  count=0; max_double=0; max_single=0\n  do nx=1,7\n    do ny=1,7\n      n=max(nx,ny)\n      allocate(x(nx),y(ny),reference(2*n-1),real_reference(2*n-1),xs(nx),ys(ny))\n      do pattern=1,3\n        do i=1,nx\n          x(i)=cmplx(sin(real(2*i+nx,8)),cos(real(i+ny,8)),8)\n        end do\n        do i=1,ny\n          y(i)=cmplx(cos(real(3*i+ny,8)),sin(real(i-nx,8)),8)\n        end do\n        if(pattern==2)then\n          x=0; y=0\n          x(nx)=cmplx(2.0_8,-1.0_8,8); y(1)=cmplx(-3.0_8,2.0_8,8)\n        else if(pattern==3)then\n          x=0\n        end if\n        reference=0; real_reference=0\n        do lag=1-n,n-1\n          do j=1,ny\n            i=j+lag\n            if(i>=1.and.i<=nx)then\n              reference(lag+n)=reference(lag+n)+x(i)*conjg(y(j))\n              real_reference(lag+n)=real_reference(lag+n)+real(x(i),8)*real(y(j),8)\n            end if\n          end do\n        end do\n        z=xcorr(x,y)\n        call check_complex(z,reference,2e-12_8,.false.)\n        r=xcorr(real(x,8),real(y,8))\n        call check_complex(cmplx(r,0.0_8,8),cmplx(real_reference,0.0_8,8),2e-12_8,.false.)\n        ! Round inputs before the single-kind reference comparisons.\n        xs=cmplx(x,kind=4); ys=cmplx(y,kind=4)\n        reference=0; real_reference=0\n        do lag=1-n,n-1\n          do j=1,ny\n            i=j+lag\n            if(i>=1.and.i<=nx)then\n              reference(lag+n)=reference(lag+n)+cmplx(xs(i),kind=8)*conjg(cmplx(ys(j),kind=8))\n              real_reference(lag+n)=real_reference(lag+n)+real(xs(i),8)*real(ys(j),8)\n            end if\n          end do\n        end do\n        zs=xcorr(xs,ys)\n        call check_complex(cmplx(zs,kind=8),reference,2e-6_8,.true.)\n        rs=xcorr(real(xs,4),real(ys,4))\n        call check_complex(cmplx(rs,0.0_4,8),cmplx(real_reference,0.0_8,8),2e-6_8,.true.)\n      end do\n      deallocate(x,y,reference,real_reference,xs,ys)\n    end do\n  end do\n  print '(a,i0)', 'Direct-sum cross-correlation comparisons: ',count\n  print '(a,es14.6)', 'Maximum normalized binary64 error: ',max_double\n  print '(a,es14.6)', 'Maximum normalized binary32 error: ',max_single\n  print '(a)', 'PASS correlation'\ncontains\n  subroutine check_complex(actual,expected,tolerance,single)\n    complex(kind=8), intent(in) :: actual(:),expected(:)\n    real(kind=8), intent(in) :: tolerance\n    logical, intent(in) :: single\n    if(size(actual)/=size(expected))error stop 'Wrong output size'\n    if(.not.all(ieee_is_finite(real(actual,8))))error stop 'Nonfinite real output'\n    if(.not.all(ieee_is_finite(aimag(actual))))error stop 'Nonfinite imaginary output'\n    scale=max(1.0_8,maxval(abs(expected)))\n    error=maxval(abs(actual-expected))/scale\n    if(error>tolerance)then\n      print *,nx,ny,pattern,error,tolerance\n      error stop 'Cross-correlation differs from direct sums'\n    end if\n    if(single)then\n      max_single=max(max_single,error)\n    else\n      max_double=max(max_double,error)\n    end if\n    count=count+1\n  end subroutine\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. All 588 four-overload vector comparisons passed direct-sum references. The wrapper/main use -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. The unchanged kernel uses -O0 -g -ffree-line-length-none -fallow-argument-mismatch -ffpe-trap=invalid,zero,overflow without bounds checks. See drivers/fftpack-correlation/ for hashes, saved results, warnings, tolerances and scope. This is not a normalized correlation coefficient or a verification of all backend memory accesses.",
+                "local_driver": {
+                  "path": "drivers/fftpack-correlation/correlation.f90",
+                  "sha256": "7c3cdde1be0b14fddfb62c8a72dd39fdf0f1070a6cb92d22e28c18c58962c546",
+                  "runner": "drivers/fftpack-correlation/run.py",
+                  "runner_sha256": "b01a0b4b334e63aea77f01d9d295355a2a8e3630b4949b77d31801ff4168204d",
+                  "report": "drivers/fftpack-correlation/results.json",
+                  "report_sha256": "a9aefd19cacbedfbb348faea02a0baeaa85dc71c3f3231b710850cee6d6cc1aa",
+                  "readme": "drivers/fftpack-correlation/README.md",
+                  "check_name": "correlation"
+                }
+              },
+              {
+                "procedure": "FFT cross-spectrum and lag rearrangement",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 995,
+                "line_end": 1007
+              },
+              {
+                "procedure": "real and single-kind conversions",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 1009,
+                "line_end": 1031
+              }
+            ]
           }
         ],
-        "notes": "Double-precision finite convolution, real-input DFT and default-length periodic analytic signals have complete locally checked drivers and saved results. The original complex-transform review/calling sketches remain historical source evidence; the new checks cover only their documented selected paths. Single-precision analytic-signal output loses its imaginary component, and legacy argument/storage conventions remain unverified for portability or full memory safety. Earlier documentation and scoped license findings remain available.",
+        "notes": "Double-precision finite convolution, real-input DFT and default-length periodic analytic signals have complete locally checked drivers and saved results. The original complex-transform review/calling sketches remain historical source evidence; the new checks cover only their documented selected paths. Single-precision analytic-signal output loses its imaginary component, and legacy argument/storage conventions remain unverified for portability or full memory safety. Earlier documentation and scoped license findings remain available. A separate complete main now checks all four cross-correlation overloads against direct sums (588 comparisons); raw sums, conjugation and symmetric lag ordering are documented. The same legacy ABI and bounds-check limitations apply.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

@@ -32,6 +32,7 @@ separate check.
 | [Chebyshev-node quadrature](boxcode-quadrature/README.md) | H2a1b2 | 30 polynomial moments and node/weight identities; documented legacy-bounds limitation |
 | [NDSM interpolation](ndsm-interpolation/README.md) | E1a; E2a | 157 scalar, bilinear and trilinear known-value checks, including lower-side extrapolation |
 | [Chebyshev spectral operations](boxcode-spectral/README.md) | E3c; E3a2; E3a3 | 116 polynomial basis/derivative/integral cases plus 30 endpoint checks; documented legacy-bounds and integration-degree limits |
+| [FFTPack cross-correlation](fftpack-correlation/README.md) | L10b2a | 588 direct-sum comparisons across all four real/complex single/double overloads; raw unnormalized sums and legacy ABI limits |
 | [FFTPack signal operations](fftpack-signals/README.md) | J2; J4; J1a1 | 175 direct convolution, analytic-signal and direct-DFT comparisons; documented legacy ABI/bounds limits |
 | [FMM splines and quadrature](fmm-interpolation-quadrature/README.md) | E1a; E3a2; H2a1a1 | 499 spline values, 499 derivative vectors and 55 analytic integrals; full bounds instrumentation |
 | [FMM SVD and ODE](fmm-svd-ode/README.md) | D6; I1a1a | 48 matrix-invariant cases and 211 analytic ODE states; documented continuation INTENT portability issue |

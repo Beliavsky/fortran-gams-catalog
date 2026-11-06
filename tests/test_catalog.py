@@ -288,6 +288,12 @@ class CatalogTests(unittest.TestCase):
                 class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
                 self.assertIn('fftpack::'+procedure, class_page)
             self.assertTrue((destination/'drivers/fftpack-signals/results.json').is_file())
+            self.assertIn('drivers/fftpack-correlation/correlation.f90', fftpack)
+            for artifact in ('correlation.f90', 'run.py', 'README.md', 'results.json'):
+                self.assertTrue((destination/'drivers/fftpack-correlation'/artifact).is_file())
+            correlation_class = (destination/'classes/L10b2a/index.html').read_text(encoding='utf-8')
+            self.assertIn('fftpack::xcorr', correlation_class)
+            self.assertIn('src/fftpack.f90#L995-L998', fftpack)
             fmm = (destination/'projects/beliavsky/computer-methods-for-mathematical-computations/index.html').read_text(encoding='utf-8')
             for name, code, procedure in [('spline', 'E1a', 'FMMspline'), ('derivatives', 'E3a2', 'Seval3'), ('quadrature', 'H2a1a1', 'Quanc8')]:
                 self.assertIn('drivers/fmm-interpolation-quadrature/'+name+'.f90', fmm)

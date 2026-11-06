@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 724 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 725 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -104,7 +104,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Mittag-Leffler function and derivative | `mod_mlf_garrappa::mlf_garrappa` (scalar binding) | Author public-domain statement and citation request; inherited terms not fully audited |
 | Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
 | fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
-| FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding) | Bundled GPL notice without version; wrapper terms unresolved |
+| FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding), `fftpack::xcorr` | Bundled GPL notice without version; wrapper terms unresolved |
 | Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8`, `::SVD`, `::RKF45` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
@@ -966,6 +966,7 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
 | [FMM collection: real SVD](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | D6 | Householder/QR rectangular singular-value decomposition | 48 square/tall matrices; reconstruction, orthogonality, energy and selected known spectra; both vector flags true. |
 | [FMM collection: RKF45](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | I1a1a | Adaptive explicit nonstiff initial-value integration | 211 analytic-state comparisons at GNU -O0; preserved helper state has an INTENT(OUT) portability issue. |
+| [FFTPack: cross-correlation](https://github.com/keurfonluu/FFTPack) | L10b2a | Raw finite cross-correlations, real/complex KIND=4/8 | 588 direct-sum comparisons; conjugated second vector, symmetric maximum-length lag range; legacy ABI limits. |
 | [minila: direct triangular solves](https://github.com/ghbrown/minila) | D2a3 | Default-REAL diagonal, forward and backward substitution | 108 known-solution/scaled-residual checks; 32-bit REAL, correct structure and nonzero pivots required. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
@@ -1916,3 +1917,15 @@ nonsquare error paths leave results undefined. The checked usage therefore
 requires finite, correctly structured square systems with nonzero diagonals;
 no error-bound, conditioning, invalid-input, dispatch-wrapper, LU/inverse/SOR
 or double-precision claim is added. Existing source/license findings remain.
+
+FFTPack now also has a [complete locally checked cross-correlation main](../drivers/fftpack-correlation/README.md)
+for L10b2a. All four real/complex single/double overloads passed 588 comparisons
+against independent finite direct sums, including unequal lengths, endpoint
+impulses and zero inputs. Output lags are symmetric about zero using the longer
+input length; complex Y is conjugated. Results are raw sums without centering,
+variance normalization or overlap-count division. Maximum normalized errors
+were 3.717673e-16 (binary64) and 5.062557e-8 (binary32). Wrapper/main bounds
+checks and traps passed under GNU Fortran 17 O0 on Windows. The unchanged
+legacy kernel still uses permissive argument matching without bounds checks;
+its implicit storage ABI, large lengths, optimized builds and other compilers
+remain unverified. Existing source and license findings are retained.
