@@ -840,6 +840,18 @@
       "parent": "H2a4a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "D1a3b": {
+      "label": "L_2 (Euclidean norm)",
+      "parent": "D1a3",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "H2a2a2": {
+      "label": "Nonautomatic",
+      "parent": "H2a2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }

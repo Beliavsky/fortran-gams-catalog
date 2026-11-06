@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 427 repositories now have 588 source-reviewed
+Reviewed on 2026-11-06. 428 repositories now have 600 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-413 repository cards now identify public routines and link their usage lines
+414 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 427 independently source-reviewed repositories now have an
+separately. All 428 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -451,6 +451,8 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FERRE | `lin`, `lsq::poly_fit`, `nelder_mead::minim` | No explicit project-wide grant identified |
 | HARMONIE Monitor | `calc_corr`, `contingency::acc_cont`, `contingency::ini_cont` | No explicit grant identified in selected Monitor sources |
 | SciJIT | `quadpack_wrappers::dqags_wrapper`, `quadpack_wrappers::dqagi_wrapper`, `minpack_wrappers::hybrd_wrapper` | BSD-3-Clause wrappers; bundled QUADPACK/MINPACK notices apply |
+| SciJIT | `quadpack_wrappers::dqagp_wrapper`, `quadpack_wrappers::dqawo_wrapper`, `quadpack_wrappers::dqaws_wrapper`, `quadpack_wrappers::dqawc_wrapper`, `minpack_wrappers::lmdif_wrapper`, `minpack_wrappers::lmder1_wrapper`, `minpack_wrappers::lmstr1_wrapper`, `minpack_wrappers::enorm_wrapper`, `odepack_wrappers::lsoda_wrapper`, `odepack_wrappers::lsodar_wrapper`, `fitpack_wrappers::curfit_wrapper`, `fitpack_wrappers::splev_wrapper`, `fitpack_wrappers::splder_wrapper`, `fitpack_wrappers::splint_wrapper`, `fitpack_wrappers::regrid_wrapper`, `fitpack_wrappers::bispev_wrapper`, `fitpack_wrappers::dblint_wrapper` | BSD-3-Clause wrappers; bundled numerical-component notices apply |
+| ANN Fortran interface | `ANN_mod::ann_buildTree`, `ANN_mod::ann_kSearch`, `ANN_mod::ann_destroyTree` | LGPL-2.1-or-later upstream ANN notice; bridge scope not separately stated |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -897,6 +899,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FERRE](https://github.com/callendeprieto/ferre) | E2a; E1b; G1b2 | Grid interpolation, intended weighted polynomial fit and coupled Nelder-Mead search | Shared precision/context, endpoint requirements, polynomial workspace defect and objective coupling. |
 | [HARMONIE Monitor](https://github.com/hirlam/monitor) | L4b3; L2b | Paired descriptive statistics and contingency-table tallying | Sample/population conventions, constant-series correlation and forecast-minus-observation input. |
 | [SciJIT](https://github.com/shmuel-gilbaum/scijit) | H2a1a1; H2a3a1; H2a4a1; F2 | Finite, semi-infinite and whole-line quadrature plus nonlinear-system binding | Callback ABI, workspace/status, conditional thread-private state and differing nested-call behavior. |
+| [SciJIT](https://github.com/shmuel-gilbaum/scijit) | H2a2a1; K1b1a1; K1b1a2; D1a3b; I1a1b; I1a2; E1a; H1; H2a2a2; E2a; H2b1 | Weighted quadrature, nonlinear least squares, norms, splines and ODE integration | Callback ABI/state, workspaces, modified spline signatures, status and representation-specific scope. |
+| [ANN Fortran interface](https://github.com/box-tools/ann-fortran) | P | Fortran/C++ kd-tree nearest-neighbor bridge | Caller-owned output buffers, zero-based indices, squared distances and unresolved allocation/cleanup defects. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1615,3 +1619,11 @@ with a suspected workspace dimension defect, rather than a checked driver.
 The SLICOT entry is a MATLAB MEX gateway; SciJit entries document native
 callback bindings without claiming independent verification of their backends.
 Cycle semantics, shared state, precision settings and component licenses remain scoped.
+
+SciJit and ANN-Fortran have twelve additional mappings and twenty newly
+annotated public entry points. Calling sketches were not compiled or run.
+SciJit coverage separates finite weighted quadrature, derivative-free and
+user-Jacobian least squares, norms, spline representation operations and
+Adams/BDF integration. Binding review does not certify every numerical backend.
+ANN-Fortran contracts remain commented post-repair sketches: the reviewed bridge
+has allocation/deallocation and public cleanup defects, with no execution check.

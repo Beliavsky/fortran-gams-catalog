@@ -65220,6 +65220,755 @@
                 "line_end": 66
               }
             ]
+          },
+          {
+            "code": "H2a2a1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. Special finite-interval adaptive quadrature is exposed by DQAGP (caller-supplied interior breakpoints), DQAWO (cosine/sine weight), DQAWS (endpoint algebraic/logarithmic weights) and DQAWC (Cauchy principal value). DQAGP requires NPTS2=number of interior points+2, enough POINTS storage and valid LENIW/LENW. DQAWO requires LENIW>=2, MAXP1>=1 and LENW>=2*LENIW+25*MAXP1; INTEGR=1/2 selects cosine/sine. Its local native driver adds MOMCOM output, so link the matching vendored version. DQAWS requires ALFA,BETA>-1, INTEGR=1..4 selecting no log/left log/right log/both, LIMIT>=2 and LENW>=4*LIMIT. DQAWC integrates f(x)/(x-C), with C distinct from endpoints, LIMIT>=1 and LENW>=4*LIMIT. Supply f rather than multiplying the weight into the callback. IER/ABSERR remain diagnostics, not proof of convergence or a rigorous bound. This mapping does not imply generic singularities can be handled without compatible controls.",
+            "evidence": [
+              {
+                "path": "src/quadpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/quadpack/wrappers.f90",
+                "sha256": "261ae076a0c2d06dca88ef02612fc8a4c5847c1857b169207b89997959cb8ed6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqagp_wrapper",
+                "role": "public-entry-point",
+                "summary": "Finite adaptive integration with explicitly supplied internal trouble points.",
+                "signature": "CALL dqagp_wrapper(CFCN,A,B,NPTS2,POINTS,EPSABS,EPSREL,RESULT, &\n ABSERR,NEVAL,IER,LENIW,LENW,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 128,
+                    "line_end": 143
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 128,
+                "line_end": 157,
+                "module": "quadpack_wrappers",
+                "usage": "use iso_c_binding\nuse quadpack_wrappers, only: dqagp_wrapper\n! After declaring/initializing all arguments to the linked C-sized interface,\n! setting FPTR to the integrand callback, and allocating the documented workspace:\ncall dqagp_wrapper(fptr,a,b,npts2,points,epsabs,epsrel,result, &\n abserr,neval,ier,leniw,lenw,iwork,work,args,nargs,last)\nif(ier/=0) error stop \"inspect QUADPACK status and error estimate\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. Callback returns C_DOUBLE, receives X by VALUE and ARGS(*) by reference, and must evaluate the unweighted integrand (the regular factor for weighted routines). Keep callback/args alive. Slots are saved/restored; thread-private separation depends on compiling OpenMP directives. No quadrature, error estimate, nested call or thread behavior was executed."
+              },
+              {
+                "procedure": "dqawo_wrapper",
+                "role": "public-entry-point",
+                "summary": "Finite oscillatory quadrature with the matching extended MOMCOM driver.",
+                "signature": "CALL dqawo_wrapper(CFCN,A,B,OMEGA,INTEGR,EPSABS,EPSREL,RESULT, &\n ABSERR,NEVAL,IER,LENIW,MAXP1,LENW,IWORK,WORK,ARGS,NARGS,LAST,MOMCOM)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 178,
+                    "line_end": 193
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 178,
+                "line_end": 209,
+                "module": "quadpack_wrappers",
+                "usage": "use iso_c_binding\nuse quadpack_wrappers, only: dqawo_wrapper\n! After declaring/initializing all arguments to the linked C-sized interface,\n! setting FPTR to the integrand callback, and allocating the documented workspace:\ncall dqawo_wrapper(fptr,a,b,omega,1_c_int,epsabs,epsrel,result, &\n abserr,neval,ier,leniw,maxp1,lenw,iwork,work,args,nargs,last,momcom)\nif(ier/=0) error stop \"inspect QUADPACK status and error estimate\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. Callback returns C_DOUBLE, receives X by VALUE and ARGS(*) by reference, and must evaluate the unweighted integrand (the regular factor for weighted routines). Keep callback/args alive. Slots are saved/restored; thread-private separation depends on compiling OpenMP directives. No quadrature, error estimate, nested call or thread behavior was executed."
+              },
+              {
+                "procedure": "dqaws_wrapper",
+                "role": "public-entry-point",
+                "summary": "Finite algebraic/logarithmic endpoint-weighted quadrature.",
+                "signature": "CALL dqaws_wrapper(CFCN,A,B,ALFA,BETA,INTEGR,EPSABS,EPSREL, &\n RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 258,
+                    "line_end": 272
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 258,
+                "line_end": 286,
+                "module": "quadpack_wrappers",
+                "usage": "use iso_c_binding\nuse quadpack_wrappers, only: dqaws_wrapper\n! After declaring/initializing all arguments to the linked C-sized interface,\n! setting FPTR to the integrand callback, and allocating the documented workspace:\ncall dqaws_wrapper(fptr,a,b,alfa,beta,1_c_int,epsabs,epsrel, &\n result,abserr,neval,ier,limit,lenw,iwork,work,args,nargs,last)\nif(ier/=0) error stop \"inspect QUADPACK status and error estimate\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. Callback returns C_DOUBLE, receives X by VALUE and ARGS(*) by reference, and must evaluate the unweighted integrand (the regular factor for weighted routines). Keep callback/args alive. Slots are saved/restored; thread-private separation depends on compiling OpenMP directives. No quadrature, error estimate, nested call or thread behavior was executed."
+              },
+              {
+                "procedure": "dqawc_wrapper",
+                "role": "public-entry-point",
+                "summary": "Cauchy principal-value integration with a specified pole location.",
+                "signature": "CALL dqawc_wrapper(CFCN,A,B,C,EPSABS,EPSREL,RESULT,ABSERR, &\n NEVAL,IER,LIMIT,LENW,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 291,
+                    "line_end": 303
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 291,
+                "line_end": 316,
+                "module": "quadpack_wrappers",
+                "usage": "use iso_c_binding\nuse quadpack_wrappers, only: dqawc_wrapper\n! After declaring/initializing all arguments to the linked C-sized interface,\n! setting FPTR to the integrand callback, and allocating the documented workspace:\ncall dqawc_wrapper(fptr,a,b,c,epsabs,epsrel,result,abserr, &\n neval,ier,limit,lenw,iwork,work,args,nargs,last)\nif(ier/=0) error stop \"inspect QUADPACK status and error estimate\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. Callback returns C_DOUBLE, receives X by VALUE and ARGS(*) by reference, and must evaluate the unweighted integrand (the regular factor for weighted routines). Keep callback/args alive. Slots are saved/restored; thread-private separation depends on compiling OpenMP directives. No quadrature, error estimate, nested call or thread behavior was executed."
+              }
+            ]
+          },
+          {
+            "code": "K1b1a1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. Callback dimensions are known by the callback rather than passed in its ABI. Module callback/args pointers are overwritten without save/restore; avoid nested calls through this interface. OpenMP threadprivate state is conditional on the build. The callback abstract interfaces here are not declared BIND(C); use the actual supported compiler/foreign-function ABI rather than assuming full standard interoperability from the exported wrapper alone. LMDIF_WRAPPER performs unconstrained smooth nonlinear least squares through finite-difference MINPACK LMDIF. Require M>=N>0, nonnegative TOL and LWA>=M*N+5*N+M; IWA has N entries. The binding sets FTOL=XTOL=TOL, GTOL=EPSFCN=0 and MODE=1; MAXFEV is passed through and backend INFO=8 is remapped to 4. X is overwritten; FVEC contains M residuals. Interpret INFO against MINPACK semantics and inspect residuals and identifiability independently; a local termination is not a global minimum, covariance estimate or certificate of a small residual.",
+            "evidence": [
+              {
+                "path": "src/minpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/wrappers.f90",
+                "sha256": "68cc22e5a1b64d3b91912700c789d5bc03d97be2c64fa6da170bb49e8f4d60a2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lmdif_wrapper",
+                "role": "public-entry-point",
+                "summary": "Finite-difference Levenberg-Marquardt residual minimization binding.",
+                "signature": "CALL lmdif_wrapper(CFCN,M,N,X,FVEC,TOL,MAXFEV,INFO,IWA,WA,LWA,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 167,
+                    "line_end": 177
+                  },
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 43,
+                    "line_end": 49
+                  }
+                ],
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 167,
+                "line_end": 202,
+                "module": "minpack_wrappers",
+                "usage": "use minpack_wrappers, only: lmdif_wrapper\n! Set a compatible residual callback and declare/initialize C-sized arrays.\n! M>=N>0; IWA(N), WA(LWA), LWA>=M*N+5*N+M.\ncall lmdif_wrapper(fptr,m,n,x,fvec,tol,maxfev,info,iwa,wa,lwa,args,nargs)\n! Interpret INFO (including remapping) and independently inspect FVEC.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-callback-setup fragment; dimensions and tolerances must be valid. No fit, finite differences, conditioning or stopping result was executed."
+              },
+              {
+                "procedure": "residual callback adapter",
+                "role": "implementation-helper",
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 84,
+                "line_end": 90
+              }
+            ]
+          },
+          {
+            "code": "K1b1a2",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. Callback dimensions are known by the callback rather than passed in its ABI. Module callback/args pointers are overwritten without save/restore; avoid nested calls through this interface. OpenMP threadprivate state is conditional on the build. The callback abstract interfaces here are not declared BIND(C); use the actual supported compiler/foreign-function ABI rather than assuming full standard interoperability from the exported wrapper alone. LMDER1_WRAPPER forwards residual and full user-Jacobian evaluation to LMDER1; LMSTR1_WRAPPER uses the row-wise Jacobian variant LMSTR1. In the full variant require LDFJAC>=M, FJAC(LDFJAC,N), IPVT(N) and LWA>=5*N+M. For the row variant require LDFJAC>=N (the returned factor is N by N), IPVT(N) and the same workspace lower bound. Both require M>=N>0. The callback receives X,FVEC,FJAC-or-row,IFLAG,ARGS, with IFLAG by reference but declared INTENT(IN); do not promise callback-requested early termination through that interface. LMDER uses IFLAG=1 for residuals, 2 for the full Jacobian; LMSTR uses IFLAG=1 for residuals and IFLAG>=2 for row IFLAG-1. Derivatives are of the residual vector, not the scalar squared norm. INFO and residual diagnostics must be checked; the factor returned in FJAC is not an untouched Jacobian or covariance matrix.",
+            "evidence": [
+              {
+                "path": "src/minpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/wrappers.f90",
+                "sha256": "68cc22e5a1b64d3b91912700c789d5bc03d97be2c64fa6da170bb49e8f4d60a2"
+              },
+              {
+                "path": "src/minpack/minpack.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/minpack.f90",
+                "sha256": "f27081eda969ccc37bc9cdc1c84c786a983ead1a21dea485961dfe8ebb18fa16"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lmder1_wrapper",
+                "role": "public-entry-point",
+                "summary": "User-supplied full-Jacobian nonlinear least-squares binding.",
+                "signature": "CALL lmder1_wrapper(CFCN,M,N,X,FVEC,FJAC,LDFJAC,TOL,INFO,IPVT,WA,LWA,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 223,
+                    "line_end": 234
+                  },
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 223,
+                "line_end": 240,
+                "module": "minpack_wrappers",
+                "usage": "use minpack_wrappers, only: lmder1_wrapper\n! Set the full residual/Jacobian callback, allocate FJAC(LDFJAC,N), IPVT(N),\n! WA(LWA), and initialize X/ARGS and valid dimensions/tolerance.\ncall lmder1_wrapper(fptr,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,lwa,args,nargs)\n! Inspect INFO and residuals; FJAC is overwritten by factorization data.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. Callback must distinguish residual versus derivative requests and use column-major Jacobian storage. No Jacobian, fit or convergence result was tested."
+              },
+              {
+                "procedure": "lmstr1_wrapper",
+                "role": "public-entry-point",
+                "summary": "Row-wise user-Jacobian nonlinear least-squares binding.",
+                "signature": "CALL lmstr1_wrapper(CFCN,M,N,X,FVEC,FJAC,LDFJAC,TOL,INFO,IPVT,WA,LWA,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 243,
+                    "line_end": 254
+                  },
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 243,
+                "line_end": 260,
+                "module": "minpack_wrappers",
+                "usage": "use minpack_wrappers, only: lmstr1_wrapper\n! Configure the row callback (IFLAG>=2 requests row IFLAG-1),\n! allocate FJAC(LDFJAC,N) with LDFJAC>=N and the documented workspace.\ncall lmstr1_wrapper(fptr,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,lwa,args,nargs)\n! Check INFO and the residuals independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. The row callback is not the full-Jacobian callback merely because both pass a pointer. No row, fit, storage or convergence behavior was tested."
+              },
+              {
+                "procedure": "full and row adapters",
+                "role": "implementation-helper",
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 101,
+                "line_end": 117
+              },
+              {
+                "procedure": "LMDER1 validation and dispatch",
+                "role": "implementation-helper",
+                "path": "src/minpack/minpack.f90",
+                "line_start": 1922,
+                "line_end": 1941
+              },
+              {
+                "procedure": "LMSTR1 validation and dispatch",
+                "role": "implementation-helper",
+                "path": "src/minpack/minpack.f90",
+                "line_start": 3127,
+                "line_end": 3148
+              }
+            ]
+          },
+          {
+            "code": "D1a3b",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. ENORM_WRAPPER returns the real Euclidean norm through an output argument. The inspected native ENORM splits small, intermediate and large magnitudes and uses scaled sums for extreme components, avoiding the naive unscaled sum-of-squares path for those ranges. N must be positive (the code divides by N); supply finite input. This is not an arbitrary-precision norm, a complex norm or a guarantee about NaN/infinity behavior.",
+            "evidence": [
+              {
+                "path": "src/minpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/wrappers.f90",
+                "sha256": "68cc22e5a1b64d3b91912700c789d5bc03d97be2c64fa6da170bb49e8f4d60a2"
+              },
+              {
+                "path": "src/minpack/minpack.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/minpack.f90",
+                "sha256": "f27081eda969ccc37bc9cdc1c84c786a983ead1a21dea485961dfe8ebb18fa16"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "enorm_wrapper",
+                "role": "public-entry-point",
+                "summary": "C binding returning a scaled real L2 vector norm.",
+                "signature": "CALL enorm_wrapper(N,X,RES)",
+                "declarations": [
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 274,
+                    "line_end": 277
+                  }
+                ],
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 274,
+                "line_end": 280,
+                "module": "minpack_wrappers",
+                "usage": "use iso_c_binding\nuse minpack_wrappers, only: enorm_wrapper\nreal(c_double) :: x(2),res\nx=[3._c_double,4._c_double]\ncall enorm_wrapper(2_c_int,x,res)\n! RES is the computed norm; no result was executed for this catalog.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Require N>0 and finite real values. No overflow/underflow stress cases or numerical result were run."
+              },
+              {
+                "procedure": "scaled native ENORM",
+                "role": "implementation-helper",
+                "path": "src/minpack/minpack.f90",
+                "line_start": 371,
+                "line_end": 423
+              }
+            ]
+          },
+          {
+            "code": "I1a1b",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. The public LSODA/LSODAR bindings forward to the separately bundled state-object ODEPACK edition, with internal dense finite-difference Jacobian selection JT=2. Their C callbacks take T by VALUE and Y/derivative-or-event/ARGS by reference. Callback slots are saved/restored and per-thread only when OpenMP directives are active; solver COMMON replacement is a local derived object. This is inspection of interface/state handling and dispatch, not independent verification of the entire ODEPACK integration/event algorithm or thread reentrancy. The nonstiff branch is a variable-order Adams multistep method, not a Runge-Kutta method. LSODA initializes at T_EVAL(1), copies U0 to the first output column, and continues through later requested times. Require NEQ>0, NTIME>=2, monotone times and valid nonzero error weights from scalar RTOL/ATOL; MXSTEP controls each solver call. A negative ISTATE exits early, leaving later output columns unassigned. LSODAR instead returns at TOUT or a detected event; ISTATE=3 and JROOT distinguish a root from ordinary completion. Zero crossings/touching or closely spaced events need independent assessment. No direction-filter option is present in this particular event wrapper.",
+            "evidence": [
+              {
+                "path": "src/odepack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/odepack/wrappers.f90",
+                "sha256": "9f1fac0e038eae334676a8d22934dfe920dfc4bad90c485e2da6957dbfec90e3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lsoda_wrapper",
+                "role": "public-entry-point",
+                "summary": "Requested-time ODE integration with automatic Adams/BDF selection.",
+                "signature": "CALL lsoda_wrapper(CFCN,NEQ,U0,T_EVAL,NTIME,YOUT,RTOL,ATOL,MXSTEP,ISTATE_OUT,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 156,
+                    "line_end": 165
+                  },
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 58
+                  }
+                ],
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 156,
+                "line_end": 217,
+                "module": "odepack_wrappers",
+                "usage": "use odepack_wrappers, only: lsoda_wrapper\n! Set a compatible C RHS callback; NEQ>0, NTIME>=2, valid scalar tolerances.\n! T_EVAL is monotone in the integration direction; U0 is at T_EVAL(1).\n! Allocate YOUT(NEQ,NTIME) and initialize all C-sized arguments.\ncall lsoda_wrapper(fptr,neq,u0,t_eval,ntime,yout,rtol,atol,mxstep,istate,args,nargs)\nif(istate<0) error stop \"integration failed; later YOUT columns may be undefined\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. No ODE, stiffness switching, error estimate, callback or concurrency behavior was tested."
+              },
+              {
+                "procedure": "lsodar_wrapper",
+                "role": "public-entry-point",
+                "summary": "ODE integration to an endpoint or detected event with JROOT flags.",
+                "signature": "CALL lsodar_wrapper(CFCN,GFCN,NEQ,U0,T0,TOUT,NG,Y_OUT,T_ROOT,JROOT, &\n RTOL,ATOL,MXSTEP,ISTATE_OUT,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 536,
+                    "line_end": 546
+                  },
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 66
+                  }
+                ],
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 536,
+                "line_end": 595,
+                "module": "odepack_wrappers",
+                "usage": "use odepack_wrappers, only: lsodar_wrapper\n! Initialize RHS and NG-component event callbacks, C-sized data and tolerances.\ncall lsodar_wrapper(fptr,gptr,neq,u0,t0,tout,ng,y_out,t_root,jroot, &\n rtol,atol,mxstep,istate,args,nargs)\nif(istate==3) then\n ! A root was reported; inspect JROOT and Y_OUT at T_ROOT.\nelse if(istate<0) then\n error stop \"inspect LSODAR failure\"\nend if",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. T_ROOT is the returned time even when no root is reported; only ISTATE=3 identifies an event return. No event, missed-root behavior or solution was tested."
+              },
+              {
+                "procedure": "RHS/event adapters",
+                "role": "implementation-helper",
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 110,
+                "line_end": 126
+              },
+              {
+                "procedure": "LSODA state initialization and native calls",
+                "role": "implementation-helper",
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 182,
+                "line_end": 215
+              }
+            ]
+          },
+          {
+            "code": "I1a2",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. The public LSODA/LSODAR bindings forward to the separately bundled state-object ODEPACK edition, with internal dense finite-difference Jacobian selection JT=2. Their C callbacks take T by VALUE and Y/derivative-or-event/ARGS by reference. Callback slots are saved/restored and per-thread only when OpenMP directives are active; solver COMMON replacement is a local derived object. This is inspection of interface/state handling and dispatch, not independent verification of the entire ODEPACK integration/event algorithm or thread reentrancy. The stiff branch uses BDF with automatic method switching; this wrapper exposes an explicit RHS ODE, not a general user-supplied DAE residual or mass matrix. LSODA initializes at T_EVAL(1), copies U0 to the first output column, and continues through later requested times. Require NEQ>0, NTIME>=2, monotone times and valid nonzero error weights from scalar RTOL/ATOL; MXSTEP controls each solver call. A negative ISTATE exits early, leaving later output columns unassigned. LSODAR instead returns at TOUT or a detected event; ISTATE=3 and JROOT distinguish a root from ordinary completion. Zero crossings/touching or closely spaced events need independent assessment. No direction-filter option is present in this particular event wrapper.",
+            "evidence": [
+              {
+                "path": "src/odepack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/odepack/wrappers.f90",
+                "sha256": "9f1fac0e038eae334676a8d22934dfe920dfc4bad90c485e2da6957dbfec90e3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lsoda_wrapper",
+                "role": "public-entry-point",
+                "summary": "Requested-time ODE integration with automatic Adams/BDF selection.",
+                "signature": "CALL lsoda_wrapper(CFCN,NEQ,U0,T_EVAL,NTIME,YOUT,RTOL,ATOL,MXSTEP,ISTATE_OUT,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 156,
+                    "line_end": 165
+                  },
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 58
+                  }
+                ],
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 156,
+                "line_end": 217,
+                "module": "odepack_wrappers",
+                "usage": "use odepack_wrappers, only: lsoda_wrapper\n! Set a compatible C RHS callback; NEQ>0, NTIME>=2, valid scalar tolerances.\n! T_EVAL is monotone in the integration direction; U0 is at T_EVAL(1).\n! Allocate YOUT(NEQ,NTIME) and initialize all C-sized arguments.\ncall lsoda_wrapper(fptr,neq,u0,t_eval,ntime,yout,rtol,atol,mxstep,istate,args,nargs)\nif(istate<0) error stop \"integration failed; later YOUT columns may be undefined\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. No ODE, stiffness switching, error estimate, callback or concurrency behavior was tested."
+              },
+              {
+                "procedure": "lsodar_wrapper",
+                "role": "public-entry-point",
+                "summary": "ODE integration to an endpoint or detected event with JROOT flags.",
+                "signature": "CALL lsodar_wrapper(CFCN,GFCN,NEQ,U0,T0,TOUT,NG,Y_OUT,T_ROOT,JROOT, &\n RTOL,ATOL,MXSTEP,ISTATE_OUT,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 536,
+                    "line_end": 546
+                  },
+                  {
+                    "path": "src/odepack/wrappers.f90",
+                    "line_start": 51,
+                    "line_end": 66
+                  }
+                ],
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 536,
+                "line_end": 595,
+                "module": "odepack_wrappers",
+                "usage": "use odepack_wrappers, only: lsodar_wrapper\n! Initialize RHS and NG-component event callbacks, C-sized data and tolerances.\ncall lsodar_wrapper(fptr,gptr,neq,u0,t0,tout,ng,y_out,t_root,jroot, &\n rtol,atol,mxstep,istate,args,nargs)\nif(istate==3) then\n ! A root was reported; inspect JROOT and Y_OUT at T_ROOT.\nelse if(istate<0) then\n error stop \"inspect LSODAR failure\"\nend if",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment. T_ROOT is the returned time even when no root is reported; only ISTATE=3 identifies an event return. No event, missed-root behavior or solution was tested."
+              },
+              {
+                "procedure": "RHS/event adapters",
+                "role": "implementation-helper",
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 110,
+                "line_end": 126
+              },
+              {
+                "procedure": "LSODA state initialization and native calls",
+                "role": "implementation-helper",
+                "path": "src/odepack/wrappers.f90",
+                "line_start": 182,
+                "line_end": 215
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. FITPACK stores knots and B-spline coefficients, not raw samples alone. Its wrapper does not infer array sizes, degrees, knot validity or workspace. The selected bundled sources are REAL*8/default INTEGER; preserve the matching C-sized ABI. CURFIT with IOPT=0 and S=0 constructs a univariate polynomial interpolating spline; SPLEV evaluates the representation. Require M>K, strictly increasing X, positive W, 1<=K<=5, bounds containing data, NEST>=M+K+1 for interpolation, LWRK>=M*(K+1)+NEST*(7+3*K), IWRK(NEST). The local fitter adds TOL and MAXIT trailing arguments, so historical unmodified interfaces are not interchangeable. Nonpositive CURFIT IER values can be normal returns; inspect FP/knots and preserve continuation work arrays if selecting IOPT=1. SPLEV E=0/1/2/3 controls extrapolation/zero/error/boundary value; E=2 can return after partial output. No claim of interpolation accuracy or suitability for noisy data is inferred from successful dispatch.",
+            "evidence": [
+              {
+                "path": "src/fitpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/wrappers.f90",
+                "sha256": "7a5e7732204449aeb7432ed287e4a9ff36c08e8051025d02aa72ef5e01bd25e8"
+              },
+              {
+                "path": "src/fitpack/curfit.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/curfit.f",
+                "sha256": "5444671c73c1750415a938ead186713c0aa9907af9ee9fe2a0bfee471447de31"
+              },
+              {
+                "path": "src/fitpack/splev.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/splev.f",
+                "sha256": "23065768cb6e0a1119ca7231e21b711417b305a0e13333e146e1a38d4b1c6a65"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "curfit_wrapper",
+                "role": "public-entry-point",
+                "summary": "Construct an interpolating spline by selecting S=0 in the modified FITPACK driver.",
+                "signature": "CALL curfit_wrapper(IOPT,M,X,Y,W,XB,XE,K,S,NEST,N,T,C,FP,WRK,LWRK,IWRK,TOL,MAXIT,IER)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 189,
+                    "line_end": 198
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 189,
+                "line_end": 202,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: curfit_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall curfit_wrapper(0_c_int,m,x,y,w,xb,xe,k,0._c_double,nest,n,t,c, &\n fp,wrk,lwrk,iwrk,tol,maxit,ier)\nif(ier>0) error stop \"inspect spline construction status\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Import ISO_C_BINDING for literals. S=0 selects interpolation; IER=-1 is a normal interpolating return.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "splev_wrapper",
+                "role": "public-entry-point",
+                "summary": "Evaluate a supplied univariate B-spline representation.",
+                "signature": "CALL splev_wrapper(T,N,C,K,X,Y,M,E,IER)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 34,
+                    "line_end": 38
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 34,
+                "line_end": 42,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: splev_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall splev_wrapper(t,n,c,k,xq,yq,mq,2_c_int,ier)\nif(ier/=0) error stop \"spline evaluation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Import ISO_C_BINDING. E=2 reports an out-of-support query; earlier Y entries may already have been assigned.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "CURFIT validation and interpolation dispatch",
+                "role": "implementation-helper",
+                "path": "src/fitpack/curfit.f",
+                "line_start": 206,
+                "line_end": 263
+              },
+              {
+                "procedure": "SPLEV support handling and B-spline evaluation",
+                "role": "implementation-helper",
+                "path": "src/fitpack/splev.f",
+                "line_start": 71,
+                "line_end": 137
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. FITPACK stores knots and B-spline coefficients, not raw samples alone. Its wrapper does not infer array sizes, degrees, knot validity or workspace. The selected bundled sources are REAL*8/default INTEGER; preserve the matching C-sized ABI. SPLDER constructs differentiated B-spline coefficients in working storage and evaluates the selected derivative order NU. This is differentiation of an existing fitted spline, not arbitrary black-box finite differences, automatic differentiation or direct derivatives of unmodeled raw data. Require 0<=NU<=K, valid knots/coefficients, M>=1 and WRK(N); E controls the out-of-domain policy. Spline approximation error remains distinct from floating-point evaluation error; differentiation can amplify data/model error.",
+            "evidence": [
+              {
+                "path": "src/fitpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/wrappers.f90",
+                "sha256": "7a5e7732204449aeb7432ed287e4a9ff36c08e8051025d02aa72ef5e01bd25e8"
+              },
+              {
+                "path": "src/fitpack/splder.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/splder.f",
+                "sha256": "97a75aaf4d19e1c2a72d1d41cc9f62ecfa3e3f85b42746107b4cac2b2ed78602"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "splder_wrapper",
+                "role": "public-entry-point",
+                "summary": "Evaluate a derivative of an already fitted polynomial spline.",
+                "signature": "CALL splder_wrapper(T,N,C,K,NU,X,Y,M,E,WRK,IER)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 44,
+                    "line_end": 48
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 44,
+                "line_end": 52,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: splder_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall splder_wrapper(t,n,c,k,nu,xq,dq,mq,2_c_int,wrk,ier)\nif(ier/=0) error stop \"inspect spline derivative status\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Import ISO_C_BINDING; 0<=NU<=K, WRK(N), valid knots/coefficient storage.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "native coefficient differentiation and evaluation",
+                "role": "implementation-helper",
+                "path": "src/fitpack/splder.f",
+                "line_start": 74,
+                "line_end": 191
+              }
+            ]
+          },
+          {
+            "code": "H2a2a2",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. FITPACK stores knots and B-spline coefficients, not raw samples alone. Its wrapper does not infer array sizes, degrees, knot validity or workspace. The selected bundled sources are REAL*8/default INTEGER; preserve the matching C-sized ABI. SPLINT integrates the supplied polynomial spline by calling FPINTB for integrated normalized B-splines and forming their coefficient-weighted sum. There is no requested accuracy, adaptive callback, IER or quadrature-error estimate, hence the nonautomatic special-integrand class. WRK has N entries. The spline is considered zero outside (T(K+1),T(N-K)); this differs from SPLEV extrapolation policies. This integral belongs to the fitted spline, not necessarily to the underlying sampled physical function.",
+            "evidence": [
+              {
+                "path": "src/fitpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/wrappers.f90",
+                "sha256": "7a5e7732204449aeb7432ed287e4a9ff36c08e8051025d02aa72ef5e01bd25e8"
+              },
+              {
+                "path": "src/fitpack/splint.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/splint.f",
+                "sha256": "99c90da153c21a1c79ac6ab53594ae5bd26990b1fa8fd6f41854dd6fd736d818"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "splint_wrapper",
+                "role": "public-entry-point",
+                "summary": "Integrate a supplied univariate spline using integrated B-spline basis functions.",
+                "signature": "CALL splint_wrapper(T,N,C,K,A,B,WRK,RES)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 54,
+                    "line_end": 59
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 54,
+                "line_end": 63,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: splint_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall splint_wrapper(t,n,c,k,a,b,wrk,res)\n! There is no IER output: validate representation and integration limits first.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The native convention treats the spline as zero outside its support.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "native integrated basis accumulation",
+                "role": "implementation-helper",
+                "path": "src/fitpack/splint.f",
+                "line_start": 41,
+                "line_end": 59
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. FITPACK stores knots and B-spline coefficients, not raw samples alone. Its wrapper does not infer array sizes, degrees, knot validity or workspace. The selected bundled sources are REAL*8/default INTEGER; preserve the matching C-sized ABI. REGRID with S=0 constructs a tensor-product spline interpolating rectangular-grid data; BISPEV evaluates such a representation. X/Y must be strictly increasing, MX>KX and MY>KY, degrees 1..5; interpolation storage requires NXEST>=MX+KX+1 and NYEST>=MY+KY+1. Input Z uses Z(MY*(I-1)+J), not an assumed Fortran Z(MX,MY) flattening. The modified fitter adds TOL/MAXIT. Its explicit workspace expressions and status are linked in implementation evidence. BISPEV requires sorted query axes, LWRK>=(KX+1)*MX+(KY+1)*MY and KWRK>=MX+MY, and returns flattened grid values. These are gridded tensor-product operations, not scattered-data triangulation or a general curved-domain interpolator.",
+            "evidence": [
+              {
+                "path": "src/fitpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/wrappers.f90",
+                "sha256": "7a5e7732204449aeb7432ed287e4a9ff36c08e8051025d02aa72ef5e01bd25e8"
+              },
+              {
+                "path": "src/fitpack/regrid.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/regrid.f",
+                "sha256": "70230fc075aa89eb460bf121931e175b4f91332ad3be2c2217bb6da8ec027849"
+              },
+              {
+                "path": "src/fitpack/bispev.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/bispev.f",
+                "sha256": "0dd35dd00dabb8c9755215cdc1055f1a4bf31494921faffb5e2723603dc5d2f2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "regrid_wrapper",
+                "role": "public-entry-point",
+                "summary": "Construct a rectangular-grid interpolating tensor-product spline with S=0.",
+                "signature": "CALL regrid_wrapper(IOPT,MX,X,MY,Y,Z,XB,XE,YB,YE,KX,KY,S, &\n NXEST,NYEST,NX,TX,NY,TY,C,FP,WRK,LWRK,IWRK,KWRK,TOL,MAXIT,IER)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 304,
+                    "line_end": 317
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 304,
+                "line_end": 322,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: regrid_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall regrid_wrapper(0_c_int,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,0._c_double, &\n nxest,nyest,nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,tol,maxit,ier)\nif(ier>0) error stop \"inspect grid spline construction\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Import ISO_C_BINDING and use the source workspace formula.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "bispev_wrapper",
+                "role": "public-entry-point",
+                "summary": "Evaluate a tensor-product spline on a Cartesian product of query coordinates.",
+                "signature": "CALL bispev_wrapper(TX,NX,TY,NY,C,KX,KY,X,MX,Y,MY,Z,WRK,LWRK,IWRK,KWRK,IER)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 460,
+                    "line_end": 466
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 460,
+                "line_end": 470,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: bispev_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall bispev_wrapper(tx,nx,ty,ny,c,kx,ky,xq,mqx,yq,mqy,zq, &\n wrk,lwrk,iwrk,kwrk,ier)\nif(ier/=0) error stop \"inspect surface evaluation status\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Query arrays must be sorted and within the intended support.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "REGRID shape/workspace validation and dispatch",
+                "role": "implementation-helper",
+                "path": "src/fitpack/regrid.f",
+                "line_start": 283,
+                "line_end": 355
+              },
+              {
+                "procedure": "BISPEV validation and tensor-product dispatch",
+                "role": "implementation-helper",
+                "path": "src/fitpack/bispev.f",
+                "line_start": 71,
+                "line_end": 103
+              }
+            ]
+          },
+          {
+            "code": "H2b1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "Review covers the named C binding, declarations, callback adaptation and native dispatch, not an independent verification of every bundled solver kernel. Match C_INT/default-integer and C_DOUBLE/native-real kinds in the complete library build. All non-VALUE scalar arguments are passed by reference. FITPACK stores knots and B-spline coefficients, not raw samples alone. Its wrapper does not infer array sizes, degrees, knot validity or workspace. The selected bundled sources are REAL*8/default INTEGER; preserve the matching C-sized ABI. DBLINT integrates a supplied bivariate tensor-product spline over a rectangle by forming products of one-dimensional integrated basis functions and contracting with the flattened coefficient array. This is representation-specific nonadaptive integration, not a general two-variable callback cubature routine or raw-grid sum. H2b1 is retained at the rectangular-region level because the finer callback-versus-grid branches do not describe its coefficient representation precisely. WRK requires NX+NY-KX-KY-2 entries. The native convention extends the spline by zero outside its support; no IER, tolerance or independent error bound is exposed.",
+            "evidence": [
+              {
+                "path": "src/fitpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/wrappers.f90",
+                "sha256": "7a5e7732204449aeb7432ed287e4a9ff36c08e8051025d02aa72ef5e01bd25e8"
+              },
+              {
+                "path": "src/fitpack/dblint.f",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/dblint.f",
+                "sha256": "1030b8ae2a22de4b345283c58176bd3ca223fe1fde000c6abd3eb67bbf6f9753"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dblint_wrapper",
+                "role": "public-entry-point",
+                "summary": "Integrate a bivariate spline over a rectangle.",
+                "signature": "CALL dblint_wrapper(TX,NX,TY,NY,C,KX,KY,XB,XE,YB,YE,WRK,RES)",
+                "declarations": [
+                  {
+                    "path": "src/fitpack/wrappers.f90",
+                    "line_start": 153,
+                    "line_end": 159
+                  }
+                ],
+                "path": "src/fitpack/wrappers.f90",
+                "line_start": 153,
+                "line_end": 163,
+                "module": "fitpack_wrappers",
+                "usage": "use fitpack_wrappers, only: dblint_wrapper\n! Post-setup fragment: declare matching C-sized arguments and initialize\n! a valid spline representation, dimensions and sufficient workspace.\ncall dblint_wrapper(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk,res)\n! No IER or adaptive error estimate is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. WRK needs NX+NY-KX-KY-2 entries; validate all knots and coefficients.  This fragment is not a standalone driver. No spline result, boundary behavior or error status was tested."
+              },
+              {
+                "procedure": "native rectangular basis integral contraction",
+                "role": "implementation-helper",
+                "path": "src/fitpack/dblint.f",
+                "line_start": 59,
+                "line_end": 88
+              }
+            ]
           }
         ],
         "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
@@ -65228,11 +65977,11 @@
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
         },
         "license": {
-          "label": "BSD-3-Clause wrappers; bundled QUADPACK/MINPACK notices apply",
+          "label": "BSD-3-Clause wrappers; bundled numerical-component notices apply",
           "spdx_expression": null,
           "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
           "reviewed_on": "2026-11-06",
-          "notes": "The project root licenses its own wrapper/glue code under BSD-3-Clause and explicitly preserves component terms. The selected QUADPACK copy has a BSD-style notice; MINPACK includes MIT contributor terms plus the retained University of Chicago/Argonne notice. Preserve component notices instead of flattening the entire bundled stack to a single unsupported expression.",
+          "notes": "The root licenses SciJit wrapper/glue code under BSD-3-Clause. QUADPACK and MINPACK retain their own notices as previously recorded. The FITPACK file records Netlib/Dierckx provenance, no separate grant text and locally modified fitter signatures; do not infer a new SPDX grant from long redistribution history. The ODEPACK notice declares that component public domain with an LLNL disclaimer. These scoped component findings do not flatten the full distribution to one license expression.",
           "evidence": [
             {
               "path": "LICENSE",
@@ -65248,6 +65997,16 @@
               "path": "src/minpack/LICENSE.txt",
               "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/LICENSE.txt",
               "sha256": "8e51afb625ad0e8c069ed844c7c95eafe88cbecd4462971a03c3799e2de9ed18"
+            },
+            {
+              "path": "src/fitpack/LICENSE",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/fitpack/LICENSE",
+              "sha256": "fc92c6543d4247e46f9a7a6b78a7ec53fb915b46162747d33d532862f990846b"
+            },
+            {
+              "path": "src/odepack/LICENSE",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/odepack/LICENSE",
+              "sha256": "77997f5f91ed2f116926ce6d583ee5a3b7b6458ee95e5361e31366f3987e6956"
             },
             {
               "path": "docs/credits.md",
@@ -77410,12 +78169,166 @@
             ],
             "notes": "The README explicitly expands ANN as Approximate Nearest Neighbors, not artificial neural networks. The underlying algorithms/data structures are C++, with Fortran access provided here. Approximation guarantees, high-dimensional performance and current build compatibility were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "7ea83844834fa602ea3ed9a38b67c36998e44ace",
+            "reviewed_on": "2026-11-06",
+            "notes": "The Fortran ANN module forwards point-cloud construction and single-query k-nearest-neighbor search to the C++ ANN kd-tree. The bridge copies a Fortran point matrix with ROWS points and COLS coordinates using input offset I+J*ROWS; QUERY has DIM coordinates, compatible with the built tree. The backend uses EPS to relax search and returns zero-based point indices with squared Euclidean distances; EPS=0 selects exact search under the native algorithm. Require 1<=K<=ROWS and nonnegative EPS. Important reviewed defects prevent treating this as a ready-to-use ownership API: NNIDX/DISTS pointers are written into but never allocated by the bridge, so callers must supply live K-entry buffers; C++ temporary arrays are freed with scalar DELETE rather than matching array deallocation; the public Fortran destroy routine only nulls its handle, with its C destroy call commented out; construction point storage ownership is not released by that public path. The C destroy declaration also passes a pointer reference while the C++ definition takes a pointer value. Native search state uses file-scope globals, so independent concurrent search is not assumed. This is a mapping of the implemented kd-tree bridge with defects recorded, not a successful build, leak-free lifecycle, numerical verification or batch-query interface.",
+            "evidence": [
+              {
+                "path": "src/ANN_mod.F90",
+                "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/ANN_mod.F90",
+                "sha256": "d1c00ca7066e85203b80e29f72c43fed9bee7069ce1f75c8d038ddbc1e7d7555"
+              },
+              {
+                "path": "src/ANN_fi.cpp",
+                "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/ANN_fi.cpp",
+                "sha256": "e7ad13b01e32979d19f478c35e58aa645eb99755e7edfad5f59c949f6e506989"
+              },
+              {
+                "path": "src/ANN_types_mod.F90",
+                "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/ANN_types_mod.F90",
+                "sha256": "c29d511ae5796b06b8090102a86435f4ec10e60b3464f1515f812fb4140b78c4"
+              },
+              {
+                "path": "src/kd_search.cpp",
+                "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/kd_search.cpp",
+                "sha256": "1d018f74b992cf75693a700f83df9e3be81510ecdabf4023829fd0a899a7bb7f"
+              },
+              {
+                "path": "include/ANN/ANN.h",
+                "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/include/ANN/ANN.h",
+                "sha256": "dcb91184580c544d09e573761551d29d6de1484db48457df8264673e4d462157"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ann_buildTree",
+                "role": "public-entry-point",
+                "summary": "Fortran point-cloud kd-tree construction bridge; ownership repair is required.",
+                "signature": "CALL ann_buildTree(ROWS,COLS,DATAPTS,KDTREE)",
+                "declarations": [
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 8,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 39,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/ANN_mod.F90",
+                "line_start": 39,
+                "line_end": 45,
+                "module": "ANN_mod",
+                "usage": "! Contract only; repair/validate bridge ownership and deallocation first.\n! POINTS(ROWS,COLS) is contiguous REAL(C_DOUBLE), TARGET.\n! ROWS/COLS use ANN_INT=C_INT; TREE is TYPE(C_PTR).\n!   call ann_buildTree(rows,cols,c_loc(points),tree)\n! This allocates C++ tree/point storage; the current public destroy leaks it.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Deliberately commented contract fragment, not a recommended executable driver. Match the complete C++/Fortran ABI and repair lifetime/cleanup before use."
+              },
+              {
+                "procedure": "ann_kSearch",
+                "role": "public-entry-point",
+                "summary": "Single-query k-nearest-neighbor bridge with caller-owned output buffers.",
+                "signature": "CALL ann_kSearch(QUERYPT,DIM,K,NNIDX,DISTS,EPS,KDTREE)",
+                "declarations": [
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 18,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 47,
+                    "line_end": 54
+                  }
+                ],
+                "path": "src/ANN_mod.F90",
+                "line_start": 47,
+                "line_end": 55,
+                "module": "ANN_mod",
+                "usage": "! Contract only after bridge repair and valid tree construction.\n! QUERY(DIM), DIST(K): contiguous REAL(C_DOUBLE), TARGET.\n! IDX(K): INTEGER(C_INT), TARGET; initialize pointer variables to their C_LOC.\n!   idxptr=c_loc(idx); distptr=c_loc(dist)\n!   call ann_kSearch(c_loc(query),dim,k,idxptr,distptr,eps,tree)\n! Returned IDX values are zero-based; DIST contains squared distances.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Deliberately commented post-repair sketch. Output C_PTR variables must already refer to live buffers; do not pass uninitialized pointers expecting allocation. No query, approximation guarantee, memory behavior or concurrent call was tested."
+              },
+              {
+                "procedure": "ann_destroyTree",
+                "role": "public-entry-point",
+                "summary": "Current public cleanup nulls the handle without freeing the tree.",
+                "signature": "CALL ann_destroyTree(KDTREE)",
+                "declarations": [
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 31,
+                    "line_end": 35
+                  },
+                  {
+                    "path": "src/ANN_mod.F90",
+                    "line_start": 57,
+                    "line_end": 61
+                  }
+                ],
+                "path": "src/ANN_mod.F90",
+                "line_start": 57,
+                "line_end": 61,
+                "module": "ANN_mod"
+              },
+              {
+                "procedure": "C++ allocation, copy, query and cleanup",
+                "role": "implementation-helper",
+                "path": "src/ANN_fi.cpp",
+                "line_start": 7,
+                "line_end": 69
+              },
+              {
+                "procedure": "native kd-tree search/state",
+                "role": "implementation-helper",
+                "path": "src/kd_search.cpp",
+                "line_start": 78,
+                "line_end": 118
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-2.1-or-later upstream ANN notice; bridge scope not separately stated",
+          "spdx_expression": null,
+          "revision": "7ea83844834fa602ea3ed9a38b67c36998e44ace",
+          "reviewed_on": "2026-11-06",
+          "notes": "The upstream ANN COPYRIGHT grants LGPL version 2.1 or later and the repository includes that license. README names the Fortran-interface contributors, but the selected bridge files contain no separate grant/attribution header establishing additional terms. Record the explicit upstream grant and scope uncertainty rather than treating public access as a new permission grant.",
+          "evidence": [
+            {
+              "path": "COPYRIGHT",
+              "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/COPYRIGHT",
+              "sha256": "3b142f4adfdf3f2aac806978c7d52dcdec968c5f32bb22d15f338e395fd1e425"
+            },
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/LICENSE",
+              "sha256": "81d15b6bb9472b2eccac12b2799afa0b0ddefaca91d5dfb01bfe1ea3a2fd52cd"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/README",
+              "sha256": "6d3a4e0cf880789f1d3288eabc947f0dd618d70d60fead2d84354fa00a6dcf39"
+            },
+            {
+              "path": "src/ANN_mod.F90",
+              "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/ANN_mod.F90",
+              "sha256": "d1c00ca7066e85203b80e29f72c43fed9bee7069ce1f75c8d038ddbc1e7d7555"
+            },
+            {
+              "path": "src/ANN_fi.cpp",
+              "url": "https://github.com/Box-Tools/ANN-Fortran/blob/7ea83844834fa602ea3ed9a38b67c36998e44ace/src/ANN_fi.cpp",
+              "sha256": "e7ad13b01e32979d19f478c35e58aa645eb99755e7edfad5f59c949f6e506989"
+            }
+          ]
         }
       },
       "imports": {}
