@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 434 repositories now have 620 source-reviewed
+Reviewed on 2026-11-06. 437 repositories now have 633 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-420 repository cards now identify public routines and link their usage lines
+423 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 434 independently source-reviewed repositories now have an
+separately. All 437 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -459,6 +459,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | BaM | `BaM_tools::BaM_Fit` | GPL-3.0 root text; dependency terms separate |
 | freeCappuccino legacy snapshot | `dpcg`, `bicgstab`, `GaussSeidel` | GPL-3.0-only root notice |
 | NumX | `MCM`, `VARIAN`, `VOLAT`, `SKEWN`, `KURTOS`, `COVM`, `CORM`, `COVCOR`, `CORCOV`, `TENSORK`, `TENSORKK`, `getNormalPdf`, `GENNOR` | Apache-2.0 root text; selected RNG files retain conflicting proprietary notices |
+| SAM Fortran library | `SKYSOLVE` | Apache-2.0 root and selected source notices |
+| TOOLIB | `cholesky::choldc`, `cholesky::cholsl`, `least_squares::moindres_carres_lineaire`, `least_squares::moindres_carres`, `intpl::interp1D`, `intpl::interp2D`, `fftw3::tab_init_fftw3`, `fftw3::tab_calc_fftw3`, `fftw3::tab_end_fftw3`, `sort_arrays::sort_array2`, `tchebychev::tcheby`, `tchebychev::tab_tcheby` | GPL-3.0 root text; component notices and Numerical Recipes provenance retained |
+| chunkmatc | `adapgauss`, `legewhts`, `legepol` | BSD-3-Clause-Modification for selected Rokhlin numerical sources |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -913,6 +916,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [BaM](https://github.com/bam-tools/bam) | M1b | Configured Bayesian-model adaptive Metropolis sampling entry | External BMSL/miniDMSL sampler, loaded prior/model state, output files and warning/error contract. |
 | [freeCappuccino legacy snapshot](https://github.com/nikola-m/freecappuccino) | D2b4; D2a4 | Serial CSR conjugate gradients, BiCGStab and Gauss-Seidel | Shared mesh/control state, SPD/structure assumptions, cut-coupling limits and independent final residual checks. |
 | [NumX](https://github.com/alpgodev/numx) | L1a1a; L1a1b; L1a1c; L1c1b; L1c1; L5a1n; L6a14 | Raw-data means, dispersion, shape, covariance, higher co-moments and normal density/sampling | Estimator/status conventions, workspace sizing, precision loss, RNG return-kind mismatch and conflicting license notices. |
+| [SAM Fortran library](https://github.com/sap-archive/sam-lib) | D2b4 | Symmetric skyline LDL-transpose full-system solve | Packed profile bounds, pivot corrections, correction initialization, operation flags and overwritten storage. |
+| [TOOLIB](https://github.com/tribo-pprime/toolib) | D2b1b; D9a1; K1b1a2; E1a; E2a; J1b; N6a2a; N6a2b; C3a2 | Dense SPD solves, linear/nonlinear fits, grid prolongation, FFTs, sorting and Chebyshev values | Mixed factor storage, fit termination/status, zero-based bounds, FFT signs/lifecycle and component terms. |
+| [chunkmatc](https://github.com/zgimbutas/chunkmatc) | H2a1a1; H2a1a2; C3a2 | Adaptive/fixed Gauss-Legendre quadrature and Legendre polynomial values/derivatives | Per-leaf tolerance, callback ABI, legacy array extents, Newton limits and endpoint derivatives. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1656,3 +1662,12 @@ posterior sampling from a standalone density sampler. The NUMX normal-generator
 contract remains commented until its uniform-return-kind mismatch is repaired.
 Shared state, status limitations, residual checks and conflicting file-level
 license notices remain explicit. No implementation is certified by these mappings.
+
+TOOLIB, chunkmatc and SAM-lib have thirteen additional source-reviewed
+mappings and sixteen distinct public entry-point annotations. Calling sketches
+were not compiled or run. Reviews distinguish factor storage from original
+matrices, normal equations from rank-revealing least squares, grid prolongation
+from arbitrary-coordinate interpolation, fixed from adaptive quadrature and
+per-leaf tolerance from global error control. FFT sign/normalization conventions,
+legacy array extents, nonlinear-fit termination limits and skyline pivot
+corrections remain explicit. Component license findings retain their scope.
