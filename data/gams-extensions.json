@@ -936,6 +936,12 @@
       "parent": "L5a1",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "D4b3": {
+      "label": "Complex Hermitian",
+      "parent": "D4b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }

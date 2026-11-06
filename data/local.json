@@ -20445,12 +20445,239 @@
             ],
             "notes": "The README identifies a specialized generalized hyperbolic SVD/EVD implementation and JACSD dependency. It explicitly says GNU Fortran 9 and newer are unsupported and documents GNU Fortran 8 support; modern compiler readiness is not assumed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "02b05554222a43db0c247acf55c64df14de50963",
+            "reviewed_on": "2026-11-06",
+            "notes": "ZHZL1SA is a public module procedure included into HIF_HZ, not a standalone external routine or LAPACK-compatible driver. Match DWP, default INTEGER, SIMD/alignment parameters and the JACSD/VN/JSTRAT and BLAS/OpenMP build; the GNU make fragment uses -fdefault-integer-8. H(LDH,N) and S(LDS,N) are overwritten, Z(LDZ,N) is initialized internally to identity then accumulated, and JVEC(M) encodes the diagonal signature with entries +1/-1. Selected usage requires M>=N>=2, even N, aligned leading dimensions/storage, a valid noncolliding JS/JSPAIR schedule generated through JSTRAT, NSWP>=1, valid CPR/TPC and enough stack storage for vector/thread scratch. The actual OpenMP team size must not exceed CPR because thread IDs index CPR-wide scratch arrays; disable dynamic team sizing and configure the matching team explicitly. Preserve original factors for residual checks. INFO<0 is an input rejection; for nonempty valid work INFO is the sweep index, so positive INFO<=NSWP can be normal and NSWP+1 means the sweep budget was exhausted. Internal STOPs and floating-point failures are not fully represented by INFO. The selected positive-signature JVEC=+1 case is a complex generalized singular-value decomposition of the factor pair (H0,S0), with S0 full column rank and suitable regularity. One-sided Hari-Zimmermann pair transformations act on H, S and the accumulated Z; final column normalization returns SY/SW and scales Z, giving factor relations H0*Z=H_out*diag(SY) and S0*Z=S_out*diag(SW). These generalized values/vectors use project conventions rather than ordinary singular values of one matrix. EY/EW are pre-normalization squared factor-column norms, EE=EY/EW, and SY/SW are normalized together with SS. This mapping remains at GAMS D6 because that hierarchy does not distinguish this generalized factor-pair decomposition cleanly. Review covers public contract, selected Gram accumulation, transformation application and final normalization; not every pair formula, hyperbolic degeneracy, rank-deficient case or convergence proof.",
+            "evidence": [
+              {
+                "path": "src/shared/zhzl1sa.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/zhzl1sa.F90",
+                "sha256": "01241765409cedd5b7ee5ec71437dfd2eaab87d37ae455067035eb87c851c9c1"
+              },
+              {
+                "path": "src/shared/hif_hz.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/hif_hz.F90",
+                "sha256": "71445a667c045fc9edd215135d1f1eee7b62678487abd3295b768c6280d5f455"
+              },
+              {
+                "path": "src/shared/hz.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/hz.F90",
+                "sha256": "c567e3bf10f2b86d332b8ea5f9ac8915d52b1cdd5214a8c1b7584b4cea4ae429"
+              },
+              {
+                "path": "src/test/zhzl1sat.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/test/zhzl1sat.F90",
+                "sha256": "272ba5453d65fff1db5d96aab4157599d38dce3deb90ff3135f7b2a0e4928289"
+              },
+              {
+                "path": "src/shared/params.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/params.F90",
+                "sha256": "58b5f6d10aeb94efbe8345e3064a3dd4b6bc9eebbcfafbf1701294a34440bdf2"
+              },
+              {
+                "path": "src/shared/blas_utils.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/blas_utils.F90",
+                "sha256": "4c8e89ff226aca37f66dc99b39567be519237668645ba5d0a218e86daa02752e"
+              },
+              {
+                "path": "src/gnu.mk",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/gnu.mk",
+                "sha256": "245207dad828b937cb0f91e108b6d24630e274beed3c01bdb0cb4c7f6b7cfd47"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZHZL1SA",
+                "role": "public-entry-point",
+                "summary": "Public module Hari-Zimmermann complex generalized singular-value procedure.",
+                "signature": "CALL ZHZL1SA(M,N,H,LDH,JVEC,S,LDS,Z,LDZ,JS,JSPAIR, &\n NSWP,CPR,TPC,EE,EY,EW,SY,SW,SS,NROT,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/shared/zhzl1sa.F90",
+                    "line_start": 2,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "src/shared/hif_hz.F90",
+                    "line_start": 1,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/shared/hz.F90",
+                    "line_start": 12,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/gnu.mk",
+                    "line_start": 18,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/shared/zhzl1sa.F90",
+                "line_start": 2,
+                "line_end": 704,
+                "module": "HIF_HZ",
+                "examples": [
+                  {
+                    "path": "src/test/zhzl1sat.F90",
+                    "line_start": 23,
+                    "line_end": 50
+                  },
+                  {
+                    "path": "src/test/zhzl1sat.F90",
+                    "line_start": 99,
+                    "line_end": 113
+                  }
+                ],
+                "usage": "use hif_hz, only: zhzl1sa\nuse omp_lib, only: omp_set_dynamic,omp_set_num_threads, &\n                   omp_get_dynamic,omp_get_max_threads\n! After compatible aligned allocation, initialized H/S/JVEC, and valid\n! JSTRAT JS/JSPAIR schedule; M>=N>=2, even N, NSWP>=1:\ncall omp_set_dynamic(logical(.false.,kind(omp_get_dynamic())))\ncall omp_set_num_threads(int(cpr,kind(omp_get_max_threads())))\ncall zhzl1sa(m,n,h,ldh,jvec,s,lds,z,ldz,js,jspair, &\n nswp,cpr,tpc,ee,ey,ew,sy,sw,ss,nrot,info)\nif(info<0.or.info>nswp) error stop \"invalid input or sweep limit\"\n! Check original-factor residuals independently; INFO is not an error bound.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation/schedule fragment. Select JVEC=+1 and full-column-rank S for this generalized-SVD sketch. Match the OpenMP module integer kinds to the linked runtime and the promoted default-integer build. Author test setup is linked as inspected usage evidence; no decomposition, eigenpair residual, orthogonality, convergence or scaling check was executed."
+              },
+              {
+                "procedure": "sweep stopping count and final signed/ordinary norms",
+                "role": "implementation-helper",
+                "path": "src/shared/zhzl1sa.F90",
+                "line_start": 598,
+                "line_end": 694
+              }
+            ]
+          },
+          {
+            "code": "D4b3",
+            "level": "source-reviewed",
+            "revision": "02b05554222a43db0c247acf55c64df14de50963",
+            "reviewed_on": "2026-11-06",
+            "notes": "ZHZL1SA is a public module procedure included into HIF_HZ, not a standalone external routine or LAPACK-compatible driver. Match DWP, default INTEGER, SIMD/alignment parameters and the JACSD/VN/JSTRAT and BLAS/OpenMP build; the GNU make fragment uses -fdefault-integer-8. H(LDH,N) and S(LDS,N) are overwritten, Z(LDZ,N) is initialized internally to identity then accumulated, and JVEC(M) encodes the diagonal signature with entries +1/-1. Selected usage requires M>=N>=2, even N, aligned leading dimensions/storage, a valid noncolliding JS/JSPAIR schedule generated through JSTRAT, NSWP>=1, valid CPR/TPC and enough stack storage for vector/thread scratch. The actual OpenMP team size must not exceed CPR because thread IDs index CPR-wide scratch arrays; disable dynamic team sizing and configure the matching team explicitly. Preserve original factors for residual checks. INFO<0 is an input rejection; for nonempty valid work INFO is the sweep index, so positive INFO<=NSWP can be normal and NSWP+1 means the sweep budget was exhausted. Internal STOPs and floating-point failures are not fully represented by INFO. The signature-weighted factor representation defines a complex Hermitian pencil A=H0^H*diag(JVEC)*H0 and B=S0^H*S0. With S0 full column rank, B is positive definite, and simultaneous diagonalization produces generalized eigenvalues EE=EY/EW and right directions in Z. EY is accumulated with JVEC and may be signed; EW is a nonnegative ordinary factor norm. This is a factor-based Hermitian-definite generalized eigenproblem, not a driver accepting arbitrary A/B arrays or general nonsymmetric pencils. The procedure normalizes H/S and scales Z after the sweep; original-pencil residuals must use original factors, not overwritten arrays. Require valid signature and regular/well-conditioned factors consistent with the method; unverified isotropic/degenerate pairs are outside the selected contract. Review covers signature Gram accumulation, common right transformations, ratio extraction and status/normalization, not all pair kernels or numerical eigenpair accuracy.",
+            "evidence": [
+              {
+                "path": "src/shared/zhzl1sa.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/zhzl1sa.F90",
+                "sha256": "01241765409cedd5b7ee5ec71437dfd2eaab87d37ae455067035eb87c851c9c1"
+              },
+              {
+                "path": "src/shared/hif_hz.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/hif_hz.F90",
+                "sha256": "71445a667c045fc9edd215135d1f1eee7b62678487abd3295b768c6280d5f455"
+              },
+              {
+                "path": "src/shared/hz.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/hz.F90",
+                "sha256": "c567e3bf10f2b86d332b8ea5f9ac8915d52b1cdd5214a8c1b7584b4cea4ae429"
+              },
+              {
+                "path": "src/test/zhzl1sat.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/test/zhzl1sat.F90",
+                "sha256": "272ba5453d65fff1db5d96aab4157599d38dce3deb90ff3135f7b2a0e4928289"
+              },
+              {
+                "path": "src/shared/params.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/params.F90",
+                "sha256": "58b5f6d10aeb94efbe8345e3064a3dd4b6bc9eebbcfafbf1701294a34440bdf2"
+              },
+              {
+                "path": "src/shared/blas_utils.F90",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/blas_utils.F90",
+                "sha256": "4c8e89ff226aca37f66dc99b39567be519237668645ba5d0a218e86daa02752e"
+              },
+              {
+                "path": "src/gnu.mk",
+                "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/gnu.mk",
+                "sha256": "245207dad828b937cb0f91e108b6d24630e274beed3c01bdb0cb4c7f6b7cfd47"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ZHZL1SA",
+                "role": "public-entry-point",
+                "summary": "Public module Hari-Zimmermann complex factorized Hermitian generalized-eigenvalue procedure.",
+                "signature": "CALL ZHZL1SA(M,N,H,LDH,JVEC,S,LDS,Z,LDZ,JS,JSPAIR, &\n NSWP,CPR,TPC,EE,EY,EW,SY,SW,SS,NROT,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/shared/zhzl1sa.F90",
+                    "line_start": 2,
+                    "line_end": 10
+                  },
+                  {
+                    "path": "src/shared/hif_hz.F90",
+                    "line_start": 1,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/shared/hz.F90",
+                    "line_start": 12,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/gnu.mk",
+                    "line_start": 18,
+                    "line_end": 19
+                  }
+                ],
+                "path": "src/shared/zhzl1sa.F90",
+                "line_start": 2,
+                "line_end": 704,
+                "module": "HIF_HZ",
+                "examples": [
+                  {
+                    "path": "src/test/zhzl1sat.F90",
+                    "line_start": 23,
+                    "line_end": 50
+                  },
+                  {
+                    "path": "src/test/zhzl1sat.F90",
+                    "line_start": 99,
+                    "line_end": 113
+                  }
+                ],
+                "usage": "use hif_hz, only: zhzl1sa\nuse omp_lib, only: omp_set_dynamic,omp_set_num_threads, &\n                   omp_get_dynamic,omp_get_max_threads\n! After compatible aligned allocation, initialized H/S/JVEC, and valid\n! JSTRAT JS/JSPAIR schedule; M>=N>=2, even N, NSWP>=1:\ncall omp_set_dynamic(logical(.false.,kind(omp_get_dynamic())))\ncall omp_set_num_threads(int(cpr,kind(omp_get_max_threads())))\ncall zhzl1sa(m,n,h,ldh,jvec,s,lds,z,ldz,js,jspair, &\n nswp,cpr,tpc,ee,ey,ew,sy,sw,ss,nrot,info)\nif(info<0.or.info>nswp) error stop \"invalid input or sweep limit\"\n! Check original-factor residuals independently; INFO is not an error bound.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation/schedule fragment. Supply valid +1/-1 signature and full-column-rank S for the Hermitian-definite factor pencil. Match the OpenMP module integer kinds to the linked runtime and the promoted default-integer build. Author test setup is linked as inspected usage evidence; no decomposition, eigenpair residual, orthogonality, convergence or scaling check was executed."
+              },
+              {
+                "procedure": "sweep stopping count and final signed/ordinary norms",
+                "role": "implementation-helper",
+                "path": "src/shared/zhzl1sa.F90",
+                "line_start": 598,
+                "line_end": 694
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT FLAPWxHZ with retained contributor attribution",
+          "spdx_expression": "MIT",
+          "revision": "02b05554222a43db0c247acf55c64df14de50963",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned root grants MIT terms and acknowledges modified contributions in phase0 and shared/hif.F90. Preserve those notices and attributions. The reviewed GNU make fragment and module dependencies also require compatible separately distributed JACSD/VN/JSTRAT and BLAS/OpenMP components; their licenses and linked binaries were not audited here.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/LICENSE",
+              "sha256": "cb64cdae2a822b39e6179b9dd3907945d3c52ee5ea0112d174ab2637cafd4ff7"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/README.md",
+              "sha256": "c52d5a9f90d73ff829cfe4ec59067d5127883279593aa075f6b4c07f86aee6b3"
+            },
+            {
+              "path": "src/shared/hif_hz.F90",
+              "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/hif_hz.F90",
+              "sha256": "71445a667c045fc9edd215135d1f1eee7b62678487abd3295b768c6280d5f455"
+            },
+            {
+              "path": "src/shared/zhzl1sa.F90",
+              "url": "https://github.com/venovako/FLAPWxHZ/blob/02b05554222a43db0c247acf55c64df14de50963/src/shared/zhzl1sa.F90",
+              "sha256": "01241765409cedd5b7ee5ec71437dfd2eaab87d37ae455067035eb87c851c9c1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21145,12 +21372,293 @@
             ],
             "notes": "The README distinguishes global spherical-harmonic and limited-area bifourier transforms and describes CPU/GPU backends. Numerical stability, scaling and accelerator maturity are not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J",
+            "level": "source-reviewed",
+            "revision": "1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3",
+            "reviewed_on": "2026-11-06",
+            "notes": "Selected CPU scalar-field interface of ecTrans. Initialize the matching FIAT/MPI/OpenMP environment and SETUP_TRANS0, then geometry/truncation/resolution setup, and query the local grid/spectral sizes before allocation. Match PARKIND1 JPIM/JPRB and all linked BLAS/FFTW/FIAT interfaces; these are assumed-shape OPTIONAL-argument external procedures requiring explicit generated interfaces. The author benchmark includes the build-provided dir_trans.h/inv_trans.h headers, not merely EXTERNAL declarations. Use one spectral field-set partition for the selected no-KVSETSC fragment; general field-set splitting requires a consistent KVSETSC map. Calls participating in distributed transforms must agree across the initialized communicator; setup/distribution state is shared and unrestricted concurrent use is not established. No scalar INFO is returned: validation can invoke ABORT_TRANS rather than report a recoverable status. DIR_TRANS maps real gridpoint samples on the initialized spherical geometry to packed real spherical-harmonic coefficients; INV_TRANS synthesizes samples from that storage. The selected PSPSCALAR layout is (local_fields,NSPEC2), with NSPEC2 counting the library real/imaginary spectral storage, not a portable complex triangular alm array. PGP uses (NPROMA,global_scalar_fields,NGPBLKS), and blocked padding is not additional physical data. Driver checks select resolution, field counts and mutually exclusive array layouts. The CPU controller dispatches longitude Fourier work then Legendre work for analysis, reversing that order for synthesis. GAMS J records a spherical integral transform rather than a Cartesian FFT. Wind/vorticity/divergence, derivative flags, regular-lat/lon alternatives, adjoints, GPU residency and individual numerical kernels are outside this selected scalar contract. Review covers driver checks, layout, setup/dispatch and author usage; no transform normalization or reconstruction accuracy was verified.",
+            "evidence": [
+              {
+                "path": "src/trans/cpu/external/dir_trans.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/external/dir_trans.F90",
+                "sha256": "f0a7c41f361a0204f2abb9deccb76c73282d972b1eea38cf1be62e08d74b91d6"
+              },
+              {
+                "path": "src/trans/cpu/external/inv_trans.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/external/inv_trans.F90",
+                "sha256": "fc04004d1d2628d181cc8bebdad3fa5fe6a2e4c5d189136054eeb5ad9eb70c0b"
+              },
+              {
+                "path": "src/trans/cpu/internal/dir_trans_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/internal/dir_trans_ctl_mod.F90",
+                "sha256": "b5b4731b4d0c795ca9396134c2b9eecbcb8119d763d9dbfde873f4836113157f"
+              },
+              {
+                "path": "src/trans/cpu/internal/inv_trans_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/internal/inv_trans_ctl_mod.F90",
+                "sha256": "1d79a0765f264af51db914fbf07e007b3c021e7944931c95ab863699dec00141"
+              },
+              {
+                "path": "src/trans/cpu/external/setup_trans.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/external/setup_trans.F90",
+                "sha256": "050e455432b512d4be928628543c8b055865d10127a14258049036ecf7a7dd4b"
+              },
+              {
+                "path": "src/trans/common/external/setup_trans0.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/common/external/setup_trans0.F90",
+                "sha256": "18cb9ac8652f0ac3e37e7043bc690998679fc1b22b04619e249b040a715d722f"
+              },
+              {
+                "path": "src/programs/ectrans-benchmark.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/programs/ectrans-benchmark.F90",
+                "sha256": "4c88e81db9954a19cd122bd5157cd6f56c9e1447ae6fdde563b1be3b17786137"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DIR_TRANS",
+                "role": "public-entry-point",
+                "summary": "External CPU spherical-harmonic scalar analysis; selected keyword interface.",
+                "signature": "CALL DIR_TRANS(PSPSCALAR=SP,PGP=GP,KPROMA=NPROMA,KRESOL=RESOL)",
+                "declarations": [
+                  {
+                    "path": "src/trans/cpu/external/dir_trans.F90",
+                    "line_start": 140,
+                    "line_end": 161
+                  },
+                  {
+                    "path": "src/programs/ectrans-benchmark.F90",
+                    "line_start": 216,
+                    "line_end": 224
+                  }
+                ],
+                "path": "src/trans/cpu/external/dir_trans.F90",
+                "line_start": 11,
+                "line_end": 519,
+                "examples": [
+                  {
+                    "path": "src/programs/ectrans-benchmark.F90",
+                    "line_start": 426,
+                    "line_end": 444
+                  },
+                  {
+                    "path": "src/programs/ectrans-benchmark.F90",
+                    "line_start": 790,
+                    "line_end": 805
+                  }
+                ],
+                "usage": "use parkind1, only: jpim,jprb\nimplicit none\n#include \"dir_trans.h\"\n! Declare REAL(JPRB) GP(NPROMA,NFIELDS,NGPBLKS), SP(NFIELDS,NSPEC2)\n! and INTEGER(JPIM) NPROMA/RESOL with queried local sizes.\n! AFTER FIAT/MPI and transform setup, using one spectral field set:\ncall dir_trans(pspscalar=sp,pgp=gp,kproma=nproma,kresol=resol)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup/preallocated CPU fragment, not a complete initialization example. The author benchmark is linked as inspected usage evidence, not an executed check. No coefficient or quadrature result was tested."
+              },
+              {
+                "procedure": "INV_TRANS",
+                "role": "public-entry-point",
+                "summary": "External CPU spherical-harmonic scalar synthesis; selected keyword interface.",
+                "signature": "CALL INV_TRANS(PSPSCALAR=SP,PGP=GP,KPROMA=NPROMA,KRESOL=RESOL)",
+                "declarations": [
+                  {
+                    "path": "src/trans/cpu/external/inv_trans.F90",
+                    "line_start": 156,
+                    "line_end": 182
+                  },
+                  {
+                    "path": "src/programs/ectrans-benchmark.F90",
+                    "line_start": 216,
+                    "line_end": 224
+                  }
+                ],
+                "path": "src/trans/cpu/external/inv_trans.F90",
+                "line_start": 11,
+                "line_end": 629,
+                "examples": [
+                  {
+                    "path": "src/programs/ectrans-benchmark.F90",
+                    "line_start": 705,
+                    "line_end": 725
+                  }
+                ],
+                "usage": "use parkind1, only: jpim,jprb\nimplicit none\n#include \"inv_trans.h\"\n! AFTER matching setup/allocation and population of packed SP:\ncall inv_trans(pspscalar=sp,pgp=gp,kproma=nproma,kresol=resol)\n! Compare only physical grid entries, respecting blocking and truncation.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Selected scalar synthesis with derivative/wind options absent. Retain matching distributed ownership and generated interface; no inverse, reconstruction or normalization was tested."
+              },
+              {
+                "procedure": "CPU Fourier-then-Legendre analysis dispatch",
+                "role": "implementation-helper",
+                "path": "src/trans/cpu/internal/dir_trans_ctl_mod.F90",
+                "line_start": 128,
+                "line_end": 193
+              },
+              {
+                "procedure": "CPU Legendre-then-Fourier synthesis dispatch",
+                "role": "implementation-helper",
+                "path": "src/trans/cpu/internal/inv_trans_ctl_mod.F90",
+                "line_start": 278,
+                "line_end": 297
+              }
+            ]
+          },
+          {
+            "code": "J1b",
+            "level": "source-reviewed",
+            "revision": "1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3",
+            "reviewed_on": "2026-11-06",
+            "notes": "The limited-area CPU EDIR_TRANS/EINV_TRANS pair provides two-dimensional bifourier analysis/synthesis on the initialized limited-area geometry, a distinct path from spherical Legendre transforms. Configure an ecTrans build with limited-area support, initialize FIAT/MPI and SETUP_TRANS0/ESETUP_TRANS, and query ETRANS_INQ for local sizes/truncation before entry. Match PARKIND1 JPIM/JPRB and generated edir_trans.h/einv_trans.h explicit interfaces. The selected one-field scalar path uses PSPSC2(1,NSPEC2), PGP2(NPROMA,1,NGPBLKS) and one spectral field-set partition; for general field-set partitioning supply the corresponding KVSETSC2 map. The controllers dispatch the longitudinal FFT stage and the second-coordinate ELEDIR/ELTINV path; ELEDIR chooses FFT992 when enabled or EXEC_EFFTW, so the legacy Legendre-like routine names must not be mistaken for spherical Legendre analysis here. Spectrum storage, scaling, truncation, extension-zone treatment and geometry are library conventions, not an arbitrary rank-2 complex FFT API. Validation may abort rather than return a status; all participating ranks need consistent setup and calls. Review covers scalar driver/layout, second-coordinate Fourier dispatch and author usage, not all kernels, vector zero modes, derivatives, adjoints or numerical round trips.",
+            "evidence": [
+              {
+                "path": "src/etrans/cpu/external/edir_trans.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/external/edir_trans.F90",
+                "sha256": "fe9e61af28053a1f41beeb8783dc7c36770a6bfd7e54b34601aee232c776c78e"
+              },
+              {
+                "path": "src/etrans/cpu/external/einv_trans.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/external/einv_trans.F90",
+                "sha256": "6d00f765b03fae09de03f23609e7c9184d705248cc784a9cf9605cd4e1844633"
+              },
+              {
+                "path": "src/etrans/cpu/internal/edir_trans_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/internal/edir_trans_ctl_mod.F90",
+                "sha256": "30ce1446be01222a40470f3c72892a4e7245a06514c5dad343f9b72ca8f5ed64"
+              },
+              {
+                "path": "src/etrans/cpu/internal/einv_trans_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/internal/einv_trans_ctl_mod.F90",
+                "sha256": "f42a20c627a38bdc8883383183781f57cb4d8895720a41cfd15de0ad00d9eb68"
+              },
+              {
+                "path": "src/etrans/cpu/internal/eledir_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/internal/eledir_mod.F90",
+                "sha256": "3cfcf30b250d30fe73dcc73b2878af22552b7dd72c17b45333ad7a8871680d08"
+              },
+              {
+                "path": "src/etrans/cpu/internal/eltdir_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/internal/eltdir_ctl_mod.F90",
+                "sha256": "31e2861b410fe5025ed8f8926783ead1ea9d3c62d012511c51a9dc9453e72069"
+              },
+              {
+                "path": "src/etrans/cpu/internal/eltinv_ctl_mod.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/internal/eltinv_ctl_mod.F90",
+                "sha256": "5fd352a639cd19ce02934278136bbc1c601ebef61ec15227e71b5d580c2b634a"
+              },
+              {
+                "path": "src/programs/ectrans-lam-benchmark.F90",
+                "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/programs/ectrans-lam-benchmark.F90",
+                "sha256": "4add05075a3b2b2a4718949049e045a09efd08aaa294751a7caeddd676bad245"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "EDIR_TRANS",
+                "role": "public-entry-point",
+                "summary": "External CPU limited-area bifourier scalar analysis; selected PSPSC2/PGP2 interface.",
+                "signature": "CALL EDIR_TRANS(PSPSC2=SP2,PGP2=GP2,KPROMA=NPROMA,KRESOL=RESOL)",
+                "declarations": [
+                  {
+                    "path": "src/etrans/cpu/external/edir_trans.F90",
+                    "line_start": 137,
+                    "line_end": 156
+                  }
+                ],
+                "path": "src/etrans/cpu/external/edir_trans.F90",
+                "line_start": 12,
+                "line_end": 511,
+                "examples": [
+                  {
+                    "path": "src/programs/ectrans-lam-benchmark.F90",
+                    "line_start": 375,
+                    "line_end": 389
+                  },
+                  {
+                    "path": "src/programs/ectrans-lam-benchmark.F90",
+                    "line_start": 689,
+                    "line_end": 720
+                  }
+                ],
+                "usage": "use parkind1, only: jpim,jprb\nimplicit none\n#include \"edir_trans.h\"\n! After limited-area setup and allocation of matching REAL(JPRB)\n! SP2(1,NSPEC2), GP2(NPROMA,1,NGPBLKS); one spectral field set:\ncall edir_trans(pspsc2=sp2,pgp2=gp2,kproma=nproma,kresol=resol)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization scalar limited-area contract. Use the geometry-dependent packed storage and physical grid extents; no FFT, truncation or coefficient normalization was tested."
+              },
+              {
+                "procedure": "EINV_TRANS",
+                "role": "public-entry-point",
+                "summary": "External CPU limited-area bifourier scalar synthesis; selected PSPSC2/PGP2 interface.",
+                "signature": "CALL EINV_TRANS(PSPSC2=SP2,PGP2=GP2,KPROMA=NPROMA,KRESOL=RESOL)",
+                "declarations": [
+                  {
+                    "path": "src/etrans/cpu/external/einv_trans.F90",
+                    "line_start": 151,
+                    "line_end": 174
+                  }
+                ],
+                "path": "src/etrans/cpu/external/einv_trans.F90",
+                "line_start": 12,
+                "line_end": 617,
+                "examples": [
+                  {
+                    "path": "src/programs/ectrans-lam-benchmark.F90",
+                    "line_start": 638,
+                    "line_end": 654
+                  }
+                ],
+                "usage": "use parkind1, only: jpim,jprb\nimplicit none\n#include \"einv_trans.h\"\n! Matching initialized limited-area scalar storage and populated SP2:\ncall einv_trans(pspsc2=sp2,pgp2=gp2,kproma=nproma,kresol=resol)\n! Interpret GP2 using the configured physical/extension geometry.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup synthesis with derivative/vector options absent. The linked author benchmark was inspected as usage evidence, not run; no inverse or extension-zone behavior was verified."
+              },
+              {
+                "procedure": "CPU limited-area forward stage dispatch",
+                "role": "implementation-helper",
+                "path": "src/etrans/cpu/internal/edir_trans_ctl_mod.F90",
+                "line_start": 142,
+                "line_end": 207
+              },
+              {
+                "procedure": "CPU limited-area inverse stage dispatch",
+                "role": "implementation-helper",
+                "path": "src/etrans/cpu/internal/einv_trans_ctl_mod.F90",
+                "line_start": 290,
+                "line_end": 303
+              },
+              {
+                "procedure": "second-coordinate Fourier backend selection",
+                "role": "implementation-helper",
+                "path": "src/etrans/cpu/internal/eledir_mod.F90",
+                "line_start": 67,
+                "line_end": 108
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Apache-2.0 ecTrans notices with ECMWF privileges/immunities statement",
+          "spdx_expression": "Apache-2.0",
+          "revision": "1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root license is Apache version 2.0. Selected source headers retain ECMWF and Meteo-France copyrights and explicitly preserve ECMWF privileges/immunities and jurisdictional position. Preserve those notices; this is a scoped record of the selected library source, not a license audit of FIAT/MPI, FFTW/FFT992, BLAS or optional GPU components.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/LICENSE",
+              "sha256": "cc975efc49ac514d83d6f0e29817f7eb197f8dda35d5242216e1d048bdc2c702"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/README.md",
+              "sha256": "08b5b417fbfe349426147c05aec9ed2371e90d2a1d19641f13dcf198006fb8b1"
+            },
+            {
+              "path": "src/trans/cpu/external/dir_trans.F90",
+              "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/trans/cpu/external/dir_trans.F90",
+              "sha256": "f0a7c41f361a0204f2abb9deccb76c73282d972b1eea38cf1be62e08d74b91d6"
+            },
+            {
+              "path": "src/etrans/cpu/external/edir_trans.F90",
+              "url": "https://github.com/ecmwf-ifs/ectrans/blob/1fcd9e2e93c81a1e53897a8b4ab92003ed0fa6c3/src/etrans/cpu/external/edir_trans.F90",
+              "sha256": "fe9e61af28053a1f41beeb8783dc7c36770a6bfd7e54b34601aee232c776c78e"
+            }
+          ]
         }
       },
       "imports": {}
