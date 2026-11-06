@@ -21087,12 +21087,123 @@
             ],
             "notes": "The README describes optional enrichment, Gmsh input, boundary conditions and LAPACK solves. Linux-specific system calls may need changes elsewhere; no general-purpose mesh or physics coverage is assumed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2b1a1b",
+            "level": "source-reviewed",
+            "revision": "72760c66403fb7facabd244d366c17087249e59c",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied standalone program assembles a complex 2D finite-element Helmholtz system on a supplied quadrilateral mesh, with Gauss integration of Lagrange/enriched shape functions, marked boundary terms and reduction to unconstrained degrees of freedom. It forms Kp squared times mass minus stiffness and solves through the repository inversion helper. The nonrectangular-domain leaf is supported by imported general meshes and the documented domain with an inner boundary, not a separable rectangular stencil. NANGL=1 selects ordinary FEM in the reviewed default driver; optional plane-wave enrichment requires separate parameter/shape configuration. Problem data, wavenumber, quadrature order and sources are partly source-defined, and dense global arrays limit scale. The kernel multiplies complex shape factors without conjugation; no Hermitian/SPD assumption or enriched formulation accuracy is inferred. The optional condition/eigenvalue diagnostics are not reviewed as independent solvers. File-system shell calls and external BLAS/LAPACK support are part of the program workflow. The default error-norm calls are commented out and do not produce a checked error estimate.",
+            "evidence": [
+              {
+                "path": "ElliFEM-1.1.2s/femSolver.f90",
+                "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/femSolver.f90",
+                "sha256": "e2ba95863d28f3da1a4b7e8077bbc89d080515fda5d508ee762f3c74d72e7849"
+              },
+              {
+                "path": "ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+                "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+                "sha256": "b3302f470bbe3dc3b920707cf8f7a39c31a91ca498d2835f54fb3e867293c5de"
+              },
+              {
+                "path": "ElliFEM-1.1.2s/psflib.f90",
+                "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/psflib.f90",
+                "sha256": "16b906df01a721c817e39a22dee0686c1b988ed1a5d2600e655b9bafd2ea88fb"
+              },
+              {
+                "path": "ElliFEM-1.1.2s/compile",
+                "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/compile",
+                "sha256": "51ac2bf16a37b6a8ad59a790e975ae7c082ff6ab4cfb4cb676d9fbdcc6592c12"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/README.md",
+                "sha256": "5d99f8353fa724dbb3bc82127d3b4523f48db2a20d879315d42ed99bc091e379"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "femSolver (unnamed main program)",
+                "role": "program-entry-point",
+                "summary": "Supplied standalone Helmholtz finite-element main program, not a callable solver API.",
+                "signature": "./femSolver",
+                "declarations": [
+                  {
+                    "path": "ElliFEM-1.1.2s/femSolver.f90",
+                    "line_start": 5,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "ElliFEM-1.1.2s/femSolver.f90",
+                    "line_start": 127,
+                    "line_end": 155
+                  }
+                ],
+                "path": "ElliFEM-1.1.2s/femSolver.f90",
+                "line_start": 1,
+                "line_end": 15,
+                "usage": "! After adapting/building the complete supplied standalone project:\n! prepare the documented Gmsh-format mesh as ./dat and matching boundary markers;\n! configure the source-defined wavenumber, quadrature, enrichment and sources.\n! Run in a disposable working directory containing any required log/input files:\n!   ./femSolver\n! Inspect the generated solution independently; the default norm calls are commented out.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The source is an unnamed main program; femSolver is the supplied executable name. It invokes shell file operations, writes/collates results and deletes generated working files. It is not a CALL interface. No build, mesh, Helmholtz solve or error norm was run."
+              },
+              {
+                "procedure": "getHlmhltz_M_S_RHS element assembly",
+                "role": "implementation-helper",
+                "path": "ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+                "line_start": 2,
+                "line_end": 58
+              },
+              {
+                "procedure": "element quadrature and matrix accumulation",
+                "role": "implementation-helper",
+                "path": "ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+                "line_start": 67,
+                "line_end": 141
+              },
+              {
+                "procedure": "global assembly and Helmholtz matrix",
+                "role": "implementation-helper",
+                "path": "ElliFEM-1.1.2s/femSolver.f90",
+                "line_start": 250,
+                "line_end": 308
+              },
+              {
+                "procedure": "boundary reduction and solve dispatch",
+                "role": "implementation-helper",
+                "path": "ElliFEM-1.1.2s/femSolver.f90",
+                "line_start": 310,
+                "line_end": 323
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "72760c66403fb7facabd244d366c17087249e59c",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned tree has no separately named LICENSE/COPYING file, and the reviewed project README/main/assembly files provide attribution but no explicit redistribution grant. Separately linked numerical libraries do not establish a license for this code.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/README.md",
+              "sha256": "5d99f8353fa724dbb3bc82127d3b4523f48db2a20d879315d42ed99bc091e379"
+            },
+            {
+              "path": "ElliFEM-1.1.2s/femSolver.f90",
+              "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/femSolver.f90",
+              "sha256": "e2ba95863d28f3da1a4b7e8077bbc89d080515fda5d508ee762f3c74d72e7849"
+            },
+            {
+              "path": "ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+              "url": "https://github.com/md861/ElliFEM/blob/72760c66403fb7facabd244d366c17087249e59c/ElliFEM-1.1.2s/pellib_Hlmhltz.f90",
+              "sha256": "b3302f470bbe3dc3b920707cf8f7a39c31a91ca498d2835f54fb3e867293c5de"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21133,12 +21244,319 @@
             ],
             "notes": "The README describes the field/time-integrator abstractions and prototype scope. This is a specific heat-equation application, not a solver for arbitrary three-dimensional PDEs.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a2a",
+            "level": "source-reviewed",
+            "revision": "8c3d425bc1475300b6f1a8244de5747dc8be6d9f",
+            "reviewed_on": "2026-11-05",
+            "notes": "THOMAS performs the no-pivot forward elimination and back substitution for one real tridiagonal system. It copies the diagonal and right-hand side, so the input arrays are preserved. All four arrays use length N, with AS(1) and CS(N) unused; they are not packed N-1 off-diagonals. N must be positive and all intermediate pivots nonzero. There is no dimension check, singularity status, pivoting, condition estimate or iterative refinement. D2a2a records general real tridiagonal systems, not an SPD-only solver. Review covers the complete short native implementation; numerical stability on arbitrary inputs is not established.",
+            "evidence": [
+              {
+                "path": "src/module_thomas.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_thomas.f90",
+                "sha256": "d1ce4d2d8eb7a246c1e53a8401d18a4d4868b0e3f89f53f045dced7f62c4cb3d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "thomas",
+                "role": "public-entry-point",
+                "summary": "Public pure no-pivot tridiagonal solver returning an allocated default-real vector.",
+                "signature": "X = thomas(AS,BS,CS,DS)",
+                "declarations": [
+                  {
+                    "path": "src/module_thomas.f90",
+                    "line_start": 6,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/module_thomas.f90",
+                "line_start": 6,
+                "line_end": 26,
+                "module": "thomas_module",
+                "usage": "use thomas_module, only: thomas\nreal :: lower(3),diagonal(3),upper(3),rhs(3)\nreal,allocatable :: x(:)\nlower=[0.,-1.,-1.]; diagonal=2.; upper=[-1.,-1.,0.]\nrhs=[1.,0.,1.]\nx=thomas(lower,diagonal,upper,rhs)\n! Check the residual independently; no solver status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sample is diagonally dominant with safe elimination pivots; this does not establish general stability. Use matching positive array lengths and default REAL. No solve or residual was evaluated."
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "8c3d425bc1475300b6f1a8244de5747dc8be6d9f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public compact differentiator constructs first- or second-derivative stencils and solves a tridiagonal or cyclic tridiagonal system. The periodic path uses two Thomas solves plus a Sherman-Morrison correction. Its padding treats the first and last samples as a duplicated periodic endpoint; it is not the usual N distinct periodic samples layout. The second argument is the divisor used directly: pass h for the first derivative and h squared for the second, as the CPU heat kernel does. The sixth-order label describes the intended smooth uniform-grid stencil, not a checked observed convergence rate. Nonperiodic constructors take boundary schemes and use the same solver, but their boundary formulas have not been numerically verified. Require enough nodes, positive spacing divisor and nonsingular solves/correction denominator; no status is returned.",
+            "evidence": [
+              {
+                "path": "src/module_differentiate.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_differentiate.f90",
+                "sha256": "2dd36e1dfc923f2fa0d891586fe8aa49bbd836c4da5ee0ee5265805340fd99ee"
+              },
+              {
+                "path": "src/module_stencil.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_stencil.f90",
+                "sha256": "7cbdb3bfa34a2a437d84035f277a233bfa1d0e21696d4f56bbc4577dc4c23e2a"
+              },
+              {
+                "path": "src/module_boundary_schemes.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_boundary_schemes.f90",
+                "sha256": "5fad5f99a47950fd4f2cd4a645212006fd5727a437c1fc25900da59b1910e4a2"
+              },
+              {
+                "path": "src/module_thomas.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_thomas.f90",
+                "sha256": "d1ce4d2d8eb7a246c1e53a8401d18a4d4868b0e3f89f53f045dced7f62c4cb3d"
+              },
+              {
+                "path": "src/module_field_cpu.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_field_cpu.f90",
+                "sha256": "ce62c8d8756c68b7aeee3022e1caeff281715995e23d5dced41b7e5bae52a997"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "diff",
+                "role": "public-entry-point",
+                "summary": "Public periodic compact differentiation binding; constructor chooses derivative order.",
+                "signature": "DF = DIFFER%diff(F,SPACING_DIVISOR)",
+                "declarations": [
+                  {
+                    "path": "src/module_differentiate.f90",
+                    "line_start": 38,
+                    "line_end": 63
+                  },
+                  {
+                    "path": "src/module_differentiate.f90",
+                    "line_start": 166,
+                    "line_end": 177
+                  }
+                ],
+                "path": "src/module_differentiate.f90",
+                "line_start": 153,
+                "line_end": 207,
+                "module": "differentiate",
+                "derived_type": "differentiator_type",
+                "usage": "use differentiate, only: differentiator_type,sixth_order_compact_1,sixth_order_compact_2\ntype(differentiator_type) :: differ\nreal :: f(17),h\nreal,allocatable :: df(:),d2f(:)\ninteger :: i\nh=2.*acos(-1.)/16.\nf=[(sin((i-1)*h),i=1,17)]\nf(17)=f(1) ! Duplicated periodic endpoint.\ndiffer=sixth_order_compact_1(); df=differ%diff(f,h)\ndiffer=sixth_order_compact_2(); d2f=differ%diff(f,h*h)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the complete matching stencil/boundary/Thomas modules. The second-order constructor does not square its argument internally. No derivative, boundary scheme, periodic closure or convergence rate was run."
+              },
+              {
+                "procedure": "sixth_order_compact_1_periodic",
+                "role": "implementation-helper",
+                "path": "src/module_differentiate.f90",
+                "line_start": 77,
+                "line_end": 82
+              },
+              {
+                "procedure": "sixth_order_compact_2_periodic",
+                "role": "implementation-helper",
+                "path": "src/module_differentiate.f90",
+                "line_start": 94,
+                "line_end": 99
+              },
+              {
+                "procedure": "apply_stencil_along periodic padding",
+                "role": "implementation-helper",
+                "path": "src/module_stencil.f90",
+                "line_start": 78,
+                "line_end": 101
+              },
+              {
+                "procedure": "compact stencil coefficients",
+                "role": "implementation-helper",
+                "path": "src/module_boundary_schemes.f90",
+                "line_start": 10,
+                "line_end": 43
+              }
+            ]
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "8c3d425bc1475300b6f1a8244de5747dc8be6d9f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public Euler and RK3 integrator bindings advance objects implementing the abstract field RHS. Euler uses one forward step; RK3 uses three explicitly weighted stages. These are fixed-step one-step methods for the semi-discrete initial-value problem, not adaptive ODE solvers. Both compute FLOOR((ENDTIME-STARTTIME)/DT) and omit any fractional final step. Positive DT and an interval giving the intended number of steps are caller responsibilities, as are stability restrictions of the spatial operator. No error estimate, rejection, status or automatic step choice is implemented. Review deliberately does not endorse the separate AB2 path: its history update assigns F1 after overwriting F2, and its startup advances even when the computed step count is zero.",
+            "evidence": [
+              {
+                "path": "src/module_time_integration.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_time_integration.f90",
+                "sha256": "cf307b6889403181283a344308d08a7c7c5f17be9ab970fda474bfb58207508f"
+              },
+              {
+                "path": "src/module_field.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_field.f90",
+                "sha256": "551695d074df67f0e276130302d854f5af4d62b609d32fe17d66368dd67d5bc7"
+              },
+              {
+                "path": "src/module_field_cpu.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_field_cpu.f90",
+                "sha256": "ce62c8d8756c68b7aeee3022e1caeff281715995e23d5dced41b7e5bae52a997"
+              },
+              {
+                "path": "tests/test_time_integration.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/tests/test_time_integration.f90",
+                "sha256": "1c0549dde710657448b3f60fba8e08e45bfe825401113360e963b08948741836"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "integrate",
+                "role": "public-entry-point",
+                "summary": "Public fixed-step three-stage explicit Runge-Kutta field integrator.",
+                "signature": "CALL RK%integrate(AFIELD)",
+                "declarations": [
+                  {
+                    "path": "src/module_time_integration.f90",
+                    "line_start": 5,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "src/module_time_integration.f90",
+                    "line_start": 66,
+                    "line_end": 70
+                  }
+                ],
+                "path": "src/module_time_integration.f90",
+                "line_start": 66,
+                "line_end": 82,
+                "module": "time_integrator",
+                "derived_type": "RK3_integrator_type",
+                "usage": "use field, only: field_type\nuse field_cpu, only: field_cpu_type\nuse time_integrator, only: RK3_integrator_type\nclass(field_type),allocatable :: afield\ntype(RK3_integrator_type) :: rk\n! INITIAL is an initialized default-real 3D periodic field, H its mesh spacing.\nafield=field_cpu_type(initial,h)\nrk=RK3_integrator_type(starttime=0.,endtime=0.125,dt=0.001953125)\ncall rk%integrate(afield)\n! Validate the spatial/temporal error and explicit stability restriction.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization field fragment, with a binary-exact interval/step ratio. The supplied CPU field represents periodic diffusion; another RHS needs a valid concrete field implementation. No step, final-time accuracy or stability experiment was run."
+              },
+              {
+                "procedure": "integrate",
+                "role": "public-entry-point",
+                "summary": "Public fixed-step forward Euler binding using the same abstract field contract.",
+                "signature": "CALL EULER%integrate(AFIELD)",
+                "declarations": [
+                  {
+                    "path": "src/module_time_integration.f90",
+                    "line_start": 12,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/module_time_integration.f90",
+                    "line_start": 38,
+                    "line_end": 44
+                  }
+                ],
+                "path": "src/module_time_integration.f90",
+                "line_start": 38,
+                "line_end": 48,
+                "module": "time_integrator",
+                "derived_type": "euler_integrator_type"
+              },
+              {
+                "procedure": "euler_timestep",
+                "role": "implementation-helper",
+                "path": "src/module_time_integration.f90",
+                "line_start": 84,
+                "line_end": 89
+              }
+            ]
+          },
+          {
+            "code": "I2a1b",
+            "level": "source-reviewed",
+            "revision": "8c3d425bc1475300b6f1a8244de5747dc8be6d9f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The CPU field RHS applies compact second derivatives along all three axes of a uniform 3D tensor grid and sums them to approximate the Laplacian for unit-diffusivity heat flow. The native implementation constructs the periodic second-derivative operator and supplies h squared as its divisor. Paired with the reviewed explicit field integrators this is a parabolic initial-boundary-value prototype in two or more spatial dimensions. All axes share one spacing; boundary conditions are periodic with duplicated endpoints on each axis. It is not an arbitrary-domain, mixed-boundary, variable-coefficient or unconditionally stable PDE solver. Stored field values are default REAL, and the RHS allocates several full-size arrays. No status, spatial error estimate, conservation check or CFL enforcement is provided. CUDA variants and the separate AB2 integration history are outside this mapping.",
+            "evidence": [
+              {
+                "path": "src/module_field_cpu.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_field_cpu.f90",
+                "sha256": "ce62c8d8756c68b7aeee3022e1caeff281715995e23d5dced41b7e5bae52a997"
+              },
+              {
+                "path": "src/module_field.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_field.f90",
+                "sha256": "551695d074df67f0e276130302d854f5af4d62b609d32fe17d66368dd67d5bc7"
+              },
+              {
+                "path": "src/module_differentiate.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_differentiate.f90",
+                "sha256": "2dd36e1dfc923f2fa0d891586fe8aa49bbd836c4da5ee0ee5265805340fd99ee"
+              },
+              {
+                "path": "src/module_boundary_schemes.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_boundary_schemes.f90",
+                "sha256": "5fad5f99a47950fd4f2cd4a645212006fd5727a437c1fc25900da59b1910e4a2"
+              },
+              {
+                "path": "src/module_stencil.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_stencil.f90",
+                "sha256": "7cbdb3bfa34a2a437d84035f277a233bfa1d0e21696d4f56bbc4577dc4c23e2a"
+              },
+              {
+                "path": "src/module_thomas.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_thomas.f90",
+                "sha256": "d1ce4d2d8eb7a246c1e53a8401d18a4d4868b0e3f89f53f045dced7f62c4cb3d"
+              },
+              {
+                "path": "src/module_time_integration.f90",
+                "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/src/module_time_integration.f90",
+                "sha256": "cf307b6889403181283a344308d08a7c7c5f17be9ab970fda474bfb58207508f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rhs",
+                "role": "public-entry-point",
+                "summary": "Public CPU field binding returning the three-dimensional periodic discrete Laplacian.",
+                "signature": "LAPLACIAN = AFIELD%rhs()",
+                "declarations": [
+                  {
+                    "path": "src/module_field_cpu.f90",
+                    "line_start": 5,
+                    "line_end": 22
+                  },
+                  {
+                    "path": "src/module_field_cpu.f90",
+                    "line_start": 33,
+                    "line_end": 41
+                  }
+                ],
+                "path": "src/module_field_cpu.f90",
+                "line_start": 24,
+                "line_end": 65,
+                "module": "field_cpu",
+                "derived_type": "field_cpu_type",
+                "usage": "use field_cpu, only: field_cpu_type\ntype(field_cpu_type) :: afield\nreal,allocatable :: laplacian(:,:,:)\n! INITIAL contains periodic samples with duplicated endpoints on each axis.\n! H>0 is the common mesh spacing; initialize sufficiently long grid pencils.\nafield=field_cpu_type(initial,h)\nlaplacian=afield%rhs()\n! Time evolution additionally requires an integrator and a stable time step.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization spatial-operator fragment. This call forms a heat-equation RHS, not a converged steady state or a completed time integration. No PDE solution, boundary closure or GPU execution was tested."
+              },
+              {
+                "procedure": "field arithmetic preserves dynamic type and spacing",
+                "role": "implementation-helper",
+                "path": "src/module_field.f90",
+                "line_start": 90,
+                "line_end": 127
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "8c3d425bc1475300b6f1a8244de5747dc8be6d9f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains the GNU GPL version 3 text. No separate version-election notice was identified in the selected modules/README; record the pinned file without inferring an or-later grant or auditing every external component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/tlestang/heatcompact3d/blob/8c3d425bc1475300b6f1a8244de5747dc8be6d9f/README.md",
+              "sha256": "ef57f7c1e076b4253bff689b09fbd7c37e4eeeabb56c67876c6e556bd110a9b4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -21177,12 +21595,112 @@
             ],
             "notes": "The README explicitly specifies the equation and prescribed boundary values. Other geometries, Neumann/Robin conditions and convergence behavior are not inferred.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2b1a1a",
+            "level": "source-reviewed",
+            "revision": "5bf0a828efad216f23a120fd8f1898cae3427b7a",
+            "reviewed_on": "2026-11-05",
+            "notes": "LAPLACE_SOLVE dispatches five-point successive over-relaxation for a rectangular 2D Laplace/Poisson grid, in lexicographic or red-black ordering. Native interior sweeps leave boundary cells unchanged; boundary values and source must already be populated. The grid weights depend on both spacings and the relaxation formula uses their geometric mean. The nonzero source enters the particular stored-source normalization in the update, so callers must derive its scaling rather than pass an arbitrary physical RHS unchanged. The sketch uses zero source to avoid claiming a generic Poisson normalization. The stopping test is maximum iterate change, not a residual norm. The setup local counter K has declaration initialization and therefore SAVE semantics: repeated wrapper calls retain its previous count. Return NSTEPS is not a fresh per-call convergence flag. The separately named SOR9 routine repeats the five-point formula and is not treated as a nine-point method.",
+            "evidence": [
+              {
+                "path": "laplace.f90",
+                "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/laplace.f90",
+                "sha256": "981ab5d98353c2bc244ebe638f2ce05765ac1f5dd56ffbb9da9edb6cce4225f5"
+              },
+              {
+                "path": "utils.f90",
+                "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/utils.f90",
+                "sha256": "7b82744659c35f57c36c6233220132353988d7c1dd4b5b45aa6bb78275b3bad6"
+              },
+              {
+                "path": "driver.f90",
+                "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/driver.f90",
+                "sha256": "0c4943d537fc1621bd2d07160db259584391852bda8abe1781476ce36250aa55"
+              },
+              {
+                "path": "globals.f90",
+                "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/globals.f90",
+                "sha256": "2a06b2bbd27be7b778d10f37faba3f0fc4e21799a0709fb6b69bc63df877114e"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "laplace_solve",
+                "role": "public-entry-point",
+                "summary": "Public rectangular-grid five-point SOR wrapper; initialize boundaries and configuration first.",
+                "signature": "CALL laplace_solve(U,SRC,ARGS,NSTEPS)",
+                "declarations": [
+                  {
+                    "path": "laplace.f90",
+                    "line_start": 22,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "utils.f90",
+                    "line_start": 6,
+                    "line_end": 11
+                  }
+                ],
+                "path": "laplace.f90",
+                "line_start": 22,
+                "line_end": 37,
+                "module": "laplace",
+                "usage": "use laplace, only: laplace_solve\nuse utils, only: confargs\ntype(confargs) :: args\nreal(kind=8) :: u(17,17),source(17,17)\ninteger :: nsteps\nu=0d0; u(:,17)=1d0; source=0d0\nargs%solver=\"SOR5\"; args%dx=[0.0625d0,0.0625d0]\nargs%eps=1d-8; args%maxiter=10000\ncall laplace_solve(u,source,args,nsteps)\n! First-call fragment: independently check the discrete Laplace residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a build supporting the repository REAL(KIND=8) convention and matching globals/utils modules. The saved iteration counter makes repeated wrapper calls problematic; the change-based stop does not certify a residual. Red-black OpenMP behavior and nonzero-source scaling were not run."
+              },
+              {
+                "procedure": "laplace_setup_solver saved counter and stopping test",
+                "role": "implementation-helper",
+                "path": "laplace.f90",
+                "line_start": 40,
+                "line_end": 86
+              },
+              {
+                "procedure": "SOR5",
+                "role": "implementation-helper",
+                "path": "laplace.f90",
+                "line_start": 89,
+                "line_end": 118
+              },
+              {
+                "procedure": "SOR5_red_black",
+                "role": "implementation-helper",
+                "path": "laplace.f90",
+                "line_start": 122,
+                "line_end": 173
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-2.0-only",
+          "revision": "5bf0a828efad216f23a120fd8f1898cae3427b7a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root license is GNU GPL version 2. The selected files retain author attribution; no separate or-later election was identified in these files. This is a scoped finding for this distribution, not an audit of toolchain dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/LICENSE",
+              "sha256": "a45d0bb572ed792ed34627a72621834b3ba92aab6e2cc4e04301dee7a728d753"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/README.md",
+              "sha256": "44d6309185a88f39b83726b9e6ef17806391a6ac09fbc9c739139cdb481b842e"
+            },
+            {
+              "path": "laplace.f90",
+              "url": "https://github.com/TarasKuzyo/laplace-2D/blob/5bf0a828efad216f23a120fd8f1898cae3427b7a/laplace.f90",
+              "sha256": "981ab5d98353c2bc244ebe638f2ce05765ac1f5dd56ffbb9da9edb6cce4225f5"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37140,12 +37658,179 @@
             ],
             "notes": "The README restricts the documented operator to one spatial dimension and describes preconditioned GMRES for implicit-stage systems. It is not classified as an arbitrary multidimensional PDE framework.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "d071a7646872c1d106aa2dda63a7c2e0c784c2e2",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public GMRES routine solves a general real linear system represented by a matrix-action callback, stored as an N by S block-shaped vector. The native restarted Arnoldi process uses modified Gram-Schmidt, Givens rotations and right preconditioning. S is part of one flattened system, not a collection of independent right-hand sides. D2a4 records use with sparse/operator-defined general systems; no sparse matrix format is required by the callback. Restart length 30, absolute tolerance 1e-15 and iteration cap 100000 are hardcoded. The module preconditioner must be selected before calling, otherwise it terminates through the error handler. There is no returned convergence flag or residual history; estimated residual exits, breakdown divisions and restart behavior need independent validation. Review covers this implementation, not a guarantee of robustness or the whole parabolic solver.",
+            "evidence": [
+              {
+                "path": "libparabol/solvers.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/solvers.f90",
+                "sha256": "30ae58ec165d09d97a82e429e4ad679fa978ac4fab575b9fe2b596a1c92c8ea1"
+              },
+              {
+                "path": "libparabol/preconditioners.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/preconditioners.f90",
+                "sha256": "5283c97012dd8f7847f54560208f50be8840640f3d3e819fb3ca501048254087"
+              },
+              {
+                "path": "libparabol/kindmod.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/kindmod.f90",
+                "sha256": "d0c878c4f2e99e39e7b01d2f66dc8bf4ad6b74685b08ead12afa49279822e8be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GMRES",
+                "role": "public-entry-point",
+                "summary": "Public restarted right-preconditioned GMRES for one block-shaped operator system.",
+                "signature": "CALL GMRES(N,S,B,X,ATIMES)",
+                "declarations": [
+                  {
+                    "path": "libparabol/solvers.f90",
+                    "line_start": 31,
+                    "line_end": 44
+                  }
+                ],
+                "path": "libparabol/solvers.f90",
+                "line_start": 31,
+                "line_end": 156,
+                "module": "SOLVERS",
+                "usage": "use KINDMOD, only: INP,RNP\nuse SOLVERS, only: GMRES\nuse PRECONDITIONERS, only: set_preconditioner\n! B(N,S) and initial guess X(N,S) use REAL(RNP); N/S use INTEGER(INP).\n! ATIMES must match the linked explicit callback declarations exactly.\ncall set_preconditioner(\"ID\")\ncall GMRES(n,s,b,x,atimes)\n! Compute B-ATIMES(N,S,X) independently; no convergence flag is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation callback fragment. Link the complete matching module graph and user operator/parameter support, even when choosing the identity preconditioner. Do not interpret return alone as successful convergence. No Krylov iteration, breakdown or residual was tested."
+              },
+              {
+                "procedure": "preconditioner selection and application",
+                "role": "implementation-helper",
+                "path": "libparabol/preconditioners.f90",
+                "line_start": 80,
+                "line_end": 112
+              }
+            ]
+          },
+          {
+            "code": "I2a1a",
+            "level": "source-reviewed",
+            "revision": "d071a7646872c1d106aa2dda63a7c2e0c784c2e2",
+            "reviewed_on": "2026-11-05",
+            "notes": "RUNGE_KUTTA_STEP advances a spatially discretized one-dimensional linear parabolic problem on the current mesh. It forms stage right-hand sides with source/boundary adjustments, dispatches explicit, diagonally implicit or fully implicit stage solves, and updates the solution with a carried roundoff-correction array. The fully implicit route forms an operator-defined coupled stage system and calls native right-preconditioned GMRES. The selected G2 tableau is two-stage Gauss; the source header mentioning only Crank-Nicolson understates the actual method dispatch. Users supply the complete parameter, boundary and spatial operator interfaces. Mesh state and RK tableau must be initialized, U and ROUNDOFF must match the interior mesh size, and ROUNDOFF initially must be zero. There is no adaptive time-step control or returned convergence status; GMRES estimated-residual and preconditioner limitations propagate.",
+            "evidence": [
+              {
+                "path": "libparabol/runge-kutta.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/runge-kutta.f90",
+                "sha256": "35845c8f5e59393357f89a14e7e76d862ffe84c782affddcff21675b0093767b"
+              },
+              {
+                "path": "libparabol/rk_parameters.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/rk_parameters.f90",
+                "sha256": "2f7718287902b78927af913b6e94f2232f534af6693c1912ffbb869b6fcbb57a"
+              },
+              {
+                "path": "libparabol/meshes.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/meshes.f90",
+                "sha256": "33ae4a0a66515e8867bf0aa604b794be7ad262dd5b47921e955bd19389969a04"
+              },
+              {
+                "path": "libparabol/intermod.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/intermod.f90",
+                "sha256": "aa899518de1e9dfcbd4bc4706754096fef4332bb04e32c0a7316b52fdbb5990e"
+              },
+              {
+                "path": "libparabol/solvers.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/solvers.f90",
+                "sha256": "30ae58ec165d09d97a82e429e4ad679fa978ac4fab575b9fe2b596a1c92c8ea1"
+              },
+              {
+                "path": "libparabol/preconditioners.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/preconditioners.f90",
+                "sha256": "5283c97012dd8f7847f54560208f50be8840640f3d3e819fb3ca501048254087"
+              },
+              {
+                "path": "libparabol/kindmod.f90",
+                "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/kindmod.f90",
+                "sha256": "d0c878c4f2e99e39e7b01d2f66dc8bf4ad6b74685b08ead12afa49279822e8be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "runge_kutta_step",
+                "role": "public-entry-point",
+                "summary": "Public one-step parabolic method-of-lines update with persistent roundoff correction.",
+                "signature": "CALL runge_kutta_step(U,ROUNDOFF,TAU,T)",
+                "declarations": [
+                  {
+                    "path": "libparabol/runge-kutta.f90",
+                    "line_start": 55,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "libparabol/rk_parameters.f90",
+                    "line_start": 53,
+                    "line_end": 80
+                  }
+                ],
+                "path": "libparabol/runge-kutta.f90",
+                "line_start": 55,
+                "line_end": 107,
+                "module": "RUNGE_KUTTA",
+                "usage": "use KINDMOD, only: INP,RNP\nuse MESHES, only: set_mesh\nuse RUNGE_KUTTA, only: set_runge_kutta,runge_kutta_step\nreal(RNP),allocatable :: u(:),roundoff(:)\n! First initialize the user parameter module and linked spatial/boundary operators.\ncall set_mesh(\"UN\",31_INP)\ncall set_runge_kutta(\"G2\")\nallocate(u(31),roundoff(31))\n! Fill U with the interior initial values for the configured problem.\nroundoff=0._RNP\ncall runge_kutta_step(u,roundoff,0.001_RNP,0._RNP)\n! Preserve ROUNDOFF between subsequent steps; T is the step starting time.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Setup/step fragment requiring initialized problem-specific U and parameter/operator callbacks; it is not a standalone example. The G2 branch uses a coupled implicit solve and its residual must be checked independently. No time step, boundary adjustment or PDE error was tested."
+              },
+              {
+                "procedure": "fully_implicit_solver",
+                "role": "implementation-helper",
+                "path": "libparabol/runge-kutta.f90",
+                "line_start": 202,
+                "line_end": 224
+              },
+              {
+                "procedure": "stage_matrix_multiplication",
+                "role": "implementation-helper",
+                "path": "libparabol/runge-kutta.f90",
+                "line_start": 246,
+                "line_end": 266
+              },
+              {
+                "procedure": "stage_rhs",
+                "role": "implementation-helper",
+                "path": "libparabol/runge-kutta.f90",
+                "line_start": 288,
+                "line_end": 313
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "d071a7646872c1d106aa2dda63a7c2e0c784c2e2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned tree has no separately named LICENSE/COPYING file; the reviewed README and selected native solver modules contain descriptive attribution but no explicit permission grant. Public availability is not a redistribution license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/README.md",
+              "sha256": "0f294f92fcffd641dcf68c1c95fb587d1fdd95be39341fa479105f3e46a412de"
+            },
+            {
+              "path": "libparabol/runge-kutta.f90",
+              "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/runge-kutta.f90",
+              "sha256": "35845c8f5e59393357f89a14e7e76d862ffe84c782affddcff21675b0093767b"
+            },
+            {
+              "path": "libparabol/solvers.f90",
+              "url": "https://github.com/nschloe/sippp/blob/d071a7646872c1d106aa2dda63a7c2e0c784c2e2/libparabol/solvers.f90",
+              "sha256": "30ae58ec165d09d97a82e429e4ad679fa978ac4fab575b9fe2b596a1c92c8ea1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -38453,12 +39138,185 @@
             ],
             "notes": "The README explicitly labels this a partial initial implementation. It documents types, initialization, a stability check and residual/variance calculations; a complete stable expectation-maximization fitting algorithm remains an aim.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2",
+            "level": "source-reviewed",
+            "revision": "9d2d56e1523be96eb6559a94452d4069534f2dd0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public ARMA residuals and GARCH variances bindings evaluate supplied-parameter time-domain recursions for each mixture component. ARMA_RESIDUALS subtracts lagged observations and, once enough residual history exists, lagged residuals; it also records in-sample fitted values. GARCH_VARIANCES adds an intercept, lagged squared residuals and lagged conditional variances. The input is squared by the supplied caller, not inside the variance routine. This is time-domain analysis L10a2, not evidence of successful parameter estimation, out-of-sample forecasting, a complete EM fit or a leaf specifically for GARCH. Require positive consistent lag orders, enough observations, initialized datetime/value arrays and allocated model parameter/prediction containers; setters alone do not initialize the lag metadata. Early recursions omit unavailable history instead of stationary/backcast initialization. No output status, missing-value handling, positivity test or numerical validation is provided. The public STABILITY function only tests row sums below one and does not check coefficient nonnegativity or ARMA root stability.",
+            "evidence": [
+              {
+                "path": "ARMA-GARCH model/mod_MODELS.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_MODELS.f90",
+                "sha256": "05396871d335bbfededf621f7b428604b3146b2d72f515ee53522a4555825e0a"
+              },
+              {
+                "path": "ARMA-GARCH model/mod_TSERIES.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_TSERIES.f90",
+                "sha256": "c66404aeb03b90060e9d7cb75a25183c8c4296c30d9484805fd65b978409bf7d"
+              },
+              {
+                "path": "ARMA-GARCH model/mod_PARAMS.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_PARAMS.f90",
+                "sha256": "5aed1f7261b6b615c8a0d635a9a1240273679359b205339e2918212643c2ab41"
+              },
+              {
+                "path": "ARMA-GARCH model/EM_core.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/EM_core.f90",
+                "sha256": "931d2e8bb0a9a1a154664266083fcdfbb2279bc2cc465ae73c8c3bbe38126116"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "residuals",
+                "role": "public-entry-point",
+                "summary": "Public ARMA binding returning one residual series per component and changing stored in-sample predictions.",
+                "signature": "RESID = MODEL%residuals(SERIES)",
+                "declarations": [
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 17,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 192,
+                    "line_end": 208
+                  }
+                ],
+                "path": "ARMA-GARCH model/mod_MODELS.f90",
+                "line_start": 192,
+                "line_end": 230,
+                "module": "MODELS",
+                "derived_type": "ARMA",
+                "usage": "use MODELS, only: ARMA_GARCH\nuse TSERIES, only: TIME_SERIES,operator(**)\ntype(ARMA_GARCH) :: model\ntype(TIME_SERIES) :: series\ntype(TIME_SERIES),allocatable :: resid(:),squared(:),variance(:)\n! Initialize SERIES dates/values, positive lag orders, all component parameters\n! and MODEL%Y_HAT containers; the parameter setters alone are insufficient.\nresid=model%residuals(series)\nsquared=resid**2\nvariance=model%variances(squared)\n! Check dimensions, finite outputs and variance positivity independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization recursion fragment requiring the full PARAMS/datetime/TIME_SERIES graph. Input values use selected precision r27 while parameters use r9; do not silently replace these kinds or assume compiler support. No residual, conditional variance, mixture likelihood or fitted model was run."
+              },
+              {
+                "procedure": "variances",
+                "role": "public-entry-point",
+                "summary": "Public conditional variance recursion; supply squared residual series with consistent dates and component shapes.",
+                "signature": "VARIANCE = MODEL%variances(SQUARED_RESIDUALS)",
+                "declarations": [
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 31,
+                    "line_end": 43
+                  },
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 235,
+                    "line_end": 248
+                  }
+                ],
+                "path": "ARMA-GARCH model/mod_MODELS.f90",
+                "line_start": 235,
+                "line_end": 266,
+                "module": "MODELS",
+                "derived_type": "ARMA_GARCH"
+              },
+              {
+                "procedure": "supplied caller squares residuals",
+                "role": "implementation-helper",
+                "path": "ARMA-GARCH model/EM_core.f90",
+                "line_start": 54,
+                "line_end": 65
+              },
+              {
+                "procedure": "ARMA/GARCH kind parameters",
+                "role": "implementation-helper",
+                "path": "ARMA-GARCH model/mod_PARAMS.f90",
+                "line_start": 27,
+                "line_end": 34
+              }
+            ]
+          },
+          {
+            "code": "L10a2d",
+            "level": "source-reviewed",
+            "revision": "9d2d56e1523be96eb6559a94452d4069534f2dd0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public ARMA%RESIDUALS binding evaluates the conditional ARMA residual recurrence for supplied coefficient rows, subtracting lagged observations and, after a finite startup interval, lagged residuals. It stores in-sample fitted observations in MODEL%Y_HAT. This specific supplied-model operation supports the ARMA/ARIMA model family L10a2d, without claiming a parameter-estimation, identification or forecasting leaf: coefficients are not fitted by this routine, no differencing is performed and the generated predictions remain in sample. Positive compatible orders, allocated parameter/prediction containers and sufficiently long initialized datetime/value sequences are required. Startup omits unavailable MA history; no error status, root-based stationarity/invertibility check or uncertainty estimate is returned. The separate L10a2 entry records associated conditional-variance recursions, for which this taxonomy offers no dedicated GARCH leaf.",
+            "evidence": [
+              {
+                "path": "ARMA-GARCH model/mod_MODELS.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_MODELS.f90",
+                "sha256": "05396871d335bbfededf621f7b428604b3146b2d72f515ee53522a4555825e0a"
+              },
+              {
+                "path": "ARMA-GARCH model/mod_TSERIES.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_TSERIES.f90",
+                "sha256": "c66404aeb03b90060e9d7cb75a25183c8c4296c30d9484805fd65b978409bf7d"
+              },
+              {
+                "path": "ARMA-GARCH model/mod_PARAMS.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_PARAMS.f90",
+                "sha256": "5aed1f7261b6b615c8a0d635a9a1240273679359b205339e2918212643c2ab41"
+              },
+              {
+                "path": "ARMA-GARCH model/EM_core.f90",
+                "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/EM_core.f90",
+                "sha256": "931d2e8bb0a9a1a154664266083fcdfbb2279bc2cc465ae73c8c3bbe38126116"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "residuals",
+                "role": "public-entry-point",
+                "summary": "Public ARMA binding returning one residual series per component and changing stored in-sample predictions.",
+                "signature": "RESID = MODEL%residuals(SERIES)",
+                "declarations": [
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 17,
+                    "line_end": 27
+                  },
+                  {
+                    "path": "ARMA-GARCH model/mod_MODELS.f90",
+                    "line_start": 192,
+                    "line_end": 208
+                  }
+                ],
+                "path": "ARMA-GARCH model/mod_MODELS.f90",
+                "line_start": 192,
+                "line_end": 230,
+                "module": "MODELS",
+                "derived_type": "ARMA",
+                "usage": "use MODELS, only: ARMA_GARCH\nuse TSERIES, only: TIME_SERIES,operator(**)\ntype(ARMA_GARCH) :: model\ntype(TIME_SERIES) :: series\ntype(TIME_SERIES),allocatable :: resid(:),squared(:),variance(:)\n! Initialize SERIES dates/values, positive lag orders, all component parameters\n! and MODEL%Y_HAT containers; the parameter setters alone are insufficient.\nresid=model%residuals(series)\nsquared=resid**2\nvariance=model%variances(squared)\n! Check dimensions, finite outputs and variance positivity independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization recursion fragment requiring the full PARAMS/datetime/TIME_SERIES graph. Input values use selected precision r27 while parameters use r9; do not silently replace these kinds or assume compiler support. No residual, conditional variance, mixture likelihood or fitted model was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit project license grant identified",
+          "spdx_expression": null,
+          "revision": "9d2d56e1523be96eb6559a94452d4069534f2dd0",
+          "reviewed_on": "2026-11-05",
+          "notes": "No root license grant was identified in the pinned README and selected model/time-series code. The vendored datetime-fortran subdirectory has its own license; that component license is not assumed to cover the author model code or the entire repository.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/README.md",
+              "sha256": "41a5c6958902030fdc5a2bc05c03f20acb7229b0f00f6f9232a194a8e7610f87"
+            },
+            {
+              "path": "ARMA-GARCH model/mod_MODELS.f90",
+              "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_MODELS.f90",
+              "sha256": "05396871d335bbfededf621f7b428604b3146b2d72f515ee53522a4555825e0a"
+            },
+            {
+              "path": "ARMA-GARCH model/mod_TSERIES.f90",
+              "url": "https://github.com/saveriocolla90/Fortran90-Gaussian-Mixture-ARMA-GARCH/blob/9d2d56e1523be96eb6559a94452d4069534f2dd0/ARMA-GARCH model/mod_TSERIES.f90",
+              "sha256": "c66404aeb03b90060e9d7cb75a25183c8c4296c30d9484805fd65b978409bf7d"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40228,12 +41086,121 @@
             ],
             "notes": "The README limits current coverage to basic 2D triangulation and partial VTK/Triangle/TetGen format support. Three-dimensional, constrained, refinement and structured-mesh capabilities are explicitly planned rather than implemented.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607",
+            "reviewed_on": "2026-11-05",
+            "notes": "BOWYER_WATSON2 implements an incremental planar triangulation path: initialize a first triangle plus dummy exterior triangles, locate conflicts, recursively remove cavity triangles, insert new triangles and remove exterior cells. Conflict tests use orientation and circumcircle predicates evaluated in a requested quad-precision kind after converting default-real input coordinates. This is broad computational geometry P because the GAMS taxonomy provides no finer general Delaunay leaf; it is not constrained Delaunay, refinement, 3D meshing or an elliptic-solver-specific domain triangulation claim. The README labels the project as development-stage. INITIALISE_MESH loops until the first three points are positively oriented, but its permutation calls are commented and the loop does not change them: clockwise or collinear initial triples can hang. Require at least three distinct points, a positive first-triangle orientation, initialized mesh counters and sufficient precision-kind support. Fixed absolute predicate tolerance is not exact arithmetic or a scale-invariant degeneracy guarantee.",
+            "evidence": [
+              {
+                "path": "delaunay2.f90",
+                "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/delaunay2.f90",
+                "sha256": "e6b5817b98af01f74c11c420690dbd66ca112674e3eab7efbcee4cd4ec5c1626"
+              },
+              {
+                "path": "geometry.f90",
+                "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/geometry.f90",
+                "sha256": "b98c38cb130d5567df32fda7084471a96a93cc934d3c726121941add862657cd"
+              },
+              {
+                "path": "mesh_types.f90",
+                "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/mesh_types.f90",
+                "sha256": "576a4dc79c4519f106690f078a7da6b765d5fa8e857cba79b742c65123c9d1f1"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/README.md",
+                "sha256": "4e01a688bd964dae7fa3bbf3e926fff108b8ca75a5852d1707e4bdd6e13ce346"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bowyer_watson2",
+                "role": "public-entry-point",
+                "summary": "Public development-stage incremental 2D Delaunay triangulation entry.",
+                "signature": "CALL bowyer_watson2(M)",
+                "declarations": [
+                  {
+                    "path": "delaunay2.f90",
+                    "line_start": 533,
+                    "line_end": 539
+                  },
+                  {
+                    "path": "mesh_types.f90",
+                    "line_start": 9,
+                    "line_end": 28
+                  }
+                ],
+                "path": "delaunay2.f90",
+                "line_start": 533,
+                "line_end": 565,
+                "module": "delaunay2",
+                "usage": "use mesh_types, only: mesh\nuse delaunay2, only: bowyer_watson2\ntype(mesh) :: m\nm%n_dims=2; m%n_points=4; m%n_cells=0; m%cell_type=3\nallocate(m%points(2,4))\nm%points(:,1)=[0.,0.]; m%points(:,2)=[1.,0.]\nm%points(:,3)=[0.,1.]; m%points(:,4)=[0.2,0.3]\n! First three points must already be positively oriented and noncollinear.\ncall bowyer_watson2(m)\n! Validate connectivity, orientation and empty-circle conditions independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The initial-triple loop can hang if its orientation precondition is violated. Link the complete mesh/hash-map/error/geometry modules and provide the requested precision kind. No triangulation, degeneracy handling or mesh file was tested."
+              },
+              {
+                "procedure": "initialise_mesh orientation loop",
+                "role": "implementation-helper",
+                "path": "delaunay2.f90",
+                "line_start": 445,
+                "line_end": 508
+              },
+              {
+                "procedure": "dig_cavity",
+                "role": "implementation-helper",
+                "path": "delaunay2.f90",
+                "line_start": 356,
+                "line_end": 396
+              },
+              {
+                "procedure": "is_conflict",
+                "role": "implementation-helper",
+                "path": "delaunay2.f90",
+                "line_start": 302,
+                "line_end": 338
+              },
+              {
+                "procedure": "in_circle",
+                "role": "implementation-helper",
+                "path": "geometry.f90",
+                "line_start": 29,
+                "line_end": 51
+              },
+              {
+                "procedure": "orient2",
+                "role": "implementation-helper",
+                "path": "geometry.f90",
+                "line_start": 83,
+                "line_end": 101
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "AGPL-3.0",
+          "spdx_expression": "AGPL-3.0-only",
+          "revision": "b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607",
+          "reviewed_on": "2026-11-05",
+          "notes": "The README explicitly identifies GNU Affero GPL v3.0 and links the matching root license. No later-version election was identified in the selected evidence; record the distribution terms without inferring licenses for external tools.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/LICENSE",
+              "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/ofgn/meshf/blob/b5aeb5f18cc7c0e81e260ebbae2dfb9b42a2a607/README.md",
+              "sha256": "4e01a688bd964dae7fa3bbf3e926fff108b8ca75a5852d1707e4bdd6e13ce346"
+            }
+          ]
         }
       },
       "imports": {}

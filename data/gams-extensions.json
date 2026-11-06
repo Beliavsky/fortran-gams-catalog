@@ -774,6 +774,18 @@
       "parent": "L10a2c",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "I2b1a1b": {
+      "label": "Nonrectangular domain",
+      "parent": "I2b1a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "I2a1b": {
+      "label": "Two or more spatial dimensions",
+      "parent": "I2a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 404 repositories now have 541 source-reviewed
+Reviewed on 2026-11-05. 410 repositories now have 552 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-391 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Thirteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples and TISEAN) identify supplied program entry points and keep their internal/benchmark
+396 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 404 independently source-reviewed repositories now have an
+separately. All 410 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -428,6 +428,12 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | PDHSEQR Algorithm 953 | `PDHSEQR`, `PDGEBAL` | No explicit license grant identified |
 | quantregpy | `rqfnb` | GPL-3.0 license file; no later-version election identified |
 | Fortran time-series translations | `itsmr_mod::arma_acvf`, `itsmr_mod::arma_forecast`, `time_series_stats_mod::burg_fit` | BSD-2-Clause and MIT identifiers in reviewed sources; other package terms vary |
+| ElliFEM | `femSolver (unnamed main program)` | No explicit license grant identified |
+| heatcompact3d | `thomas_module::thomas`, `differentiate::differentiator_type%diff`, `time_integrator::RK3_integrator_type%integrate`, `time_integrator::euler_integrator_type%integrate`, `field_cpu::field_cpu_type%rhs` | GPL-3.0 license file; no later-version election identified |
+| laplace-2D | `laplace::laplace_solve` | GPL-2.0 license file; no later-version election identified |
+| LIBPARABOL / sippp | `SOLVERS::GMRES`, `RUNGE_KUTTA::runge_kutta_step` | No explicit license grant identified |
+| Gaussian Mixture ARMA-GARCH prototype | `MODELS::ARMA%residuals`, `MODELS::ARMA_GARCH%variances` | No explicit project license grant identified |
+| meshf | `delaunay2::bowyer_watson2` | AGPL-3.0 |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -851,6 +857,12 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [PDHSEQR Algorithm 953](https://github.com/nlafet/sevp-pdhseqr-alg953) | D4c2b; D4c1a | Distributed Hessenberg QR/Schur computation and matrix balancing | Schur factors versus eigenvectors, replicated spectra, permutation/scaling data and distributed storage. |
 | [quantregpy](https://github.com/quantregpy/quantregpy) | L8c3 | Median/L1 multiple regression through quantile regression | Transposed design, coefficient signs, mutable workspaces and iteration-limit/status interpretation. |
 | [Fortran time-series translations](https://github.com/beliavsky/time-series) | L10a2a1; L10a2d3; L10a2c2 | ARMA theoretical covariance/forecasting and Burg AR estimation | Supplied stable models, covariance sentinel, sample centering, conditional intervals and scoped source licenses. |
+| [ElliFEM](https://github.com/md861/ellifem) | I2b1a1b | Standalone two-dimensional Helmholtz finite-element workflow | General quadrilateral meshes, source-defined problem data, dense storage, shell file operations and no callable solver claim. |
+| [heatcompact3d](https://github.com/tlestang/heatcompact3d) | D2a2a; H1; I1a1a; I2a1b | No-pivot tridiagonal solve, compact differentiation, explicit stepping and periodic 3D heat RHS | Duplicated endpoints, spacing divisor, fixed time grid, stability and excluded AB2 history defect. |
+| [laplace-2D](https://github.com/taraskuzyo/laplace-2d) | I2b1a1a | Rectangular Laplace/Poisson five-point SOR | Source normalization, change versus residual, saved iteration counter and actual five-point stencil. |
+| [LIBPARABOL / sippp](https://github.com/nschloe/sippp) | D2a4; I2a1a | Operator GMRES and one-dimensional parabolic implicit Runge-Kutta stepping | Right preconditioning, fixed tolerances, callback contracts, persistent correction and absent returned solver status. |
+| [Gaussian Mixture ARMA-GARCH prototype](https://github.com/saveriocolla90/fortran90-gaussian-mixture-arma-garch) | L10a2; L10a2d | Supplied-parameter ARMA residual and GARCH variance recursions | Squared-residual input, initialized component metadata, limited stability predicate and no fitting/forecast guarantee. |
+| [meshf](https://github.com/ofgn/meshf) | P | Incremental planar Delaunay triangulation | Positive initial orientation, possible initialization hang, quad-kind predicates and development scope. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1528,3 +1540,14 @@ bootstrap components and supplied-model forecasting. The midasmlpy success-statu
 and inactive-output defects and tidybench QR-workspace concern remain explicit;
 these interfaces are not presented as checked numerical drivers. License notes
 identify selected-source scope and missing explicit grants where applicable.
+
+Heatcompact3d, SIPPP, laplace-2d, meshf, ElliFEM and the Gaussian-mixture
+ARMA-GARCH model repository have eleven additional source-reviewed mappings.
+Calling sketches were not compiled or run. Reviews identify periodic endpoint
+layout and derivative scaling, fixed-step time integration, preconditioned
+operator solves, change-based SOR termination and its saved iteration counter,
+triangulation initialization risks, supplied-model statistical recursions and
+the standalone finite-element workflow. ElliFEM is a program entry rather than
+a callable solver; source-defined parameters, mesh data, dense storage and file
+operations remain explicit. No project-wide grant is inferred from a bundled
+dependency license, and numerical correctness is not inferred from source review.
