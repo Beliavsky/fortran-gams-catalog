@@ -612,6 +612,18 @@
       "parent": "L10a1c",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "J1b": {
+      "label": "Multidimensional",
+      "parent": "J1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "G2d": {
+      "label": "Network (for network reliability search class M)",
+      "parent": "G2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -6172,12 +6172,102 @@
             ],
             "notes": "The README documents nestRun, likelihood callbacks, mode separation, evidence tolerances and posterior outputs. This entry refers to this pinned mirror/version, not every MultiNest distribution. The original README uses Windows-1252 encoding.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L",
+            "level": "source-reviewed",
+            "revision": "a06501151c7851c0933f95bcadadbd5c515d6c21",
+            "reviewed_on": "2026-11-05",
+            "notes": "NESTRUN initializes state/randomness and dispatches Bayesian nested sampling with user log-likelihood/prior transformation and dumper callbacks. The likelihood overwrites unit-cube coordinates with physical and derived parameters; dumper receives posterior/live-point pointer arrays and estimated log-evidence/error. Selected iteration code partitions live points, uses ellipsoidal proposal machinery and estimated remaining-evidence stopping; a finite iteration cap and estimated evidence tolerance are not guarantees of posterior coverage or integration accuracy. The pinned fork identifies itself as MultiNest v2.17 (2012), so this is not a review of later MultiNest interfaces. Global module state, output-file naming, optional resume behavior and optional MPI initialization/finalization are part of the contract. Review covers public dispatch, callback declarations and selected stopping/proposal paths, not a full statistical algorithm audit. Broad L is retained rather than a deterministic quadrature or optimizer leaf.",
+            "evidence": [
+              {
+                "path": "nested.F90",
+                "url": "https://github.com/rjw57/MultiNest/blob/a06501151c7851c0933f95bcadadbd5c515d6c21/nested.F90",
+                "sha256": "19a66f1ddbaabefa8a200c02cf28a0f753c48da9b8e22e27c49e8c9bbfece1fc"
+              },
+              {
+                "path": "example_gaussian/nestwrap.f90",
+                "url": "https://github.com/rjw57/MultiNest/blob/a06501151c7851c0933f95bcadadbd5c515d6c21/example_gaussian/nestwrap.f90",
+                "sha256": "700e7dbc8903081518bdc3a21f807080adb72e9ac1afdceb509c63424a88cc23"
+              },
+              {
+                "path": "example_gaussian/like.f90",
+                "url": "https://github.com/rjw57/MultiNest/blob/a06501151c7851c0933f95bcadadbd5c515d6c21/example_gaussian/like.f90",
+                "sha256": "bdb26ff9e895204ca5c4ae7a4fee711a8cdff98bbbd40cb42ae6c0428a3cf23f"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/rjw57/MultiNest/blob/a06501151c7851c0933f95bcadadbd5c515d6c21/README",
+                "sha256": "8dfc80d56ae314d6eb51e10b9481a843505aed13bb2726c618561fc0f4312a14",
+                "source_encoding": "cp1252"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "nestRun",
+                "role": "public-entry-point",
+                "summary": "Public Nested module Bayesian nested-sampling entry with likelihood and pointer-array dumper callbacks.",
+                "signature": "CALL nestRun(MMODAL,CEFF,NLIVE,TOL,EFF,NDIM,NPAR,NCLSPAR,MAXMODES, &\n UPDINT,ZTOL,ROOT,SEED,PWRAP,FEEDBACK,RESUME,OUTFILE,INITMPI, &\n LOGZERO,MAXITER,LOGLIKE,DUMPER,CONTEXT)",
+                "declarations": [
+                  {
+                    "path": "nested.F90",
+                    "line_start": 47,
+                    "line_end": 74
+                  },
+                  {
+                    "path": "example_gaussian/nestwrap.f90",
+                    "line_start": 36,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "example_gaussian/nestwrap.f90",
+                    "line_start": 64,
+                    "line_end": 79
+                  }
+                ],
+                "path": "nested.F90",
+                "line_start": 47,
+                "line_end": 74,
+                "module": "Nested",
+                "usage": "use Nested, only: nestRun\ninteger :: wrap(2),context\ncharacter(len=100) :: root\nwrap=0; context=0; root=\"chains/example-\"\n! Supply LOGLIKE and DUMPER matching the pinned callback declarations.\n! LOGLIKE must transform the unit cube to a normalized prior before evaluation.\ncall nestRun(.false.,.false.,100,0.5d0,0.8d0,2,2,2,10, &\n 100,-1d90,root,12345,wrap,.true.,.false.,.true.,.true., &\n -1d100,1000,loglike,dumper,context)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback bodies omitted. Create the output directory, match the pinned older callback ABI (including pointer dummies), and build/link all numerical/RNG modules. INITMPI controls MPI lifecycle only in an MPI build; avoid double initialization. No sampler, evidence, posterior or convergence result was run."
+              },
+              {
+                "procedure": "Nestsample",
+                "role": "implementation-helper",
+                "path": "nested.F90",
+                "line_start": 234,
+                "line_end": 262
+              },
+              {
+                "procedure": "clusteredNest",
+                "role": "implementation-helper",
+                "path": "nested.F90",
+                "line_start": 600,
+                "line_end": 610
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom MultiNest noncommercial research license",
+          "spdx_expression": null,
+          "revision": "a06501151c7851c0933f95bcadadbd5c515d6c21",
+          "reviewed_on": "2026-11-05",
+          "notes": "Pinned agreement grants noncommercial academic/research use and redistribution subject to attribution, indemnity and derivative-distribution conditions; commercial use requires a separate arrangement. Do not replace these terms with an assumed license from newer forks/releases.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/rjw57/MultiNest/blob/a06501151c7851c0933f95bcadadbd5c515d6c21/LICENCE",
+              "sha256": "c01677a200900e85141512bb38f2415b17588b609e7f7d2ff700572bc5bee848",
+              "source_encoding": "cp1252"
+            }
+          ]
         }
       },
       "imports": {}
@@ -36442,12 +36532,76 @@
             ],
             "notes": "Pinned module interfaces and inline comments show cuFFT plans, CUDA streams/events and double buffering. This is accelerator-specific experiment code, not an independent CPU FFT implementation; timing and correctness were not checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "J1b",
+            "level": "source-reviewed",
+            "revision": "22b1af9127a2866666b3fcf06531a23d1ee12aa4",
+            "reviewed_on": "2026-11-05",
+            "notes": "CUFFT2DTEST_MANYSTREAM dispatches single-precision complex two-dimensional cuFFT forward/inverse pairs on successive array planes, overlapping device copies via two streams and CUDA events. This is a GPU transform integration demonstration, not an independent FFT implementation. The output round trip is unnormalized and should be divided by NX*NY before comparison with A. CUDA Fortran PINNED/DEVICE arrays, cuFFT, MPI and NVTX modules are required by the source. Return codes are repeatedly overwritten without a caller-visible status, and created plans/streams/events are not destroyed. The separate CUFFT3DTEST is explicitly unfinished: its next-plane copy uses the current source plane and comments acknowledge an unsynchronized MPI send; it is not promoted as a correct distributed 3D transform. Review covers only the two-dimensional many-stream path, not device portability or throughput.",
+            "evidence": [
+              {
+                "path": "overlapfft_mod.F90",
+                "url": "https://github.com/dappelha/fft-overlap/blob/22b1af9127a2866666b3fcf06531a23d1ee12aa4/overlapfft_mod.F90",
+                "sha256": "2b4646e2992aa05d5b014029a8663557d147668ec9760cee69b93c5b89d29601"
+              },
+              {
+                "path": "driver.F90",
+                "url": "https://github.com/dappelha/fft-overlap/blob/22b1af9127a2866666b3fcf06531a23d1ee12aa4/driver.F90",
+                "sha256": "a539d88fcd4a3cde73ea5e095844cc0a41aafdd1167eef95f20c6e71c94e5ca0"
+              },
+              {
+                "path": "makefile",
+                "url": "https://github.com/dappelha/fft-overlap/blob/22b1af9127a2866666b3fcf06531a23d1ee12aa4/makefile",
+                "sha256": "265f156988d5ef4a5cf865c3e3f44714f45f6ae2d1da5f21bdf1c5b7df449e68"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cufft2dTest_manystream",
+                "role": "public-entry-point",
+                "summary": "Public CUDA Fortran module plane-wise complex 2D forward/inverse round-trip demonstration.",
+                "signature": "CALL cufft2dTest_manystream(A,B,NX,NY,NZ)",
+                "declarations": [
+                  {
+                    "path": "overlapfft_mod.F90",
+                    "line_start": 10,
+                    "line_end": 23
+                  }
+                ],
+                "path": "overlapfft_mod.F90",
+                "line_start": 10,
+                "line_end": 92,
+                "module": "overlapfft_mod",
+                "usage": "use overlapfft_mod, only: cufft2dTest_manystream\nuse cudafor\ncomplex,pinned,allocatable :: a(:,:,:),b(:,:,:)\ninteger,parameter :: nx=8,ny=8,nz=2\nallocate(a(nx,ny,nz),b(nx,ny,nz))\na=cmplx(1.0,0.0)\ncall cufft2dTest_manystream(a,b,nx,ny,nz)\nb=b/real(nx*ny)\n! Compare B against A after checking CUDA/cuFFT status in an instrumented build.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Requires a compatible CUDA Fortran compiler/GPU and cuFFT/MPI/NVTX build environment. The routine has no returned error status and omits plan/stream/event destruction; repeated calls need cleanup repairs. Do not infer correctness of the separate unfinished distributed 3D path from this 2D mapping. No GPU transform or timing was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified in selected source/build files",
+          "spdx_expression": null,
+          "revision": "22b1af9127a2866666b3fcf06531a23d1ee12aa4",
+          "reviewed_on": "2026-11-05",
+          "notes": "No standalone LICENSE/COPYING file appears in the pinned tree, and no permission grant was identified in the selected module/build files. Public availability is not a redistribution grant; linked NVIDIA/MPI components have separate terms.",
+          "evidence": [
+            {
+              "path": "overlapfft_mod.F90",
+              "url": "https://github.com/dappelha/fft-overlap/blob/22b1af9127a2866666b3fcf06531a23d1ee12aa4/overlapfft_mod.F90",
+              "sha256": "2b4646e2992aa05d5b014029a8663557d147668ec9760cee69b93c5b89d29601"
+            },
+            {
+              "path": "makefile",
+              "url": "https://github.com/dappelha/fft-overlap/blob/22b1af9127a2866666b3fcf06531a23d1ee12aa4/makefile",
+              "sha256": "265f156988d5ef4a5cf865c3e3f44714f45f6ae2d1da5f21bdf1c5b7df449e68"
+            }
+          ]
         }
       },
       "imports": {}
@@ -50946,12 +51100,111 @@
             ],
             "notes": "The README documents compatibility wrappers and modernizing work, explicitly warning that the project should not be considered stable. A similar LAPACK transformation is a future intention, not a completed part of this entry.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "ef9a8c19bc94f02cd914a2759db1d46778be9f32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public M_blas DGEMM module procedure directly implements double-precision dense C=alpha*op(A)*op(B)+beta*C using scalar/array loops for all real transpose flag pairs. This is a reference BLAS adaptation, not a vendor-tuned backend or a LAPACK driver. It checks flags, dimensions and leading dimensions, routing argument failures through a configurable XERBLA procedure pointer rather than a returned INFO. Zero-alpha/beta and empty-dimension paths are explicit; C is overwritten. Review covers this routine, module visibility and error dispatch, not every real/complex/quad wrapper in the large module or performance.",
+            "evidence": [
+              {
+                "path": "src/M_blas.f90",
+                "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/src/M_blas.f90",
+                "sha256": "17cc66d5b955446faa40156cd73e7f415915f075803589b7586cbe30f1171aac"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/README.md",
+                "sha256": "e2a9fd6785886c17512c19d2617c8428ee52d1ebb4ab9b53462aa8862b860ddb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dgemm",
+                "role": "public-entry-point",
+                "summary": "Public module double-precision general matrix multiplication and accumulation.",
+                "signature": "CALL dgemm(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)",
+                "declarations": [
+                  {
+                    "path": "src/M_blas.f90",
+                    "line_start": 10949,
+                    "line_end": 10964
+                  }
+                ],
+                "path": "src/M_blas.f90",
+                "line_start": 10949,
+                "line_end": 11127,
+                "module": "M_blas",
+                "usage": "use M_blas, only: dgemm\ndouble precision :: a(2,2),b(2,2),c(2,2)\na=reshape([1d0,2d0,3d0,4d0],[2,2]); b=a; c=0d0\ncall dgemm(\"N\",\"N\",2,2,2,1d0,a,2,b,2,0d0,c,2)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match DOUBLE PRECISION/default INTEGER kinds and leading dimensions; no overlapping A/B/C storage. Invalid arguments go through the configurable error handler, not INFO. README calls the modernization unstable. No product, transpose branch or performance comparison was run."
+              }
+            ]
+          },
+          {
+            "code": "D2a3",
+            "level": "source-reviewed",
+            "revision": "ef9a8c19bc94f02cd914a2759db1d46778be9f32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public M_blas DTRSV module procedure solves real triangular systems by forward/back substitution, overwriting the RHS vector. UPLO selects the stored triangle, TRANS selects A or A-transpose, DIAG selects explicit or unit diagonal, and INCX supports strided/reverse storage. Invalid flags/dimensions/zero stride call XERBLA. Nonunit diagonals are divided directly without singularity or conditioning checks. This is a real triangular solve, not factorization of a general matrix, an SPD-only solve or an error-bounded solver. Review covers dispatch and substitution/stride loops, not every BLAS routine.",
+            "evidence": [
+              {
+                "path": "src/M_blas.f90",
+                "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/src/M_blas.f90",
+                "sha256": "17cc66d5b955446faa40156cd73e7f415915f075803589b7586cbe30f1171aac"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/README.md",
+                "sha256": "e2a9fd6785886c17512c19d2617c8428ee52d1ebb4ab9b53462aa8862b860ddb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dtrsv",
+                "role": "public-entry-point",
+                "summary": "Public module double-precision triangular solve overwriting X.",
+                "signature": "CALL dtrsv(UPLO,TRANS,DIAG,N,A,LDA,X,INCX)",
+                "declarations": [
+                  {
+                    "path": "src/M_blas.f90",
+                    "line_start": 18353,
+                    "line_end": 18367
+                  }
+                ],
+                "path": "src/M_blas.f90",
+                "line_start": 18353,
+                "line_end": 18541,
+                "module": "M_blas",
+                "usage": "use M_blas, only: dtrsv\ndouble precision :: a(2,2),x(2)\na=reshape([2d0,0d0,1d0,3d0],[2,2]); x=[4d0,6d0]\ncall dtrsv(\"U\",\"N\",\"N\",2,a,2,x,1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide a nonsingular triangular matrix and compatible array storage/stride; no singularity or condition estimate is returned. Preserve the RHS and matrix for independent residual checks. No triangular solve, reverse stride or error handler was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root with inherited Reference BLAS notices",
+          "spdx_expression": null,
+          "revision": "ef9a8c19bc94f02cd914a2759db1d46778be9f32",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENSE is MIT; the large module retains Reference BLAS institutional attribution and historical routine provenance. Preserve inherited component notices rather than assuming the root license replaces them. This is a scoped finding for DGEMM/DTRSV, not clearance of the entire generated documentation bundle.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/LICENSE",
+              "sha256": "a0416f67ece319452a77166a2ebedd9c5583a152539f38b0a63b1ca429635e0d"
+            },
+            {
+              "path": "src/M_blas.f90",
+              "url": "https://github.com/urbanjost/M_blas/blob/ef9a8c19bc94f02cd914a2759db1d46778be9f32/src/M_blas.f90",
+              "sha256": "17cc66d5b955446faa40156cd73e7f415915f075803589b7586cbe30f1171aac"
+            }
+          ]
         }
       },
       "imports": {}
@@ -51520,12 +51773,75 @@
             ],
             "notes": "The pinned Fortran interface module exposes update arrays, indices and Slater inverse arguments for Maponi/SM variants through C bindings. This is interface evidence for broad matrix operations, not a verified numerical implementation or ABI audit; backend code is mixed language.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2e",
+            "level": "source-reviewed",
+            "revision": "0ba978e78727cb4c70e17d50153b09b4839d5c0a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected SM1 implementation updates an existing dense inverse after additive column updates A <- A + u*e_j^T, applying the Sherman-Morrison outer-product correction with denominator 1+(A^-1*u)(j). Updates_index is one-based, while C++ matrix storage is row-major. SM1_f is the exported pointer-to-pointer C wrapper. The checked-in Fortran SM1 declaration omits the required by-value BREAKDOWN argument and uses allocatable assumed-shape BIND(C) arrays, whose descriptor ABI is incompatible with these raw pointer-to-pointer parameters. The sketch therefore declares a separate C binding using C_PTR arguments, rather than calling that defective module interface. SM1 only logs a small denominator inside DEBUG1 and still divides by it; BREAKDOWN is not a protective error return. There is no status result or rollback. Review covers the naive update and C wrapper, not Maponi, recursive splitting, Woodbury variants or the independent determinant-scaled IRPF90 kernels.",
+            "evidence": [
+              {
+                "path": "src/SM_Standard.cpp",
+                "url": "https://github.com/TREX-CoE/Sherman-Morrison/blob/0ba978e78727cb4c70e17d50153b09b4839d5c0a/src/SM_Standard.cpp",
+                "sha256": "5b05850bf06929a189d20e9ab960bcfc1a11ac3c395181ac66964f25d2cfdc0c"
+              },
+              {
+                "path": "src/finterface_mod.f90",
+                "url": "https://github.com/TREX-CoE/Sherman-Morrison/blob/0ba978e78727cb4c70e17d50153b09b4839d5c0a/src/finterface_mod.f90",
+                "sha256": "178b32a9b93faae4cd96cac2d2d89e85bb388b7d49d611745826c10b8b18489a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SM1_f",
+                "role": "public-entry-point",
+                "summary": "Exported C inverse-update wrapper; the supplied Fortran SM1 interface needs repair before use.",
+                "signature": "CALL sm1_c(INVERSE_PTR,DIM,N_UPDATES,UPDATES_PTR,INDEX_PTR,BREAKDOWN)",
+                "declarations": [
+                  {
+                    "path": "src/SM_Standard.cpp",
+                    "line_start": 9,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "src/SM_Standard.cpp",
+                    "line_start": 283,
+                    "line_end": 286
+                  },
+                  {
+                    "path": "src/finterface_mod.f90",
+                    "line_start": 18,
+                    "line_end": 24
+                  }
+                ],
+                "path": "src/SM_Standard.cpp",
+                "line_start": 283,
+                "line_end": 286,
+                "usage": "use iso_c_binding, only: c_ptr,c_loc,c_int,c_double\ninterface\n subroutine sm1_c(a,n,k,u,idx,threshold) bind(C,name=\"SM1_f\")\n  import c_ptr,c_int,c_double\n  type(c_ptr) :: a,u,idx\n  integer(c_int) :: n,k\n  real(c_double),value :: threshold\n end subroutine\nend interface\nreal(c_double),target :: inverse_rows(4),updates(2)\ninteger(c_int),target :: indices(1)\ninteger(c_int) :: n,k\ntype(c_ptr) :: ap,up,ip\ninverse_rows=[1d0,0d0,0d0,1d0]; updates=[0.25d0,0.1d0]\nindices=1; n=2; k=1\nap=c_loc(inverse_rows); up=c_loc(updates); ip=c_loc(indices)\ncall sm1_c(ap,n,k,up,ip,1d-12)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Alternative declaration matches the reviewed raw pointers and missing scalar; do not combine it with the checked-in SM1 interface. Requires a companion C ABI where positive C_INT values match unsigned int representation/width. Keep row-major inverse storage and valid one-based indices, link the C++ backend/runtime, and independently reject singular updates. Small-denominator threshold does not stop division; no update or ABI behavior was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "0ba978e78727cb4c70e17d50153b09b4839d5c0a",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root BSD three-clause grant from TREX Center of Excellence. This scoped review covers the current naive C++ update and interface; it does not replace notices or establish permissions for every bundled dataset/third-party numerical component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/TREX-CoE/Sherman-Morrison/blob/0ba978e78727cb4c70e17d50153b09b4839d5c0a/LICENSE",
+              "sha256": "bfece3775994960c64ca5178a9cd8c6a8212ec4aa000e6b6cfaa67b467686ecb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -51694,12 +52010,91 @@
             ],
             "notes": "The README describes external-library examples and MUMPS parallel-functionality tests. This is build/use integration rather than a new sparse solver implementation; backend availability and current platform compatibility need separate checks.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "2b410edf60bc920b14779fdb8832e7e9d76b395f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected TEST_MUMPS program initializes an unsymmetric double-precision MUMPS instance, reads a coordinate sparse matrix and one RHS on the host, dispatches JOB=6 analysis/factorization/solve, prints the host solution and destroys the instance. MUMPS_RUN checks global INFOG for fatal and warning statuses. This repository demonstrates external-library integration rather than implementing its own sparse solver. Input uses default-integer matrix indices, an INT64 nonzero loop counter, and the exact DMUMPS_STRUC header from the linked build. Internal SIMPLE_TEST, READ_INPUT and MUMPS_RUN are program-scoped helpers, not reusable exported routines. Review covers the complete small driver and its data layout/status checks; no residual, conditioning, distributed input or installed-library compatibility was verified.",
+            "evidence": [
+              {
+                "path": "src/test_mumps.f90",
+                "url": "https://github.com/scivision/sparse-fortran/blob/2b410edf60bc920b14779fdb8832e7e9d76b395f/src/test_mumps.f90",
+                "sha256": "7cc6b4969cbc97b274854327908da2e108deea9392611b89971c4ec95d2a53f8"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/scivision/sparse-fortran/blob/2b410edf60bc920b14779fdb8832e7e9d76b395f/README.md",
+                "sha256": "a9aa21580ed6bdecf6bf2cf4d21fec1c0021cfc348b82e4a4098898295a68c91"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "test_mumps",
+                "role": "program-entry-point",
+                "summary": "MPI Fortran MUMPS sparse unsymmetric solve example; internal helpers are not standalone public library procedures.",
+                "signature": "mpiexec -n N ./test_mumps INPUT_FILE",
+                "declarations": [
+                  {
+                    "path": "src/test_mumps.f90",
+                    "line_start": 1,
+                    "line_end": 16
+                  },
+                  {
+                    "path": "src/test_mumps.f90",
+                    "line_start": 81,
+                    "line_end": 105
+                  }
+                ],
+                "usage": "! Build the author test_mumps executable against matching MPI/MUMPS libraries.\n! INPUT_FILE: N, then NNZ, then NNZ lines of row/column/value, then N RHS values.\n! Run: mpiexec -n 1 ./test_mumps input_simpletest_real",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The internal procedures are scoped to this program. This example depends on external MUMPS/MPI, not an included sparse factorization implementation. No solve or process-count configuration was tested.",
+                "path": "src/test_mumps.f90",
+                "line_start": 1,
+                "line_end": 42
+              },
+              {
+                "procedure": "simple_test",
+                "role": "implementation-helper",
+                "path": "src/test_mumps.f90",
+                "line_start": 47,
+                "line_end": 78
+              },
+              {
+                "procedure": "read_input",
+                "role": "implementation-helper",
+                "path": "src/test_mumps.f90",
+                "line_start": 81,
+                "line_end": 110
+              },
+              {
+                "procedure": "mumps_run",
+                "role": "implementation-helper",
+                "path": "src/test_mumps.f90",
+                "line_start": 113,
+                "line_end": 128
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "2b410edf60bc920b14779fdb8832e7e9d76b395f",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root MIT license covers the example code. MUMPS, MPI, BLAS and optional ordering libraries are external dependencies with separate licenses; this does not relicense their implementations.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/scivision/sparse-fortran/blob/2b410edf60bc920b14779fdb8832e7e9d76b395f/LICENSE",
+              "sha256": "adb4a7d04bd00dde6fcdfa4c377920b69560eef8d1dd6997eb46074f7a88b256"
+            }
+          ]
         }
       },
       "imports": {}
@@ -51739,12 +52134,107 @@
             ],
             "notes": "The README says matrices should already be reordered by reverse Cuthill-McKee. Reordering is a prerequisite rather than a documented bundled routine; speed and convergence are not independently measured.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "fe82bd08e2050716c2ed43996337d5e8f4723c44",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected mSolver SingleRHS path is real sparse preconditioned conjugate gradient, dispatching block SGS or BLUT preconditioning and sparse matrix-vector products. This supports a symmetric sparse linear-system mapping, with SPD matrix and suitable preconditioner required for ordinary CG guarantees; no general nonsymmetric solver is inferred. SetSolverSettings prepares ordering/scaling/preconditioners and SolverAxB dispatches the wrapper. Several implementation qualifications matter: setup reads optional iSolverType without PRESENT guards, uses integer truth tests, and the wrapper may change RHS and matrix normalization/order. Output%Success is private; public Output%Status is overwritten with a bounded iteration count even on exhaustion, and the iterate is restored to its starting value on unsuccessful termination. Therefore status is not a reliable convergence certificate. There is no initial zero-residual guard before CG quotients. Review covers the real iterative dispatch, setup and stopping paths, not the unimplemented Pardiso option or scalability.",
+            "evidence": [
+              {
+                "path": "Solver.f90",
+                "url": "https://github.com/tueboesen/Sparse-iterative-parallel-linear-solver/blob/fe82bd08e2050716c2ed43996337d5e8f4723c44/Solver.f90",
+                "sha256": "3a75ddd0c889b7b16d35729bda7abde9cffb930eac5431130042578dfb164a0a"
+              },
+              {
+                "path": "SparseMatrix.f90",
+                "url": "https://github.com/tueboesen/Sparse-iterative-parallel-linear-solver/blob/fe82bd08e2050716c2ed43996337d5e8f4723c44/SparseMatrix.f90",
+                "sha256": "79da71f6c6aa3c5de64b8bd8d92a986bc68ecb82c543ba41b63e541ca9338ae3"
+              },
+              {
+                "path": "Example.f90",
+                "url": "https://github.com/tueboesen/Sparse-iterative-parallel-linear-solver/blob/fe82bd08e2050716c2ed43996337d5e8f4723c44/Example.f90",
+                "sha256": "bc563612abca48c13c43c2f91c655ce52cf5d89307fdb1e5fe43f2f28fe9f690"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SolverAxB",
+                "role": "public-entry-point",
+                "summary": "Public module generic for the real sparse single-RHS wrapper, following explicit solver setup.",
+                "signature": "CALL SetSolverSettings(SETTINGS,A,...)\nCALL SolverAxB(A,RHS,X,SETTINGS)\nCALL FreeSolverSettings(SETTINGS)",
+                "declarations": [
+                  {
+                    "path": "Solver.f90",
+                    "line_start": 103,
+                    "line_end": 119
+                  },
+                  {
+                    "path": "Solver.f90",
+                    "line_start": 970,
+                    "line_end": 1002
+                  },
+                  {
+                    "path": "Solver.f90",
+                    "line_start": 31,
+                    "line_end": 48
+                  }
+                ],
+                "path": "Solver.f90",
+                "line_start": 93,
+                "line_end": 95,
+                "module": "mSolver",
+                "usage": "use mSMat, only: TSparseMat\nuse mSolver, only: TSolverSettings,SetSolverSettings,SolverAxB,FreeSolverSettings\ntype(TSparseMat) :: a\ntype(TSolverSettings) :: settings\n! Initialize OpenMP using the author mParallel setup; populate valid CSR A.\n! Allocate REAL*8 RHS/X of A%NoRows; preserve original A and RHS for residuals.\ncall SetSolverSettings(settings,a,iUseRCM=0,iUseNormalization=0, &\n iSolverType=1,iIter=500,iBlockSize=1,iFillingFactor=2.5d0,iStepLimit=0)\nx=0d0\ncall SolverAxB(a,rhs,x,settings)\n! Independently check the original-system residual; status alone is insufficient.\ncall FreeSolverSettings(settings)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-CSR-allocation fragment. Supply iSolverType explicitly to avoid absent-optional references. Build the full module graph with compatible OpenMP, BLAS and the nonstandard integer-logical/compiler conventions used by the source. Success is private and Status alone can report exhaustion as a count; no solve, residual, breakdown or parallel case was tested."
+              },
+              {
+                "procedure": "SingleRHS",
+                "role": "implementation-helper",
+                "path": "Solver.f90",
+                "line_start": 184,
+                "line_end": 319
+              },
+              {
+                "procedure": "SetSolverSettings",
+                "role": "implementation-helper",
+                "path": "Solver.f90",
+                "line_start": 970,
+                "line_end": 1130
+              },
+              {
+                "procedure": "FreeSolverSettings",
+                "role": "implementation-helper",
+                "path": "Solver.f90",
+                "line_start": 1226,
+                "line_end": 1250
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "fe82bd08e2050716c2ed43996337d5e8f4723c44",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root and selected solver source contain the MIT grant naming the Aarhus HydroGeophysics group; separately linked BLAS/OpenMP/compiler components retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tueboesen/Sparse-iterative-parallel-linear-solver/blob/fe82bd08e2050716c2ed43996337d5e8f4723c44/LICENSE",
+              "sha256": "fb959f65cd596fab58ccf08bd8fe83f87283cca082da286be51fbaef2dbbaed0"
+            },
+            {
+              "path": "Solver.f90",
+              "url": "https://github.com/tueboesen/Sparse-iterative-parallel-linear-solver/blob/fe82bd08e2050716c2ed43996337d5e8f4723c44/Solver.f90",
+              "sha256": "3a75ddd0c889b7b16d35729bda7abde9cffb930eac5431130042578dfb164a0a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -53909,12 +54399,148 @@
             ],
             "notes": "The README documents derivatives, binning, bootstrap intervals and an allometric option; the repository contains a Fortran computation source. Statistical coverage and performance depend on smoother choices and are not independently verified.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K5",
+            "level": "source-reviewed",
+            "revision": "6346dda405ebf192a31b00e058d2945c01cbcceb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected Reg1D kernel computes local polynomial regression at one query using bandwidth H relative to RANGO and observation weights W. Kernel 1 is compact Epanechnikov, 2 triangular and 3 Gaussian; IFCV=1 removes observations at exactly the query value. It centers polynomial powers at X0, calls the local weighted regression helper and returns fitted level, first/second polynomial coefficients, standard errors, R-squared and helper status in PRED(1:8). The third polynomial coefficient is not multiplied by 2, so PRED(3) is not automatically the second derivative. At least seven positive-weight local observations are required even for lower degree. The fixed four-column local design and output accesses motivate restricting this sketch to degree 2. Invalid/insufficient fits set all PRED=-1, so failure cannot be detected from PRED(1) alone. This is a selected smoothing kernel, not the complete factor-by-curve/bootstrap R workflow.",
+            "evidence": [
+              {
+                "path": "src/program2.f90",
+                "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/src/program2.f90",
+                "sha256": "5d3b5df6ebaf09a822dfb8d579b144173fe0f06e80c138649b6b923c30ad53b2"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/DESCRIPTION",
+                "sha256": "a6a2383f7a5db7a0a31d7252911bd296c846f5076cd3f761738d57d39948de82"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "Reg1D",
+                "role": "public-entry-point",
+                "summary": "External double-precision one-query local polynomial smoother returning a packed eight-value result.",
+                "signature": "CALL Reg1D(X,Y,W,N,H,P,X0,PRED,RANGO,KERNEL,IFCV)",
+                "declarations": [
+                  {
+                    "path": "src/program2.f90",
+                    "line_start": 2543,
+                    "line_end": 2549
+                  }
+                ],
+                "path": "src/program2.f90",
+                "line_start": 2543,
+                "line_end": 2626,
+                "usage": "external :: Reg1D\ninteger :: i\ndouble precision :: x(9),y(9),w(9),pred(8)\ndo i=1,9\n x(i)=dble(i-1)/8d0\nend do\ny=1d0+x+x*x; w=1d0\ncall Reg1D(x,y,w,9,1d0,2,0.5d0,pred,1d0,3,0)\nif(pred(8)/=0d0) error stop \"local fit rejected\"\n! PRED(3) is a quadratic coefficient; second derivative would be 2*PRED(3).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite data, positive bandwidth/range and more than six retained local observations. Link the package weighted-regression helpers; the large source file also contains other package routines. The sketch fixes degree 2 and does not validate derivative uncertainty or bootstrap inference. No fit, failure status or derivative result was tested."
+              },
+              {
+                "procedure": "rfast_h",
+                "role": "implementation-helper",
+                "path": "src/program2.f90",
+                "line_start": 2311,
+                "line_end": 2371
+              }
+            ]
+          },
+          {
+            "code": "L8c1b1",
+            "level": "source-reviewed",
+            "revision": "6346dda405ebf192a31b00e058d2945c01cbcceb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The bundled public LSQ module implements sequential weighted least-squares reduction using STARTUP, INCLUD and REGCF (AS75/AS274 lineage). With unit weights it estimates ordinary multiple-linear regression coefficients from raw rows, including a caller-supplied leading constant when fit_const is true. STARTUP allocates shared saved state; INCLUD overwrites XROW and deliberately omits dimension checks. REGCF back-substitutes the reduction, calling TOLSET if needed, and uses negative IFAULT values for detected deficient diagonals rather than proving numerical rank. The module is stateful and not a reentrant independent-fit object. Review covers initialization, row inclusion and coefficient recovery; variable-selection/inference routines in the same file are not promoted by this claim.",
+            "evidence": [
+              {
+                "path": "src/program2.f90",
+                "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/src/program2.f90",
+                "sha256": "5d3b5df6ebaf09a822dfb8d579b144173fe0f06e80c138649b6b923c30ad53b2"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/DESCRIPTION",
+                "sha256": "a6a2383f7a5db7a0a31d7252911bd296c846f5076cd3f761738d57d39948de82"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "startup",
+                "role": "public-entry-point",
+                "summary": "Public LSQ module initialization followed by destructive row inclusion and coefficient recovery.",
+                "signature": "CALL startup(NVAR,FIT_CONST)\nCALL includ(WEIGHT,XROW,YELEM)\nCALL regcf(BETA,NREQ,IFAULT)",
+                "declarations": [
+                  {
+                    "path": "src/program2.f90",
+                    "line_start": 2777,
+                    "line_end": 2779
+                  },
+                  {
+                    "path": "src/program2.f90",
+                    "line_start": 2846,
+                    "line_end": 2848
+                  },
+                  {
+                    "path": "src/program2.f90",
+                    "line_start": 2909,
+                    "line_end": 2912
+                  }
+                ],
+                "path": "src/program2.f90",
+                "line_start": 2768,
+                "line_end": 2826,
+                "module": "lsq",
+                "usage": "use lsq, only: startup,includ,regcf\ninteger :: i,ifault\ndouble precision :: row(3),beta(3),x1(4),x2(4),y(4)\nx1=[0d0,1d0,0d0,1d0]; x2=[0d0,0d0,1d0,1d0]\ny=1d0+2d0*x1+3d0*x2\ncall startup(2,.true.)\ndo i=1,4\n row=[1d0,x1(i),x2(i)]\n call includ(1d0,row,y(i))\nend do\ncall regcf(beta,3,ifault)\nif(ifault/=0) error stop \"coefficient recovery failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. INCLUD overwrites row, so rebuild it for every observation. Saved module state means concurrent fits need isolation. REAL arguments are declared DOUBLE PRECISION in this bundled variant despite a selected-kind DP parameter. Preserve inherited LSQ notices; no coefficient, rank or statistical inference was tested."
+              },
+              {
+                "procedure": "includ",
+                "role": "implementation-helper",
+                "path": "src/program2.f90",
+                "line_start": 2831,
+                "line_end": 2895,
+                "module": "lsq"
+              },
+              {
+                "procedure": "regcf",
+                "role": "implementation-helper",
+                "path": "src/program2.f90",
+                "line_start": 2899,
+                "line_end": 2942,
+                "module": "lsq"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT package declaration with inherited LSQ attribution",
+          "spdx_expression": null,
+          "revision": "6346dda405ebf192a31b00e058d2945c01cbcceb",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares MIT plus file LICENSE (holder/year metadata). The source explicitly incorporates Alan Miller LSQ and AS75/AS274 lineage. Preserve inherited attribution; this is a scoped package-declaration finding rather than a complete provenance clearance of the combined numerical file.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/DESCRIPTION",
+              "sha256": "a6a2383f7a5db7a0a31d7252911bd296c846f5076cd3f761738d57d39948de82"
+            },
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/LICENSE",
+              "sha256": "ac67cb0140e81b8c8da55e3e10957976649fa1b521f4e4697af93da063a4f538"
+            },
+            {
+              "path": "src/program2.f90",
+              "url": "https://github.com/sestelo/npregfast/blob/6346dda405ebf192a31b00e058d2945c01cbcceb/src/program2.f90",
+              "sha256": "5d3b5df6ebaf09a822dfb8d579b144173fe0f06e80c138649b6b923c30ad53b2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -57275,12 +57901,99 @@
             ],
             "notes": "The README distinguishes a simplified sanitized interface from an advanced raw interface and identifies research-use restrictions. Solver assumptions, integer limits and numerical results need later review; graph optimization is not classified as a geometric mesh solver.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2d",
+            "level": "source-reviewed",
+            "revision": "34eaf1206f068c1bfe05fb99be13af46348f0b40",
+            "reviewed_on": "2026-11-05",
+            "notes": "RELAXALG builds network incidence lists and invokes the RELAX4 relaxation/auction algorithm for integer capacitated minimum-cost flow. The wrapper takes positive supplies in B1 and converts them to internal demands with B=-B1, despite a lower-level R comment calling them demands. It overwrites capacities with residual capacities, supplies with final internal deficits, flows X1 and reduced costs RC1. CRASH=1 selects auction initialization. Valid node indices, nonnegative capacities, balanced supplies and bounded integer arithmetic are caller responsibilities. The wrapper starts FEASIBLE=1 but some large-cost/capacity rejection paths return before copying that flag or output arrays, so FEASIBLE1 alone is not a universal validation status. COMMON blocks preclude concurrent independent calls. Review covers wrapper/list construction and selected price-flow/feasibility paths, not complexity bounds, sensitivity analysis or every augmentation case.",
+            "evidence": [
+              {
+                "path": "src/relax4s.f",
+                "url": "https://github.com/josherrickson/rrelaxiv/blob/34eaf1206f068c1bfe05fb99be13af46348f0b40/src/relax4s.f",
+                "sha256": "7525fcdbceb68ba62d055d9cf099a48f21f8e5591bbea509ac268052ebda2ac2"
+              },
+              {
+                "path": "R/relaxiv.R",
+                "url": "https://github.com/josherrickson/rrelaxiv/blob/34eaf1206f068c1bfe05fb99be13af46348f0b40/R/relaxiv.R",
+                "sha256": "43f6c35bf6c651761703715affd0659166c45d1d36ec8f1102485dd14e173eaa"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "RELAXALG",
+                "role": "public-entry-point",
+                "summary": "External default-integer capacitated minimum-cost network-flow wrapper.",
+                "signature": "CALL RELAXALG(N,NA,STARTN,ENDN,COST,CAPACITY,SUPPLY,FLOW,RC,CRASH,LARGE,FEASIBLE)",
+                "declarations": [
+                  {
+                    "path": "src/relax4s.f",
+                    "line_start": 12,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "src/relax4s.f",
+                    "line_start": 103,
+                    "line_end": 105
+                  },
+                  {
+                    "path": "src/relax4s.f",
+                    "line_start": 128,
+                    "line_end": 131
+                  },
+                  {
+                    "path": "src/relax4s.f",
+                    "line_start": 317,
+                    "line_end": 328
+                  }
+                ],
+                "path": "src/relax4s.f",
+                "line_start": 12,
+                "line_end": 13,
+                "usage": "external :: RELAXALG\ninteger :: n,na,startn(1),endn(1),cost(1),capacity(1),supply(2),flow(1),rc(1)\ninteger :: crash,large,feasible\nn=2; na=1; startn=1; endn=2; cost=2; capacity=5\nsupply=[3,-3]; flow=0; rc=cost; crash=0; large=1000000; feasible=-1\ncall RELAXALG(n,na,startn,endn,cost,capacity,supply,flow,rc,crash,large,feasible)\nif(feasible/=1) error stop \"flow not reported feasible\"\n! Also validate original capacities, conservation and objective using input copies.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This sketch uses positive supply at node 1 and negative supply at node 2. Retain original arrays before their overwrite, bound arithmetic below LARGE, and validate inputs before the call. The early-return flag/output defect and COMMON state prevent treating the wrapper as a fully checked API. No flow, infeasibility or optimality result was tested."
+              },
+              {
+                "procedure": "INIDAT",
+                "role": "implementation-helper",
+                "path": "src/relax4s.f",
+                "line_start": 335,
+                "line_end": 421
+              },
+              {
+                "procedure": "RELAX4",
+                "role": "implementation-helper",
+                "path": "src/relax4s.f",
+                "line_start": 423,
+                "line_end": 449
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom academic-institution license",
+          "spdx_expression": null,
+          "revision": "34eaf1206f068c1bfe05fb99be13af46348f0b40",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE restricts applicability to members of noncommercial academic institutions and imposes citation, redistribution, tracking and notification conditions. It is not an unrestricted open-source grant or a standard SPDX academic-use identifier. Preserve the exact pinned conditions for this RELAX-IV adaptation.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/josherrickson/rrelaxiv/blob/34eaf1206f068c1bfe05fb99be13af46348f0b40/LICENSE",
+              "sha256": "4505904341d633bf8e8860e061b8f7bffa076408837e030721d6797d2f7c69ea"
+            },
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/josherrickson/rrelaxiv/blob/34eaf1206f068c1bfe05fb99be13af46348f0b40/DESCRIPTION",
+              "sha256": "2d43c97411a6738e4748b78056a771fb0debdfdf8d0dad3684897c232d0d4fba"
+            }
+          ]
         }
       },
       "imports": {}

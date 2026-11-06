@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 348 repositories now have 464 source-reviewed
+Reviewed on 2026-11-05. 356 repositories now have 474 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-337 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Eleven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV and TiktakGlobalSearch) identify supplied program entry points and keep their internal/benchmark
+344 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 348 independently source-reviewed repositories now have an
+separately. All 356 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -372,6 +372,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Spaloess | `lowesf` | MIT package plus retained AT&T permissive source notice |
 | Clustering via Nonsmooth Optimization | `dcclust_method::optim` | Academic teaching/research permission for reviewed DCDB subset |
 | forApollo | `fa_kf_predict` | Proprietary designation; no standalone permission grant identified |
+| MultiNest | `Nested::nestRun` | Custom MultiNest noncommercial research license |
+| FFT overlap experiments | `overlapfft_mod::cufft2dTest_manystream` | No license identified in selected source/build files |
+| M_blas | `M_blas::dgemm`, `M_blas::dtrsv` | MIT root with inherited Reference BLAS notices |
+| Sherman Morrison update interfaces | `SM1_f` | BSD-3-Clause |
+| Sparse Fortran examples | `test_mumps` | MIT |
+| Sparse Iterative Parallel Linear Solver | `mSolver::SolverAxB` | MIT |
+| npregfast | `Reg1D`, `lsq::startup` | MIT package declaration with inherited LSQ attribution |
+| rrelaxiv | `RELAXALG` | Custom academic-institution license |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -739,6 +747,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Spaloess](https://github.com/xiaosutong/spaloess) | K5 | Direct local polynomial smoothing | Versioned packed workspace, explicit Euclidean distance selector and C/R numerical diagnostics. |
 | [Clustering via Nonsmooth Optimization](https://github.com/snta2019/clustering-via-nonsmooth-optimization) | L14a1b | DC-Clust minimum-sum-of-squares nonhierarchical clustering | Shared data/control modules and packed centers; selected DCDB-directory academic terms. |
 | [forApollo](https://github.com/forkernels/forapollo) | L10a2e | Linear Kalman prediction and gated Joseph-form updates | Flat row-major C boundary, output gating flags, helper aliasing and proprietary designation. |
+| [MultiNest](https://github.com/rjw57/multinest) | L | Bayesian nested sampling with likelihood and dumper callbacks | Pinned older v2.17 interface, normalized priors, pointer arguments and estimated stopping. |
+| [FFT overlap experiments](https://github.com/dappelha/fft-overlap) | J1b | GPU plane-wise complex two-dimensional FFT round trip | CUDA Fortran dependency, unnormalized output, unchecked statuses/cleanup and unfinished 3D path. |
+| [M_blas](https://github.com/urbanjost/m_blas) | D1b6; D2a3 | Dense matrix multiplication and real triangular substitution | Public module routines; configurable error handler, no singularity/condition estimate. |
+| [Sherman Morrison update interfaces](https://github.com/trex-coe/sherman-morrison) | D2e | Additive column updates of a dense inverse | C pointer ABI and missing Fortran scalar are explicit; naive denominator threshold does not protect division. |
+| [Sparse Fortran examples](https://github.com/scivision/sparse-fortran) | D2a4 | MPI/MUMPS sparse unsymmetric linear-system driver | Program-scoped helpers, external implementation and no residual validation. |
+| [Sparse Iterative Parallel Linear Solver](https://github.com/tueboesen/sparse-iterative-parallel-linear-solver) | D2b4 | Real sparse preconditioned conjugate-gradient solve | CSR/OpenMP setup, optional-argument defects and public convergence-status limitations. |
+| [npregfast](https://github.com/sestelo/npregfast) | K5; L8c1b1 | Local polynomial smoothing and sequential multiple-linear coefficient estimation | Bandwidth/packed coefficient semantics, overwritten rows and shared LSQ state. |
+| [rrelaxiv](https://github.com/josherrickson/rrelaxiv) | G2d | Integer capacitated minimum-cost network flow | Supply sign conversion, destructive residual arrays, integer ranges and early-return flag caveat. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1349,3 +1365,12 @@ or run. Review distinguishes matrix layouts, signature-metric versus ordinary
 decomposition, covariance normalization, gating outputs, boundary extrapolation
 and estimated sampler convergence. Conflicting/proprietary/academic-use notices
 are retained rather than assigning an unsupported blanket permissive license.
+
+Sherman-Morrison, Sparse-Iterative-Parallel-Linear-Solver, npregfast,
+rrelaxiv, MultiNest, fft-overlap, M_blas and Sparse Fortran examples now
+have ten additional pinned mappings and source calling sketches. These were
+not compiled or run. Review distinguishes raw C pointers from allocatable
+Fortran descriptors, accessible status from actual convergence, coefficients
+from derivatives, and integration examples from numerical implementations.
+The MUMPS example remains a program entry point. The GPU mapping covers only
+the inspected 2D round-trip path, with the unfinished 3D path explicitly excluded.
