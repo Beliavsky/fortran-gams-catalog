@@ -1,0 +1,64 @@
+{
+  "checked_at": "2026-11-06T15:16:42.321014+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings",
+  "checks": [
+    {
+      "name": "poisson",
+      "gams_code": "I2b1a1a",
+      "source": {
+        "path": "fortran/ndsm_poisson.f90",
+        "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+        "sha256": "b809a18efc4d9d148f544dd6f24692b049459193c78571eee290795f6ee622b1"
+      },
+      "dependencies": [
+        {
+          "path": "fortran/ndsm_root.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+        },
+        {
+          "path": "fortran/ndsm_interp.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+        },
+        {
+          "path": "fortran/ndsm_multigrid_core.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "258a2f3c2f88992fdb2a05f56368901b0d336da27e73d0853a97d132756db1a1"
+        },
+        {
+          "path": "fortran/ndsm_optimized.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "465b1835964d861334ade6ea65760fe6b1e01590ee1470d6d106206af732b150"
+        }
+      ],
+      "driver": "poisson.f90",
+      "driver_sha256": "974bcac2069fec71f9fa4043904018f2660674173a1720961a95d49b2c5109dc",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\ndsm_root.f90:343:46:\n\n  343 | SUBROUTINE assert_n_inbounds_1D(ndim,nsize,n,ivec,subname,eid)\n      |                                              1~~~\nWarning: Unused dummy argument 'ivec' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_interp.f90:495:9:\n\n  495 |   DO i=1,ndim\n      |         1\nWarning: Possible change of value in conversion from INTEGER(8) to INTEGER(4) at (1) [-Wconversion]\n<temporary>\\ndsm_interp.f90:387:33:\n\n  387 |   CHARACTER(LEN=*),PARAMETER :: THIS_SUB = \"find_bracket_points_uniform\"\n      |                                 1~~~~~~~\nWarning: Unused parameter 'this_sub' declared at (1) [-Wunused-parameter]\n<temporary>\\ndsm_multigrid_core.f90:424:26:\n\n  424 | SUBROUTINE one_grid(this,grid_id,relax)\n      |                          1~~~~~~\nWarning: Unused dummy argument 'grid_id' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_multigrid_core.f90:385:26:\n\n  385 | SUBROUTINE two_grid(this,grid_id,relax,residual)\n      |                          1~~~~~~\nWarning: Unused dummy argument 'grid_id' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_multigrid_core.f90:182:25:\n\n  182 |   REAL(FP)    :: Lq,qil,dq\n      |                         1~\nWarning: Unused variable 'dq' declared at (1) [-Wunused-variable]\n<temporary>\\ndsm_poisson.f90:224:43:\n\n  224 | SUBROUTINE ndsm_relax_wrapper(this,g_id,u,rhs)\n      |                                           1~~\nWarning: Unused dummy argument 'rhs' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_poisson.f90:224:41:\n\n  224 | SUBROUTINE ndsm_relax_wrapper(this,g_id,u,rhs)\n      |                                         1\nWarning: Unused dummy argument 'u' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_poisson.f90:163:46:\n\n  163 | SUBROUTINE ndsm_residual_wrapper(this,g_id,u,rhs,r)\n      |                                              1~~\nWarning: Unused dummy argument 'rhs' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_poisson.f90:163:44:\n\n  163 | SUBROUTINE ndsm_residual_wrapper(this,g_id,u,rhs,r)\n      |                                            1\nWarning: Unused dummy argument 'u' at (1) [-Wunused-dummy-argument]\n",
+      "stdout": "Grid    17   25 error/residual/mean:   8.78906E-04  3.31402E-12  1.46941E-19\nGrid    33   49 error/residual/mean:   2.19727E-04  2.00107E-12  1.41610E-19\nFine/coarse error ratio:   2.5000E-01\nPASS Poisson: two grids, analytic error, interior residual and zero-mean gauge\n",
+      "stderr": ""
+    }
+  ]
+}

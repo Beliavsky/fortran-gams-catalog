@@ -45426,9 +45426,58 @@
                 "line_end": 1292
               }
             ]
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+            "reviewed_on": "2026-11-06",
+            "notes": "CHEBEXPS with ITYPE=1 constructs Chebyshev-root nodes in ascending order on [-1,1] and weights for unweighted interpolatory quadrature. The degree recurrence accumulates even-Chebyshev moments into the weights, which the caller applies to sampled integrand values. This is fixed-order quadrature for grid data (H2a1b2), not an adaptive callback integrator or the weighted Gauss-Chebyshev measure dx/sqrt(1-x**2). Match REAL*8 arrays and default INTEGER arguments with the selected legacy GNU build, provide X/WHTS length N and U/V(N,N) buffers, and choose N>=2 for the selected contract. ITYPE=1 leaves U/V unassigned; only node/weight outputs are used. There is no status or accuracy-estimate output. The original routine and companion source use length-one dummy arrays for larger actual storage; the unmodified legacy object was compiled without bounds instrumentation, while the catalog main program used bounds checks. No claim of modern Fortran conformance or full-file memory safety follows from the numerical checks. A complete driver verifies all monomial moments through degree N-1 for N=2,4,8,16, plus node ordering, interval membership and positive weights. All 30 moments passed absolute tolerance 2e-13; maximum error was 1.7347e-16. Transform-matrix mode ITYPE=2 and the Poisson wrapper retain separate unverified scopes.",
+            "evidence": [
+              {
+                "path": "src/chebexps.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/chebexps.f",
+                "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "chebexps",
+                "role": "public-entry-point",
+                "summary": "External legacy Chebyshev-root node and unweighted quadrature-weight construction.",
+                "signature": "CALL chebexps(ITYPE,N,X,U,V,WHTS)",
+                "declarations": [
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 12,
+                    "line_end": 15
+                  },
+                  {
+                    "path": "src/chebexps.f",
+                    "line_start": 26,
+                    "line_end": 49
+                  }
+                ],
+                "path": "src/chebexps.f",
+                "line_start": 12,
+                "line_end": 180,
+                "usage": "! GAMS H2a1b2. Unweighted polynomial quadrature on [-1,1].\nprogram check_cheb_quadrature\n  implicit none\n  interface\n    subroutine chebexps(itype,n,x,u,v,w)\n      integer :: itype,n\n      real(kind=8) :: x(*),u(n,n),v(n,n),w(*)\n    end subroutine\n  end interface\n  integer,parameter :: orders(4)=[2,4,8,16]\n  real(kind=8),allocatable :: x(:),w(:),u(:,:),v(:,:)\n  real(kind=8) :: exact,error,maxerr\n  integer :: n,i,k,cases\n  cases=0; maxerr=0d0\n  do i=1,size(orders)\n    n=orders(i)\n    allocate(x(n),w(n),u(n,n),v(n,n))\n    call chebexps(1,n,x,u,v,w)\n    if(.not.all(x(2:n)>x(1:n-1)))error stop 'nodes not ascending'\n    if(.not.all(abs(x)<1d0))error stop 'nodes outside open interval'\n    if(.not.all(w>0d0))error stop 'weights not positive'\n    do k=0,n-1\n      exact=0d0\n      if(mod(k,2)==0)exact=2d0/real(k+1,8)\n      error=abs(sum(w*x**k)-exact)\n      if(.not.(error<2d-13))error stop 'unweighted polynomial moment failed'\n      maxerr=max(maxerr,error); cases=cases+1\n    enddo\n    deallocate(x,w,u,v)\n  enddo\n  print '(a,i0)','Polynomial moments checked: ',cases\n  print '(a,es12.4)','Maximum absolute moment error: ',maxerr\n  print '(a)','PASS Chebyshev-node quadrature: 30 moments and node/weight checks'\nend program check_cheb_quadrature",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unmodified upstream object used -O0 -g -std=legacy -ffixed-line-length-none -ffpe-trap=invalid,zero,overflow, with no bounds instrumentation because of its legacy length-one dummy declarations. The binary64 main program used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Thirty unweighted polynomial moments and node/weight checks passed; maximum absolute moment error was 1.7347e-16. Both per-source flag sets and all compiler warnings are saved under drivers/boxcode-quadrature/. This result does not verify companion routines or the separate Poisson solver.",
+                "local_driver": {
+                  "path": "drivers/boxcode-quadrature/moments.f90",
+                  "sha256": "b3dac275ac5102a29ddbd947a96f0c7296c6387f78bd3c48ae060d35e4c74d37",
+                  "runner": "drivers/boxcode-quadrature/run.py",
+                  "runner_sha256": "423e3730bb1a73dd3f42555419c14fd1f4e84a6d161ed58e7b0de1ad0db4079a",
+                  "report": "drivers/boxcode-quadrature/results.json",
+                  "report_sha256": "de2e3a057a051e11a55b4db72361922f7694288eb796a10d37ad6539b33e2bf6",
+                  "readme": "drivers/boxcode-quadrature/README.md",
+                  "check_name": "moments"
+                }
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
+        "notes": "The Chebyshev-node quadrature has a complete locally checked numerical driver with saved results and a documented legacy-bounds limitation. The Poisson wrapper remains source-reviewed only and uncompiled for this catalog. The earlier documentation and license findings remain available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
@@ -45438,7 +45487,7 @@
           "spdx_expression": null,
           "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
           "reviewed_on": "2026-11-06",
-          "notes": "The pinned repository tree has no separately named LICENSE/COPYING file, and the inspected README, wrapper and legacy Poisson file do not establish a redistribution grant. This is a scoped absence finding, not a conclusion about all historical upstream distributions. Keep links/hashes and review notes; no upstream source is bundled into the catalog.",
+          "notes": "The pinned repository tree has no separately named LICENSE/COPYING file, and the inspected README, wrapper and legacy Poisson file do not establish a redistribution grant. This is a scoped absence finding, not a conclusion about all historical upstream distributions. Keep links/hashes and review notes; no upstream source is bundled into the catalog. The additionally inspected CHEBEXPS source does not establish a redistribution grant; the catalog stores its own checking program and pinned source hashes, not the upstream numerical file.",
           "evidence": [
             {
               "path": "README.md",
@@ -45454,6 +45503,11 @@
               "path": "src/poisson8.f",
               "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/poisson8.f",
               "sha256": "203b6930b5bacfde5ab3ee71a376a156300816366b00344cdd31049db3bbbf30"
+            },
+            {
+              "path": "src/chebexps.f",
+              "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/chebexps.f",
+              "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
             }
           ]
         }
@@ -45792,12 +45846,181 @@
             ],
             "notes": "The README distinguishes an N-dimensional Poisson backend from the specifically 3D magnetic-field application on fixed-spacing rectilinear grids. It warns that poor convergence can violate the intended potential field and boundary values; accuracy is not certified by the nominal discretization order.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2b1a1a",
+            "level": "source-reviewed",
+            "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+            "reviewed_on": "2026-11-06",
+            "notes": "NDSM_POISSON::solve_poisson_bvp applies multigrid V cycles to finite-difference Poisson problems on Cartesian rectangular grids. This mapping and local check select two dimensions, uniform equal spacing in both directions and homogeneous Neumann conditions. NDSM_ROOT sets FP to double precision and IT=C_INT64_T; do not pass default-width integers where the interface requires IT. Create MG_HANDLE through new_mg_handle with coordinate vectors and valid hierarchy sizes, set smoothing count, coarse tolerance, boundary selectors and the module DEBUG flag. The constructor floors coarser sizes and can reach one point; choose levels so every active dimension retains at least two points, since setup divides by NQ-1 and stencils read adjacent coordinates. Select zero-mean compatible Neumann data; the generic smoother subtracts the arithmetic solution mean to fix its additive constant. SOLVE_POISSON_BVP returns IERR=0 on its chosen maximum/mean iterate-change tolerance, 1 when the outer cycle budget is exhausted, and DU_LAST is that change metric rather than a PDE residual. Coarse relaxation may print nonconvergence without propagating a distinct outer status; independently check residual and gauge. The selected generic 2-D path uses red/black relaxation, restriction/interpolation and coarse correction; optimized 3-D paths and OpenMP behavior were not checked. A complete serial main program adapted from the BSD-licensed author setup was compiled and run on 17x25 and 33x49 grids. Maximum solution errors were 8.78906e-4 and 2.19727e-4 (ratio 0.25), independently calculated interior residuals below 3.4e-12, and solution means below 1.5e-19. These are checks of one manufactured family, not every dimension, boundary configuration or convergence regime.",
+            "evidence": [
+              {
+                "path": "fortran/ndsm_poisson.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_poisson.f90",
+                "sha256": "b809a18efc4d9d148f544dd6f24692b049459193c78571eee290795f6ee622b1"
+              },
+              {
+                "path": "fortran/ndsm_multigrid_core.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_multigrid_core.f90",
+                "sha256": "258a2f3c2f88992fdb2a05f56368901b0d336da27e73d0853a97d132756db1a1"
+              },
+              {
+                "path": "fortran/ndsm_root.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_root.f90",
+                "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+              },
+              {
+                "path": "fortran/ndsm_interp.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_interp.f90",
+                "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+              },
+              {
+                "path": "fortran/ndsm_optimized.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_optimized.f90",
+                "sha256": "465b1835964d861334ade6ea65760fe6b1e01590ee1470d6d106206af732b150"
+              },
+              {
+                "path": "tests/unit_tests/unit_test_2D_solve.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/tests/unit_tests/unit_test_2D_solve.f90",
+                "sha256": "f89dcaf6074ca68c49bd94bf96ebb5d3ac5f834a5a6c9d5db68c5c8e96f77897"
+              },
+              {
+                "path": "fortran/Makefile",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/Makefile",
+                "sha256": "3cbf3a8d46f7614b29ff185250f36cdca5cf6f4287a413018e2c9ab497e07409"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve_poisson_bvp",
+                "role": "public-entry-point",
+                "summary": "Public multigrid Poisson boundary-value solver; selected serial 2-D Neumann configuration.",
+                "signature": "CALL solve_poisson_bvp(BVP,NSIZE,VC_TOL,NMAX,U,RHS,DU_LAST,IERR)",
+                "declarations": [
+                  {
+                    "path": "fortran/ndsm_poisson.f90",
+                    "line_start": 63,
+                    "line_end": 81
+                  },
+                  {
+                    "path": "fortran/ndsm_multigrid_core.f90",
+                    "line_start": 86,
+                    "line_end": 101
+                  },
+                  {
+                    "path": "fortran/ndsm_root.f90",
+                    "line_start": 46,
+                    "line_end": 74
+                  }
+                ],
+                "path": "fortran/ndsm_poisson.f90",
+                "line_start": 63,
+                "line_end": 155,
+                "module": "NDSM_POISSON",
+                "examples": [
+                  {
+                    "path": "tests/unit_tests/unit_test_2D_solve.f90",
+                    "line_start": 124,
+                    "line_end": 229
+                  }
+                ],
+                "usage": "! BSD 3-Clause License\n!\n! Copyright (c) 2024, S.A. Gilchrist\n!\n! Redistribution and use in source and binary forms, with or without\n! modification, are permitted provided that the following conditions are met:\n!\n! 1. Redistributions of source code must retain the above copyright notice, this\n!    list of conditions and the following disclaimer.\n!\n! 2. Redistributions in binary form must reproduce the above copyright notice,\n!    this list of conditions and the following disclaimer in the documentation\n!    and/or other materials provided with the distribution.\n!\n! 3. Neither the name of the copyright holder nor the names of its\n!    contributors may be used to endorse or promote products derived from\n!    this software without specific prior written permission.\n!\n! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n! DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n! FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n! DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n! SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n! CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n! OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n! OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n! GAMS I2b1a1a. Manufactured Neumann problem, following the author test setup.\nprogram check_poisson\n  use ndsm_root\n  use ndsm_poisson\n  implicit none\n  real(fp) :: errors(2),residuals(2),gauges(2)\n  debug=.false.\n  call solve_case(17_it,25_it,3_it,errors(1),residuals(1),gauges(1))\n  call solve_case(33_it,49_it,4_it,errors(2),residuals(2),gauges(2))\n  if(.not.(errors(2)<0.35_fp*errors(1)))error stop 'refinement did not reduce error by expected order'\n  print '(a,es12.4)','Fine/coarse error ratio: ',errors(2)/errors(1)\n  print '(a)','PASS Poisson: two grids, analytic error, interior residual and zero-mean gauge'\ncontains\n  subroutine solve_case(nx,ny,ng,error,residual,gauge)\n    integer(it),intent(in) :: nx,ny,ng\n    real(fp),intent(out) :: error,residual,gauge\n    type(mg_ptr) :: mesh(2)\n    type(mg_handle) :: bvp\n    real(fp),allocatable :: u(:,:),exact(:,:),rhs(:,:)\n    real(fp) :: h,x,y,lx,ly,du,stencil\n    real(fp),parameter :: a=0.75_fp,b=-0.4_fp\n    integer(it) :: nshape(2),nsize,ierr\n    integer :: i,j\n    nshape=[nx,ny]; nsize=nx*ny; h=1.0_fp/real(nx-1,fp)\n    lx=1.0_fp; ly=real(ny-1,fp)*h\n    allocate(mesh(1)%val(nx),mesh(2)%val(ny),u(nx,ny),exact(nx,ny),rhs(nx,ny))\n    mesh(1)%val=[(real(i-1,fp)*h,i=1,int(nx))]\n    mesh(2)%val=[(real(j-1,fp)*h,j=1,int(ny))]\n    do j=1,int(ny)\n      y=mesh(2)%val(j)\n      do i=1,int(nx)\n        x=mesh(1)%val(i)\n        rhs(i,j)=a*(2*x-lx)+b*(2*y-ly)\n        exact(i,j)=a*x*x*(x/3-lx/2)+b*y*y*(y/3-ly/2)\n      enddo\n    enddo\n    exact=exact-sum(exact)/real(nsize,fp)\n    call new_mg_handle(bvp,2_it,nshape,ng,mesh,.true.,100000_it)\n    bvp%ms=5_it; bvp%ex_tol=1e-13_fp; bvp%copt='N'\n    u=0.0_fp\n    call solve_poisson_bvp(bvp,nsize,1e-12_fp,256_it,u,rhs,du,ierr)\n    if(ierr/=IERR_POISSON_SUCCESS)error stop 'Poisson solver did not report convergence'\n    error=maxval(abs(u-exact)); gauge=abs(sum(u)/real(nsize,fp)); residual=0.0_fp\n    do j=2,int(ny)-1\n      do i=2,int(nx)-1\n        stencil=(u(i-1,j)+u(i+1,j)+u(i,j-1)+u(i,j+1)-4*u(i,j))/(h*h)\n        residual=max(residual,abs(stencil-rhs(i,j)))\n      enddo\n    enddo\n    if(.not.(error<0.5_fp*h*h))error stop 'analytic solution error too large'\n    if(.not.(residual<5e-8_fp))error stop 'independent interior residual too large'\n    if(.not.(gauge<1e-11_fp))error stop 'Neumann solution gauge not removed'\n    print '(a,2i5,a,3es13.5)','Grid ',nx,ny,' error/residual/mean: ',error,residual,gauge\n    call delete_mg_handle(bvp)\n  end subroutine\nend program check_poisson",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. FP=binary64; IT=C_INT64_T. All five module sources and the driver used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow, with OpenMP disabled. Saved source, runner and report are under drivers/ndsm/. Checks require solver success, maximum analytic error<0.5*h**2, independent interior residual<5e-8, absolute solution mean<1e-11 and fine/coarse error ratio<0.35. Both grids passed; the observed ratio was 0.25. The main program retains the author copyright/license notice; the author benchmark is linked as inspected provenance, while this catalog driver provides the recorded checks.",
+                "local_driver": {
+                  "path": "drivers/ndsm/poisson.f90",
+                  "sha256": "974bcac2069fec71f9fa4043904018f2660674173a1720961a95d49b2c5109dc",
+                  "runner": "drivers/ndsm/run.py",
+                  "runner_sha256": "fb2ca2d976bb8a7155609417786aed6a6bc55b0544a908b9aa6c013a3e5af31e",
+                  "report": "drivers/ndsm/results.json",
+                  "report_sha256": "1536852d0d845575c0197b8eabdd59407a8dd724256b16cd2cc8fc52e1cff5f8",
+                  "readme": "drivers/ndsm/README.md",
+                  "check_name": "poisson"
+                }
+              },
+              {
+                "procedure": "hierarchy construction and dimensions",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_multigrid_core.f90",
+                "line_start": 165,
+                "line_end": 270
+              },
+              {
+                "procedure": "V-cycle dispatch",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_multigrid_core.f90",
+                "line_start": 341,
+                "line_end": 377
+              },
+              {
+                "procedure": "coarse relaxation stopping and warning-only failure",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_multigrid_core.f90",
+                "line_start": 728,
+                "line_end": 800
+              },
+              {
+                "procedure": "generic Poisson residual, boundary treatment and zero-mean smoothing",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_poisson.f90",
+                "line_start": 280,
+                "line_end": 549
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "The selected serial two-dimensional homogeneous-Neumann Poisson configuration has a complete local driver with saved numerical results. Other dimensions, optimized/OpenMP paths and boundary configurations retain their separate unverified scope; the earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause NDSM source notices",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned BSD three-clause notice credits S.A. Gilchrist, with matching notices in the reviewed Fortran modules and author test. The catalog main program adapts the manufactured polynomial/setup and retains the notice. This is scoped source/license evidence rather than an audit of all package interfaces or external compiler/runtime dependencies.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/LICENSE",
+              "sha256": "4549c9620f4ebc2696cfa248061c390164295a7a0e6e74256f8f0b565b91685d"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/README.md",
+              "sha256": "70567f0cec9e3b114d7bf2f8d528d2e7abc94de6683cc927df9f565e9ef28af7"
+            },
+            {
+              "path": "fortran/ndsm_poisson.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_poisson.f90",
+              "sha256": "b809a18efc4d9d148f544dd6f24692b049459193c78571eee290795f6ee622b1"
+            },
+            {
+              "path": "fortran/ndsm_multigrid_core.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_multigrid_core.f90",
+              "sha256": "258a2f3c2f88992fdb2a05f56368901b0d336da27e73d0853a97d132756db1a1"
+            },
+            {
+              "path": "fortran/ndsm_root.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_root.f90",
+              "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+            },
+            {
+              "path": "fortran/ndsm_interp.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_interp.f90",
+              "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+            },
+            {
+              "path": "fortran/ndsm_optimized.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_optimized.f90",
+              "sha256": "465b1835964d861334ade6ea65760fe6b1e01590ee1470d6d106206af732b150"
+            },
+            {
+              "path": "tests/unit_tests/unit_test_2D_solve.f90",
+              "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/tests/unit_tests/unit_test_2D_solve.f90",
+              "sha256": "f89dcaf6074ca68c49bd94bf96ebb5d3ac5f834a5a6c9d5db68c5c8e96f77897"
+            }
+          ]
         }
       },
       "imports": {}

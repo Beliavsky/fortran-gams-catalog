@@ -22,3 +22,11 @@ validator checks the upstream source pin/hash, GAMS class and successful named
 result. Generated pages label and link these artifacts separately from unchecked
 calling sketches. Catalog builds remain offline; compilation is an explicit
 separate check.
+
+## Available local checks
+
+| Main program set | GAMS class | Numerical checks |
+| --- | --- | --- |
+| [Riemann solvers](riemann/README.md) | I2a2 | 17 scalar advection/Burgers flux and entropy cases |
+| [NDSM Poisson](ndsm/README.md) | I2b1a1a | Manufactured Neumann solution, interior residual, gauge and two-grid refinement |
+| [Chebyshev-node quadrature](boxcode-quadrature/README.md) | H2a1b2 | 30 polynomial moments and node/weight identities; documented legacy-bounds limitation |

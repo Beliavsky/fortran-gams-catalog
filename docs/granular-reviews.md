@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 452 repositories now have 708 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 710 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-438 repository cards now identify public routines and link their usage lines
+439 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 452 independently source-reviewed repositories now have an
+separately. All 453 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -476,7 +476,8 @@ complete public-API audit. Individual local driver checks are identified separat
 | FLAPWxHZ | `HIF_HZ::ZHZL1SA` | MIT FLAPWxHZ with retained contributor attribution |
 | ecTrans | `DIR_TRANS`, `INV_TRANS`, `EDIR_TRANS`, `EINV_TRANS` | Apache-2.0 ecTrans notices with ECMWF privileges/immunities statement |
 | Clawpack Riemann solvers | `rp1_ptwise` | BSD-3-Clause Clawpack Riemann solver notice |
-| Boxcode2D legacy wrapper | `lbfmm2d` | No license grant identified in reviewed root and wrapper files |
+| Boxcode2D legacy wrapper | `lbfmm2d`, `chebexps` | No license grant identified in reviewed root and wrapper files |
+| NDSM | `NDSM_POISSON::solve_poisson_bvp` | BSD-3-Clause NDSM source notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -950,6 +951,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ecTrans](https://github.com/ecmwf-ifs/ectrans) | J; J1b | CPU spherical-harmonic and limited-area bifourier analysis/synthesis | Explicit generated interfaces, initialized geometry/distribution, packed storage, field-set ownership and abort behavior. |
 | [Clawpack Riemann solvers](https://github.com/clawpack/riemann) | I2a2 | Scalar hyperbolic advection/Burgers interface solvers | Two complete local main programs: 17 flux/entropy/conservation cases; separate same-symbol source variants; no full PDE evolution check. |
 | [Boxcode2D legacy wrapper](https://github.com/mrachh/boxcode2d-legacy) | I2b1a1 | Adaptive eighth-order free-space two-dimensional Poisson volume potential | Unit-root wrapper contract, rank-three data, default/four-byte integer compatibility, ignored selectors, unassigned timing and large workspaces; uncompiled. |
+| [Boxcode2D legacy wrapper: quadrature](https://github.com/mrachh/boxcode2d-legacy) | H2a1b2 | Fixed-order unweighted quadrature on Chebyshev-root nodes | 30 checked monomial moments and node/weight checks; bounds checks disabled for unchanged legacy object, enabled for the main program. |
+| [NDSM](https://github.com/sag2021/ndsm) | I2b1a1a | Rectangular two-dimensional homogeneous-Neumann Poisson multigrid | Checked manufactured solution on two grids, independent interior residual/gauge and refinement; serial binary64 and 64-bit index scope. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1797,3 +1800,18 @@ remains uncompiled; review notes document unit-root scaling assumptions,
 ignored selectors, default/four-byte integer compatibility, large workspaces
 and unassigned TIMEINFO. No redistribution grant was found in its inspected
 root/wrapper files, and its source is linked rather than bundled.
+
+Two further mappings have complete locally checked main programs.
+[NDSM Poisson checks](../drivers/ndsm/README.md) solve a manufactured
+homogeneous-Neumann problem on 17x25 and 33x49 rectangular grids. The
+maximum solution error decreases from 8.78906e-4 to 2.19727e-4 (ratio 0.25),
+with independent interior residuals below 3.4e-12 and a zero-mean gauge.
+[Chebyshev-node quadrature checks](../drivers/boxcode-quadrature/README.md)
+verify 30 unweighted polynomial moments for orders 2,4,8,16, with maximum
+error 1.7347e-16. Both use GNU Fortran 17.0.0 20260510 (experimental) on
+Windows; reports retain exact flags, pins, dependency hashes and warnings.
+The unmodified legacy quadrature object uses length-one dummy arrays and
+was built without bounds instrumentation, while the main program was checked.
+Only these specified numerical configurations are verified; the legacy
+Poisson wrapper, OpenMP, 3-D optimized operators and other configurations
+retain their separate unverified scope.

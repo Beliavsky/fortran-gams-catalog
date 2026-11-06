@@ -94,7 +94,9 @@ vendored module is unused; builds do not depend on the playground's other tools.
 See [review policy](docs/review-policy.md), [independent reviews](docs/local-reviews.md)
 and [driver requirements](drivers/README.md).
 The [local Riemann checks](drivers/riemann/README.md) provide complete main
-programs, a pinned-source build runner and saved numerical results. Each new classification needs pinned
+programs, a pinned-source build runner and saved numerical results.
+Further checked main programs cover [NDSM Poisson](drivers/ndsm/README.md)
+and [Chebyshev-node quadrature](drivers/boxcode-quadrature/README.md). Each new classification needs pinned
 evidence and scope notes. Build systems can be Make, CMake, custom scripts or
 unreviewed; FPM compatibility is not an inclusion criterion.
 

@@ -1,0 +1,41 @@
+{
+  "checked_at": "2026-11-06T15:11:15.269929+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings",
+  "checks": [
+    {
+      "name": "moments",
+      "gams_code": "H2a1b2",
+      "source": {
+        "path": "src/chebexps.f",
+        "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+        "sha256": "9cfe802097431a506fa3f8b960e9b53b9a5590f412fd360f9e14348e7aae9f98"
+      },
+      "dependencies": [],
+      "driver": "moments.f90",
+      "driver_sha256": "b3dac275ac5102a29ddbd947a96f0c7296c6387f78bd3c48ae060d35e4c74d37",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-O0",
+        "-g",
+        "-std=legacy",
+        "-ffixed-line-length-none",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\chebexps.f:475:15:\n\n  475 |         polout(2)=polin(1)\n      |               1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:477:15:\n\n  477 |         polout(3)=polin(2)/4\n      |               1\nWarning: Array reference at (1) is out of bounds (3 > 1) in dimension 1\n<temporary>\\chebexps.f:477:24:\n\n  477 |         polout(3)=polin(2)/4\n      |                        1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:482:15:\n\n  480 |         do 2000 k=3,n\n      |                     2\n  481 | c\n  482 |         polout(k+1)=polin(k)/(2*k)\n      |               1\nWarning: Array reference at (1) out of bounds (4 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:482:26:\n\n  480 |         do 2000 k=3,n\n      |                     2     \n  481 | c\n  482 |         polout(k+1)=polin(k)/(2*k)\n      |                          1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:483:15:\n\n  480 |         do 2000 k=3,n\n      |                     2\n......\n  483 |         polout(k-1)=-polin(k)/(2*k-4)+polout(k-1)\n      |               1\nWarning: Array reference at (1) out of bounds (2 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:483:27:\n\n  480 |         do 2000 k=3,n\n      |                     2      \n......\n  483 |         polout(k-1)=-polin(k)/(2*k-4)+polout(k-1)\n      |                           1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:483:45:\n\n  480 |         do 2000 k=3,n\n      |                     2                        \n......\n  483 |         polout(k-1)=-polin(k)/(2*k-4)+polout(k-1)\n      |                                             1\nWarning: Array reference at (1) out of bounds (2 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:491:21:\n\n  489 |         do 2200 k=2,n+1\n      |                       2\n  490 | c\n  491 |         dd=dd+polout(k)*sss\n      |                     1\nWarning: Array reference at (1) out of bounds (2 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:425:13:\n\n  425 |         pols(2)=x\n      |             1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:430:13:\n\n  430 |         pols(2)=x\n      |             1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:438:13:\n\n  434 |         do 2000 k=1,n-1\n      |                       2\n......\n  438 |         pols(k+2)=pkp1\n      |             1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:569:30:\n\n  569 |         val=texp(1)*pjm2+texp(2)*pjm1\n      |                              1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:574:21:\n\n  571 |         DO 600 J = 2,N\n      |                      2\n......\n  574 |         val=val+texp(j+1)*pj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:616:30:\n\n  616 |         val=texp(1)*tjm2+texp(2)*tjm1\n      |                              1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:617:17:\n\n  617 |         der=texp(2)\n      |                 1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:622:21:\n\n  619 |       DO 600 J = 2,N\n      |                    2 \n......\n  622 |         val=val+texp(j+1)*tj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:625:21:\n\n  619 |       DO 600 J = 2,N\n      |                    2 \n......\n  625 |         der=der+texp(j+1)*derj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:667:30:\n\n  667 |         val=texp(1)*tjm2+texp(2)*tjm1\n      |                              1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:672:21:\n\n  669 |       DO 600 J = 2,N\n      |                    2 \n......\n  672 |         val=val+texp(j+1)*tj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:712:30:\n\n  712 |         val=texp(1)*tjm2+texp(2)*tjm1\n      |                              1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:717:21:\n\n  714 |       DO 600 J = 2,N\n      |                    2 \n......\n  717 |         val=val+texp(j+1)*tj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:759:30:\n\n  759 |         val=texp(1)*tjm2+texp(2)*tjm1\n      |                              1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:760:17:\n\n  760 |         der=texp(2)\n      |                 1\nWarning: Array reference at (1) is out of bounds (2 > 1) in dimension 1\n<temporary>\\chebexps.f:765:21:\n\n  762 |       DO 600 J = 2,N\n      |                    2 \n......\n  765 |         val=val+texp(j+1)*tj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n<temporary>\\chebexps.f:768:21:\n\n  762 |       DO 600 J = 2,N\n      |                    2 \n......\n  768 |         der=der+texp(j+1)*derj\n      |                     1\nWarning: Array reference at (1) out of bounds (3 > 1) in loop beginning at (2)\n",
+      "stdout": "Polynomial moments checked: 30\nMaximum absolute moment error:   1.7347E-16\nPASS Chebyshev-node quadrature: 30 moments and node/weight checks\n",
+      "stderr": ""
+    }
+  ]
+}
