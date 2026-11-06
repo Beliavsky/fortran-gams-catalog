@@ -684,6 +684,24 @@
       "parent": "D2c",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "G2e2": {
+      "label": "Indefinite Hessian",
+      "parent": "G2e",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L13a": {
+      "label": "Factor analysis",
+      "parent": "L13",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c4": {
+      "label": "Robust",
+      "parent": "L8c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

@@ -500,12 +500,111 @@
             ],
             "notes": "Documents algebraic multilevel preconditioning used with PSBLAS Krylov solvers. This is a preconditioner component, not a standalone solver; MPI and PSBLAS are required.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2e",
+            "level": "source-reviewed",
+            "revision": "1395c67d9c63cb8f879aa097c5c4f38de7603c03",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public real-double multilevel preconditioner type constructs an algebraic multilevel hierarchy and its level smoothers for a distributed PSBLAS sparse matrix. The build binding dispatches hierarchy_build followed by smoothers_build; init selects ML rather than the separate diagonal/block-Jacobi/Schwarz options. The associated apply implementation contains V/W/K cycle paths. This is a concrete associated linear-system operation, not a claim that build itself solves A*x=b or that a generic multigrid cycle is a particular Krylov method. MPI/PSBLAS context, assembled matrix/descriptor, level settings and optional coarse-solver configuration must already be consistent. INFO and the configured PSBLAS error policy govern failures; some policies terminate rather than returning. Review covers initialization, public binding/build dispatch and cycle entry documentation, not every smoother, coarse solver or parallel scaling claim.",
+            "evidence": [
+              {
+                "path": "amgprec/amg_d_prec_type.f90",
+                "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/amgprec/amg_d_prec_type.f90",
+                "sha256": "02f260f9596fc59cf9dc239b37e18312adafc9c5e5d846df41a660019c67b7eb"
+              },
+              {
+                "path": "amgprec/impl/amg_dprecbld.f90",
+                "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/amgprec/impl/amg_dprecbld.f90",
+                "sha256": "cd847c0f9df6e41eea42d05ff3f1419953433f5e8cca8b92ff220202832565a0"
+              },
+              {
+                "path": "amgprec/impl/amg_dprecinit.F90",
+                "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/amgprec/impl/amg_dprecinit.F90",
+                "sha256": "4108522785ea0664e0768e5099a0dbbfefe22b9f5364bd86f2ab608c02eaf9c5"
+              },
+              {
+                "path": "amgprec/amg_d_prec_mod.f90",
+                "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/amgprec/amg_d_prec_mod.f90",
+                "sha256": "990490a0b4951b07069cbcc7fdba927f015411b109e272373ceff195996f4236"
+              },
+              {
+                "path": "amgprec/impl/amg_dmlprec_aply.f90",
+                "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/amgprec/impl/amg_dmlprec_aply.f90",
+                "sha256": "8d361fce2bc6060872ab642851a08bcc77abb46c78bff7d0175e5402e11f0789"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "build",
+                "role": "public-entry-point",
+                "summary": "Public type-bound construction of a distributed multilevel preconditioner.",
+                "signature": "CALL P%INIT(CTXT,\"ML\",INFO)\nCALL P%BUILD(A,DESC_A,INFO)",
+                "declarations": [
+                  {
+                    "path": "amgprec/impl/amg_dprecbld.f90",
+                    "line_start": 60,
+                    "line_end": 74
+                  },
+                  {
+                    "path": "amgprec/impl/amg_dprecinit.F90",
+                    "line_start": 91,
+                    "line_end": 117
+                  },
+                  {
+                    "path": "amgprec/amg_d_prec_type.f90",
+                    "line_start": 628,
+                    "line_end": 639
+                  }
+                ],
+                "path": "amgprec/amg_d_prec_type.f90",
+                "line_start": 137,
+                "line_end": 143,
+                "module": "amg_d_prec_mod",
+                "derived_type": "amg_dprec_type",
+                "usage": "use psb_base_mod\nuse amg_d_prec_mod, only: amg_dprec_type\ntype(amg_dprec_type) :: p\ninteger(psb_ipk_) :: info\n! After initializing CTXT and assembling distributed A and DESC_A:\ncall p%init(ctxt,\"ML\",info)\nif(info/=0) error stop \"AMG initialization failed\"\ncall p%build(a,desc_a,info)\nif(info/=0) error stop \"AMG construction failed\"\n! Pass P to the matching PSBLAS iterative solver; BUILD is not a solve.\n! After all applications of P have completed:\ncall p%free(info)\nif(info/=0) error stop \"AMG cleanup failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-assembly fragment, requiring the matching PSBLAS/MPI build and configured coarse solvers. CTXT, A and DESC_A are caller-owned objects, not declared or initialized here. Retain compatible matrix/descriptor lifetime and inspect INFO/error policy. No hierarchy, cycle, residual or MPI test was run."
+              },
+              {
+                "procedure": "amg_dprecbld",
+                "role": "implementation-helper",
+                "path": "amgprec/impl/amg_dprecbld.f90",
+                "line_start": 106,
+                "line_end": 156
+              },
+              {
+                "procedure": "amg_dmlprec_aply_vect",
+                "role": "implementation-helper",
+                "path": "amgprec/impl/amg_dmlprec_aply.f90",
+                "line_start": 206,
+                "line_end": 223
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. No root fpm.toml was present in the reviewed repository tree.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "1395c67d9c63cb8f879aa097c5c4f38de7603c03",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root license gives the three redistribution/endorsement clauses and retains named contributor notices; the inherited MLD2P4 notice is also retained. PSBLAS, MPI and optional coarse-solver dependencies have separate terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/LICENSE",
+              "sha256": "046e4fa14417df4296cf5205633b8a499dc5a6c7f70050ae1b29b8270796ad95"
+            },
+            {
+              "path": "LICENSE.MLD2P4",
+              "url": "https://github.com/sfilippone/amg4psblas/blob/1395c67d9c63cb8f879aa097c5c4f38de7603c03/LICENSE.MLD2P4",
+              "sha256": "1039fa9d6fb545a4296b5793cf130d7b595c135f94f132a7dae9317a7612c462"
+            }
+          ]
         }
       },
       "imports": {}
@@ -2316,12 +2415,154 @@
             ],
             "notes": "The README documents the multilevel BDDC solver interface, matrix input modes and external numerical libraries. No working local installation is claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "dc92ab6f148b8057b457d6a5adb803a274003710",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public bddcml_solve method selector 0 dispatches to preconditioned conjugate gradients for SPD systems using the multilevel BDDC preconditioner. The native Krylov module applies level preconditioning and distributed matrix/vector operations; this is not a classification inferred solely from an external sparse factorization dependency. Initialize MPI, upload the global or subdomain FEM problem and construct the preconditioner with a compatible matrix type first. A direct-only level configuration overrides the selected iterative method with a direct solve, so the mapping requires an iterative configuration. CONVERGED_REASON=0 means the relative-residual criterion was met, -1 means the iteration limit and -2 the nondecreasing-residual limit. Solution values remain in internal state until downloaded. The condition-number estimate belongs to the PCG path and is not an independent conditioning/accuracy guarantee. Shared level/Krylov state and MPI collectives require consistent calls across participating ranks. Review covers public dispatch and selected recurrence/preconditioner paths, not every mesh decomposition, singular problem or scalability case.",
+            "evidence": [
+              {
+                "path": "src/module_bddcml.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/src/module_bddcml.f90",
+                "sha256": "6d4b1c98e74f4e87bb44ef8f963f6ee2b54f89efd190349a87db74a35b783a04"
+              },
+              {
+                "path": "src/module_krylov.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/src/module_krylov.f90",
+                "sha256": "a39edafe956872d36ace1e5d330d194c9aac7bfa0d6b784a931e972a3d035e3c"
+              },
+              {
+                "path": "examples/bddcml_global.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/examples/bddcml_global.f90",
+                "sha256": "0e81095650b7455384d1d51d1a98c74db07da89f09756312803b31ebfc7cc7ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bddcml_solve",
+                "role": "public-entry-point",
+                "summary": "Public distributed BDDC-preconditioned PCG entry selected by METHOD.",
+                "signature": "CALL bddcml_solve(COMM_ALL,METHOD,TOL,MAXIT,NDECRMAX, &\n RECYCLING_INT,MAX_NUMBER_OF_STORED_VECTORS,NUM_ITER,CONVERGED_REASON,CONDITION_NUMBER)",
+                "declarations": [
+                  {
+                    "path": "src/module_bddcml.f90",
+                    "line_start": 459,
+                    "line_end": 509
+                  },
+                  {
+                    "path": "src/module_bddcml.f90",
+                    "line_start": 359,
+                    "line_end": 406
+                  }
+                ],
+                "path": "src/module_bddcml.f90",
+                "line_start": 459,
+                "line_end": 509,
+                "module": "module_bddcml",
+                "usage": "use iso_fortran_env, only: real64\nuse module_bddcml, only: bddcml_solve\ninteger :: iterations,reason\nreal(real64) :: condition\n! After MPI initialization, FEM matrix/mesh upload and BDDC setup:\n! COMM_ALL is the communicator used for the setup.\n! Use matrix type 1 (SPD) and an iterative multilevel configuration.\ncall bddcml_solve(comm_all,0,1e-8_real64,500,30,0,100, &\n iterations,reason,condition)\nif(reason/=0) error stop \"inspect BDDCML convergence reason\"\n! Download the global/local solution through the matching BDDCML API.\n! Check a residual against the original assembled system before cleanup.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup collective fragment; link the complete MPI/BDDCML/MUMPS build with matching integer/real ABI. Method and matrix type must agree. Recycling is disabled here. A successful reason is a stopping test, not an independent solution-error certificate. No FEM solve, condition estimate or parallel run was tested."
+              },
+              {
+                "procedure": "bddcml_solve dispatch",
+                "role": "implementation-helper",
+                "path": "src/module_bddcml.f90",
+                "line_start": 539,
+                "line_end": 564
+              },
+              {
+                "procedure": "krylov_bddcpcg",
+                "role": "implementation-helper",
+                "path": "src/module_krylov.f90",
+                "line_start": 48,
+                "line_end": 73
+              }
+            ]
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "dc92ab6f148b8057b457d6a5adb803a274003710",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public bddcml_solve method selector 1 dispatches to preconditioned BiCGStab for general systems using the multilevel BDDC preconditioner. The native Krylov module applies level preconditioning and distributed matrix/vector operations; this is not a classification inferred solely from an external sparse factorization dependency. Initialize MPI, upload the global or subdomain FEM problem and construct the preconditioner with a compatible matrix type first. A direct-only level configuration overrides the selected iterative method with a direct solve, so the mapping requires an iterative configuration. CONVERGED_REASON=0 means the relative-residual criterion was met, -1 means the iteration limit and -2 the nondecreasing-residual limit. Solution values remain in internal state until downloaded. The BiCGStab path returns CONDITION_NUMBER=-1; it is not an estimate of conditioning. Shared level/Krylov state and MPI collectives require consistent calls across participating ranks. Review covers public dispatch and selected recurrence/preconditioner paths, not every mesh decomposition, singular problem or scalability case.",
+            "evidence": [
+              {
+                "path": "src/module_bddcml.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/src/module_bddcml.f90",
+                "sha256": "6d4b1c98e74f4e87bb44ef8f963f6ee2b54f89efd190349a87db74a35b783a04"
+              },
+              {
+                "path": "src/module_krylov.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/src/module_krylov.f90",
+                "sha256": "a39edafe956872d36ace1e5d330d194c9aac7bfa0d6b784a931e972a3d035e3c"
+              },
+              {
+                "path": "examples/bddcml_global.f90",
+                "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/examples/bddcml_global.f90",
+                "sha256": "0e81095650b7455384d1d51d1a98c74db07da89f09756312803b31ebfc7cc7ba"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "bddcml_solve",
+                "role": "public-entry-point",
+                "summary": "Public distributed BDDC-preconditioned BiCGStab entry selected by METHOD.",
+                "signature": "CALL bddcml_solve(COMM_ALL,METHOD,TOL,MAXIT,NDECRMAX, &\n RECYCLING_INT,MAX_NUMBER_OF_STORED_VECTORS,NUM_ITER,CONVERGED_REASON,CONDITION_NUMBER)",
+                "declarations": [
+                  {
+                    "path": "src/module_bddcml.f90",
+                    "line_start": 459,
+                    "line_end": 509
+                  },
+                  {
+                    "path": "src/module_bddcml.f90",
+                    "line_start": 359,
+                    "line_end": 406
+                  }
+                ],
+                "path": "src/module_bddcml.f90",
+                "line_start": 459,
+                "line_end": 509,
+                "module": "module_bddcml",
+                "usage": "use iso_fortran_env, only: real64\nuse module_bddcml, only: bddcml_solve\ninteger :: iterations,reason\nreal(real64) :: condition\n! After MPI initialization, FEM matrix/mesh upload and BDDC setup:\n! COMM_ALL is the communicator used for the setup.\n! Use matrix type 0 (general) and an iterative multilevel configuration.\ncall bddcml_solve(comm_all,1,1e-8_real64,500,30,0,100, &\n iterations,reason,condition)\nif(reason/=0) error stop \"inspect BDDCML convergence reason\"\n! Download the global/local solution through the matching BDDCML API.\n! Check a residual against the original assembled system before cleanup.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup collective fragment; link the complete MPI/BDDCML/MUMPS build with matching integer/real ABI. Method and matrix type must agree. Recycling is disabled here. A successful reason is a stopping test, not an independent solution-error certificate. No FEM solve, condition estimate or parallel run was tested."
+              },
+              {
+                "procedure": "bddcml_solve dispatch",
+                "role": "implementation-helper",
+                "path": "src/module_bddcml.f90",
+                "line_start": 539,
+                "line_end": 564
+              },
+              {
+                "procedure": "krylov_bddcbicgstab",
+                "role": "implementation-helper",
+                "path": "src/module_krylov.f90",
+                "line_start": 948,
+                "line_end": 976
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0-or-later",
+          "spdx_expression": "LGPL-3.0-or-later",
+          "revision": "dc92ab6f148b8057b457d6a5adb803a274003710",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned license explicitly elects LGPL version 3 or later. Optional/required MPI and sparse direct-solver dependencies retain their own licenses.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sistek/bddcml/blob/dc92ab6f148b8057b457d6a5adb803a274003710/LICENSE",
+              "sha256": "ace6f7e897ce5c8ad2c066bf82a399115e5fa02e27fcc74f3f85b503a4af0580"
+            }
+          ]
         }
       },
       "imports": {}
@@ -15734,12 +15975,144 @@
             ],
             "notes": "The README documents a broad collection and several language interfaces. Individual algorithms, optional linear solvers and problem subclasses need their own procedure reviews; availability of a release binary is not catalog verification.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "G2e1",
+            "level": "source-reviewed",
+            "revision": "4275b98e4fdf9af1141d302f04ef944bcda23d32",
+            "reviewed_on": "2026-11-05",
+            "notes": "EQP solves equality-constrained quadratic subproblems through projected/preconditioned iterative work with dependency removal and sparse block factorizations. The concrete sketch has positive-definite H=2I, so its mapping is the convex quadratic-program class G2e1; this does not assert that all library EQP problems require positive-definite H on the full space. Public QPT data stores the constraint constant C in A*x+C=0, as the native example and feasibility RHS=-C show, despite the solve prologue shorthand A*x=c. H uses its lower triangle in coordinate storage. The sketch sets Hessian_kind=-1 to select the supplied Hessian explicitly. The source module name is precision-preprocessed; GALAHAD_EQP_double is the author-example public double-precision facade. Match its integer ABI and configured sparse/dense factorization backends. INITIALIZE/SOLVE/TERMINATE form the lifecycle; TERMINATE overwrites INFORM, so retain solve diagnostics first. Review covers the public solver, author data layout and selected native dispatch/stopping paths, not every linear algebra backend or a numerical verification.",
+            "evidence": [
+              {
+                "path": "src/eqp/eqp.F90",
+                "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/src/eqp/eqp.F90",
+                "sha256": "d29d305a21995252c08315f302c99179f203dba72b6cba20ba1604c79a0ef18f"
+              },
+              {
+                "path": "src/eqp/eqps.f90",
+                "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/src/eqp/eqps.f90",
+                "sha256": "37b1ce1b64f9a58d80f3d2e719dffacb85756e887a21fc5668de18ccd533e5d2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "EQP_solve",
+                "role": "public-entry-point",
+                "summary": "Public double-precision convex equality-constrained quadratic-program driver.",
+                "signature": "CALL EQP_solve(PROB,DATA,CONTROL,INFORM)",
+                "declarations": [
+                  {
+                    "path": "src/eqp/eqp.F90",
+                    "line_start": 959,
+                    "line_end": 969
+                  },
+                  {
+                    "path": "src/eqp/eqps.f90",
+                    "line_start": 3,
+                    "line_end": 10
+                  }
+                ],
+                "path": "src/eqp/eqp.F90",
+                "line_start": 691,
+                "line_end": 706,
+                "module": "GALAHAD_EQP_double",
+                "usage": "program quadratic_sketch\nuse GALAHAD_EQP_double\nimplicit none\ninteger,parameter :: wp=kind(1d0)\ninteger :: status\ntype(QPT_problem_type) :: p\ntype(EQP_data_type) :: data\ntype(EQP_control_type) :: control\ntype(EQP_inform_type) :: inform\np%n=2; p%m=1; p%f=0._wp; p%new_problem_structure=.true.\nallocate(p%G(2),p%C(1),p%X(2),p%Y(1))\np%X=0._wp; p%Y=0._wp\np%Hessian_kind=-1; p%G=[-2._wp,-4._wp]; p%C=[-1._wp]\n! EQP interprets the equality as A*X + C = 0.\ncall SMT_put(p%H%type,'COORDINATE',status)\nif(status/=0) error stop \"H storage allocation failed\"\ncall SMT_put(p%A%type,'COORDINATE',status)\nif(status/=0) error stop \"A storage allocation failed\"\nallocate(p%H%val(2),p%H%row(2),p%H%col(2))\nallocate(p%A%val(2),p%A%row(2),p%A%col(2))\np%H%ne=2; p%H%row=[1,2]; p%H%col=[1,2]\np%H%val=[2._wp,2._wp]\np%A%ne=2; p%A%row=[1,1]; p%A%col=[1,2]; p%A%val=1._wp\ncall EQP_initialize(data,control,inform)\ncontrol%SBLS_control%symmetric_linear_solver=\"sytr\"\ncontrol%FDC_control%symmetric_linear_solver=\"sytr\"\ncall EQP_solve(p,data,control,inform)\nif(inform%status/=0) then\n print *,\"solver status\",inform%status\nelse\n print *,inform%obj,p%X\nend if\n! Preserve solve status before termination, which overwrites INFORM.\ncall EQP_terminate(data,control,inform)\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete GALAHAD double-precision modules and dependencies, with integer kinds matching this author-style default-integer sketch. Validate feasibility and optimality independently; a successful status is not a global guarantee for an indefinite problem. No QP, factorization or termination case was run."
+              },
+              {
+                "procedure": "EQP_solve selected dispatch",
+                "role": "implementation-helper",
+                "path": "src/eqp/eqp.F90",
+                "line_start": 1020,
+                "line_end": 1034
+              },
+              {
+                "procedure": "EQP_resolve_main feasibility RHS",
+                "role": "implementation-helper",
+                "path": "src/eqp/eqp.F90",
+                "line_start": 2020,
+                "line_end": 2027
+              }
+            ]
+          },
+          {
+            "code": "G2e2",
+            "level": "source-reviewed",
+            "revision": "4275b98e4fdf9af1141d302f04ef944bcda23d32",
+            "reviewed_on": "2026-11-05",
+            "notes": "QPB solves quadratic programs with simple variable bounds and two-sided linear constraints using a primal-dual interior/trust-region approach. The implementation supports indefinite Hessians and explicitly handles negative-curvature information in the GLTR subproblem/convergence paths; the selected sketch H=diag(-1,2) is indefinite and maps to G2e2. Status zero is the package stopping condition and does not certify the global optimum of a nonconvex QP. A is the constraint matrix with C_l<=A*x<=C_u, distinct from the EQP constant-vector convention. H uses lower-triangular coordinate storage. The source module name is precision-preprocessed; GALAHAD_QPB_double is the author-example public double-precision facade. Match its integer ABI and configured sparse/dense factorization backends. INITIALIZE/SOLVE/TERMINATE form the lifecycle; TERMINATE overwrites INFORM, so retain solve diagnostics first. Review covers the public solver, author data layout and selected native dispatch/stopping paths, not every linear algebra backend or a numerical verification.",
+            "evidence": [
+              {
+                "path": "src/qpb/qpb.F90",
+                "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/src/qpb/qpb.F90",
+                "sha256": "45a3da1c16b2d8314b12fd26097abfff09caa018bb8f6819803154c394393276"
+              },
+              {
+                "path": "src/qpb/qpbs.f90",
+                "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/src/qpb/qpbs.f90",
+                "sha256": "1c286719d99a3f657cfad56066507f81d4a6ff6239545ea501f2b0c018e9cf62"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "QPB_solve",
+                "role": "public-entry-point",
+                "summary": "Public double-precision possibly indefinite bound/inequality-constrained quadratic-program driver.",
+                "signature": "CALL QPB_solve(PROB,DATA,CONTROL,INFORM)",
+                "declarations": [
+                  {
+                    "path": "src/qpb/qpb.F90",
+                    "line_start": 1511,
+                    "line_end": 1520
+                  },
+                  {
+                    "path": "src/qpb/qpbs.f90",
+                    "line_start": 3,
+                    "line_end": 11
+                  }
+                ],
+                "path": "src/qpb/qpb.F90",
+                "line_start": 1259,
+                "line_end": 1275,
+                "module": "GALAHAD_QPB_double",
+                "usage": "program quadratic_sketch\nuse GALAHAD_QPB_double\nimplicit none\ninteger,parameter :: wp=kind(1d0)\ninteger :: status\ntype(QPT_problem_type) :: p\ntype(QPB_data_type) :: data\ntype(QPB_control_type) :: control\ntype(QPB_inform_type) :: inform\np%n=2; p%m=1; p%f=0._wp; p%new_problem_structure=.true.\nallocate(p%G(2),p%C(1),p%X(2),p%Y(1))\np%X=0._wp; p%Y=0._wp\nallocate(p%X_l(2),p%X_u(2),p%C_l(1),p%C_u(1),p%Z(2))\np%G=0._wp; p%C=0._wp; p%Z=0._wp\np%X_l=-1._wp; p%X_u=1._wp; p%C_l=-0.5_wp; p%C_u=0.5_wp\np%X=[0.1_wp,-0.1_wp]\ncall SMT_put(p%H%type,'COORDINATE',status)\nif(status/=0) error stop \"H storage allocation failed\"\ncall SMT_put(p%A%type,'COORDINATE',status)\nif(status/=0) error stop \"A storage allocation failed\"\nallocate(p%H%val(2),p%H%row(2),p%H%col(2))\nallocate(p%A%val(2),p%A%row(2),p%A%col(2))\np%H%ne=2; p%H%row=[1,2]; p%H%col=[1,2]\np%H%val=[-1._wp,2._wp]\np%A%ne=2; p%A%row=[1,1]; p%A%col=[1,2]; p%A%val=1._wp\ncall QPB_initialize(data,control,inform)\ncontrol%infinity=1e20_wp\ncall QPB_solve(p,data,control,inform)\nif(inform%status/=0) then\n print *,\"solver status\",inform%status\nelse\n print *,inform%obj,p%X\nend if\n! Preserve solve status before termination, which overwrites INFORM.\ncall QPB_terminate(data,control,inform)\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete GALAHAD double-precision modules and dependencies, with integer kinds matching this author-style default-integer sketch. Validate feasibility and optimality independently; a successful status is not a global guarantee for an indefinite problem. No QP, factorization or termination case was run."
+              },
+              {
+                "procedure": "QPB_solve selected dispatch",
+                "role": "implementation-helper",
+                "path": "src/qpb/qpb.F90",
+                "line_start": 5331,
+                "line_end": 5355
+              },
+              {
+                "procedure": "QPB GLTR negative-curvature setting",
+                "role": "implementation-helper",
+                "path": "src/qpb/qpb.F90",
+                "line_start": 4684,
+                "line_end": 4695
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "4275b98e4fdf9af1141d302f04ef944bcda23d32",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root license supplies the three-clause BSD grant and retains GALAHAD contributor notices. Optional HSL and other factorization/backends have separate licensing; the root grant does not cover every separately installed dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ralna/GALAHAD/blob/4275b98e4fdf9af1141d302f04ef944bcda23d32/LICENSE",
+              "sha256": "af48ef6f4ead7d666119687d57773f602c1b6662df62435cfb7338ddae80ac29"
+            }
+          ]
         }
       },
       "imports": {}
@@ -28214,12 +28587,117 @@
             ],
             "notes": "DESCRIPTION documents Bayesian exploratory factor analysis and MCMC-based inference of factor counts/loading allocations. This is an R package requiring compiled Fortran, not a general standalone matrix-factorization library.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L13a",
+            "level": "source-reviewed",
+            "revision": "296a80a1a76714a99fee9316ee7669ead836ca26",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public update_factor_normal component draws latent Gaussian factor scores conditional on the supplied loadings, dedicated-factor assignments, idiosyncratic precisions and factor covariance distribution. It adds loading-weighted diagonal contributions to the factor precision, inverts this precision, forms the conditional mean and adds a Cholesky-transformed normal draw. This is a factor-analysis component, not a complete Bayesian fit or evidence that one draw constitutes a converged posterior analysis. DEDIC values must lie in 0..NFAC, with zero denoting an inactive measurement; precisions and covariance must be valid. The module uses the package MT19937-64-based probability generator, while matrix failures call R error helpers and inversion uses LAPACK. Consequently this is not a standalone standard-library routine or a routine governed by R RNG state alone. Review covers this conditional update and its constructors/numerical dependencies; it does not assert that this particular type is the full BEFA driver path.",
+            "evidence": [
+              {
+                "path": "src/factor_normal.f90",
+                "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/factor_normal.f90",
+                "sha256": "7f50a2f58649a759e7d80f367d544e774317cd13a85a0294e208543ed8a16a89"
+              },
+              {
+                "path": "src/covmat_block_invwishart.f90",
+                "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/covmat_block_invwishart.f90",
+                "sha256": "5e552af1d004f0d5760ba0868986c7f3cbf3f2f5459f0eb591c0d2137ddf8409"
+              },
+              {
+                "path": "src/probability.f90",
+                "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/probability.f90",
+                "sha256": "f919730d4df8fbb4eed7d79e25a7fc6bbcd16de63d28abf3d944c5ed229e96f1"
+              },
+              {
+                "path": "src/matrix.f90",
+                "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/matrix.f90",
+                "sha256": "49e2066b64d63a7ba9a5e3b6a2fd88120dd471731d8f2f85506dccc6b30b16ce"
+              },
+              {
+                "path": "src/global.f90",
+                "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/global.f90",
+                "sha256": "752f83b55c9bf1adfd7babdd434af15fc98a5efefc71f21c89a528807f8d0390"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "update_factor_normal",
+                "role": "public-entry-point",
+                "summary": "Public conditional normal-factor score update in the Bayesian factor-model package.",
+                "signature": "CALL update_factor_normal(FACTORS,Y,ALPHA,DEDIC,IDIOPREC,FDIST)",
+                "declarations": [
+                  {
+                    "path": "src/factor_normal.f90",
+                    "line_start": 47,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "src/factor_normal.f90",
+                    "line_start": 25,
+                    "line_end": 42
+                  },
+                  {
+                    "path": "src/covmat_block_invwishart.f90",
+                    "line_start": 38,
+                    "line_end": 46
+                  }
+                ],
+                "path": "src/factor_normal.f90",
+                "line_start": 47,
+                "line_end": 89,
+                "module": "factor_normal_class",
+                "usage": "use global, only: r8\nuse probability, only: set_seed\nuse factor_normal_class, only: factor_normal,init_factor_normal,update_factor_normal\nuse covmat_block_invwishart_class, only: covmat_block_invwishart,init_covmat_block_invwishart\ntype(factor_normal) :: factors\ntype(covmat_block_invwishart) :: fdist\nreal(r8) :: y(3,2),alpha(2),idioprec(2),start(3,1),covstart(1,1),prior(2)\ninteger :: dedic(2)\ny(:,1)=[0.1_r8,0.4_r8,-0.2_r8]; y(:,2)=[0.2_r8,0.3_r8,-0.1_r8]\nalpha=1._r8; idioprec=1._r8; dedic=1; start=0._r8; covstart=1._r8\nprior=[3._r8,1._r8]\ncall set_seed(12345)\ncall init_factor_normal(factors,3,2,1,start)\ncall init_covmat_block_invwishart(fdist,3,1,.false.,prior,covstart)\ncall update_factor_normal(factors,y,alpha,dedic,idioprec,fdist)\n! FACTORS%THETA contains one conditional draw, not a fitted posterior.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Run within a correctly linked package/R environment, with the pinned real/integer kinds, RNG implementation and BLAS/LAPACK helpers. This one-factor conditional step supplies fixed measurement parameters and does not estimate them or assess MCMC convergence. No sample distribution, fit or random-seed result was tested."
+              },
+              {
+                "procedure": "matinv",
+                "role": "implementation-helper",
+                "path": "src/matrix.f90",
+                "line_start": 147,
+                "line_end": 181
+              },
+              {
+                "procedure": "chol",
+                "role": "implementation-helper",
+                "path": "src/matrix.f90",
+                "line_start": 56,
+                "line_end": 87
+              },
+              {
+                "procedure": "set_seed",
+                "role": "implementation-helper",
+                "path": "src/probability.f90",
+                "line_start": 62,
+                "line_end": 73
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-only",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "296a80a1a76714a99fee9316ee7669ead836ca26",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION specifies GPL-3 without an or-later election. The probability source also retains MT19937-64 author attribution; dependencies and embedded notices remain applicable.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/DESCRIPTION",
+              "sha256": "c39b68f54adbc3a92667754d808cf29eae1560337bde51c81e4fe3f43ffb7e1f"
+            },
+            {
+              "path": "src/probability.f90",
+              "url": "https://github.com/cran/BayesFM/blob/296a80a1a76714a99fee9316ee7669ead836ca26/src/probability.f90",
+              "sha256": "f919730d4df8fbb4eed7d79e25a7fc6bbcd16de63d28abf3d944c5ed229e96f1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45157,12 +45635,94 @@
             ],
             "notes": "The README lists location/scatter, linear/generalized-linear regression and Gamma/Weibull/lognormal fitting. Robustness guarantees depend on the estimator, contamination model and tuning; the catalog has not independently tested breakdown points or implementation behavior.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c4",
+            "level": "source-reviewed",
+            "revision": "af6348d9f3c1a2555b9e4c486d30f9099e5e2096",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external rlRWAGm2 kernel implements the W-algorithm for robust/bounded-influence multiple-linear regression. The selected ITYPE=1, ISIGMA=0 branch performs a fixed-scale M-estimation update with residual-dependent weights, rank-revealing QR and coefficient increments. IPS=3 selects Huber psi; PSP0=1 is its derivative at zero. This scoped use does not include a high-breakdown initial fit or the complete MM regression workflow exposed by higher-level R wrappers. COV supplies the packed coefficient convergence metric and WGT is not an arbitrary precision-weight interface for all ITYPE branches. NIT is an iteration count, not a general numerical-success code; small-scale/rank exits can bypass final output assignment, so SIGMAF and coefficients need inspection. Source review covers the selected fixed-scale update and psi selector, not all scale estimators, leverage corrections or inferential covariance calculations. The full package includes R trace/error helpers.",
+            "evidence": [
+              {
+                "path": "src/lmrobmm.f",
+                "url": "https://github.com/valentint/robust/blob/af6348d9f3c1a2555b9e4c486d30f9099e5e2096/src/lmrobmm.f",
+                "sha256": "aace5f85a77f0d06f2791f6aee30f302db7441e42d9b46b68ef71bb6ea58a8ad"
+              },
+              {
+                "path": "R/lmRob.wm.q",
+                "url": "https://github.com/valentint/robust/blob/af6348d9f3c1a2555b9e4c486d30f9099e5e2096/R/lmRob.wm.q",
+                "sha256": "ea38fd26525f3379741c89b181af6160a04a8f7268bb478325a4273024e62799"
+              },
+              {
+                "path": "R/lmRob.const.q",
+                "url": "https://github.com/valentint/robust/blob/af6348d9f3c1a2555b9e4c486d30f9099e5e2096/R/lmRob.const.q",
+                "sha256": "ade5212cad76539cced40769f590dda0dc30f94dbfb449daeaf73684614e16a4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rlRWAGm2",
+                "role": "public-entry-point",
+                "summary": "External robust linear-regression W-iteration with explicit work arrays and selected fixed-scale Huber loss.",
+                "signature": "CALL rlRWAGm2(X,Y,THETA,WGT,COV,PSP0,SIGMAI,N,NP,MDX,NCOV, &\n TOL,GAM,TAU,ITYPE,ISIGMA,ICNV,MAXIT,MAXIS,NIT,SIGMAF,RS,DELTA, &\n SC,SF,SG,SH,IP,SW,SX,IPS,XK,BETA,BET0)",
+                "declarations": [
+                  {
+                    "path": "src/lmrobmm.f",
+                    "line_start": 1104,
+                    "line_end": 1111
+                  },
+                  {
+                    "path": "src/lmrobmm.f",
+                    "line_start": 1763,
+                    "line_end": 1778
+                  }
+                ],
+                "path": "src/lmrobmm.f",
+                "line_start": 1104,
+                "line_end": 1111,
+                "usage": "external :: rlRWAGm2\ninteger,parameter :: n=6,np=2\ninteger :: nit,ip(np)\ndouble precision :: x(n,np),y(n),theta(np),wgt(n),cov(3),sigmaf\ndouble precision :: rs(n),delta(np),sc(n),sf(np),sg(np),sh(np),sw(n),sx(n,np)\n! In the linked package/R environment; input matrix has full column rank.\nx(:,1)=1d0; x(:,2)=[0d0,1d0,2d0,3d0,4d0,5d0]\ny=[1d0,3d0,5d0,7d0,9d0,30d0]; theta=0d0; wgt=1d0\ncov=[1d0,0d0,1d0]; sigmaf=-1d0\ncall rlRWAGm2(x,y,theta,wgt,cov,1d0,1d0,n,np,n,3, &\n 1d-6,1d0,1d-10,1,0,1,50,1,nit,sigmaf,rs,delta, &\n sc,sf,sg,sh,ip,sw,sx,3,1.345d0,0d0,1d0)\n! Inspect NIT, SIGMAF, finite coefficients and residuals; no success flag is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The supplied scale is fixed at one and the initial coefficients are zero; this illustrates the kernel, not a full robust-MM fitting recipe or verified fit. Preserve the legacy default INTEGER/DOUBLE PRECISION ABI and full helper linkage. An iteration count alone does not establish convergence or robustness. No regression result was run."
+              },
+              {
+                "procedure": "rlRWAGm2 iteration",
+                "role": "implementation-helper",
+                "path": "src/lmrobmm.f",
+                "line_start": 1142,
+                "line_end": 1223
+              },
+              {
+                "procedure": "rlPSIm2",
+                "role": "implementation-helper",
+                "path": "src/lmrobmm.f",
+                "line_start": 1763,
+                "line_end": 1778
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "af6348d9f3c1a2555b9e4c486d30f9099e5e2096",
+          "reviewed_on": "2026-11-05",
+          "notes": "The R package DESCRIPTION specifies GPL (>=3). The selected source retains ROBETH/MathSoft contributor notices; linkage to R and numerical dependencies retains their separate notices.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/valentint/robust/blob/af6348d9f3c1a2555b9e4c486d30f9099e5e2096/DESCRIPTION",
+              "sha256": "b10478d75b3baa9d4706aff83c1657d1d763d94d3c04a4557ed9b5384043b3a4"
+            },
+            {
+              "path": "src/lmrobmm.f",
+              "url": "https://github.com/valentint/robust/blob/af6348d9f3c1a2555b9e4c486d30f9099e5e2096/src/lmrobmm.f",
+              "sha256": "aace5f85a77f0d06f2791f6aee30f302db7441e42d9b46b68ef71bb6ea58a8ad"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45206,12 +45766,84 @@
             ],
             "notes": "The README enumerates MCD/MVE/S/MM/SD and regularized/projection-pursuit variants. This is mixed R and compiled-code software; not every advertised estimator is necessarily implemented in the repository Fortran components or valid under the same assumptions.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4c1b",
+            "level": "source-reviewed",
+            "revision": "cf03cf78676a871eedc1615a2dc4d6734e8afaf3",
+            "reviewed_on": "2026-11-05",
+            "notes": "RLDS computes a nonparametric robust multivariate location/scatter estimate from projection outlyingness. RLWEIGHTS samples subsets defining projection directions, standardizes projected distances using medians and robust scale, retains maximal outlyingness and forms redescending weights. RLDONOSTAH then computes weighted location using W and scatter using W squared, normalized by their respective sums; this is not the ordinary sample covariance. The GAMS nonparametric multidimensional-data-analysis class is retained because the adopted taxonomy has no specific Stahel-Donoho leaf. Positive NRESAMP bounds requested valid random subsets and MAXRES bounds attempted subsets; NRESAMP=0 instead enumerates all subsets and is not bounded by MAXRES. NRESPER reports valid subsets, not a success or accuracy certificate. Degenerate data or vanishing weight sums need caller-side checks because the location/scatter divisions have no general error status. The routine brackets its own R RNG state and requires the package R/native helpers. Review covers the estimator paths, not breakdown guarantees, covariance calibration or exhaustive runtime complexity.",
+            "evidence": [
+              {
+                "path": "src/ds11.f",
+                "url": "https://github.com/valentint/rrcov/blob/cf03cf78676a871eedc1615a2dc4d6734e8afaf3/src/ds11.f",
+                "sha256": "af64aa3f57033031edc38f345f047e69e0d82f9741338dd742d94eb8b8ceaf7d"
+              },
+              {
+                "path": "src/R-rng4ftn.c",
+                "url": "https://github.com/valentint/rrcov/blob/cf03cf78676a871eedc1615a2dc4d6734e8afaf3/src/R-rng4ftn.c",
+                "sha256": "7ba49a3adecad50b942d3bfaf718585ccf7ad84bf8553692327523ea128b5c8b"
+              },
+              {
+                "path": "src/fsada.f",
+                "url": "https://github.com/valentint/rrcov/blob/cf03cf78676a871eedc1615a2dc4d6734e8afaf3/src/fsada.f",
+                "sha256": "a5bd3add4bf937fbd6f876b649904ea6736789820e281b6c18618a12a987cd39"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rlds",
+                "role": "public-entry-point",
+                "summary": "External R-hosted random-projection robust multivariate location/scatter estimator.",
+                "signature": "CALL RLDS(N,NP,NRESAMP,X,TUNE,WK,LOCAT,COV,MAXRES,NRESPER,W,Z,ICENT,IWORK)",
+                "declarations": [
+                  {
+                    "path": "src/ds11.f",
+                    "line_start": 1,
+                    "line_end": 36
+                  }
+                ],
+                "path": "src/ds11.f",
+                "line_start": 1,
+                "line_end": 53,
+                "usage": "external :: rlds\ninteger,parameter :: n=8,np=2\ninteger :: performed,iwork(4*n+np)\ndouble precision :: x(n,np),wk(4*n+np),center(np),cov(np,np),w(n),z(n)\n! Execute inside the package/R runtime; seed R externally if reproducibility is needed.\nx(:,1)=[0d0,1d0,0d0,1d0,2d0,2d0,-1d0,20d0]\nx(:,2)=[0d0,0d0,1d0,1d0,1d0,2d0,1d0,-10d0]\ncall rlds(n,np,100,x,2.5d0,wk,center,cov,500,performed,w,z,1,iwork)\nif(performed<=0) error stop \"no valid random subsets\"\n! Also check finite location/scatter, nonzero weight sums and degeneracy.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The sketch requests random subsets rather than combinatorial enumeration. RLDS enters/exits R RNG state internally; link the package RNG and legacy numerical helpers. TUNE=2.5 is illustrative, not a calibrated inference guarantee. No estimator, RNG or covariance result was tested."
+              },
+              {
+                "procedure": "rlweights",
+                "role": "implementation-helper",
+                "path": "src/ds11.f",
+                "line_start": 56,
+                "line_end": 110
+              },
+              {
+                "procedure": "rldonostah",
+                "role": "implementation-helper",
+                "path": "src/ds11.f",
+                "line_start": 207,
+                "line_end": 240
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "cf03cf78676a871eedc1615a2dc4d6734e8afaf3",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned R package DESCRIPTION specifies GPL (>=3). R runtime/RNG and other linked components retain their own notices.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/valentint/rrcov/blob/cf03cf78676a871eedc1615a2dc4d6734e8afaf3/DESCRIPTION",
+              "sha256": "66c2f144f13029677879fa2de6436b502e10de03613862bf27756a5bba30126f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45254,12 +45886,104 @@
             ],
             "notes": "The README identifies an R interface to Pierre Joly Fortran functions. This supports the specialized statistical scope without claiming a general survival-analysis toolkit; censoring assumptions, model options and numerical estimation need deeper review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L15",
+            "level": "source-reviewed",
+            "revision": "a4179bf4656e4b17b72c6b6d3dfef49065ccc662",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external SURVWEIB entry fits a parametric Weibull proportional-hazards survival model by maximizing a likelihood with exact/right/interval-censored observations and optional left truncation. The likelihood contains exp(X*beta), Weibull baseline cumulative hazard and the selected censoring/truncation contributions; the baseline parameters are squared internally to keep them nonnegative. The baseline formula is S(t)=exp(-(b2*t)**b1), so B2 is an inverse-scale/rate rather than the usual direct Weibull scale. A baseline-only optimization precedes the covariate fit. For P>0, CONVERGED(1:2)=1 denotes success of both optimizer stages; zero is not the success convention. EPS holds integer accuracy exponents. Confidence-band arrays should only be used if requested and successfully computed. Saved module work arrays and unconditional R RNG enter/exit calls mean this is R-hosted shared-state code even with bands disabled. The interval branch subtracts survival terms and invalid likelihoods use a sentinel, so tail cancellation and invalid data need independent validation. Review covers the parametric likelihood/driver, not the separate spline model, confidence-band coverage or arbitrary survival workflows.",
+            "evidence": [
+              {
+                "path": "src/survWeib.f90",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/src/survWeib.f90",
+                "sha256": "d671cdf1a013175954420651268aa3986504ea160d592904538e7394dd824bce"
+              },
+              {
+                "path": "src/survLikelihood.f90",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/src/survLikelihood.f90",
+                "sha256": "1e7a9fd05fc059c79d12f6a8706b66bc36818e738635ab0191b76deb7b54cc54"
+              },
+              {
+                "path": "src/optim.f90",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/src/optim.f90",
+                "sha256": "11a78dbb69cbe8547ee0047885a65d7d307af303d748185178b5cfeff8c01855"
+              },
+              {
+                "path": "src/fonct.f90",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/src/fonct.f90",
+                "sha256": "c5b877e41427a2cb827ab030fcf89410e502e71830bc4eb63a256ed3572cfdbd"
+              },
+              {
+                "path": "src/runiran.c",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/src/runiran.c",
+                "sha256": "c839a5ced0a59da929d1eba9b15494a3fdf934041c7422f9b7004731abc96d34"
+              },
+              {
+                "path": "R/shr.R",
+                "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/R/shr.R",
+                "sha256": "7bcba4b41308897d9976685af58e2dbd68e46bd77a0d324d8542386d04515fc2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "survWeib",
+                "role": "public-entry-point",
+                "summary": "External R-hosted Weibull proportional-hazards fit with explicit result and 100-point curve arrays.",
+                "signature": "CALL survWeib(ENTRYTIME,L,R,STATUS,X,N,P,TRUNCATED,INTERVAL,EPS,MAXITER0, &\n LOGLIK,BASEPAR,REGPAR,V,CONVERGED,CV,NITER,T,S,S_L,S_U,H,H_L,H_U, &\n CONF_BANDS,LEVEL_CONF,PRT,HESS_TOT)",
+                "declarations": [
+                  {
+                    "path": "src/survWeib.f90",
+                    "line_start": 6,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "src/survWeib.f90",
+                    "line_start": 50,
+                    "line_end": 53
+                  }
+                ],
+                "path": "src/survWeib.f90",
+                "line_start": 6,
+                "line_end": 50,
+                "usage": "external :: survWeib\ninteger,parameter :: n=8,p=1\ninteger :: status(n),converged(2),niter\ndouble precision :: entry(n),l(n),r(n),x(n,p),loglik(2),basepar(2),regpar(p),v(p*p),cv(3)\ndouble precision :: t(100),surv(100),sl(100),su(100),h(100),hl(100),hu(100),hess(p+2,p+2)\n! In an initialized R/native package environment; 1=event, 0=right censored.\nentry=0d0; l=[1d0,2d0,3d0,4d0,5d0,6d0,7d0,8d0]; r=l\nstatus=[1,1,0,1,0,1,1,0]; x(:,1)=[0d0,1d0,0d0,1d0,0d0,1d0,0d0,1d0]\ncall survWeib(entry,l,r,status,x,n,p,0,0,[6,6,6],200, &\n loglik,basepar,regpar,v,converged,cv,niter,t,surv,sl,su,h,hl,hu, &\n 0,0.95d0,0,hess)\nif(any(converged/=1)) error stop \"inspect survival optimizer status\"\n! Bands were disabled; do not interpret SL/SU/HL/HU as computed bands.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Small right-censored covariate example, not a checked fit. Positive observation times avoid baseline singularities at zero; validate censor/truncation data before calling. Link all R/numerical helpers and isolate shared state. Success codes do not establish identification, fit quality or interval coverage. No survival calculation was run."
+              },
+              {
+                "procedure": "survLikelihood",
+                "role": "implementation-helper",
+                "path": "src/survLikelihood.f90",
+                "line_start": 11,
+                "line_end": 99
+              },
+              {
+                "procedure": "fonct",
+                "role": "implementation-helper",
+                "path": "src/fonct.f90",
+                "line_start": 1,
+                "line_end": 21
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "a4179bf4656e4b17b72c6b6d3dfef49065ccc662",
+          "reviewed_on": "2026-11-05",
+          "notes": "The R package DESCRIPTION specifies GPL (>=2). R runtime and numerical dependencies retain separate terms.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/tagteam/SmoothHazard/blob/a4179bf4656e4b17b72c6b6d3dfef49065ccc662/DESCRIPTION",
+              "sha256": "b3eff59ce044f715ea12cfab36ac2b93ad513d392de73c1e173dc6f781d168bb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -59427,12 +60151,95 @@
             ],
             "notes": "The README identifies three heuristics, a Rosenbrock example and HYMOD calibration. Robustness and comparative performance are research claims, not independent results here; the example physical model is not universally validated.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K1b2",
+            "level": "source-reviewed",
+            "revision": "277ad1bab849f66a5c152a82aa99fd4c42514800",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public RGN module routine minimizes one-half the sum of squared user residuals subject to simple lower/upper parameter bounds. It estimates the Jacobian by bound-clipped finite differences, forms J-transpose*r and J-transpose*J, adjusts the active bounds and solves a reduced Gauss-Newton system with step/globalization logic. This is constrained nonlinear least squares; Robust in the project name does not establish an outlier-resistant loss function. Callers must supply consistent residuals and scalar objective, finite strictly separated bounds and the module-defined kinds. ERROR reports callback/interface failures, while INFO%TERMFLAG distinguishes iteration limit, small objective change, no reduction and small parameter change; ERROR=0 alone does not certify convergence. Some input/storage errors use STOP or console interaction rather than a clean status return. Review covers the native bounded iteration and concrete Rosenbrock callback convention, not convergence guarantees, rank-deficient behavior or a global optimum claim.",
+            "evidence": [
+              {
+                "path": "SRC_RGN/rgn.f90",
+                "url": "https://github.com/eachonly/Robust-Gauss-Newton-Algorithm/blob/277ad1bab849f66a5c152a82aa99fd4c42514800/SRC_RGN/rgn.f90",
+                "sha256": "3235e0bde9c9256a3a1daa5ee7e47d5a704dbe5036722fefabf47990e5ac548f"
+              },
+              {
+                "path": "SRC_RGN/constantsMod.f90",
+                "url": "https://github.com/eachonly/Robust-Gauss-Newton-Algorithm/blob/277ad1bab849f66a5c152a82aa99fd4c42514800/SRC_RGN/constantsMod.f90",
+                "sha256": "cbb2c436528ebdebaa8956c3a2e30617e558f2a35b9ca53ef30793c4904a7b4f"
+              },
+              {
+                "path": "SRC_DEMO/rosenbrock/rgnMain_Rosenbrock.f90",
+                "url": "https://github.com/eachonly/Robust-Gauss-Newton-Algorithm/blob/277ad1bab849f66a5c152a82aa99fd4c42514800/SRC_DEMO/rosenbrock/rgnMain_Rosenbrock.f90",
+                "sha256": "d4fa71758af41c2f008deaebf162e74c29da4679171caf0f30573e8821bd75ac"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rgn",
+                "role": "public-entry-point",
+                "summary": "Public module bounded nonlinear least-squares driver with a residual/objective callback.",
+                "signature": "CALL rgn(OBJFUNC,P,N,X0,XLO,XHI,CNV,X,INFO,ERROR,MESSAGE)",
+                "declarations": [
+                  {
+                    "path": "SRC_RGN/rgn.f90",
+                    "line_start": 126,
+                    "line_end": 154
+                  },
+                  {
+                    "path": "SRC_RGN/rgn.f90",
+                    "line_start": 48,
+                    "line_end": 58
+                  },
+                  {
+                    "path": "SRC_RGN/constantsMod.f90",
+                    "line_start": 18,
+                    "line_end": 20
+                  }
+                ],
+                "path": "SRC_RGN/rgn.f90",
+                "line_start": 126,
+                "line_end": 154,
+                "module": "rgnMod",
+                "usage": "program bounded_ls_sketch\nuse constantsMod, only: ik,rk\nuse rgnMod, only: rgn,rgnConvType,rgnInfoType,setDefaultRgnConvergeSettings\nimplicit none\ntype(rgnConvType) :: cnv\ntype(rgnInfoType) :: info\nreal(rk) :: x0(2),lo(2),hi(2),x(2)\ninteger(ik) :: error\ncharacter(100) :: message\nx0=[-1._rk,0._rk]; lo=[-1.5_rk,-1._rk]; hi=[1.5_rk,3._rk]\ncall setDefaultRgnConvergeSettings(cnv)\ncnv%iterMax=200_ik; cnv%dumpResults=0_ik\nerror=0_ik; message=\"\"\ncall rgn(residual,2_ik,2_ik,x0,lo,hi,cnv,x,info,error,message)\nif(error/=0_ik) error stop \"RGN callback/interface failure\"\nprint *,info%termFlag,info%f,x\ncontains\nsubroutine residual(nPar,nSim,x,r,f,timeFunc,error,message)\n integer(ik),intent(in) :: nPar,nSim\n real(rk),intent(in) :: x(:)\n real(rk),intent(out) :: r(:),f,timeFunc\n integer(ik),intent(inout) :: error\n character(100),intent(inout) :: message\n r(1)=1._rk-x(1); r(2)=10._rk*(x(2)-x(1)**2)\n f=0.5_rk*sum(r*r); timeFunc=0._rk; error=0_ik; message=\"\"\nend subroutine\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The callback follows the author one-half squared-residual convention and fixed-length 100-character interface. IK/RK are literal kind 8 in the pinned constants module; use a compiler supporting that configuration. Inspect TERMFLAG, residuals and bound feasibility independently. No Rosenbrock solve, derivatives or convergence result was tested."
+              },
+              {
+                "procedure": "rgn finite-difference and normal matrix",
+                "role": "implementation-helper",
+                "path": "SRC_RGN/rgn.f90",
+                "line_start": 231,
+                "line_end": 265
+              },
+              {
+                "procedure": "rgn stopping tests",
+                "role": "implementation-helper",
+                "path": "SRC_RGN/rgn.f90",
+                "line_start": 450,
+                "line_end": 487
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "277ad1bab849f66a5c152a82aa99fd4c42514800",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root license is the MIT grant and retains the stated contributor copyright. This does not validate numerical results or extend to unrelated linked software.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/eachonly/Robust-Gauss-Newton-Algorithm/blob/277ad1bab849f66a5c152a82aa99fd4c42514800/LICENSE",
+              "sha256": "0cae96106fac748c32d073638768379c1e04c114e63bbd76b7702abab7092902"
+            }
+          ]
         }
       },
       "imports": {}

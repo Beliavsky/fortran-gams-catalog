@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 372 repositories now have 495 source-reviewed
+Reviewed on 2026-11-05. 380 repositories now have 505 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-360 repository cards now identify public routines and link their usage lines
+368 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 372 independently source-reviewed repositories now have an
+separately. All 380 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -396,6 +396,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | FM Algorithm 814 archive | `FMZM::GAMMA`, `FMZM::BETA` | No explicit license grant identified in reviewed distribution files |
 | Induced Smoothed Lasso | `islasso` | GPL-2.0-or-later |
 | tfQMRgpu | `tfqmrgpu::tfqmrgpu_bsrsv_complete` | MIT |
+| AMG4PSBLAS | `amg_d_prec_mod::amg_dprec_type%build` | BSD-3-Clause |
+| BDDCML | `module_bddcml::bddcml_solve` | LGPL-3.0-or-later |
+| GALAHAD | `GALAHAD_EQP_double::EQP_solve`, `GALAHAD_QPB_double::QPB_solve` | BSD-3-Clause |
+| BayesFM | `factor_normal_class::update_factor_normal` | GPL-3.0-only |
+| Robust Library for R | `rlRWAGm2` | GPL-3.0-or-later |
+| rrcov | `rlds` | GPL-3.0-or-later |
+| SmoothHazard | `survWeib` | GPL-2.0-or-later |
+| Robust Gauss Newton | `rgnMod::rgn` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -787,6 +795,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FM Algorithm 814 archive](https://github.com/toms-algo/814-fm-2001) | C7a; C7b | Real multiprecision complete gamma and beta functions | Historical FM modules, decimal-string inputs, shared precision/cache state and explicit scope. |
 | [Induced Smoothed Lasso](https://github.com/cran/islasso) | L8c | Induced-smoothed penalized Gaussian multiple-linear regression | R-hosted numerical helpers, input/output work arrays and masked factorization status. |
 | [tfQMRgpu](https://github.com/real-space/tfqmrgpu) | D2c4 | Complex block-sparse transpose-free QMR solves on GPU | Public square-block convenience API, compiled block support, prescribed X sparsity and residual/status caveats. |
+| [AMG4PSBLAS](https://github.com/sfilippone/amg4psblas) | D2e | Distributed algebraic multilevel preconditioner construction | PSBLAS/MPI setup, public type-bound build, hierarchy/smoother dispatch and explicit distinction from a solve. |
+| [BDDCML](https://github.com/sistek/bddcml) | D2b4; D2a4 | BDDC-preconditioned conjugate-gradient and BiCGStab linear solves | Method/matrix type, iterative versus direct-only configuration, collective setup and downloaded solution state. |
+| [GALAHAD](https://github.com/ralna/galahad) | G2e1; G2e2 | Convex equality-constrained and indefinite inequality-constrained quadratic programs | Precision facade, sparse layouts, EQP constraint sign, solver lifecycle and local versus global claims. |
+| [BayesFM](https://github.com/cran/bayesfm) | L13a | Conditional Gaussian factor-score update | One Bayesian factor-analysis component, initialized covariance, custom RNG and R-hosted numerical helpers. |
+| [Robust Library for R](https://github.com/valentint/robust) | L8c4 | Fixed-scale Huber W-iteration for robust multiple-linear regression | Concrete psi selector, QR updates, packed convergence metric and no general success return. |
+| [rrcov](https://github.com/valentint/rrcov) | L4c1b | Projection-based robust multivariate location/scatter | Nonparametric scope, bounded random versus exhaustive subsets, squared-weight scatter and degenerate-weight checks. |
+| [SmoothHazard](https://github.com/tagteam/smoothhazard) | L15 | Censored Weibull proportional-hazards fitting | R-hosted saved state, optimizer success code one, inverse-scale convention and optional confidence bands. |
+| [Robust Gauss Newton](https://github.com/eachonly/robust-gauss-newton-algorithm) | K1b2 | Bounded nonlinear least squares | Consistent residual/objective callback, module kinds, finite-difference bounds and stopping-code interpretation. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1425,3 +1441,13 @@ timing limitations, L-BFGS curvature and zero-gradient guards, and sparse
 GPU residual checks are retained alongside the usage lines. Spherical
 harmonic synthesis remains in broad J because this taxonomy has no
 dedicated spherical-harmonic leaf.
+
+AMG4PSBLAS, BDDCML, BayesFM, robust, rrcov, SmoothHazard, the Robust
+Gauss-Newton Algorithm and GALAHAD have ten additional pinned mappings.
+Calling sketches were not compiled or run. The reviews distinguish
+preconditioner construction from a complete solve, PCG from BiCGStab,
+a conditional factor draw from posterior fitting, fixed-scale M-estimation
+from a complete MM workflow, and convex from indefinite quadratic programs.
+R-hosted dependencies, random-subset limits, Weibull inverse-scale and
+success conventions, EQP constraint signs and solver termination diagnostics
+are recorded with the public interfaces.
