@@ -30,3 +30,4 @@ separate check.
 | [Riemann solvers](riemann/README.md) | I2a2 | 17 scalar advection/Burgers flux and entropy cases |
 | [NDSM Poisson](ndsm/README.md) | I2b1a1a | Manufactured Neumann solution, interior residual, gauge and two-grid refinement |
 | [Chebyshev-node quadrature](boxcode-quadrature/README.md) | H2a1b2 | 30 polynomial moments and node/weight identities; documented legacy-bounds limitation |
+| [NDSM interpolation](ndsm-interpolation/README.md) | E1a; E2a | 157 scalar, bilinear and trilinear known-value checks, including lower-side extrapolation |

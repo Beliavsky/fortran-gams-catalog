@@ -1,0 +1,90 @@
+{
+  "checked_at": "2026-11-06T16:31:52.048516+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings",
+  "checks": [
+    {
+      "name": "linear",
+      "gams_code": "E1a",
+      "source": {
+        "path": "fortran/ndsm_interp.f90",
+        "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+        "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+      },
+      "dependencies": [
+        {
+          "path": "fortran/ndsm_root.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+        }
+      ],
+      "driver": "linear.f90",
+      "driver_sha256": "a08359ae9a8c761eb8f9f0bacde9c340c9bb33cb062f3391391ac1bcbacb321b",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\ndsm_root.f90:343:46:\n\n  343 | SUBROUTINE assert_n_inbounds_1D(ndim,nsize,n,ivec,subname,eid)\n      |                                              1~~~\nWarning: Unused dummy argument 'ivec' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_interp.f90:495:9:\n\n  495 |   DO i=1,ndim\n      |         1\nWarning: Possible change of value in conversion from INTEGER(8) to INTEGER(4) at (1) [-Wconversion]\n<temporary>\\ndsm_interp.f90:387:33:\n\n  387 |   CHARACTER(LEN=*),PARAMETER :: THIS_SUB = \"find_bracket_points_uniform\"\n      |                                 1~~~~~~~\nWarning: Unused parameter 'this_sub' declared at (1) [-Wunused-parameter]\n",
+      "stdout": "Known-value checks: 7\nMaximum normalized error:   1.655814E-16\nPASS linear\n",
+      "stderr": ""
+    },
+    {
+      "name": "multilinear",
+      "gams_code": "E2a",
+      "source": {
+        "path": "fortran/ndsm_interp.f90",
+        "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+        "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+      },
+      "dependencies": [
+        {
+          "path": "fortran/ndsm_root.f90",
+          "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+          "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+        }
+      ],
+      "driver": "multilinear.f90",
+      "driver_sha256": "d5543ec61992deb6b09cfbe8b5471dc50d806e19b7fcb0549c835a623f75b46f",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\ndsm_root.f90:343:46:\n\n  343 | SUBROUTINE assert_n_inbounds_1D(ndim,nsize,n,ivec,subname,eid)\n      |                                              1~~~\nWarning: Unused dummy argument 'ivec' at (1) [-Wunused-dummy-argument]\n<temporary>\\ndsm_interp.f90:495:9:\n\n  495 |   DO i=1,ndim\n      |         1\nWarning: Possible change of value in conversion from INTEGER(8) to INTEGER(4) at (1) [-Wconversion]\n<temporary>\\ndsm_interp.f90:387:33:\n\n  387 |   CHARACTER(LEN=*),PARAMETER :: THIS_SUB = \"find_bracket_points_uniform\"\n      |                                 1~~~~~~~\nWarning: Unused parameter 'this_sub' declared at (1) [-Wunused-parameter]\n",
+      "stdout": "Known-value checks: 150\nMaximum normalized error:   6.692324E-16\nPASS multilinear\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 710 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 712 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -477,7 +477,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | ecTrans | `DIR_TRANS`, `INV_TRANS`, `EDIR_TRANS`, `EINV_TRANS` | Apache-2.0 ecTrans notices with ECMWF privileges/immunities statement |
 | Clawpack Riemann solvers | `rp1_ptwise` | BSD-3-Clause Clawpack Riemann solver notice |
 | Boxcode2D legacy wrapper | `lbfmm2d`, `chebexps` | No license grant identified in reviewed root and wrapper files |
-| NDSM | `NDSM_POISSON::solve_poisson_bvp` | BSD-3-Clause NDSM source notices |
+| NDSM | `NDSM_POISSON::solve_poisson_bvp`, `NDSM_INTERP::ninterp` | BSD-3-Clause NDSM source notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -953,6 +953,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Boxcode2D legacy wrapper](https://github.com/mrachh/boxcode2d-legacy) | I2b1a1 | Adaptive eighth-order free-space two-dimensional Poisson volume potential | Unit-root wrapper contract, rank-three data, default/four-byte integer compatibility, ignored selectors, unassigned timing and large workspaces; uncompiled. |
 | [Boxcode2D legacy wrapper: quadrature](https://github.com/mrachh/boxcode2d-legacy) | H2a1b2 | Fixed-order unweighted quadrature on Chebyshev-root nodes | 30 checked monomial moments and node/weight checks; bounds checks disabled for unchanged legacy object, enabled for the main program. |
 | [NDSM](https://github.com/sag2021/ndsm) | I2b1a1a | Rectangular two-dimensional homogeneous-Neumann Poisson multigrid | Checked manufactured solution on two grids, independent interior residual/gauge and refinement; serial binary64 and 64-bit index scope. |
+| [NDSM: piecewise-linear interpolation](https://github.com/sag2021/NDSM) | E1a | Uniform-grid scalar interpolation and end-cell extrapolation | Seven checked values, including a non-affine nodal table; 64-bit IT and nondefault coordinate bounds. |
+| [NDSM: multilinear interpolation](https://github.com/sag2021/NDSM) | E2a | Bilinear and trilinear interpolation on Cartesian grids | 150 checked cross-term polynomial values; unequal spacings and nonsquare grids; no arbitrary-data accuracy claim. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1815,3 +1817,16 @@ was built without bounds instrumentation, while the main program was checked.
 Only these specified numerical configurations are verified; the legacy
 Poisson wrapper, OpenMP, 3-D optimized operators and other configurations
 retain their separate unverified scope.
+
+Two NDSM interpolation mappings now have [complete locally checked main
+programs](../drivers/ndsm-interpolation/README.md): univariate piecewise-linear
+interpolation (E1a) and gridded multilinear interpolation (E2a). All 157
+known-value cases passed with bounds checks and floating-point traps using
+GNU Fortran 17.0.0 20260510 (experimental) on Windows. Maximum errors were
+1.655814e-16 and 6.692324e-16, below tolerance 5e-13. Tests include nondefault
+coordinate bounds, unequal spacings, nonsquare grids, polynomial cross terms,
+and lower-side extrapolation; scalar tabular checks distinguish piecewise
+interpolation from a global fit. The function discards bracketing status and
+extrapolates without clipping. General nonuniform, repeated-node, decreasing,
+and high-dimensional cases remain unverified; source review and these finite
+numerical checks do not certify arbitrary-data accuracy.

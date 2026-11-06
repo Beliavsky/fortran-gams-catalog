@@ -45966,9 +45966,147 @@
                 "line_end": 549
               }
             ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+            "reviewed_on": "2026-11-06",
+            "notes": "With NDIM=1 this is univariate piecewise-linear interpolation, a degree-one polynomial spline, not a single global high-degree polynomial fit. Seven independent known-value checks cover an affine function at endpoints, a node, an interior point and below the interval, plus a non-affine nodal table with explicitly calculated interpolation and extrapolation values. Maximum error was 1.655814e-16. NDSM_INTERP::ninterp uses adjacent nodes in each coordinate and successively reduces the 2**NDIM corner values with linear weights. Supply strictly increasing coordinates with at least two nodes and uniform spacing within each axis; different axes may have different spacing. FP is the module double-precision kind and IT=C_INT64_T, so all size/shape arguments must use IT. F contains PRODUCT(NSHAPE) samples flattened in Fortran order, with the first coordinate varying fastest. MG_PTR%VAL stores each coordinate vector and may have nondefault bounds. Set NDSM_ROOT DEBUG explicitly. The bracketing helper selects the first/last interval for endpoint or exterior queries; NINTERP discards its IERR and applies the weights without clipping or returning status. Exterior values therefore extrapolate the end cell rather than reporting failure. Assertions can stop on inconsistent dimensions or indexing; no accuracy estimate is returned. High dimension requires exponentially many corner samples. Nonuniform or decreasing coordinates, repeated nodes, and high-dimensional behavior are outside the checked contract. The complete catalog main program and both original module sources were compiled and run locally with GNU Fortran 17.0.0 20260510 (experimental) on Windows, with bounds checks and floating-point traps; tolerance was 5e-13. These finite known-value cases do not establish arbitrary-data accuracy or every extrapolation regime.",
+            "evidence": [
+              {
+                "path": "fortran/ndsm_interp.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_interp.f90",
+                "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+              },
+              {
+                "path": "fortran/ndsm_root.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_root.f90",
+                "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ninterp",
+                "role": "public-entry-point",
+                "summary": "Public module function for univariate piecewise-linear interpolation; inspect coordinate and storage requirements before use.",
+                "signature": "value = ninterp(NDIM,NSIZE,NSHAPE,QVECS,Q0,F)",
+                "declarations": [
+                  {
+                    "path": "fortran/ndsm_interp.f90",
+                    "line_start": 85,
+                    "line_end": 97
+                  },
+                  {
+                    "path": "fortran/ndsm_root.f90",
+                    "line_start": 46,
+                    "line_end": 74
+                  }
+                ],
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 85,
+                "line_end": 158,
+                "module": "NDSM_INTERP",
+                "usage": "! Catalog-owned numerical checks; upstream numerical sources are downloaded separately.\nprogram check_linear\n  use ndsm_root, only: fp, it, mg_ptr, debug\n  use ndsm_interp, only: ninterp\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer(it) :: ndim, shape(3), nsize, k, j, index, rem, axis\n  integer :: trial, checked\n  type(mg_ptr) :: mesh(3)\n  real(fp), allocatable :: f(:)\n  real(fp) :: q(3), x(3), want, got, err, maximum\n  real(fp), parameter :: tol=5.e-13_fp\n  debug=.false.\n  checked=0\n  maximum=0\n  do ndim=1_it,1_it\n    shape=[4_it,5_it,3_it]\n    nsize=product(shape(:ndim))\n    do axis=1,ndim\n      ! Different spacing per axis; nondefault mesh bounds exercise internal remapping.\n      allocate(mesh(axis)%val(-2:shape(axis)-3))\n      do j=0,shape(axis)-1\n        mesh(axis)%val(j-2)=-0.5_fp*axis+0.25_fp*axis*j\n      end do\n    end do\n    allocate(f(nsize))\n    do k=1,nsize\n      rem=k-1\n      x=0\n      do axis=1,ndim\n        index=mod(rem,shape(axis)); rem=rem/shape(axis)\n        x(axis)=mesh(axis)%val(index-2)\n      end do\n      f(k)=known(ndim,x)\n    end do\n    ! Tensor product of endpoint, node, interior and exterior coordinates.\n    do trial=0,5**int(ndim)-1\n      rem=trial\n      q=0\n      do axis=1,ndim\n        j=mod(rem,5_it); rem=rem/5\n        select case(j)\n        case(0); q(axis)=mesh(axis)%val(-2)\n        case(1); q(axis)=mesh(axis)%val(shape(axis)-3)\n        case(2); q(axis)=mesh(axis)%val(-1)\n        case(3); q(axis)=mesh(axis)%val(-2)+0.37_fp*axis\n        case(4); q(axis)=mesh(axis)%val(-2)-0.1_fp*axis\n        end select\n      end do\n      want=known(ndim,q)\n      got=ninterp(ndim,nsize,shape(:ndim),mesh(:ndim),q(:ndim),f)\n      if (.not.ieee_is_finite(got)) error stop 'nonfinite interpolation'\n      err=abs(got-want)/max(1._fp,abs(want))\n      maximum=max(maximum,err)\n      if (err>tol) error stop 'interpolation mismatch'\n      checked=checked+1\n    end do\n    ! A non-affine nodal table distinguishes piecewise-linear evaluation from a global fit.\n    f=[0.25_fp,0.0625_fp,0._fp,0.0625_fp]\n    do trial=1,2\n      if(trial==1) then\n        q(1)=-0.375_fp; want=0.15625_fp\n      else\n        q(1)=-0.6_fp; want=0.325_fp\n      end if\n      got=ninterp(ndim,nsize,shape(:ndim),mesh(:ndim),q(:ndim),f)\n      if (.not.ieee_is_finite(got)) error stop 'nonfinite tabular interpolation'\n      err=abs(got-want)\n      maximum=max(maximum,err)\n      if(err>tol) error stop 'piecewise tabular mismatch'\n      checked=checked+1\n    end do\n    deallocate(f)\n    do axis=1,ndim\n      deallocate(mesh(axis)%val)\n    end do\n  end do\n  print '(a,i0)', 'Known-value checks: ',checked\n  print '(a,es14.6)', 'Maximum normalized error: ',maximum\n  print '(a)', 'PASS linear'\ncontains\n  pure function known(n,x) result(y)\n    integer(it), intent(in) :: n\n    real(fp), intent(in) :: x(3)\n    real(fp) :: y\n    y=1.25_fp-0.7_fp*x(1)\n    if(n>=2) y=y+0.4_fp*x(2)+0.6_fp*x(1)*x(2)\n    if(n>=3) y=y-0.3_fp*x(3)+0.2_fp*x(1)*x(3)-0.5_fp*x(2)*x(3)+0.8_fp*x(1)*x(2)*x(3)\n  end function\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Both upstream modules and the main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. The driver uses FP and 64-bit IT from NDSM_ROOT and explicitly initializes DEBUG. Known values must be finite and agree within 5e-13; failure terminates with ERROR STOP. Coordinate-vector lower bounds of -2 and lower-side extrapolation are included. See drivers/ndsm-interpolation/ for build instructions, pinned source hashes, complete programs and recorded numerical results.",
+                "local_driver": {
+                  "path": "drivers/ndsm-interpolation/linear.f90",
+                  "sha256": "a08359ae9a8c761eb8f9f0bacde9c340c9bb33cb062f3391391ac1bcbacb321b",
+                  "runner": "drivers/ndsm-interpolation/run.py",
+                  "runner_sha256": "2cb29e80aa66629aecc9fe6b9699f8c70c50cd8a8c58e3b3b63060b70f7f7554",
+                  "report": "drivers/ndsm-interpolation/results.json",
+                  "report_sha256": "fb8a0f9cda3fc0894f1f8e3ac877b33f81d3a9d35e707e7546352f9f87ec13aa",
+                  "readme": "drivers/ndsm-interpolation/README.md",
+                  "check_name": "linear"
+                }
+              },
+              {
+                "procedure": "bracketing on uniform coordinates",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 373,
+                "line_end": 435
+              },
+              {
+                "procedure": "Fortran-order corner sample gathering",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 314,
+                "line_end": 365
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "6f5b44d76a33d247a0c73d721766a867f40b4ad3",
+            "reviewed_on": "2026-11-06",
+            "notes": "With NDIM=2 or 3 this is bilinear/trilinear interpolation on a Cartesian grid, not scattered-data interpolation. The complete driver evaluates a multi-affine polynomial with cross terms on nonsquare 4x5 and 4x5x3 grids and unequal coordinate spacings. A tensor product of endpoint, interior-node, between-node and lower-exterior positions gives 150 independent known-value checks; maximum normalized error was 6.692324e-16. NDSM_INTERP::ninterp uses adjacent nodes in each coordinate and successively reduces the 2**NDIM corner values with linear weights. Supply strictly increasing coordinates with at least two nodes and uniform spacing within each axis; different axes may have different spacing. FP is the module double-precision kind and IT=C_INT64_T, so all size/shape arguments must use IT. F contains PRODUCT(NSHAPE) samples flattened in Fortran order, with the first coordinate varying fastest. MG_PTR%VAL stores each coordinate vector and may have nondefault bounds. Set NDSM_ROOT DEBUG explicitly. The bracketing helper selects the first/last interval for endpoint or exterior queries; NINTERP discards its IERR and applies the weights without clipping or returning status. Exterior values therefore extrapolate the end cell rather than reporting failure. Assertions can stop on inconsistent dimensions or indexing; no accuracy estimate is returned. High dimension requires exponentially many corner samples. Nonuniform or decreasing coordinates, repeated nodes, and high-dimensional behavior are outside the checked contract. The complete catalog main program and both original module sources were compiled and run locally with GNU Fortran 17.0.0 20260510 (experimental) on Windows, with bounds checks and floating-point traps; tolerance was 5e-13. These finite known-value cases do not establish arbitrary-data accuracy or every extrapolation regime.",
+            "evidence": [
+              {
+                "path": "fortran/ndsm_interp.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_interp.f90",
+                "sha256": "3fe9311d368ce4870653622a1e99886ab0cf35c5efd24c7d5572d47e1c48564f"
+              },
+              {
+                "path": "fortran/ndsm_root.f90",
+                "url": "https://github.com/sag2021/ndsm/blob/6f5b44d76a33d247a0c73d721766a867f40b4ad3/fortran/ndsm_root.f90",
+                "sha256": "bd5bd2c05d57ec935fbf051c5c99a78fdcce48e47eab99ce4c06a74c1e59f7a8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ninterp",
+                "role": "public-entry-point",
+                "summary": "Public module function for gridded multilinear interpolation; inspect coordinate and storage requirements before use.",
+                "signature": "value = ninterp(NDIM,NSIZE,NSHAPE,QVECS,Q0,F)",
+                "declarations": [
+                  {
+                    "path": "fortran/ndsm_interp.f90",
+                    "line_start": 85,
+                    "line_end": 97
+                  },
+                  {
+                    "path": "fortran/ndsm_root.f90",
+                    "line_start": 46,
+                    "line_end": 74
+                  }
+                ],
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 85,
+                "line_end": 158,
+                "module": "NDSM_INTERP",
+                "usage": "! Catalog-owned numerical checks; upstream numerical sources are downloaded separately.\nprogram check_multilinear\n  use ndsm_root, only: fp, it, mg_ptr, debug\n  use ndsm_interp, only: ninterp\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer(it) :: ndim, shape(3), nsize, k, j, index, rem, axis\n  integer :: trial, checked\n  type(mg_ptr) :: mesh(3)\n  real(fp), allocatable :: f(:)\n  real(fp) :: q(3), x(3), want, got, err, maximum\n  real(fp), parameter :: tol=5.e-13_fp\n  debug=.false.\n  checked=0\n  maximum=0\n  do ndim=2_it,3_it\n    shape=[4_it,5_it,3_it]\n    nsize=product(shape(:ndim))\n    do axis=1,ndim\n      ! Different spacing per axis; nondefault mesh bounds exercise internal remapping.\n      allocate(mesh(axis)%val(-2:shape(axis)-3))\n      do j=0,shape(axis)-1\n        mesh(axis)%val(j-2)=-0.5_fp*axis+0.25_fp*axis*j\n      end do\n    end do\n    allocate(f(nsize))\n    do k=1,nsize\n      rem=k-1\n      x=0\n      do axis=1,ndim\n        index=mod(rem,shape(axis)); rem=rem/shape(axis)\n        x(axis)=mesh(axis)%val(index-2)\n      end do\n      f(k)=known(ndim,x)\n    end do\n    ! Tensor product of endpoint, node, interior and exterior coordinates.\n    do trial=0,5**int(ndim)-1\n      rem=trial\n      q=0\n      do axis=1,ndim\n        j=mod(rem,5_it); rem=rem/5\n        select case(j)\n        case(0); q(axis)=mesh(axis)%val(-2)\n        case(1); q(axis)=mesh(axis)%val(shape(axis)-3)\n        case(2); q(axis)=mesh(axis)%val(-1)\n        case(3); q(axis)=mesh(axis)%val(-2)+0.37_fp*axis\n        case(4); q(axis)=mesh(axis)%val(-2)-0.1_fp*axis\n        end select\n      end do\n      want=known(ndim,q)\n      got=ninterp(ndim,nsize,shape(:ndim),mesh(:ndim),q(:ndim),f)\n      if (.not.ieee_is_finite(got)) error stop 'nonfinite interpolation'\n      err=abs(got-want)/max(1._fp,abs(want))\n      maximum=max(maximum,err)\n      if (err>tol) error stop 'interpolation mismatch'\n      checked=checked+1\n    end do\n    deallocate(f)\n    do axis=1,ndim\n      deallocate(mesh(axis)%val)\n    end do\n  end do\n  print '(a,i0)', 'Known-value checks: ',checked\n  print '(a,es14.6)', 'Maximum normalized error: ',maximum\n  print '(a)', 'PASS multilinear'\ncontains\n  pure function known(n,x) result(y)\n    integer(it), intent(in) :: n\n    real(fp), intent(in) :: x(3)\n    real(fp) :: y\n    y=1.25_fp-0.7_fp*x(1)\n    if(n>=2) y=y+0.4_fp*x(2)+0.6_fp*x(1)*x(2)\n    if(n>=3) y=y-0.3_fp*x(3)+0.2_fp*x(1)*x(3)-0.5_fp*x(2)*x(3)+0.8_fp*x(1)*x(2)*x(3)\n  end function\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Both upstream modules and the main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. The driver uses FP and 64-bit IT from NDSM_ROOT and explicitly initializes DEBUG. Known values must be finite and agree within 5e-13; failure terminates with ERROR STOP. Coordinate-vector lower bounds of -2 and lower-side extrapolation are included. See drivers/ndsm-interpolation/ for build instructions, pinned source hashes, complete programs and recorded numerical results.",
+                "local_driver": {
+                  "path": "drivers/ndsm-interpolation/multilinear.f90",
+                  "sha256": "d5543ec61992deb6b09cfbe8b5471dc50d806e19b7fcb0549c835a623f75b46f",
+                  "runner": "drivers/ndsm-interpolation/run.py",
+                  "runner_sha256": "2cb29e80aa66629aecc9fe6b9699f8c70c50cd8a8c58e3b3b63060b70f7f7554",
+                  "report": "drivers/ndsm-interpolation/results.json",
+                  "report_sha256": "fb8a0f9cda3fc0894f1f8e3ac877b33f81d3a9d35e707e7546352f9f87ec13aa",
+                  "readme": "drivers/ndsm-interpolation/README.md",
+                  "check_name": "multilinear"
+                }
+              },
+              {
+                "procedure": "bracketing on uniform coordinates",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 373,
+                "line_end": 435
+              },
+              {
+                "procedure": "Fortran-order corner sample gathering",
+                "role": "implementation-helper",
+                "path": "fortran/ndsm_interp.f90",
+                "line_start": 314,
+                "line_end": 365
+              }
+            ]
           }
         ],
-        "notes": "The selected serial two-dimensional homogeneous-Neumann Poisson configuration has a complete local driver with saved numerical results. Other dimensions, optimized/OpenMP paths and boundary configurations retain their separate unverified scope; the earlier documentation review remains available.",
+        "notes": "The selected serial two-dimensional Neumann Poisson solve, univariate piecewise-linear interpolation and two-/three-dimensional gridded multilinear interpolation have complete locally checked main programs with saved results. Other PDE dimensions, optimized/OpenMP paths, boundary configurations and untested interpolation regimes retain their separate unverified scope; the earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

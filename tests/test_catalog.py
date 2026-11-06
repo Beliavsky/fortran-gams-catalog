@@ -258,6 +258,12 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('Locally checked main program:', box)
             self.assertIn('Calling sketch (not a checked driver)', box)
             self.assertTrue((destination/'drivers/ndsm/results.json').is_file())
+            for name, code in [('linear', 'E1a'), ('multilinear', 'E2a')]:
+                self.assertIn('drivers/ndsm-interpolation/'+name+'.f90', ndsm)
+                self.assertTrue((destination/'drivers/ndsm-interpolation'/f'{name}.f90').is_file())
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('NDSM_INTERP::ninterp', class_page)
+            self.assertTrue((destination/'drivers/ndsm-interpolation/results.json').is_file())
             self.assertTrue((destination/'drivers/boxcode-quadrature/moments.f90').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
