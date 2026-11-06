@@ -101,3 +101,58 @@ assert.equal(classCount.textContent,'(1)');
 assert.equal(new URL(links[0].href).searchParams.get('exclude_fpm'),'1');
 assert.equal(new URL(links[0].href).searchParams.get('source_reviewed'),'1');
 console.log('Search: combined filters, FPM exclusions, taxonomy counts, navigation and restored state passed.');
+
+// License filters restore from shared URLs, combine with the other filters,
+// update taxonomy counts, and propagate through internal navigation.
+const license = {value:'',addEventListener:(event,handler)=>license.handler=handler};
+const licenseReviewed = {checked:false,addEventListener:(event,handler)=>licenseReviewed.handler=handler};
+cards.forEach((card, i) => {
+  card.dataset.license = ['permissive','strong-copyleft','unclear'][i];
+  card.dataset.licenseReviewed = i === 1 ? 'false' : 'true';
+});
+classCount.dataset.licenseCounts = JSON.stringify({
+  '|0|0|0':3, '|0|0|1':1, '|0|1|0':2, '|1|0|0':2,
+  'permissive|0|0|0':1, 'permissive|1|0|0':1,
+  'permissive|1|1|0':1, 'permissive|1|1|1':1,
+  'strong-copyleft|0|0|0':1, 'unclear|1|0|0':1
+});
+query.value=''; collection.value='';
+const licensed = {
+  ...context,
+  document:{...context.document,
+    getElementById:id=>({license,'license-reviewed':licenseReviewed})[id] || context.document.getElementById(id)},
+  location:{href:'https://example.org/catalog/projects/?license=permissive&license_reviewed=1',
+    search:'?license=permissive&license_reviewed=1'}
+};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),licensed);
+assert.equal(license.value,'permissive'); assert.equal(licenseReviewed.checked,true);
+assert.deepEqual(cards.map(c=>c.hidden),[false,true,true]);
+assert.equal(classCount.textContent,'(1)');
+assert.equal(new URL(links[0].href).searchParams.get('license'),'permissive');
+assert.equal(new URL(links[0].href).searchParams.get('license_reviewed'),'1');
+assert.equal(saved.searchParams.get('license'),'permissive');
+sourceReviewed.checked=true; excludeFpm.checked=true; sourceReviewed.handler();
+assert.deepEqual(cards.map(c=>c.hidden),[false,true,true]);
+assert.equal(classCount.textContent,'(1)');
+license.value='strong-copyleft'; license.handler();
+assert.equal(matches.textContent,'0 of 3 repositories shown');
+assert.equal(classCount.textContent,'(0)');
+licenseReviewed.checked=false; excludeFpm.checked=false; sourceReviewed.checked=false; licenseReviewed.handler();
+assert.deepEqual(cards.map(c=>c.hidden),[true,false,true]);
+assert.equal(classCount.textContent,'(1)');
+license.value='unclear'; licenseReviewed.checked=true; license.handler();
+assert.deepEqual(cards.map(c=>c.hidden),[true,true,false]);
+license.value=''; licenseReviewed.checked=false; license.handler();
+assert.equal(matches.textContent,'3 of 3 repositories shown');
+assert.equal(saved.searchParams.has('license'),false);
+assert.equal(saved.searchParams.has('license_reviewed'),false);
+assert.equal(new URL(links[0].href).searchParams.has('license'),false);
+assert.equal(new URL(links[0].href).searchParams.has('license_reviewed'),false);
+const licenseHome = {...home,
+  document:{...home.document,
+    getElementById:id=>({license,'license-reviewed':licenseReviewed})[id] || home.document.getElementById(id)},
+  location:licensed.location};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),licenseHome);
+assert.equal(license.value,'permissive'); assert.equal(licenseReviewed.checked,true);
+assert.equal(classCount.textContent,'(1)');
+console.log('License filters: restored state, combined exclusions, counts, and navigation passed.');

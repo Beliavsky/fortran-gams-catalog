@@ -2,6 +2,7 @@
 import argparse
 from html import escape
 import json
+from licenses import license_group, license_reviewed, LICENSE_GROUPS
 from pathlib import Path
 import shutil
 from urllib.parse import quote
@@ -37,6 +38,24 @@ def source_codes(project):
                    if c['level'] == 'source-reviewed'} |
                   {c for p in project['procedures'] if p.get('review_level') == 'source-reviewed'
                    for c in p['gams_codes']})
+
+
+def license_counts(members, reviewed_ids):
+    counts = {}
+    for member in members:
+        for reviewed_only in (False, True):
+            if reviewed_only and not license_reviewed(member):
+                continue
+            for source_only in (False, True):
+                if source_only and member['id'] not in reviewed_ids:
+                    continue
+                for exclude_fpm in (False, True):
+                    if exclude_fpm and supports_fpm(member):
+                        continue
+                    for group in ('', license_group(member)):
+                        key = '|'.join((group, str(int(reviewed_only)), str(int(source_only)), str(int(exclude_fpm))))
+                        counts[key] = counts.get(key, 0) + 1
+    return counts
 
 
 def license_html(project, detailed=False):
@@ -102,7 +121,11 @@ def build(destination, root=ROOT):
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
 <span class="muted" id="fpm-filter-help">Repositories with unreviewed build support remain included.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="source-reviewed" aria-describedby="source-filter-help"> Only source-reviewed mappings</label>
-<span class="muted" id="source-filter-help">Evidence in the source supports the classification; compilation and numerical testing are separate.</span></div></header>
+<span class="muted" id="source-filter-help">Evidence in the source supports the classification; compilation and numerical testing are separate.</span></div>
+<div class="build-filter"><label class="checkbox-label">License <select id="license" aria-describedby="license-filter-help">
+<option value="">All licenses</option>{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in LICENSE_GROUPS.items())}</select></label>
+<label class="checkbox-label"><input type="checkbox" id="license-reviewed"> Reviewed license evidence only</label>
+<span class="muted" id="license-filter-help">Recorded terms, not a guarantee of compatibility. Check component and dependency notices.</span></div></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
 {link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
@@ -176,7 +199,7 @@ def build(destination, root=ROOT):
             if entries:
                 entry_html = '<div class="entry-points"><p>Reviewed entry points:</p><ul>'+entry_html+'</ul><p>'+link(
                     prefix+project_path(p), 'Usage and full procedure evidence')+'</p></div>'
-            cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
+            cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-license="{license_group(p)}" data-license-reviewed="{str(license_reviewed(p)).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
 <p>{e(p['description'])}</p>{license_html(p)}<div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
 <div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div>{entry_html}</article>''')
@@ -189,8 +212,9 @@ def build(destination, root=ROOT):
             members = [p for p in projects if any(belongs(tree, k, c) for k in p['codes'])]
             without_fpm = sum(not supports_fpm(p) for p in members)
             reviewed = [p for p in members if any(belongs(tree, k, c) for k in reviewed_codes[p['id']])]
+            counts = license_counts(members, {p['id'] for p in reviewed})
             rows.append('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
-                        f' <span class="muted" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
+                        f' <span class="muted" data-license-counts="{e(json.dumps(counts))}" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
         return '<ul class="classes">'+''.join(rows)+'</ul>'
 
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'

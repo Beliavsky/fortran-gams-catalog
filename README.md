@@ -35,6 +35,21 @@ evidence at a pinned commit; imported labels are marked as imported metadata.
 Entries without recorded terms say "License not yet reviewed". The review ledger
 records the evidence and scope of independent license reviews.
 
+The **License** filter groups recorded terms as permissive, weak copyleft,
+strong copyleft, custom or mixed, or unclear/not yet reviewed. Select
+**Reviewed license evidence only** to exclude imported license metadata and
+unreviewed entries. A reviewed finding that no grant was identified remains in
+the unclear group. Both filters combine with source-review and FPM filters,
+update GAMS category counts, and follow catalog links. Share, for example,
+`?license=permissive&license_reviewed=1`.
+
+License groups describe recorded terms, not guaranteed compatibility with a
+particular project. Check the pinned notices and component/dependency terms.
+Standard license expressions respect `AND` (both required) and `OR` (a choice);
+an available permissive option qualifies under Permissive. Scoped prose,
+unrecognized terms, and license exceptions remain Custom or mixed until
+explicitly supported. A missing SPDX identifier alone does not mean unlicensed.
+
 New discovery reviews start with broad GAMS divisions. More granular classes
 and procedure mappings are added through later reviews of individual repositories.
 Detailed numerical-method reviews include source-linked

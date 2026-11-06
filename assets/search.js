@@ -2,6 +2,8 @@
 const form = document.querySelector('.search');
 const excludeFpm = document.getElementById('exclude-fpm');
 const sourceReviewed = document.getElementById('source-reviewed');
+const license = document.getElementById('license');
+const licenseReviewed = document.getElementById('license-reviewed');
 if (excludeFpm) {
   const query = document.getElementById('query');
   const collection = document.getElementById('collection');
@@ -19,13 +21,19 @@ if (excludeFpm) {
   if (collection && ['independent', 'imported'].includes(params.get('collection'))) collection.value = params.get('collection');
   excludeFpm.checked = params.get('exclude_fpm') === '1';
   if (sourceReviewed) sourceReviewed.checked = params.get('source_reviewed') === '1';
+  if (license && ['permissive', 'weak-copyleft', 'strong-copyleft', 'custom-mixed', 'unclear'].includes(params.get('license'))) license.value = params.get('license');
+  if (licenseReviewed) licenseReviewed.checked = params.get('license_reviewed') === '1';
   function update() {
     const sourceOnly = Boolean(sourceReviewed?.checked);
+    const licenseOnly = license?.value || '';
+    const reviewedLicenseOnly = Boolean(licenseReviewed?.checked);
     const terms = (query?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
     let count = 0;
     for (const card of cards) {
       const search = sourceOnly ? card.dataset.sourceSearch : card.dataset.search;
       card.hidden = !((!sourceOnly || card.dataset.sourceMatch === 'true') &&
+        (!licenseOnly || card.dataset.license === licenseOnly) &&
+        (!reviewedLicenseOnly || card.dataset.licenseReviewed === 'true') &&
         terms.every(term => search.includes(term)) &&
         (!collection?.value || card.dataset.collection === collection.value) &&
         (!excludeFpm.checked || card.dataset.fpm !== 'true'));
@@ -38,7 +46,9 @@ if (excludeFpm) {
     for (const label of classCounts) {
       const key = sourceOnly ? (excludeFpm.checked ? 'sourceWithoutFpm' : 'sourceCount') :
         (excludeFpm.checked ? 'withoutFpm' : 'classCount');
-      label.textContent = `(${label.dataset[key]})`;
+      const licenseKey = [licenseOnly, Number(reviewedLicenseOnly), Number(sourceOnly), Number(excludeFpm.checked)].join('|');
+      const count = label.dataset.licenseCounts ? (JSON.parse(label.dataset.licenseCounts)[licenseKey] || 0) : label.dataset[key];
+      label.textContent = `(${count})`;
     }
     for (const {link, url: original} of navigation) {
       const target = new URL(original);
@@ -46,12 +56,17 @@ if (excludeFpm) {
       else target.searchParams.delete('exclude_fpm');
       if (sourceOnly) target.searchParams.set('source_reviewed', '1');
       else target.searchParams.delete('source_reviewed');
+      if (licenseOnly) target.searchParams.set('license', licenseOnly);
+      else target.searchParams.delete('license');
+      if (reviewedLicenseOnly) target.searchParams.set('license_reviewed', '1');
+      else target.searchParams.delete('license_reviewed');
       link.href = target.href;
     }
     const url = new URL(location.href);
     for (const [name, value] of [['q', query?.value.trim() || ''], ['collection', collection?.value || ''],
                                  ['exclude_fpm', excludeFpm.checked ? '1' : ''],
-                                 ['source_reviewed', sourceOnly ? '1' : '']]) {
+                                 ['source_reviewed', sourceOnly ? '1' : ''],
+                                 ['license', licenseOnly], ['license_reviewed', reviewedLicenseOnly ? '1' : '']]) {
       if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
     }
     history.replaceState(null, '', url);
@@ -61,5 +76,7 @@ if (excludeFpm) {
   collection?.addEventListener('change', update);
   excludeFpm.addEventListener('change', update);
   sourceReviewed?.addEventListener('change', update);
+  license?.addEventListener('change', update);
+  licenseReviewed?.addEventListener('change', update);
   update();
 }
