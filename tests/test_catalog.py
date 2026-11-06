@@ -281,6 +281,13 @@ class CatalogTests(unittest.TestCase):
                 class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
                 self.assertIn('Boxcode2D', class_page)
             self.assertTrue((destination/'drivers/boxcode-spectral/results.json').is_file())
+            fftpack = (destination/'projects/keurfonluu/fftpack/index.html').read_text(encoding='utf-8')
+            for name, code, procedure in [('convolution', 'J2', 'conv'), ('analytic', 'J4', 'hilbert'), ('real_dft', 'J1a1', 'fft')]:
+                self.assertIn('drivers/fftpack-signals/'+name+'.f90', fftpack)
+                self.assertTrue((destination/'drivers/fftpack-signals'/f'{name}.f90').is_file())
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('fftpack::'+procedure, class_page)
+            self.assertTrue((destination/'drivers/fftpack-signals/results.json').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)

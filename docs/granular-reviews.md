@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 715 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 718 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -104,7 +104,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Mittag-Leffler function and derivative | `mod_mlf_garrappa::mlf_garrappa` (scalar binding) | Author public-domain statement and citation request; inherited terms not fully audited |
 | Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
 | fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
-| FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings) | Bundled GPL notice without version; wrapper terms unresolved |
+| FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding) | Bundled GPL notice without version; wrapper terms unresolved |
 | Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
@@ -958,6 +958,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Boxcode2D: Chebyshev basis conversion](https://github.com/mrachh/boxcode2d-legacy) | E3c | Dense Chebyshev nodal/coefficient transforms | 60 checked unit-coefficient/value cases; no FFT-speed claim. |
 | [Boxcode2D: interpolant differentiation](https://github.com/mrachh/boxcode2d-legacy) | E3a2 | Spectral derivative matrix on Chebyshev-root nodes | 30 monomial derivatives plus 30 endpoint checks; legacy object has bounds instrumentation disabled. |
 | [Boxcode2D: interpolant integration](https://github.com/mrachh/boxcode2d-legacy) | E3a3 | Spectral integration of fitted polynomials | 26 checked monomial integrals; input restricted to degree N-2 because higher coefficients are truncated. |
+| [FFTPack: finite convolution](https://github.com/keurfonluu/FFTPack) | J2 | Real/complex binary64 linear convolution | 98 direct-sum comparisons, unequal/length-one inputs; no conjugation or circular-convolution claim. |
+| [FFTPack: periodic analytic signal](https://github.com/keurfonluu/FFTPack) | J4 | Double-precision Hilbert/analytic-signal FFT mask | 44 Fourier-mode/DC/Nyquist checks; single-precision overload discards the imaginary result. |
+| [FFTPack: real-input Fourier transform](https://github.com/keurfonluu/FFTPack) | J1a1 | Full complex spectrum via complex backend | 33 independent DFT comparisons with padding/truncation; unscaled negative-exponent convention. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1847,3 +1850,19 @@ the supported polynomial claim stop at input degree N-2. No arbitrary-data
 accuracy, full-file memory safety, higher-order, threading or Poisson-solver
 verification follows from these finite checks. Upstream source remains
 linked rather than bundled under the existing scoped license finding.
+
+Three FFTPack mappings now have [complete locally checked signal drivers](../drivers/fftpack-signals/README.md):
+finite convolution (J2), the periodic analytic signal/Hilbert transform (J4),
+and the real-input DFT (J1a1). GNU Fortran 17.0.0 20260510 (experimental) on
+Windows passed all 175 direct-sum or analytic vector comparisons. Maximum
+normalized errors were 3.608225e-16, 2.258517e-15 and 4.540382e-15, below
+5e-12. Coverage includes unequal convolution lengths, odd/even and several
+prime/mixed-radix FFT lengths, DC/Nyquist behavior, padding and truncation.
+The wrapper and mains have bounds checks and floating-point traps; the legacy
+backend has bounds instrumentation disabled and uses permissive argument
+mismatch handling. Its storage conventions and ignored status remain explicit
+ABI/portability limits. The single-precision Hilbert overload discards the
+imaginary result and is outside the checked API. The original complex-wrapper
+review remains historical source evidence; these finite checks do not certify
+all kernels or arbitrarily sized transforms. Existing GPL/version and wrapper
+license-scope findings are retained, and upstream source is not bundled.

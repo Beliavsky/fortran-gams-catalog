@@ -8247,9 +8247,231 @@
                 "usage_notes": "Calling sketch only; not compiled or run for this catalog. The wrapper multiplies normalized CFFT1F output by N and divides CFFT1B output by N, giving an unnormalized forward DFT and inverse scaled by 1/N. KIND=8 is the source ABI, not a portable guarantee of real64 across compilers. Scalar type-punning to REAL backend workspaces may require compatibility build options. No round trip or full radix-kernel audit was run."
               }
             ]
+          },
+          {
+            "code": "J2",
+            "level": "source-reviewed",
+            "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public CONV generic computes finite linear convolution. The selected real64 and complex64-component overloads choose output length SIZE(X)+SIZE(Y)-1, pad to a power-of-two FFT length, multiply spectra, apply the inverse transform and trim. The complex operation does not conjugate Y; this is convolution, not cross-correlation or circular convolution. Real output discards the tiny imaginary FFT residue. A complete driver compares both double-precision overloads against independent nested finite sums for every pair of lengths 1 through 7, including unequal lengths and length-one inputs. All 98 vector comparisons passed with maximum normalized error 3.608225e-16. Single-precision variants take a different length path and were not checked. Use the public generic names, not their private specific functions. The checked GNU build maps real/complex KIND=8 to binary64 components and INTEGER(KIND=4) to 32-bit integers; these numeric kind values are not a portable kind-selection contract. Inputs and effective FFT lengths must be positive. Each FFT rebuilds factor/twiddle workspaces and discards backend IERR, so the caller receives no explicit numerical status or estimate. Wrapper work arrays are declared complex while the external FFTPACK routines expect real storage; the selected GNU ABI accepts this implicit-interface storage usage, which is not a portable interface guarantee. The old backend also has mismatched argument/storage conventions requiring -fallow-argument-mismatch; it was compiled without bounds instrumentation. The wrapper and catalog mains were compiled with bounds checks and floating-point traps. These numerical checks do not establish standard conformance, full-backend memory safety, other compilers, large-array sizing or single-precision behavior. Existing GPL/version and wrapper-license scope findings remain; no upstream source is bundled here. The complete driver was compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental). All results must be finite and normalized maximum error must not exceed 5e-12.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+                "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+              },
+              {
+                "path": "src/fftpack5.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+                "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/README.md",
+                "sha256": "d396849d2553a4c2e1e825e991118e7807dd8c8f20c8f3181a572301926f5a15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "conv",
+                "role": "public-entry-point",
+                "summary": "Public fftpack generic; selected double-precision finite convolution interface.",
+                "signature": "z = conv(X,Y)",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 50,
+                    "line_end": 54
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 163,
+                    "line_end": 184
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 50,
+                "line_end": 54,
+                "module": "fftpack",
+                "usage": "! GAMS J2: fftpack::conv checked against direct finite convolution.\nprogram convolution\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n use fftpack, only: conv\n implicit none\n integer :: nx,ny,i,j,count\n real(real64), allocatable :: x(:),y(:),r(:),reference(:)\n complex(real64), allocatable :: z(:),w(:),c(:),creference(:)\n real(real64) :: error,maximum\n maximum=0;count=0\n do nx=1,7\n  do ny=1,7\n   allocate(x(nx),y(ny),reference(nx+ny-1),z(nx),w(ny),creference(nx+ny-1))\n   do i=1,nx\n    x(i)=(-1._real64)**i*real(i,real64)/3\n    z(i)=cmplx(x(i),0.1_real64*i,kind=real64)\n   end do\n   do j=1,ny\n    y(j)=0.2_real64*j-0.7_real64\n    w(j)=cmplx(y(j),-0.15_real64*j,kind=real64)\n   end do\n   reference=0;creference=0\n   do i=1,nx\n    do j=1,ny\n     reference(i+j-1)=reference(i+j-1)+x(i)*y(j)\n     creference(i+j-1)=creference(i+j-1)+z(i)*w(j)\n    end do\n   end do\n   r=conv(x,y);c=conv(z,w)\n   if(size(r)/=nx+ny-1 .or. size(c)/=nx+ny-1) error stop 'convolution size'\n   if(.not.all(ieee_is_finite(r))) error stop 'nonfinite real convolution'\n   if(.not.all(ieee_is_finite(real(c))) .or. .not.all(ieee_is_finite(aimag(c)))) error stop 'nonfinite complex convolution'\n   error=maxval(abs(r-reference))/max(1._real64,maxval(abs(reference)))\n   maximum=max(maximum,error)\n   if(error>5.e-12_real64) error stop 'real convolution mismatch'\n   error=maxval(abs(c-creference))/max(1._real64,maxval(abs(creference)))\n   maximum=max(maximum,error)\n   if(error>5.e-12_real64) error stop 'complex convolution mismatch'\n   count=count+2\n   deallocate(x,y,reference,z,w,creference,r,c)\n  end do\n end do\n print '(a,i0)', 'Direct convolution comparisons: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS convolution'\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unchanged FFTPACK backend used -O0 -g -ffree-line-length-none -fallow-argument-mismatch -ffpe-trap=invalid,zero,overflow, without bounds instrumentation. The wrapper and main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Each check requires the expected vector length, finite components and normalized maximum discrepancy <=5e-12. The report records separate kernel/wrapper/main flags, pinned source hashes and compiler warnings. See drivers/fftpack-signals/ for reproduction and scope. Implicit external real/complex storage conventions remain an ABI limitation despite these passing finite checks.",
+                "local_driver": {
+                  "path": "drivers/fftpack-signals/convolution.f90",
+                  "sha256": "e509b8d1bc2e6443af0cd97b920dc649f9f5d94e0451ae50ab80a51ddd4b7801",
+                  "runner": "drivers/fftpack-signals/run.py",
+                  "runner_sha256": "15f96bb1650f06e6e9d8828463241ecaa6ed8b2a68b7767f35082ce9499cda25",
+                  "report": "drivers/fftpack-signals/results.json",
+                  "report_sha256": "ba4b7cf42c1c403e9b1d519e16202abd0faec6e7bdac9a8c5a597c298da6078b",
+                  "readme": "drivers/fftpack-signals/README.md",
+                  "check_name": "convolution"
+                }
+              },
+              {
+                "procedure": "complex double convolution",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 163,
+                "line_end": 174
+              },
+              {
+                "procedure": "real double convolution",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 176,
+                "line_end": 186
+              }
+            ]
+          },
+          {
+            "code": "J4",
+            "level": "source-reviewed",
+            "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public HILBERT generic with REAL(KIND=8) input returns a complex discrete periodic analytic signal. The real part reconstructs X and the imaginary part is the selected Hilbert-transform convention. The FFT multiplier preserves DC, doubles strictly positive frequency bins, removes negative bins and preserves the Nyquist bin for even lengths. Optional positive N truncates or zero-pads before this periodic transform; this is not an arbitrary continuous nonperiodic Hilbert integral or a padded edge-artifact correction. The driver checks constants and every positive Fourier mode for lengths 1,2,3,4,5,7,8,9,10,16,17, mixing sine/cosine components with DC and the even-length Nyquist component. All 44 analytic-signal comparisons passed with maximum normalized error 2.258517e-15. Only default N was executed for this mapping. The REAL(KIND=4) overload declares a real result and converts the complex result to real, discarding its Hilbert component; it must not be treated as the checked analytic-signal API. Use the public generic names, not their private specific functions. The checked GNU build maps real/complex KIND=8 to binary64 components and INTEGER(KIND=4) to 32-bit integers; these numeric kind values are not a portable kind-selection contract. Inputs and effective FFT lengths must be positive. Each FFT rebuilds factor/twiddle workspaces and discards backend IERR, so the caller receives no explicit numerical status or estimate. Wrapper work arrays are declared complex while the external FFTPACK routines expect real storage; the selected GNU ABI accepts this implicit-interface storage usage, which is not a portable interface guarantee. The old backend also has mismatched argument/storage conventions requiring -fallow-argument-mismatch; it was compiled without bounds instrumentation. The wrapper and catalog mains were compiled with bounds checks and floating-point traps. These numerical checks do not establish standard conformance, full-backend memory safety, other compilers, large-array sizing or single-precision behavior. Existing GPL/version and wrapper-license scope findings remain; no upstream source is bundled here. The complete driver was compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental). All results must be finite and normalized maximum error must not exceed 5e-12.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+                "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+              },
+              {
+                "path": "src/fftpack5.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+                "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/README.md",
+                "sha256": "d396849d2553a4c2e1e825e991118e7807dd8c8f20c8f3181a572301926f5a15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hilbert",
+                "role": "public-entry-point",
+                "summary": "Public fftpack generic; selected double-precision periodic analytic signal interface.",
+                "signature": "Z = hilbert(X[,N])",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 104,
+                    "line_end": 108
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 761,
+                    "line_end": 766
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 104,
+                "line_end": 108,
+                "module": "fftpack",
+                "usage": "! GAMS J4: fftpack::hilbert for binary64 real input, analytic periodic signals.\nprogram analytic\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n use fftpack, only: hilbert\n implicit none\n integer,parameter :: sizes(*)=[1,2,3,4,5,7,8,9,10,16,17]\n integer :: k,n,j,m,count\n real(real64),allocatable :: x(:)\n complex(real64),allocatable :: z(:),want(:)\n real(real64) :: angle,nyquist,error,maximum,pi\n maximum=0;count=0;pi=acos(-1._real64)\n do k=1,size(sizes)\n  n=sizes(k)\n  allocate(x(n),want(n))\n  do m=0,(n-1)/2\n   do j=0,n-1\n    angle=2*pi*m*j/n\n    nyquist=0\n    if(mod(n,2)==0) nyquist=0.3_real64*(-1._real64)**j\n    if(m==0) then\n     x(j+1)=1.25_real64+nyquist\n     want(j+1)=cmplx(x(j+1),0._real64,kind=real64)\n    else\n     x(j+1)=1.25_real64+0.7_real64*cos(angle)+0.2_real64*sin(angle)+nyquist\n     want(j+1)=cmplx(x(j+1),0.7_real64*sin(angle)-0.2_real64*cos(angle),kind=real64)\n    end if\n   end do\n   z=hilbert(x)\n   if(size(z)/=n) error stop 'analytic signal size'\n   if(.not.all(ieee_is_finite(real(z))) .or. .not.all(ieee_is_finite(aimag(z)))) error stop 'nonfinite analytic signal'\n   error=maxval(abs(z-want))/max(1._real64,maxval(abs(want)))\n   maximum=max(maximum,error)\n   if(error>5.e-12_real64) error stop 'analytic signal mismatch'\n   count=count+1\n  end do\n  deallocate(x,want,z)\n end do\n print '(a,i0)', 'Analytic periodic signal comparisons: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS analytic'\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unchanged FFTPACK backend used -O0 -g -ffree-line-length-none -fallow-argument-mismatch -ffpe-trap=invalid,zero,overflow, without bounds instrumentation. The wrapper and main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Each check requires the expected vector length, finite components and normalized maximum discrepancy <=5e-12. The report records separate kernel/wrapper/main flags, pinned source hashes and compiler warnings. See drivers/fftpack-signals/ for reproduction and scope. Implicit external real/complex storage conventions remain an ABI limitation despite these passing finite checks.",
+                "local_driver": {
+                  "path": "drivers/fftpack-signals/analytic.f90",
+                  "sha256": "8901b61cbb03a3a5eef4a06b728c5c573464e8a458730bd5f63852dc87580109",
+                  "runner": "drivers/fftpack-signals/run.py",
+                  "runner_sha256": "15f96bb1650f06e6e9d8828463241ecaa6ed8b2a68b7767f35082ce9499cda25",
+                  "report": "drivers/fftpack-signals/results.json",
+                  "report_sha256": "ba4b7cf42c1c403e9b1d519e16202abd0faec6e7bdac9a8c5a597c298da6078b",
+                  "readme": "drivers/fftpack-signals/README.md",
+                  "check_name": "analytic"
+                }
+              },
+              {
+                "procedure": "double analytic signal spectral mask",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 761,
+                "line_end": 788
+              },
+              {
+                "procedure": "single overload loses imaginary component",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 790,
+                "line_end": 801
+              }
+            ]
+          },
+          {
+            "code": "J1a1",
+            "level": "source-reviewed",
+            "revision": "f4b82af35a1a473d33593b3b6f7a03977bf3110e",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public FFT generic accepts a real double-precision vector and returns the full complex spectrum through the complex-double backend. It does not use a packed-real output format or a specialized real FFT kernel. Optional positive N truncates the input or appends zeros. The normalization is the unscaled negative-exponent forward DFT; the wrapper compensates for the backend normalization by multiplying by N. The driver independently forms every spectral bin with a direct trigonometric sum for lengths 1,2,3,4,5,7,8,9,10,16,17, at the original length, N+3 padding and MAX(1,N-2) truncation. All 33 vector comparisons passed with maximum normalized error 4.540382e-15. This finite test set covers several mixed-radix/prime lengths, not every kernel or arbitrary transform size. Use the public generic names, not their private specific functions. The checked GNU build maps real/complex KIND=8 to binary64 components and INTEGER(KIND=4) to 32-bit integers; these numeric kind values are not a portable kind-selection contract. Inputs and effective FFT lengths must be positive. Each FFT rebuilds factor/twiddle workspaces and discards backend IERR, so the caller receives no explicit numerical status or estimate. Wrapper work arrays are declared complex while the external FFTPACK routines expect real storage; the selected GNU ABI accepts this implicit-interface storage usage, which is not a portable interface guarantee. The old backend also has mismatched argument/storage conventions requiring -fallow-argument-mismatch; it was compiled without bounds instrumentation. The wrapper and catalog mains were compiled with bounds checks and floating-point traps. These numerical checks do not establish standard conformance, full-backend memory safety, other compilers, large-array sizing or single-precision behavior. Existing GPL/version and wrapper-license scope findings remain; no upstream source is bundled here. The complete driver was compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental). All results must be finite and normalized maximum error must not exceed 5e-12.",
+            "evidence": [
+              {
+                "path": "src/fftpack.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack.f90",
+                "sha256": "98f9442f34e2a31a8bb02e8812cb1ed56de7a9c26836d294afc3fe06eade07f8"
+              },
+              {
+                "path": "src/fftpack5.f90",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/src/fftpack5.f90",
+                "sha256": "ea855addff387c75434eb0113fda26a86fef685ab666e5d71948f368a98cb37f"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/keurfonluu/FFTPack/blob/f4b82af35a1a473d33593b3b6f7a03977bf3110e/README.md",
+                "sha256": "d396849d2553a4c2e1e825e991118e7807dd8c8f20c8f3181a572301926f5a15"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fft",
+                "role": "public-entry-point",
+                "summary": "Public fftpack generic; selected double-precision real-input full-spectrum Fourier transform interface.",
+                "signature": "Z = fft(X[,N])",
+                "declarations": [
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 68,
+                    "line_end": 72
+                  },
+                  {
+                    "path": "src/fftpack.f90",
+                    "line_start": 445,
+                    "line_end": 456
+                  }
+                ],
+                "path": "src/fftpack.f90",
+                "line_start": 68,
+                "line_end": 72,
+                "module": "fftpack",
+                "usage": "! GAMS J1a1: fftpack::fft(real64) checked against an independent direct DFT.\nprogram real_dft\n use iso_fortran_env, only: real64\n use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n use fftpack, only: fft\n implicit none\n integer,parameter :: sizes(*)=[1,2,3,4,5,7,8,9,10,16,17]\n integer :: k,n,i,j,mode,dim,count\n real(real64),allocatable :: x(:)\n complex(real64),allocatable :: z(:),want(:)\n real(real64) :: angle,error,maximum,pi\n maximum=0;count=0;pi=acos(-1._real64)\n do k=1,size(sizes)\n  n=sizes(k)\n  allocate(x(n))\n  do i=1,n\n   x(i)=cos(0.4_real64*i)-0.1_real64*i\n  end do\n  do mode=1,3\n   select case(mode)\n   case(1);dim=n;z=fft(x)\n   case(2);dim=n+3;z=fft(x,dim)\n   case(3);dim=max(1,n-2);z=fft(x,dim)\n   end select\n   if(size(z)/=dim) error stop 'DFT output size'\n   allocate(want(dim));want=0\n   do j=0,dim-1\n    do i=0,min(n,dim)-1\n     angle=-2*pi*j*i/dim\n     want(j+1)=want(j+1)+x(i+1)*cmplx(cos(angle),sin(angle),kind=real64)\n    end do\n   end do\n   if(.not.all(ieee_is_finite(real(z))) .or. .not.all(ieee_is_finite(aimag(z)))) error stop 'nonfinite DFT'\n   error=maxval(abs(z-want))/max(1._real64,maxval(abs(want)))\n   maximum=max(maximum,error)\n   if(error>5.e-12_real64) error stop 'DFT mismatch'\n   count=count+1\n   deallocate(want,z)\n  end do\n  deallocate(x)\n end do\n print '(a,i0)', 'Direct real-input DFT comparisons: ',count\n print '(a,es14.6)', 'Maximum normalized error: ',maximum\n print '(a)', 'PASS real_dft'\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. The unchanged FFTPACK backend used -O0 -g -ffree-line-length-none -fallow-argument-mismatch -ffpe-trap=invalid,zero,overflow, without bounds instrumentation. The wrapper and main used -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. Each check requires the expected vector length, finite components and normalized maximum discrepancy <=5e-12. The report records separate kernel/wrapper/main flags, pinned source hashes and compiler warnings. See drivers/fftpack-signals/ for reproduction and scope. Implicit external real/complex storage conventions remain an ABI limitation despite these passing finite checks.",
+                "local_driver": {
+                  "path": "drivers/fftpack-signals/real_dft.f90",
+                  "sha256": "fef932bbe67ca2eb30989d1dcadf2c3407cd39e8a13550beda84643a0bd8050e",
+                  "runner": "drivers/fftpack-signals/run.py",
+                  "runner_sha256": "15f96bb1650f06e6e9d8828463241ecaa6ed8b2a68b7767f35082ce9499cda25",
+                  "report": "drivers/fftpack-signals/results.json",
+                  "report_sha256": "ba4b7cf42c1c403e9b1d519e16202abd0faec6e7bdac9a8c5a597c298da6078b",
+                  "readme": "drivers/fftpack-signals/README.md",
+                  "check_name": "real_dft"
+                }
+              },
+              {
+                "procedure": "real double to complex transform dispatch",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 445,
+                "line_end": 456
+              },
+              {
+                "procedure": "complex forward allocation and normalization",
+                "role": "implementation-helper",
+                "path": "src/fftpack.f90",
+                "line_start": 363,
+                "line_end": 399
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
+        "notes": "Double-precision finite convolution, real-input DFT and default-length periodic analytic signals have complete locally checked drivers and saved results. The original complex-transform review/calling sketches remain historical source evidence; the new checks cover only their documented selected paths. Single-precision analytic-signal output loses its imaginary component, and legacy argument/storage conventions remain unverified for portability or full memory safety. Earlier documentation and scoped license findings remain available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

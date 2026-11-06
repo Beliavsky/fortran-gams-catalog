@@ -32,3 +32,4 @@ separate check.
 | [Chebyshev-node quadrature](boxcode-quadrature/README.md) | H2a1b2 | 30 polynomial moments and node/weight identities; documented legacy-bounds limitation |
 | [NDSM interpolation](ndsm-interpolation/README.md) | E1a; E2a | 157 scalar, bilinear and trilinear known-value checks, including lower-side extrapolation |
 | [Chebyshev spectral operations](boxcode-spectral/README.md) | E3c; E3a2; E3a3 | 116 polynomial basis/derivative/integral cases plus 30 endpoint checks; documented legacy-bounds and integration-degree limits |
+| [FFTPack signal operations](fftpack-signals/README.md) | J2; J4; J1a1 | 175 direct convolution, analytic-signal and direct-DFT comparisons; documented legacy ABI/bounds limits |
