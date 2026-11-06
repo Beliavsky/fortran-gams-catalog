@@ -48056,6 +48056,1220 @@
                 "line_end": 17743
               }
             ]
+          },
+          {
+            "code": "L5a1b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. BETCDF evaluates the standard beta CDF for positive ALPHA/BETA by dispatching to the bundled DBETAI incomplete-beta ratio, with explicit zero/one support endpoints. DBETAI uses symmetry, logarithmic scaling and finite/infinite series and caches initialized machine constants. BETPDF evaluates the interior density through log powers and DLBETA, then exponentiates. Selected usage requires 0<X<1 and finite moderate positive shapes. BETPDF endpoint handling is not a general mathematical limit: for example ALPHA=1, BETA>1 at X=0 is returned as zero rather than BETA. Its BETA<=0 diagnostic branch also lacks the early jump present for ALPHA<=0 and can continue; validate parameters yourself. No binomial interface is claimed merely because this GAMS class groups beta and binomial.",
+            "evidence": [
+              {
+                "path": "src/dp3.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp3.F90",
+                "sha256": "d3f4750bb0b86a45cfa8ed3ca5113ef29f3e3a6a9ff2126923fe0abbfc913ddc"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BETCDF",
+                "role": "public-entry-point",
+                "summary": "External BETCDF probability distribution routine in Dataplot.",
+                "signature": "CALL BETCDF(X,ALPHA,BETA,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 16943,
+                    "line_end": 16943
+                  },
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 16962,
+                    "line_end": 16970
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp3.F90",
+                "line_start": 16943,
+                "line_end": 17013,
+                "usage": "real :: x,alpha,beta,cdf\nx=0.4; alpha=2.0; beta=3.0\ncall BETCDF(x,alpha,beta,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Interior beta-CDF fragment. No CDF, series convergence or tail accuracy was tested."
+              },
+              {
+                "procedure": "BETPDF",
+                "role": "public-entry-point",
+                "summary": "External BETPDF probability distribution routine in Dataplot.",
+                "signature": "CALL BETPDF(X,ALPHA,BETA,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 18319,
+                    "line_end": 18319
+                  },
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 18342,
+                    "line_end": 18353
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp3.F90",
+                "line_start": 18319,
+                "line_end": 18453,
+                "usage": "real :: x,alpha,beta,density\nx=0.4; alpha=2.0; beta=3.0\ncall BETPDF(x,alpha,beta,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Interior density only; validate both shapes before entry. No normalization, endpoint limit or density was tested."
+              },
+              {
+                "procedure": "SLATEC-derived incomplete-beta ratio with symmetry and series",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 3784,
+                "line_end": 3924
+              },
+              {
+                "procedure": "log-beta parameter-size dispatch and dependency calls",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 21483,
+                "line_end": 21556
+              }
+            ]
+          },
+          {
+            "code": "L5a2b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. BETPPF inverts the incomplete-beta ratio by bisection on [0,1]. The executable implementation is bisection rather than a Newton method inferred from its algorithm citation. Each iteration calls DBETAI, returns the current midpoint and requires both bracket width<=1e-5 and probability residual<=1e-6; after roughly 200 iterations it prints a diagnostic but returns the latest midpoint without a status flag. The argument check permits endpoint probabilities, but the selected contract uses 0<P<1 and ALPHA,BETA>0, avoiding assumptions about exact endpoint returns. Fixed tolerances are not relative tail-error bounds and cannot be requested through the interface.",
+            "evidence": [
+              {
+                "path": "src/dp3.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp3.F90",
+                "sha256": "d3f4750bb0b86a45cfa8ed3ca5113ef29f3e3a6a9ff2126923fe0abbfc913ddc"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BETPPF",
+                "role": "public-entry-point",
+                "summary": "External BETPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL BETPPF(P,ALPHA,BETA,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 18454,
+                    "line_end": 18454
+                  },
+                  {
+                    "path": "src/dp3.F90",
+                    "line_start": 18475,
+                    "line_end": 18488
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp3.F90",
+                "line_start": 18454,
+                "line_end": 18573,
+                "usage": "real :: probability,alpha,beta,quantile\nprobability=0.75; alpha=2.0; beta=3.0\ncall BETPPF(probability,alpha,beta,quantile)\n! Independently evaluate the CDF residual at QUANTILE.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Interior-probability fragment. The caller cannot infer convergence merely from a returned number; no inverse round trip or tail result was tested."
+              },
+              {
+                "procedure": "SLATEC-derived incomplete-beta ratio with symmetry and series",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 3784,
+                "line_end": 3924
+              }
+            ]
+          },
+          {
+            "code": "L5a1c",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. CHSCDF and CHSPDF implement central chi-square probability calculations with an INTEGER NU, unlike the real degrees-of-freedom argument of the t routines below. The selected CHSCDF path uses 1<=NU<1000 and parity-dependent finite recurrences; odd NU also uses NORCDF. At NU>=1000 it dispatches normal-based approximations with different below/above-mean formulas. Hard standardized-tail cutoffs can return zero/one. CHSPDF constructs a gamma normalizer and direct powers/exponentials, which can overflow internally for large parameters; the selected sketch uses positive moderate X and small NU. It returns zero at X<=0, including cases whose mathematical boundary density is nonzero or infinite. These entries do not cover Cauchy distributions despite the shared class label.",
+            "evidence": [
+              {
+                "path": "src/dp4.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp4.F90",
+                "sha256": "62e85721b2116b50b916fcb1c3e00e647acd0985e70c4caceffad4d2f0a26118",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CHSCDF",
+                "role": "public-entry-point",
+                "summary": "External CHSCDF probability distribution routine in Dataplot.",
+                "signature": "CALL CHSCDF(X,NU,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6166,
+                    "line_end": 6166
+                  },
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6225,
+                    "line_end": 6245
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp4.F90",
+                "line_start": 6166,
+                "line_end": 6405,
+                "usage": "real :: x,cdf\ninteger :: nu\nx=4.0; nu=5\ncall CHSCDF(x,nu,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Selected small-integer-df recurrence; no probability or large-df approximation was tested."
+              },
+              {
+                "procedure": "CHSPDF",
+                "role": "public-entry-point",
+                "summary": "External CHSPDF probability distribution routine in Dataplot.",
+                "signature": "CALL CHSPDF(X,NU,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6406,
+                    "line_end": 6406
+                  },
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6453,
+                    "line_end": 6465
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp4.F90",
+                "line_start": 6406,
+                "line_end": 6524,
+                "usage": "real :: x,density\ninteger :: nu\nx=4.0; nu=5\ncall CHSPDF(x,nu,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Positive interior-density fragment; no boundary, overflow or normalization result was tested."
+              },
+              {
+                "procedure": "positive-real gamma recurrence and asymptotic expansion",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 14362,
+                "line_end": 14452
+              }
+            ]
+          },
+          {
+            "code": "L5a2c",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. CHSPPF computes central chi-square quantiles by inverting an internally evaluated incomplete-gamma series at shape NU/2 and multiplying the gamma quantile by two. NU is INTEGER. It builds an initial upper bracket by stepping multiples of a small-probability estimate (up to 30000 trials), then bisects with an absolute midpoint-change threshold 1e-10 or a 100-iteration stop. Its 10000-term series failure prints diagnostics and returns zero; no status distinguishes an iteration-limit return from convergence. The input check allows P=0 although execution subsequently takes LOG(P), so the selected contract strictly requires 0<P<1 and NU>=1. Bracket exhaustion does not produce a distinct failure status. This is not a Cauchy quantile interface.",
+            "evidence": [
+              {
+                "path": "src/dp4.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp4.F90",
+                "sha256": "62e85721b2116b50b916fcb1c3e00e647acd0985e70c4caceffad4d2f0a26118",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CHSPPF",
+                "role": "public-entry-point",
+                "summary": "External CHSPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL CHSPPF(P,NU,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6525,
+                    "line_end": 6525
+                  },
+                  {
+                    "path": "src/dp4.F90",
+                    "line_start": 6603,
+                    "line_end": 6618
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp4.F90",
+                "line_start": 6525,
+                "line_end": 6803,
+                "usage": "real :: probability,quantile\ninteger :: nu\nprobability=0.9; nu=5\nif(probability<=0.0.or.probability>=1.0) error stop \"open unit interval required\"\ncall CHSPPF(probability,nu,quantile)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Selected positive interior probability. Check the forward residual independently; no bracketing, quantile or series accuracy was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a1t",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. TCDF and TPDF implement central Student t distributions with REAL ANU>0. TCDF converts ANU to INTEGER first and selects an integer path within 1e-6; that path assigns ANU=NU, so supply a writable variable rather than a literal. Small integer degrees use parity recurrences, large integer degrees a normal-based expansion, and genuinely fractional degrees an incomplete-beta relation. TPDF uses parity products for integer degrees and log-gamma differences for fractional degrees. Both initial INT conversions must fit the integer kind; huge/NaN degree values are outside the contract. The selected sketch uses ANU=5.5 and moderate X to follow the fractional branch. No noncentral t probabilities or uniformly accurate extreme tails are claimed.",
+            "evidence": [
+              {
+                "path": "src/dp44.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp44.F90",
+                "sha256": "231734c064e20e2e3abdf205e44a715761302de4cf816ec2e20a9f60e27466ae"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TCDF",
+                "role": "public-entry-point",
+                "summary": "External TCDF probability distribution routine in Dataplot.",
+                "signature": "CALL TCDF(X,ANU,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 367,
+                    "line_end": 367
+                  },
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 434,
+                    "line_end": 455
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp44.F90",
+                "line_start": 367,
+                "line_end": 638,
+                "usage": "real :: x,nu,cdf\nx=0.75; nu=5.5\ncall TCDF(x,nu,cdf)\n! NU is writable: near-integral values can be replaced by an integer-valued REAL.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Fractional-df incomplete-beta path; no CDF or approximation comparison was tested."
+              },
+              {
+                "procedure": "TPDF",
+                "role": "public-entry-point",
+                "summary": "External TPDF probability distribution routine in Dataplot.",
+                "signature": "CALL TPDF(X,ANU,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 6730,
+                    "line_end": 6730
+                  },
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 6796,
+                    "line_end": 6815
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp44.F90",
+                "line_start": 6730,
+                "line_end": 6915,
+                "usage": "real :: x,nu,density\nx=0.75; nu=5.5\ncall TPDF(x,nu,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Fractional-df log-gamma path; no density normalization or overflow behavior was tested."
+              },
+              {
+                "procedure": "SLATEC-derived incomplete-beta ratio with symmetry and series",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 3784,
+                "line_end": 3924
+              },
+              {
+                "procedure": "SLATEC-derived log-absolute-gamma dispatch, not all kernels",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 21695,
+                "line_end": 21795
+              }
+            ]
+          },
+          {
+            "code": "L5a2t",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. TPPF computes central t quantiles with REAL ANU>=1 and 0<P<1. The selected genuinely fractional ANU=5.5 path brackets between normal and Cauchy quantiles, evaluates the beta-based t CDF and bisects with fixed width 1e-7 and probability-residual 1e-4 requirements and a 3000-iteration diagnostic. Invalid P can return PPF unassigned; there is no status output. Integer paths are materially different: closed forms for NU=1/2, five-update special formulas for 3-6, a Hill-labelled branch for 7-30 and a normal-quantile expansion thereafter. Source caution for 7-30: PT is made a symmetric two-tail probability, but the first XT uses D*P rather than D*PT; inspect/correct and test that inconsistency before relying on this branch. The mapping records that branch structure without certifying those integer approximations. The routine excludes fractional 0<ANU<1 even though a t distribution exists there.",
+            "evidence": [
+              {
+                "path": "src/dp44.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp44.F90",
+                "sha256": "231734c064e20e2e3abdf205e44a715761302de4cf816ec2e20a9f60e27466ae"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TPPF",
+                "role": "public-entry-point",
+                "summary": "External TPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL TPPF(P,ANU,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 6916,
+                    "line_end": 6916
+                  },
+                  {
+                    "path": "src/dp44.F90",
+                    "line_start": 7004,
+                    "line_end": 7036
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp44.F90",
+                "line_start": 6916,
+                "line_end": 7291,
+                "usage": "real :: probability,nu,quantile\nprobability=0.9; nu=5.5\n! Selected FRACTIONAL-df bisection; not the integer 7-30 branch.\ncall TPPF(probability,nu,quantile)\n! Independently evaluate TCDF at QUANTILE and assess the fixed tolerance.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Fractional-df interior-probability fragment. No quantile, symmetry, convergence or normal/Cauchy bracketing was tested."
+              },
+              {
+                "procedure": "SLATEC-derived incomplete-beta ratio with symmetry and series",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 3784,
+                "line_end": 3924
+              }
+            ]
+          },
+          {
+            "code": "L5a1f",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. FCDF and FPDF implement the central F distribution with two INTEGER degrees of freedom NU1 and NU2. FCDF uses parity-dependent finite sums for both degrees below 250; outside that range it chooses normal-transform or chi-square approximations using 100/250 cutoffs and standardized-tail clipping. The selected fragment uses small positive degrees and X>0. FPDF uses separate gamma values, degree powers and direct products, not a fully log-scaled density; moderate inputs are essential to the selected scope. It returns zero at X<=0 rather than the general boundary density limit. No real-valued degrees, noncentrality parameter, complementary CDF or log-density is exposed by these interfaces.",
+            "evidence": [
+              {
+                "path": "src/dp36.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp36.F90",
+                "sha256": "5668d749b7a29050b97bc745d14b437ff0ee9724f0fac07dd4a083c1afca1b6f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "FCDF",
+                "role": "public-entry-point",
+                "summary": "External FCDF probability distribution routine in Dataplot.",
+                "signature": "CALL FCDF(X,NU1,NU2,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 46741,
+                    "line_end": 46741
+                  },
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 46811,
+                    "line_end": 46834
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp36.F90",
+                "line_start": 46741,
+                "line_end": 47100,
+                "usage": "real :: x,cdf\ninteger :: nu1,nu2\nx=1.5; nu1=5; nu2=12\ncall FCDF(x,nu1,nu2,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Small-integer-df central-F fragment. No CDF, tail clipping or large-degree approximation was tested."
+              },
+              {
+                "procedure": "FPDF",
+                "role": "public-entry-point",
+                "summary": "External FPDF probability distribution routine in Dataplot.",
+                "signature": "CALL FPDF(X,NU1,NU2,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 51982,
+                    "line_end": 51982
+                  },
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 52036,
+                    "line_end": 52055
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp36.F90",
+                "line_start": 51982,
+                "line_end": 52120,
+                "usage": "real :: x,density\ninteger :: nu1,nu2\nx=1.5; nu1=5; nu2=12\ncall FPDF(x,nu1,nu2,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Moderate positive density fragment. No density, normalization or overflow behavior was tested."
+              },
+              {
+                "procedure": "positive-real gamma recurrence and asymptotic expansion",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 14362,
+                "line_end": 14452
+              }
+            ]
+          },
+          {
+            "code": "L5a2f",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. FPPF inverts FCDF for positive INTEGER NU1/NU2. It initializes with a log-F normal approximation, searches by doubling/halving and then bisects within a fixed [0,1e30] search range, returning the current midpoint on equality, absolute change<1e-8 or outer count>500. No convergence status/error bound is returned, and inner bracketing searches are not themselves charged against that outer count. The selected contract uses moderate integer degrees and 0<P<1; P=0 has an explicit zero return while P>=1 is rejected. Quantile quality inherits FCDF finite-sum/approximation and tail-clipping behavior; this is not an independent high-accuracy inverse-beta implementation.",
+            "evidence": [
+              {
+                "path": "src/dp36.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp36.F90",
+                "sha256": "5668d749b7a29050b97bc745d14b437ff0ee9724f0fac07dd4a083c1afca1b6f",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "FPPF",
+                "role": "public-entry-point",
+                "summary": "External FPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL FPPF(P,NU1,NU2,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 52322,
+                    "line_end": 52322
+                  },
+                  {
+                    "path": "src/dp36.F90",
+                    "line_start": 52393,
+                    "line_end": 52393
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp36.F90",
+                "line_start": 52322,
+                "line_end": 52519,
+                "usage": "real :: probability,quantile\ninteger :: nu1,nu2\nprobability=0.9; nu1=5; nu2=12\ncall FPPF(probability,nu1,nu2,quantile)\n! Reevaluate FCDF at QUANTILE; a return alone does not certify convergence.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Interior-probability small-degree fragment. No inverse round trip, bracket-limit or tail result was tested."
+              },
+              {
+                "procedure": "forward-F probability and approximation dispatch",
+                "role": "implementation-helper",
+                "path": "src/dp36.F90",
+                "line_start": 46741,
+                "line_end": 47100
+              }
+            ]
+          },
+          {
+            "code": "L5a1g",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. GAMCDF and GAMPDF implement a gamma distribution with positive REAL shape GAMMA, unit scale and zero location, not a rate/scale argument also named gamma. GAMCDF shifts the gamma normalizer argument to at least ten for a fixed asymptotic expansion, then evaluates an incomplete-gamma positive series with a 10000-term limit. Series exhaustion prints an error and returns CDF=1, which is not a successful probability certificate. GAMPDF uses a log-gamma formula but hard-clips log density below -80 to zero and above 65 to EXP(65); these cutoffs do not adapt to the promoted-real machine range. At X<=0 its PDF is returned as zero with a warning rather than a general boundary limit. DPCOMC provides D1MACH as an initialized COMMON array, not an external function. The selected sketch uses moderate shape and positive X; no geometric distribution is claimed from the grouped class label.",
+            "evidence": [
+              {
+                "path": "src/dp37.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp37.F90",
+                "sha256": "e3f20d705f6325b64d87ff1196c46fa96b997e985af77c556307b32087ede838"
+              },
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GAMCDF",
+                "role": "public-entry-point",
+                "summary": "External GAMCDF probability distribution routine in Dataplot.",
+                "signature": "CALL GAMCDF(X,GAMMA,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 1455,
+                    "line_end": 1455
+                  },
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 1519,
+                    "line_end": 1535
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp37.F90",
+                "line_start": 1455,
+                "line_end": 1620,
+                "usage": "real :: x,shape,cdf\nx=2.0; shape=2.5\ncall GAMCDF(x,shape,cdf)\n! Unit scale; this interface has no scale/rate argument.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Moderate positive shape/argument fragment. No series accuracy, tail or failure path was tested."
+              },
+              {
+                "procedure": "GAMPDF",
+                "role": "public-entry-point",
+                "summary": "External GAMPDF probability distribution routine in Dataplot.",
+                "signature": "CALL GAMPDF(X,GAMMA,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 4588,
+                    "line_end": 4588
+                  },
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 4643,
+                    "line_end": 4649
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp37.F90",
+                "line_start": 4588,
+                "line_end": 4720,
+                "usage": "real :: x,shape,density\nx=2.0; shape=2.5\ncall GAMPDF(x,shape,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Moderate positive unit-scale density; initialize D1MACH COMMON first. No density or clipping result was tested."
+              },
+              {
+                "procedure": "SLATEC-derived log-absolute-gamma dispatch, not all kernels",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 21695,
+                "line_end": 21795
+              }
+            ]
+          },
+          {
+            "code": "L5a2g",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. GAMPPF inverts the unit-scale gamma CDF for positive REAL shape. It constructs a small-probability starting estimate using an internally computed log-gamma expansion, seeks an upper bracket for at most 30000 multiples and bisects with an absolute 1e-10 midpoint-change or 100-iteration stop. The internally evaluated incomplete-gamma series has a 10000-term limit and returns PPF=0 with diagnostics on exhaustion. There is no returned convergence flag; exhausting the bracket search or bisection budget is not separately certified. Require 0<P<1, finite moderate positive shape and independent CDF-residual checks. This is a gamma quantile, not an inverse gamma-function or geometric-distribution routine.",
+            "evidence": [
+              {
+                "path": "src/dp37.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp37.F90",
+                "sha256": "e3f20d705f6325b64d87ff1196c46fa96b997e985af77c556307b32087ede838"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GAMPPF",
+                "role": "public-entry-point",
+                "summary": "External GAMPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL GAMPPF(P,GAMMA,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 4721,
+                    "line_end": 4721
+                  },
+                  {
+                    "path": "src/dp37.F90",
+                    "line_start": 4804,
+                    "line_end": 4819
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp37.F90",
+                "line_start": 4721,
+                "line_end": 5005,
+                "usage": "real :: probability,shape,quantile\nprobability=0.9; shape=2.5\ncall GAMPPF(probability,shape,quantile)\n! Unit scale: multiply by a chosen scale outside this interface.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Interior unit-scale gamma-quantile fragment. No inverse residual, bracketing or series accuracy was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a1w",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. WEICDF/WEIPDF implement unit-scale Weibull probability functions with positive REAL shape GAMMA and INTEGER MINMAX. MINMAX=1 (also zero as an alias) selects the usual nonnegative distribution, CDF=1-EXP(-X**GAMMA); MINMAX=2 selects its reflected nonpositive counterpart, CDF=EXP(-(-X)**GAMMA). The selected usage explicitly chooses 1 and X>0. The PDF formula is a direct power/exponential product; at X=0 the source returns 1 for all GAMMA<=1, which is not the infinite mathematical limit for shapes below one. CDF subtraction can lose small probabilities, and large powers can overflow before the exponential suppresses the value. Invalid MINMAX prints diagnostics and can leave PDF unassigned; validate the selector and shape yourself.",
+            "evidence": [
+              {
+                "path": "src/dp45.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp45.F90",
+                "sha256": "488e1bdb05da0fa427bbe9585a71588b154b818f16d107f92ac431d5ce891aa1",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "WEICDF",
+                "role": "public-entry-point",
+                "summary": "External WEICDF probability distribution routine in Dataplot.",
+                "signature": "CALL WEICDF(X,GAMMA,MINMAX,CDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 8575,
+                    "line_end": 8575
+                  },
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 8643,
+                    "line_end": 8643
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp45.F90",
+                "line_start": 8575,
+                "line_end": 8676,
+                "usage": "real :: x,shape,cdf\ninteger :: minmax\nx=1.25; shape=2.0; minmax=1\ncall WEICDF(x,shape,minmax,cdf)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Usual positive-support unit-scale Weibull fragment. No small-probability or reflected-distribution result was tested."
+              },
+              {
+                "procedure": "WEIPDF",
+                "role": "public-entry-point",
+                "summary": "External WEIPDF probability distribution routine in Dataplot.",
+                "signature": "CALL WEIPDF(X,GAMMA,MINMAX,PDF)",
+                "declarations": [
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 13754,
+                    "line_end": 13754
+                  },
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 13822,
+                    "line_end": 13822
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp45.F90",
+                "line_start": 13754,
+                "line_end": 13868,
+                "usage": "real :: x,shape,density\ninteger :: minmax\nx=1.25; shape=2.0; minmax=1\ncall WEIPDF(x,shape,minmax,density)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Positive interior density, with valid selector/shape. No boundary limit, normalization or overflow behavior was tested."
+              }
+            ]
+          },
+          {
+            "code": "L5a2w",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. WEIPPF uses closed-form unit-scale Weibull quantiles: [LOG(1/(1-P))]**(1/GAMMA) for MINMAX=1/0, and -[LOG(1/P)]**(1/GAMMA) for the reflected MINMAX=2 distribution. Require positive REAL shape, INTEGER selector and strictly interior probability in the selected sketch. The input check admits P=0, but the reflected formula then divides by zero; no endpoint-infinity handling is supplied. Ratios and logarithms are computed directly rather than LOG1P-based forms, so rounded endpoints and extreme-tail cancellation/overflow need separate handling. Invalid inputs print diagnostics and return zero without a status flag. Location and scale must be applied outside this interface.",
+            "evidence": [
+              {
+                "path": "src/dp45.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp45.F90",
+                "sha256": "488e1bdb05da0fa427bbe9585a71588b154b818f16d107f92ac431d5ce891aa1",
+                "source_encoding": "cp1252"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "WEIPPF",
+                "role": "public-entry-point",
+                "summary": "External WEIPPF inverse distribution routine in Dataplot.",
+                "signature": "CALL WEIPPF(P,GAMMA,MINMAX,PPF)",
+                "declarations": [
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 13869,
+                    "line_end": 13869
+                  },
+                  {
+                    "path": "src/dp45.F90",
+                    "line_start": 13948,
+                    "line_end": 13948
+                  },
+                  {
+                    "path": "src/DPCOP2.INC",
+                    "line_start": 8,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp45.F90",
+                "line_start": 13869,
+                "line_end": 13990,
+                "usage": "real :: probability,shape,quantile\ninteger :: minmax\nprobability=0.9; shape=2.0; minmax=1\nif(probability<=0.0.or.probability>=1.0) error stop \"open unit interval required\"\ncall WEIPPF(probability,shape,minmax,quantile)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Usual positive-support interior quantile. No inverse round trip, reflected endpoint or tail accuracy was tested."
+              }
+            ]
+          },
+          {
+            "code": "C7b",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. DLBETA is the bundled SLATEC-derived DOUBLE PRECISION log complete beta function for positive A/B. It branches on MIN/MAX parameter sizes: a gamma-ratio expression when both are below ten, and log-gamma/asymptotic correction plus DLNREL formulas for larger parameters. It returns LOG(BETA(A,B)), not BETA or a probability, and has no separate error estimate/status. Nonpositive input prints diagnostics and returns zero, which is also a legitimate log-beta value for some valid inputs. The review covers this public function and size-based dispatch, not every DGAMMA, D9LGMC, DLNGAM or DLNREL dependency kernel. Selected usage uses moderate positive parameters and a compatible initialized Dataplot environment.",
+            "evidence": [
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DLBETA",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION natural logarithm of the complete beta function.",
+                "signature": "VALUE = DLBETA(A,B)",
+                "declarations": [
+                  {
+                    "path": "src/dp6.F90",
+                    "line_start": 21483,
+                    "line_end": 21483
+                  },
+                  {
+                    "path": "src/dp6.F90",
+                    "line_start": 21509,
+                    "line_end": 21518
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp6.F90",
+                "line_start": 21483,
+                "line_end": 21556,
+                "usage": "double precision, external :: dlbeta\ndouble precision :: a,b,value\na=2d0; b=3d0\nif(a<=0d0.or.b<=0d0) error stop \"positive beta parameters required\"\nvalue=dlbeta(a,b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Explicit DOUBLE PRECISION function/result; do not confuse it with default-REAL distribution wrappers. No special-function value or dependency accuracy was tested."
+              },
+              {
+                "procedure": "SLATEC-derived log-absolute-gamma dispatch, not all kernels",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 21695,
+                "line_end": 21795
+              }
+            ]
+          },
+          {
+            "code": "C7f",
+            "level": "source-reviewed",
+            "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
+            "reviewed_on": "2026-11-06",
+            "notes": "Dataplot external Fortran routines, with implicit default REAL dummies except integer arguments and explicitly DOUBLE PRECISION kernel interfaces identified below. The pinned Makefile promotes default REAL to eight bytes with -fdefault-real-8 and keeps DOUBLE PRECISION eight bytes with -fdefault-double-8; match caller, common blocks and all dependencies to that build. Initialize the Dataplot output/common environment and machine-constant arrays before any SLATEC-derived helper is first called; saved FIRST-call constants make late initialization ineffective. Link required support, not just a monolithic source file. There is no general INFO/error-bound output, NaN policy or independently packaged library API. DBETAI is the bundled SLATEC-derived DOUBLE PRECISION normalized incomplete-beta ratio I_X(PIN,QIN). Inputs are X in [0,1] and positive shapes; result is a ratio, not an unregularized incomplete-beta integral. It swaps X/shapes by symmetry, combines infinite/finite series, uses logarithmic scaling and machine-small thresholds, and clamps its main result to [0,1]. The first call saves EPS/ALNEPS/SML/ALNSML from D1MACH COMMON, which must be initialized first. Invalid inputs print diagnostics and return zero with no status; saved scratch constants and Dataplot common output mean unrestricted thread-safe use is not established. Review covers the recurrence/series and normalization dispatch, not a complete SLATEC dependency audit or uniform relative-tail accuracy.",
+            "evidence": [
+              {
+                "path": "src/dp6.F90",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+                "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
+              },
+              {
+                "path": "src/DPCOP2.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOP2.INC",
+                "sha256": "fe3c551e704d25845c35066020ef2f6ae987d94fc415d0f6bd6c76d312998a45"
+              },
+              {
+                "path": "src/DPCOMC.INC",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/DPCOMC.INC",
+                "sha256": "98a38194d758d26c4b9eb959ba1e063f4d0d3eefedb23b00b90c34040f95bd04"
+              },
+              {
+                "path": "src/Makefile",
+                "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/Makefile",
+                "sha256": "a67160c55add1a05fabfa009fa83d51447e4c9f931def20a465b640833088eee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DBETAI",
+                "role": "public-entry-point",
+                "summary": "External DOUBLE PRECISION regularized incomplete-beta ratio.",
+                "signature": "VALUE = DBETAI(X,PIN,QIN)",
+                "declarations": [
+                  {
+                    "path": "src/dp6.F90",
+                    "line_start": 3784,
+                    "line_end": 3784
+                  },
+                  {
+                    "path": "src/dp6.F90",
+                    "line_start": 3818,
+                    "line_end": 3828
+                  },
+                  {
+                    "path": "src/DPCOMC.INC",
+                    "line_start": 32,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/Makefile",
+                    "line_start": 120,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/dp6.F90",
+                "line_start": 3784,
+                "line_end": 3924,
+                "usage": "double precision, external :: dbetai\ndouble precision :: x,a,b,value\n! Initialize Dataplot D1MACH/output COMMON before the FIRST call.\nx=0.4d0; a=2d0; b=3d0\nvalue=dbetai(x,a,b)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Match the pinned Dataplot ABI and initialize output/machine common state before entry. Selected moderate interior ratio. No series, symmetry, endpoint or probability error was measured."
+              },
+              {
+                "procedure": "log-beta parameter-size dispatch and dependency calls",
+                "role": "implementation-helper",
+                "path": "src/dp6.F90",
+                "line_start": 21483,
+                "line_end": 21556
+              }
+            ]
           }
         ],
         "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
@@ -48068,7 +49282,7 @@
           "spdx_expression": "NIST-PD",
           "revision": "d0355b982446af013dc22a1ca67d1ea6ca7fbe2b",
           "reviewed_on": "2026-11-06",
-          "notes": "The pinned root explicitly says Dataplot is distributed under the NIST Public Domain Notice and references https://spdx.org/licenses/NIST-PD.html; README identifies Dataplot as trademarked but not copyrighted. Selected routines retain James Filliben/NIST attribution. This scope records those notices, not a declaration that every bundled contributed algorithm, graphics backend or dependency has identical terms. Preserve separate component notices and trademarks; no complete provenance/license audit was performed.",
+          "notes": "The pinned root explicitly says Dataplot is distributed under the NIST Public Domain Notice and references https://spdx.org/licenses/NIST-PD.html; README identifies Dataplot as trademarked but not copyrighted. Selected routines retain James Filliben/NIST attribution. This scope records those notices, not a declaration that every bundled contributed algorithm, graphics backend or dependency has identical terms. Preserve separate component notices and trademarks; no complete provenance/license audit was performed. The additional distribution review identifies bundled SLATEC FNLIB-derived DBETAI, DLBETA and DLNGAM with their original author/prologue attribution. It does not infer that the NIST root notice supersedes any contributed-component terms.",
           "evidence": [
             {
               "path": "LICENSE.txt",
@@ -48096,6 +49310,11 @@
               "path": "src/dp40.F90",
               "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp40.F90",
               "sha256": "f2f64a574b1fe0a1401821aab533768c1dd8807b84fa5836389645484c89ff97"
+            },
+            {
+              "path": "src/dp6.F90",
+              "url": "https://github.com/usnistgov/dataplot/blob/d0355b982446af013dc22a1ca67d1ea6ca7fbe2b/src/dp6.F90",
+              "sha256": "9ef5ddcc40b16b289005b7251d6b974cd3a7c0d85137188fc2e932d99be37aac"
             }
           ]
         }

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 448 repositories now have 688 source-reviewed
+Reviewed on 2026-11-06. 448 repositories now have 702 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -468,7 +468,7 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ButterflyPACK | `d_BPACK_factor::d_BPACK_Factorization`, `d_BPACK_Solve_Mul::d_BPACK_Solution`, `z_BPACK_factor::z_BPACK_Factorization`, `z_BPACK_Solve_Mul::z_BPACK_Solution`, `d_BPACK_Solve_Mul::d_BPACK_Mult` | BSD-style root with additional enhancement-license clause |
 | AUTO-07p | `AE::AUTOAE`, `BVP::AUTOBV`, `MESH::ADAPT2`, `MESH::INTWTS`, `MESH::GENWTS`, `MESH::WINT` | BSD-3-Clause numerical core; optional plotting dependencies separately scoped |
 | Cedar | `BMG2_SymStd_restrict`, `BMG2_SymStd_interp_add` | BSD-3-Clause Cedar framework notices |
-| Dataplot | `MEAN`, `MEDIAN`, `SD`, `RANK`, `SORT`, `RANKCR`, `LINFIT`, `NORCDF`, `NORPDF`, `NORPPF`, `LOGCDF`, `LOGPDF`, `LOGPPF`, `LOGGAM`, `POICDF` | NIST public-domain notice for Dataplot; bundled notices retain their scope |
+| Dataplot | `MEAN`, `MEDIAN`, `SD`, `RANK`, `SORT`, `RANKCR`, `LINFIT`, `NORCDF`, `NORPDF`, `NORPPF`, `LOGCDF`, `LOGPDF`, `LOGPPF`, `LOGGAM`, `POICDF`, `BETCDF`, `BETPDF`, `BETPPF`, `CHSCDF`, `CHSPDF`, `CHSPPF`, `TCDF`, `TPDF`, `TPPF`, `FCDF`, `FPDF`, `FPPF`, `GAMCDF`, `GAMPDF`, `GAMPPF`, `WEICDF`, `WEIPDF`, `WEIPPF`, `DLBETA`, `DBETAI` | NIST public-domain notice for Dataplot; bundled notices retain their scope |
 | PFLARE | `pflare::PCRegister_PFLARE`, `pcair_shell::create_pc_air_shell`, `cf_splitting::compute_cf_splitting` | MIT PFLARE root notice |
 | ScaLAPACK | `PDGESV`, `PZGESV`, `PDPOSV`, `PZPOSV`, `PDTRTRS`, `PDGELS`, `PDSYEV`, `PZHEEV`, `PDGESVD`, `PDGBSV` | BSD-3-Clause-Open-MPI-style ScaLAPACK root notice |
 | pyOpt | `solvopt`, `SLSQP`, `COBYLA`, `NNLS`, `LSEI`, `HFTI`, `LDP`, `H12` | MIT selected solver components; LGPL-3.0-or-later pyOpt framework |
@@ -941,6 +941,7 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ScaLAPACK](https://github.com/reference-scalapack/scalapack) | D2a1; D2c1; D2b1b; D2d1b; D2a3; D9a1; D4a1; D4a3; D6; D2a2 | Distributed real/complex general and positive-definite solves, triangular/banded solves, least squares, symmetric/Hermitian eigenproblems and SVD | Collective grids/descriptors, local workspaces, rank assumptions, nonunit diagonal-scan finding and distinct banded layout. |
 | [pyOpt](https://github.com/madebr/pyopt) | G1b2; G2h3b2; G2h3b1b; G2h3b1a; D9b1; D9a1; G2e1; D1b11 | Native nonsmooth/SQP/derivative-free optimization, constrained and rank-deficient least squares, minimum-distance QP and Householder transformations | Patched callback signatures, executable workspace requirements, status/output limitations and scoped component licenses. |
 | [fastSHT](https://github.com/liuhao-cn/fastsht) | C9; J1a1; J | Associated Legendre recurrence, ringwise real FFT and scalar spherical-harmonic analysis/synthesis | Shared state, CPU/MKL packing and normalization; allocator parameter bounds mismatch; unchecked post-initialization sketches. |
+| [Dataplot: distributions and beta functions](https://github.com/usnistgov/dataplot) | L5a1b; L5a2b; L5a1c; L5a2c; L5a1t; L5a2t; L5a1f; L5a2f; L5a1g; L5a2g; L5a1w; L5a2w; C7b; C7f | Beta, chi-square, Student t, F, gamma and Weibull probability/quantile functions; complete log-beta and normalized incomplete-beta functions | Promoted-real ABI, integer versus real degrees, common initialization, fixed tolerances, clipping, boundary conventions and branch findings. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1750,3 +1751,14 @@ The fastSHT CPU scope distinguishes raw ring FFTs from full spherical
 transforms and records an allocator bounds mismatch that requires correction
 before relying on initialization. These mappings do not certify numerical
 accuracy, arbitrary parameter regimes or complete dependency licensing.
+
+Dataplot has fourteen additional source-reviewed probability and special-
+function mappings with twenty public routine annotations. These cover six
+central distribution families and their inverses, plus log-beta and the
+regularized incomplete-beta ratio. Calling sketches were not compiled or run.
+Contracts distinguish integer chi-square/F degrees from real Student t
+degrees, unit-scale gamma/Weibull families, promoted-real ABI and initialized
+machine/output common blocks. Fixed stopping tolerances, numeric error
+sentinels, support-boundary conventions, clipping and the integer 7-30 t
+quantile branch inconsistency are documented without asserting numerical
+verification. Existing reviews and scoped license evidence are retained.

@@ -900,6 +900,42 @@
       "parent": "D1b",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "L5a2b": {
+      "label": "Beta, binomial",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L5a2c": {
+      "label": "Cauchy, chi-squared",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L5a2t": {
+      "label": "t distribution",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L5a2f": {
+      "label": "F distribution",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L5a2g": {
+      "label": "Gamma, general, geometric",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L5a1w": {
+      "label": "Weibull",
+      "parent": "L5a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }
