@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 422 repositories now have 576 source-reviewed
+Reviewed on 2026-11-06. 427 repositories now have 588 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-408 repository cards now identify public routines and link their usage lines
+413 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 422 independently source-reviewed repositories now have an
+separately. All 427 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -446,6 +446,11 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | System Dynamics | `runge_kutta::rk4`, `math::akima` | MIT root notice; selected original routines reviewed |
 | PyMC 2 historical implementation | `normcdf`, `poisson`, `exponweib_ppf` | AFL-3.0 root notice; bundled components have separate terms |
 | wvdecomp | `atrouswv` | LPPL notice; version not specified |
+| octree-mg | `m_multigrid::mg_fas_fmg`, `m_multigrid::mg_fas_vcycle`, `m_vlaplacian::vlaplacian_set_methods` | No explicit grant identified for selected multigrid modules |
+| SLICOT System Identification | `MEXFUNCTION (sident gateway)` | BSD-3-Clause root notice |
+| FERRE | `lin`, `lsq::poly_fit`, `nelder_mead::minim` | No explicit project-wide grant identified |
+| HARMONIE Monitor | `calc_corr`, `contingency::acc_cont`, `contingency::ini_cont` | No explicit grant identified in selected Monitor sources |
+| SciJIT | `quadpack_wrappers::dqags_wrapper`, `quadpack_wrappers::dqagi_wrapper`, `minpack_wrappers::hybrd_wrapper` | BSD-3-Clause wrappers; bundled QUADPACK/MINPACK notices apply |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -887,6 +892,11 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [System Dynamics](https://github.com/quimbp/system_dynamics) | I1a1a; E1a | Classical RK4 stepping and cubic Akima interpolation | Actual RHS includes N, fixed time step, minimum sample count, saved interval state and component provenance. |
 | [PyMC 2 historical implementation](https://github.com/pymc-devs/pymc2) | L5a1n; L5a1p; L5a2w | Historical native normal CDF, Poisson log mass and Weibull-family quantiles | Explicit Fortran lengths, in-place CDF, tails, broadcast/zero-rate limits and saved factorial cache. |
 | [wvdecomp](https://github.com/avikhlinin/wvdecomp) | J2 | Separable dilated image convolution for adjacent smooth levels | Details require subtraction, fixed padded workspace, C float/int ABI and unversioned LPPL notice. |
+| [octree-mg](https://github.com/jannisteunissen/octree-mg) | I2b1a1a; I2b1a3 | Rectangular Poisson FAS cycles and smooth variable-coefficient elliptic operators | One-cycle semantics, coarse-grid rank restriction, coefficient setup and periodic compatibility. |
+| [SLICOT System Identification](https://github.com/slicot/slicot-systemidentification) | L10c | Subspace system-identification MATLAB MEX gateway | Processed Hankel factor input, A/C/B/D output order and external SLICOT/MATLAB ABI. |
+| [FERRE](https://github.com/callendeprieto/ferre) | E2a; E1b; G1b2 | Grid interpolation, intended weighted polynomial fit and coupled Nelder-Mead search | Shared precision/context, endpoint requirements, polynomial workspace defect and objective coupling. |
+| [HARMONIE Monitor](https://github.com/hirlam/monitor) | L4b3; L2b | Paired descriptive statistics and contingency-table tallying | Sample/population conventions, constant-series correlation and forecast-minus-observation input. |
+| [SciJIT](https://github.com/shmuel-gilbaum/scijit) | H2a1a1; H2a3a1; H2a4a1; F2 | Finite, semi-infinite and whole-line quadrature plus nonlinear-system binding | Callback ABI, workspace/status, conditional thread-private state and differing nested-call behavior. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1597,3 +1607,11 @@ minimum sample counts, explicit RHS callback shape, solver attachment/status,
 phase-bin wrapping limits and in-place coordinate normalization remain explicit.
 The DDD root MIT notice is not substituted for the bundled BQPD terms; historical
 component provenance and the unversioned wavelet license notice remain scoped.
+
+Octree-mg, FERRE, HIRLAM Monitor, SLICOT-SystemIdentification and SciJit
+have twelve additional pinned source-reviewed mappings. Calling sketches were
+not compiled or run. FERRE polynomial fitting is marked as an intended mapping
+with a suspected workspace dimension defect, rather than a checked driver.
+The SLICOT entry is a MATLAB MEX gateway; SciJit entries document native
+callback bindings without claiming independent verification of their backends.
+Cycle semantics, shared state, precision settings and component licenses remain scoped.

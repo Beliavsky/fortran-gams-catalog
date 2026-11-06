@@ -798,6 +798,48 @@
       "parent": "L5a2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "I2b1a3": {
+      "label": "Nonseparable problems",
+      "parent": "I2b1a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L4b": {
+      "label": "Two dimensional data (search also class L4c)",
+      "parent": "L4",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L4b3": {
+      "label": "Pairwise dependent data",
+      "parent": "L4b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L2b": {
+      "label": "Tally",
+      "parent": "L2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "H2a4": {
+      "label": "Infinite interval (including exp(-x^2) weight function)",
+      "parent": "H2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "H2a4a": {
+      "label": "Integrand available via user-defined procedure",
+      "parent": "H2a4",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "H2a4a1": {
+      "label": "Automatic (user need only specify required accuracy)",
+      "parent": "H2a4a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }

@@ -27574,12 +27574,193 @@
             ],
             "notes": "The README identifies elliptic/Poisson solves and explicitly restricts stencils without diagonal elements and strongly unequal grid spacing. The solver is not represented as handling arbitrary AMR stencils or anisotropy.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2b1a1a",
+            "level": "source-reviewed",
+            "revision": "677d96dd4f4bf21569d08ed9143fd2f9a8bfb740",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public FAS full-multigrid/V-cycle entries solve discretized elliptic problems on an initialized MPI tree/grid. The selected Cartesian constant-Laplacian path installs native centered box operators and Gauss-Seidel or red-black smoothers; the supplied uniform-grid driver creates a rectangular domain and a manufactured Poisson problem. A cycle restricts data/coarse RHS, relaxes the coarse grid, prolongs corrections and smooths upward. One call performs a cycle, not an automatic globally tolerance-driven solve. MAX_RES optionally reduces maximum residual magnitudes across ranks; callers must repeat/check cycles and assess discretization error separately. Fully periodic constant-Laplacian setup removes mean RHS/solution to address compatibility/gauge. The coarse level must reside on one rank in the reviewed cycle implementation; unsupported geometries/smoothers/configurations can ERROR STOP. Review covers selected native dispatch, cycles and constant operator, not every AMR refinement or boundary case.",
+            "evidence": [
+              {
+                "path": "src/m_multigrid.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_multigrid.f90",
+                "sha256": "79cdc7e6076f7c9cf8d10286b3eeef9b1e2e83b2e6b3b11575225f3093188aec"
+              },
+              {
+                "path": "src/m_laplacian.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_laplacian.f90",
+                "sha256": "2082dcdcf154e4c1d8316bdc84fdb2cb8f4700b89a6a62bd4aad130dee6371fd"
+              },
+              {
+                "path": "src/m_data_structures.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_data_structures.f90",
+                "sha256": "d7d0317c1b378146ef1d062858cd1403c6d619744e23d72412bbf88dbae4587f"
+              },
+              {
+                "path": "src/m_octree_mg.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_octree_mg.f90",
+                "sha256": "0159f06a5873b727ac2e12f306182b59cd45adbe7704450d51ee7fbf334e7ad6"
+              },
+              {
+                "path": "tests/test_uniform_grid.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/tests/test_uniform_grid.f90",
+                "sha256": "b264d0029c0d5b92175af5fff0dca6d4e5ffaa943c41fbf3abc439c1422d9c20"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mg_fas_fmg",
+                "role": "public-entry-point",
+                "summary": "Public FAS full-multigrid cycle on an initialized distributed Poisson problem.",
+                "signature": "CALL mg_fas_fmg(MG,HAVE_GUESS[,MAX_RES])",
+                "declarations": [
+                  {
+                    "path": "src/m_multigrid.f90",
+                    "line_start": 84,
+                    "line_end": 88
+                  }
+                ],
+                "path": "src/m_multigrid.f90",
+                "line_start": 84,
+                "line_end": 147,
+                "module": "m_multigrid",
+                "examples": [
+                  {
+                    "path": "tests/test_uniform_grid.f90",
+                    "line_start": 62,
+                    "line_end": 104
+                  }
+                ],
+                "usage": "use m_octree_mg, only: mg_t,dp,mg_fas_fmg\ntype(mg_t) :: mg\nreal(dp) :: residual\n! First initialize MPI, tree storage/distribution, operator/smoother methods,\n! physical boundaries, RHS and ghost-cell data as in the supplied uniform-grid driver.\ncall mg_fas_fmg(mg,.false.,residual)\n! Repeat cycles with HAVE_GUESS=.true. as required and inspect residual/error.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup collective fragment. The source is preprocessed for the selected dimension and requires the full matching MPI/module graph. One cycle or a small residual alone does not certify PDE solution accuracy. No grid, cycle, MPI reduction or convergence order was run."
+              },
+              {
+                "procedure": "mg_fas_vcycle",
+                "role": "public-entry-point",
+                "summary": "Public single FAS V-cycle with optional level selection and maximum residual output.",
+                "signature": "CALL mg_fas_vcycle(MG[,HIGHEST_LVL,MAX_RES,STANDALONE])",
+                "declarations": [
+                  {
+                    "path": "src/m_multigrid.f90",
+                    "line_start": 150,
+                    "line_end": 159
+                  }
+                ],
+                "path": "src/m_multigrid.f90",
+                "line_start": 150,
+                "line_end": 243,
+                "module": "m_multigrid"
+              },
+              {
+                "procedure": "laplacian_set_methods",
+                "role": "implementation-helper",
+                "path": "src/m_laplacian.f90",
+                "line_start": 13,
+                "line_end": 33
+              },
+              {
+                "procedure": "Cartesian centered Laplacian",
+                "role": "implementation-helper",
+                "path": "src/m_laplacian.f90",
+                "line_start": 163,
+                "line_end": 191
+              }
+            ]
+          },
+          {
+            "code": "I2b1a3",
+            "level": "source-reviewed",
+            "revision": "677d96dd4f4bf21569d08ed9143fd2f9a8bfb740",
+            "reviewed_on": "2026-11-06",
+            "notes": "The native variable-Laplacian methods implement a Cartesian divergence-form elliptic operator with a smoothly varying cell-centered coefficient. Neighbor coupling uses harmonic face coefficients 2*a0*a_neighbor/(a0+a_neighbor) divided by squared grid spacings, supporting a nonseparable second-order linear elliptic mapping. VLAPLACIAN_SET_METHODS reserves coefficient storage, configures coefficient ghost boundaries and installs the native box operator/smoother for FAS cycles. Supply finite positive coefficients and valid initialized ghost values; zero/opposite-sign neighboring coefficients can make harmonic denominators singular and ellipticity is not checked. The method explicitly disables the constant-Laplacian mean-subtraction flag, so periodic/nullspace compatibility must not be assumed to be handled identically. Geometry/smoother restrictions and collective cycle prerequisites remain. This review records the selected smooth variable-coefficient implementation, not discontinuous-material accuracy, a general anisotropic tensor operator or automatic convergence.",
+            "evidence": [
+              {
+                "path": "src/m_vlaplacian.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_vlaplacian.f90",
+                "sha256": "b2a3576e0ec28c3920e2a331045d98032885847a340ecb75c892d76930d04f9e"
+              },
+              {
+                "path": "src/m_multigrid.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_multigrid.f90",
+                "sha256": "79cdc7e6076f7c9cf8d10286b3eeef9b1e2e83b2e6b3b11575225f3093188aec"
+              },
+              {
+                "path": "src/m_data_structures.f90",
+                "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_data_structures.f90",
+                "sha256": "d7d0317c1b378146ef1d062858cd1403c6d619744e23d72412bbf88dbae4587f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "vlaplacian_set_methods",
+                "role": "public-entry-point",
+                "summary": "Public variable-coefficient operator/smoother setup; configure before allocating a complete solve context.",
+                "signature": "CALL vlaplacian_set_methods(MG)",
+                "declarations": [
+                  {
+                    "path": "src/m_vlaplacian.f90",
+                    "line_start": 14,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/m_vlaplacian.f90",
+                "line_start": 14,
+                "line_end": 48,
+                "module": "m_vlaplacian",
+                "usage": "use m_vlaplacian, only: vlaplacian_set_methods\nuse m_multigrid, only: mg_fas_vcycle\n! MG is a configured Cartesian multigrid object with supported smoother.\n! Reserve coefficient storage before allocation, then initialize tree/positive\n! coefficient values and all problem/ghost data before the collective cycle.\ncall vlaplacian_set_methods(mg)\n! ... complete allocation, coefficients, boundary and RHS initialization ...\ncall mg_fas_vcycle(mg,max_res=residual)\n! Check compatibility, residual and the variable-coefficient PDE independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Setup/cycle contract fragment; the setter itself does not solve a PDE. Use the matching dimension/precision build and positive smooth coefficient data. No variable-coefficient stencil, interface condition or periodic solve was tested."
+              },
+              {
+                "procedure": "variable-coefficient 3D box operator",
+                "role": "implementation-helper",
+                "path": "src/m_vlaplacian.f90",
+                "line_start": 169,
+                "line_end": 189
+              },
+              {
+                "procedure": "harmonic-face smoother coefficients",
+                "role": "implementation-helper",
+                "path": "src/m_vlaplacian.f90",
+                "line_start": 75,
+                "line_end": 86
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit grant identified for selected multigrid modules",
+          "spdx_expression": null,
+          "revision": "677d96dd4f4bf21569d08ed9143fd2f9a8bfb740",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned tree has no root LICENSE/COPYING file and no explicit grant was identified in the reviewed README/native multigrid modules. The separate poisson_3d_fft component has its own COPYING file; do not apply that component notice to the whole distribution.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/README.md",
+              "sha256": "bcf68117f0cf9d583cb23f5834e7c89b456ee6ecebc2bca81742468a277d6cf9"
+            },
+            {
+              "path": "src/m_multigrid.f90",
+              "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_multigrid.f90",
+              "sha256": "79cdc7e6076f7c9cf8d10286b3eeef9b1e2e83b2e6b3b11575225f3093188aec"
+            },
+            {
+              "path": "src/m_laplacian.f90",
+              "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_laplacian.f90",
+              "sha256": "2082dcdcf154e4c1d8316bdc84fdb2cb8f4700b89a6a62bd4aad130dee6371fd"
+            },
+            {
+              "path": "src/m_vlaplacian.f90",
+              "url": "https://github.com/jannisteunissen/octree-mg/blob/677d96dd4f4bf21569d08ed9143fd2f9a8bfb740/src/m_vlaplacian.f90",
+              "sha256": "b2a3576e0ec28c3920e2a331045d98032885847a340ecb75c892d76930d04f9e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29738,12 +29919,101 @@
             ],
             "notes": "The README documents MOESP/N4SID-related methods and specialized nonlinear fitting, with MATLAB/Control System Toolbox requirements for its MATLAB workflow. No general current-platform or every-interface compatibility is claimed.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10c",
+            "level": "source-reviewed",
+            "revision": "947f1c5edd3f9455577c3ac3505bdc0caa13e042",
+            "reviewed_on": "2026-11-06",
+            "notes": "The SIDENT MATLAB-facing Fortran MEX gateway obtains a discrete-time multivariable state-space realization from a preprocessed block-Hankel R factor and a chosen model order. It translates MOESP/N4SID/combined method and job selectors, allocates workspaces and dispatches the external SLICOT IB01BD implementation. Optional sample-count inputs enable covariance/Kalman-gain output paths. This is multivariate time-series system identification, not direct identification from arbitrary raw data passed as R or a Kalman filtering run. The chosen order, input/output counts, preprocessing method and factor layout must match; requested output ordering depends on the job. Review covers gateway declarations/validation/dispatch/status and supplied MATLAB usage, not an audit of the separately linked numerical solver. MATLAB MEX pointer/integer ABI and the complete SLICOT/BLAS/LAPACK build must match; this gateway is not a direct Fortran numerical CALL interface.",
+            "evidence": [
+              {
+                "path": "mex_src/sident.f",
+                "url": "https://github.com/SLICOT/SLICOT-SystemIdentification/blob/947f1c5edd3f9455577c3ac3505bdc0caa13e042/mex_src/sident.f",
+                "sha256": "0edf1c8f99912bc7cb7e9a8d54554a16c71ef0896531e68db71d435522de8fe6"
+              },
+              {
+                "path": "sident.m",
+                "url": "https://github.com/SLICOT/SLICOT-SystemIdentification/blob/947f1c5edd3f9455577c3ac3505bdc0caa13e042/sident.m",
+                "sha256": "d4f2f20fcf42d4d8483f82befefd21992e1f2267c49386fcabf8d88a9708fb0d"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/SLICOT/SLICOT-SystemIdentification/blob/947f1c5edd3f9455577c3ac3505bdc0caa13e042/README.md",
+                "sha256": "d0b40d6112e4bab095343dc3f959e57c2c94226b4496d454155c5de86b406550"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "MEXFUNCTION (sident gateway)",
+                "role": "public-entry-point",
+                "summary": "Fortran MEX entry exposed to MATLAB as sident, forwarding subspace realization to IB01BD.",
+                "signature": "[A,C,B,D] = sident(METH,JOB,S,N,L,R)",
+                "declarations": [
+                  {
+                    "path": "mex_src/sident.f",
+                    "line_start": 19,
+                    "line_end": 65
+                  },
+                  {
+                    "path": "mex_src/sident.f",
+                    "line_start": 90,
+                    "line_end": 116
+                  }
+                ],
+                "path": "mex_src/sident.f",
+                "line_start": 90,
+                "line_end": 124,
+                "usage": "% MATLAB-side calling fragment after compiling/installing the matching MEX toolbox:\n% R is the correctly preprocessed factor from the matching identification workflow;\n% S/N/L are consistent block-row count, model order and number of outputs.\n[A,C,B,D] = sident(1,1,S,N,L,R);\n% This selects MOESP and all system matrices; validate against held-out data.\n% This is not CALL SIDENT from a standalone Fortran program.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. MATLAB gateway fragment, with numerical work delegated to the linked SLICOT version. Backend INFO produces a MEX error; warning display is optional and must not be treated as validation evidence. No MEX build, factor construction, identification, covariance or Kalman-gain result was run."
+              },
+              {
+                "procedure": "IB01BD dispatch",
+                "role": "implementation-helper",
+                "path": "mex_src/sident.f",
+                "line_start": 465,
+                "line_end": 477
+              },
+              {
+                "procedure": "MATLAB output ordering",
+                "role": "implementation-helper",
+                "path": "mex_src/sident.f",
+                "line_start": 480,
+                "line_end": 537
+              },
+              {
+                "procedure": "MEX error/warning propagation",
+                "role": "implementation-helper",
+                "path": "mex_src/sident.f",
+                "line_start": 546,
+                "line_end": 554
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root notice",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "947f1c5edd3f9455577c3ac3505bdc0caa13e042",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root contains BSD-3-Clause terms for this toolbox distribution and the gateway retains SLICOT/NICONET contributor attribution. The separately linked SLICOT reference library, MATLAB/MEX runtime and numerical dependencies retain their own notices; this is not a complete dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/SLICOT/SLICOT-SystemIdentification/blob/947f1c5edd3f9455577c3ac3505bdc0caa13e042/LICENSE",
+              "sha256": "d5f796f1075cb6ffa4d9dd839a4297933ab37875913a82b37ce84d618b4058a2"
+            },
+            {
+              "path": "mex_src/sident.f",
+              "url": "https://github.com/SLICOT/SLICOT-SystemIdentification/blob/947f1c5edd3f9455577c3ac3505bdc0caa13e042/mex_src/sident.f",
+              "sha256": "0edf1c8f99912bc7cb7e9a8d54554a16c71ef0896531e68db71d435522de8fe6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -34242,12 +34512,234 @@
             ],
             "notes": "The README requires model predictions supplied as an array and describes covariance outputs. Validity of inferred parameter errors and coverage outside the supplied model grid are not established.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "f50a006677deafb1a5f9f80b34c89e2e091febf1",
+            "reviewed_on": "2026-11-06",
+            "notes": "LIN performs multilinear interpolation of vector-valued responses on a tensor-product parameter grid. It converts normalized parameter coordinates into grid indices, loads 2**NDIM neighboring response vectors from the shared in-memory array or direct-access file and repeatedly interpolates along configured parameter axes. This supports multivariate gridded interpolation, not scattered interpolation or a fit of model parameters. The short routine depends on fully initialized SHARE dimensions, strides, axis/order maps and grid/file data. It has no local clipping or endpoint correction: at p=1 its corner indexing can request a neighbor past the final grid cell, so callers must follow the enclosing package coordinate conventions and verify boundaries. The scratch response array grows exponentially with dimension. SHARE sets DP=SELECTED_REAL_KIND(6) in this pin, despite historical double-precision comments elsewhere; use the actual module kind. No shape/range/status validation is returned by LIN.",
+            "evidence": [
+              {
+                "path": "src/lin.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/lin.f90",
+                "sha256": "8bf0f1f1ccb993d2e57639c118733ab21194ac2b79fdb41eb1e6180727528d31"
+              },
+              {
+                "path": "src/share.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/share.f90",
+                "sha256": "8a6be02e16e3f5e7bf84c6114de5e9162c87e116ff9dd8e9c310da55e4eb331a"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/README.md",
+                "sha256": "8dc53f48b368ea1e6baf599fd53f0d86f3ae7226930e78585e03016e64f39f1c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lin",
+                "role": "public-entry-point",
+                "summary": "External grid interpolation routine coupled to FERRE shared state and response storage.",
+                "signature": "CALL lin(P,FLUX)",
+                "declarations": [
+                  {
+                    "path": "src/lin.f90",
+                    "line_start": 8,
+                    "line_end": 23
+                  },
+                  {
+                    "path": "src/share.f90",
+                    "line_start": 9,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lin.f90",
+                "line_start": 4,
+                "line_end": 77,
+                "usage": "use share, only: dp,ndim,npix\n! After initializing all FERRE grid dimensions, strides, corner maps and response storage:\n! P(NDIM) and FLUX(NPIX) use REAL(DP), with safe interior normalized parameters.\ncall lin(p,flux)\n! Verify corner indexing and parameter endpoints independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization internal-package calling fragment. Do not treat LIN as an independent general-array interpolation API or infer double precision from DP naming. No interpolation, grid boundary or direct-access file path was run."
+              },
+              {
+                "procedure": "LIN grid/corner indexing",
+                "role": "implementation-helper",
+                "path": "src/lin.f90",
+                "line_start": 30,
+                "line_end": 55
+              },
+              {
+                "procedure": "LIN axis interpolation",
+                "role": "implementation-helper",
+                "path": "src/lin.f90",
+                "line_start": 58,
+                "line_end": 71
+              }
+            ]
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "f50a006677deafb1a5f9f80b34c89e2e091febf1",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public POLY_FIT wrapper forms powers of input abscissae and inverse-variance weights, then dispatches the bundled incremental least-squares factorization and coefficient backsolve for a polynomial approximation. Nonpositive uncertainty values are given zero weight. The intended polynomial-fitting mapping is supported by this construction and the native factorization/backsolve components, but the wrapper has an important dimension mismatch: XROW has N+1 entries, while STARTUP(N+1,.TRUE.) sets NCOL=N+2 and INCLUD loops through NCOL. This can access beyond XROW and must be repaired/validated before relying on results. INFO from SING is subsequently overwritten by REGCF, so it is not a complete record of every intermediate issue. Saved module factorization arrays also make independent concurrent fits unsafe. DP is imported from SHARE and requests six decimal digits at this pin; power-basis conditioning and uncertainty interpretations are not verified.",
+            "evidence": [
+              {
+                "path": "src/lsq.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/lsq.f90",
+                "sha256": "01b331556986c4a167a5cae735eb1867af783dbccb7c050a9c23b4fbbcbb7d8d"
+              },
+              {
+                "path": "src/share.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/share.f90",
+                "sha256": "8a6be02e16e3f5e7bf84c6114de5e9162c87e116ff9dd8e9c310da55e4eb331a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poly_fit",
+                "role": "public-entry-point",
+                "summary": "Public intended weighted polynomial-fit wrapper with a recorded startup/row-size mismatch.",
+                "signature": "CALL poly_fit(X,Y,S,M,N,A,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/lsq.f90",
+                    "line_start": 128,
+                    "line_end": 143
+                  },
+                  {
+                    "path": "src/lsq.f90",
+                    "line_start": 109,
+                    "line_end": 110
+                  }
+                ],
+                "path": "src/lsq.f90",
+                "line_start": 121,
+                "line_end": 164,
+                "module": "lsq",
+                "usage": "! Contract fragment only: repair/validate the STARTUP/XROW column-count mismatch first.\n! X/Y/S have M entries; N is polynomial degree, A has N+1 coefficients.\n! All real arguments use SHARE%DP (SELECTED_REAL_KIND(6) at this pin).\n! After repair and matching setup:\n!   call poly_fit(x,y,s,m,n,a,info)\n! Inspect rank/status, weights and polynomial residuals independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is an identified source interface, not a recommended working driver. The dimension mismatch and status-overwrite finding require attention; no polynomial fit, rank decision or uncertainty estimate was run."
+              },
+              {
+                "procedure": "startup adds the constant column",
+                "role": "implementation-helper",
+                "path": "src/lsq.f90",
+                "line_start": 167,
+                "line_end": 195
+              },
+              {
+                "procedure": "includ row traversal",
+                "role": "implementation-helper",
+                "path": "src/lsq.f90",
+                "line_start": 245,
+                "line_end": 278
+              }
+            ]
+          },
+          {
+            "code": "G1b2",
+            "level": "source-reviewed",
+            "revision": "f50a006677deafb1a5f9f80b34c89e2e091febf1",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public MINIM routine implements an adapted Nelder-Mead simplex search for FERRE model matching. It creates a simplex from nonzero parameter steps, evaluates the package OBJFUN, and applies reflection, expansion and contraction/shrink logic without requiring user derivatives or a smoothness test. G1b2 records this local general-function minimization scope, not a global optimizer. This adaptation is coupled to SHARE and model/observation arrays: FUNC is the returned objective value, not a callback argument, despite older generic FUNCTN comments. NOP, the active parameter mapping and all array/module dimensions must agree. Stopping uses dispersion of simplex objective values at configured intervals; small dispersion alone does not establish stationarity or parameter error. IFAULT distinguishes the documented budget/input/quadratic-fit reasons, and VAR is only meaningful when the optional quadratic-surface calculation actually defines it. Review covers the adapted entry, native simplex decisions and package objective dispatch, not all covariance or model-processing dependencies.",
+            "evidence": [
+              {
+                "path": "src/nelder_mead.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/nelder_mead.f90",
+                "sha256": "bdd634e3510b36649c2b78a4b1974e8397ffd3fbaecfb7a8ffa1fc4df9747802"
+              },
+              {
+                "path": "src/fun.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/fun.f90",
+                "sha256": "1f812052947bfed0068a01569cd71f9dd44c26a5f4f0f2172a51fa1e5257ab23"
+              },
+              {
+                "path": "src/share.f90",
+                "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/share.f90",
+                "sha256": "8a6be02e16e3f5e7bf84c6114de5e9162c87e116ff9dd8e9c310da55e4eb331a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "minim",
+                "role": "public-entry-point",
+                "summary": "Public FERRE-coupled derivative-free simplex minimization entry; FUNC is an output scalar.",
+                "signature": "CALL minim(W,CHISCALE,PF,PF0,OBS,LAMBDA_OBS,E_OBS,MOBS,LSFARR, &\n P,STEP,NOP,FUNC,MAXFN,IPRINT,STOPCR,NLOOP,IQUAD,SIMP,VAR,IFAULT)",
+                "declarations": [
+                  {
+                    "path": "src/nelder_mead.f90",
+                    "line_start": 91,
+                    "line_end": 104
+                  },
+                  {
+                    "path": "src/nelder_mead.f90",
+                    "line_start": 74,
+                    "line_end": 84
+                  }
+                ],
+                "path": "src/nelder_mead.f90",
+                "line_start": 14,
+                "line_end": 16,
+                "module": "nelder_mead",
+                "usage": "use nelder_mead, only: minim\n! First initialize FERRE shared grid/model state, parameter mapping, observations\n! and every array in the linked declarations, using the actual SHARE DP kind.\ncall minim(w,chiscale,pf,pf0,obs,lambda_obs,e_obs,mobs,lsfarr, &\n p,step,nop,func,maxfn,iprint,stopcr,nloop,iquad,simp,var,ifault)\nif(ifault/=0) error stop \"inspect FERRE simplex termination diagnostics\"\n! Check objective/parameter behavior independently; VAR may be undefined without fitting.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup package-entry fragment rather than an arbitrary objective callback API. Keep array lengths equal to the configured parameter counts, and do not interpret simplex dispersion as a certified optimum. No model match, simplex iteration or quadratic covariance fit was tested."
+              },
+              {
+                "procedure": "FERRE simplex setup",
+                "role": "implementation-helper",
+                "path": "src/nelder_mead.f90",
+                "line_start": 132,
+                "line_end": 161
+              },
+              {
+                "procedure": "reflection and expansion",
+                "role": "implementation-helper",
+                "path": "src/nelder_mead.f90",
+                "line_start": 195,
+                "line_end": 237
+              },
+              {
+                "procedure": "package objfun interface",
+                "role": "implementation-helper",
+                "path": "src/fun.f90",
+                "line_start": 12,
+                "line_end": 29
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit project-wide grant identified",
+          "spdx_expression": null,
+          "revision": "f50a006677deafb1a5f9f80b34c89e2e091febf1",
+          "reviewed_on": "2026-11-06",
+          "notes": "No separately named root LICENSE/COPYING or explicit project-wide permission grant was identified in the reviewed README/manual/selected routines. Historical algorithm contributors and modifications are retained in source. Descriptive provenance is not by itself a redistribution grant for this combined code.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/README.md",
+              "sha256": "8dc53f48b368ea1e6baf599fd53f0d86f3ae7226930e78585e03016e64f39f1c"
+            },
+            {
+              "path": "docs/ferre.tex",
+              "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/docs/ferre.tex",
+              "sha256": "841cf075f31cddc729753a65bc44464ee7a4a11aca27af14c1425796b4a7de62"
+            },
+            {
+              "path": "src/lsq.f90",
+              "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/lsq.f90",
+              "sha256": "01b331556986c4a167a5cae735eb1867af783dbccb7c050a9c23b4fbbcbb7d8d"
+            },
+            {
+              "path": "src/nelder_mead.f90",
+              "url": "https://github.com/callendeprieto/ferre/blob/f50a006677deafb1a5f9f80b34c89e2e091febf1/src/nelder_mead.f90",
+              "sha256": "bdd634e3510b36649c2b78a4b1974e8397ffd3fbaecfb7a8ffa1fc4df9747802"
+            }
+          ]
         }
       },
       "imports": {}
@@ -60868,12 +61360,132 @@
             ],
             "notes": "The documentation overview describes scores, matched model/observation samples and web presentation. It says station-based verification is less suitable for moving platforms or fields; it evaluates predictions rather than generating a weather forecast.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4b3",
+            "level": "source-reviewed",
+            "revision": "a9bef907e570e4b18e0eca412aeba3f1e51b6cc3",
+            "reviewed_on": "2026-11-06",
+            "notes": "CALC_CORR computes descriptive statistics for paired observations: both means/sample standard deviations, signed bias Ymean-Xmean, RMSE, centered population-scale difference spread and Pearson correlation. This supports elementary analysis of paired data; it does not compute a significance test, confidence interval or distribution model. The native routine uses default-real one-pass sums, so cancellation can affect nearly constant/large-offset data. Require NOBS>1 and finite prefiltered pairs because no missing-value or small-sample checks are performed. Constant-series correlation remains the initialized zero rather than returning a distinct undefined-correlation status. ABS under square roots masks negative roundoff terms, and the standard-deviation and centered-error denominators are not the same. Review covers the complete short calculation, not forecast-verification inference or numerical stability by execution.",
+            "evidence": [
+              {
+                "path": "src/calc_corr.f90",
+                "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/src/calc_corr.f90",
+                "sha256": "c40c658d313ebbeab8c312fe31f591770909e24f77479d6ce7919789fc8a3db3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calc_corr",
+                "role": "public-entry-point",
+                "summary": "External paired descriptive statistics with default-real arrays and no status output.",
+                "signature": "CALL calc_corr(NOBS,XVAL,YVAL,XMEAN,YMEAN,STDEVX,STDEVY,BIAS,RMSE,STDV,CORR)",
+                "declarations": [
+                  {
+                    "path": "src/calc_corr.f90",
+                    "line_start": 1,
+                    "line_end": 18
+                  }
+                ],
+                "path": "src/calc_corr.f90",
+                "line_start": 1,
+                "line_end": 73,
+                "usage": "real :: x(3),y(3),xm,ym,sx,sy,bias,rmse,spread,corr\nx=[1.,2.,3.]; y=[1.2,1.8,3.1]\ncall calc_corr(3,x,y,xm,ym,sx,sy,bias,rmse,spread,corr)\nprint *,bias,rmse,corr\n! Require more than one finite pair; handle constant-series correlation explicitly.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default REAL contract; preserve the documented bias direction and denominator conventions. A returned zero correlation is not necessarily evidence of no association. No statistic, cancellation or missing-data path was tested."
+              }
+            ]
+          },
+          {
+            "code": "L2b",
+            "level": "source-reviewed",
+            "revision": "a9bef907e570e4b18e0eca412aeba3f1e51b6cc3",
+            "reviewed_on": "2026-11-06",
+            "notes": "INI_CONT configures thresholds and ACC_CONT tallies observation/forecast category pairs for each experiment. The native loops use strict greater-than threshold comparisons, with categories numbered zero through NCLASS, so an observation equal to a threshold remains in the lower category. The input scatter layout stores observations in row one and forecast-minus-observation differences in later rows; ACC_CONT adds the observation back before classifying each forecast. It resets the count table on each call rather than accumulating successive batches. Supply initialized pointer-backed SCATTER_TYPE arrays, increasing thresholds, valid parameter indices and compatible experiment/table dimensions. The shared module state is not independent per caller. This is contingency-table construction L2b, not a score calculation, categorical hypothesis test or probability estimate.",
+            "evidence": [
+              {
+                "path": "mod/module_contingency.f90",
+                "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/mod/module_contingency.f90",
+                "sha256": "f6c6de6a948f233277d132b6c73dd486675e74b0149d5b6ea4fe13c4de4487a1"
+              },
+              {
+                "path": "mod/module_types.f90",
+                "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/mod/module_types.f90",
+                "sha256": "44199dbafd5b3c0148ba03bd148cf5ad80b8721f9d353b2e11508dd506d8218b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "acc_cont",
+                "role": "public-entry-point",
+                "summary": "Public threshold-category contingency tally for initialized Monitor scatter records.",
+                "signature": "CALL acc_cont(NEXP,NPARVER,DAT)",
+                "declarations": [
+                  {
+                    "path": "mod/module_contingency.f90",
+                    "line_start": 124,
+                    "line_end": 135
+                  },
+                  {
+                    "path": "mod/module_types.f90",
+                    "line_start": 66,
+                    "line_end": 70
+                  }
+                ],
+                "path": "mod/module_contingency.f90",
+                "line_start": 124,
+                "line_end": 179,
+                "module": "contingency",
+                "usage": "use types, only: scatter_type\nuse contingency, only: ini_cont,acc_cont,cont_table\ntype(scatter_type) :: dat(1)\ncall ini_cont(1,2,1,[2],1,[1],reshape([0.,1.],[2,1]))\ndat(1)%n=3; allocate(dat(1)%dat(2,3))\ndat(1)%dat(1,:)=[-0.5,0.5,1.5] ! Observations.\ndat(1)%dat(2,:)=[0.1,-0.1,0.2] ! Forecast minus observation.\ncall acc_cont(1,1,dat)\nprint *,cont_table(1)%table\n! Each ACC_CONT call starts a fresh table.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use matching Monitor TYPES/CONTINGENCY modules and valid pointer lifetimes; follow package cleanup when done. Threshold equality, forecast reconstruction and per-call reset are part of the contract. No counts, table dimensions or forecast scores were run."
+              },
+              {
+                "procedure": "ini_cont",
+                "role": "public-entry-point",
+                "summary": "Public shared contingency-threshold/table initialization.",
+                "signature": "CALL ini_cont(NEXP,MCLASS,MPARAM,CLASSES,NPARAM,INDICES,LIMITS)",
+                "declarations": [
+                  {
+                    "path": "mod/module_contingency.f90",
+                    "line_start": 68,
+                    "line_end": 82
+                  }
+                ],
+                "path": "mod/module_contingency.f90",
+                "line_start": 68,
+                "line_end": 118,
+                "module": "contingency"
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit grant identified in selected Monitor sources",
+          "spdx_expression": null,
+          "revision": "a9bef907e570e4b18e0eca412aeba3f1e51b6cc3",
+          "reviewed_on": "2026-11-06",
+          "notes": "No separately named LICENSE/COPYING file was identified in the pinned tree. The reviewed README and statistical/tally routines contain attribution but no explicit permission grant; public availability does not establish redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/README.md",
+              "sha256": "6a10a3d631047d4fe033527ccd8759b01e8b76386f7402dabe0b2b40dcb1047c"
+            },
+            {
+              "path": "src/calc_corr.f90",
+              "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/src/calc_corr.f90",
+              "sha256": "c40c658d313ebbeab8c312fe31f591770909e24f77479d6ce7919789fc8a3db3"
+            },
+            {
+              "path": "mod/module_contingency.f90",
+              "url": "https://github.com/Hirlam/Monitor/blob/a9bef907e570e4b18e0eca412aeba3f1e51b6cc3/mod/module_contingency.f90",
+              "sha256": "f6c6de6a948f233277d132b6c73dd486675e74b0149d5b6ea4fe13c4de4487a1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -64413,12 +65025,236 @@
             ],
             "notes": "The README identifies interpolate/optimize/integrate subpackages and explicitly says not all SciPy functionality is mirrored. It distinguishes Fortran wrappers from njit reimplementations; SciPy agreement and speed claims were not reproduced.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2a1a1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "The reviewed binding converts a C function pointer to a module callback adapter and forwards arrays/controls to the bundled modern QUADPACK implementation. Integrands return C_DOUBLE and accept x by value plus an args-array pointer. Workspaces, callback/args lifetimes, compatible C_INT/default-integer and C_DOUBLE/native-real ABI and valid tolerances remain caller responsibilities. The implementation saves/restores callback slots around the call; OpenMP threadprivate directives only provide separate thread state when compiled with OpenMP. This is a source review of the binding/dispatch, not a new audit or numerical validation of QUADPACK or a guarantee of nested backend reentrancy. DQAGS_WRAPPER exposes finite-interval adaptive quadrature with error estimation/extrapolation. RESULT is the integral approximation; ABSERR is an estimated absolute error, NEVAL counts evaluations, IER is the solver status and LAST describes the used partition. IWORK has LIMIT entries and WORK has 4*LIMIT entries. Endpoint/interior difficulty and invalid inputs can return nonzero IER; a small estimated error is not a rigorous bound.",
+            "evidence": [
+              {
+                "path": "src/quadpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/quadpack/wrappers.f90",
+                "sha256": "261ae076a0c2d06dca88ef02612fc8a4c5847c1857b169207b89997959cb8ed6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqags_wrapper",
+                "role": "public-entry-point",
+                "summary": "Public C-interoperable finite-interval QUADPACK binding with explicit work and partition outputs.",
+                "signature": "CALL dqags_wrapper(CFCN,A,B,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER, &\n LIMIT,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 64,
+                    "line_end": 79
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 64,
+                "line_end": 89,
+                "module": "quadpack_wrappers",
+                "usage": "use iso_c_binding\nuse quadpack_wrappers, only: dqags_wrapper\ninteger(c_int),parameter :: limit=100\ninteger(c_int) :: iwork(limit),neval,ier,last\nreal(c_double) :: work(4*limit),args(1),result,abserr\ntype(c_funptr) :: fptr\n! FPTR is a valid C_FUNLOC callback: real(c_double) function f(x,args) bind(c),\n! with X passed VALUE and ARGS(*) passed by reference. Initialize it first.\nargs=0._c_double\ncall dqags_wrapper(fptr,0._c_double,1._c_double,1.e-8_c_double, &\n 1.e-8_c_double,result,abserr,neval,ier,limit,iwork,work,args,1_c_int,last)\nif(ier/=0) error stop \"inspect QUADPACK diagnostics\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-callback-setup fragment. Match pointer lifetimes/ABI and inspect status, integrand behavior and estimated error independently. No finite integral, callback execution, thread or nesting behavior was tested."
+              },
+              {
+                "procedure": "f_adapter",
+                "role": "implementation-helper",
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 49,
+                "line_end": 55
+              }
+            ]
+          },
+          {
+            "code": "H2a3a1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "The reviewed binding converts a C function pointer to a module callback adapter and forwards arrays/controls to the bundled modern QUADPACK implementation. Integrands return C_DOUBLE and accept x by value plus an args-array pointer. Workspaces, callback/args lifetimes, compatible C_INT/default-integer and C_DOUBLE/native-real ABI and valid tolerances remain caller responsibilities. The implementation saves/restores callback slots around the call; OpenMP threadprivate directives only provide separate thread state when compiled with OpenMP. This is a source review of the binding/dispatch, not a new audit or numerical validation of QUADPACK or a guarantee of nested backend reentrancy. DQAGI_WRAPPER exposes semi-infinite adaptive quadrature through a transformed finite-interval problem. BOUND is the finite endpoint; INF=1 selects (BOUND,+infinity). The work arrays again need LIMIT and 4*LIMIT entries; partition locations refer to the transformed variable, not original x. Require an actually convergent integrand and inspect IER/ABSERR; the wrapper does not infer convergence from tail decay or provide an oscillatory-infinite-integral certificate.",
+            "evidence": [
+              {
+                "path": "src/quadpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/quadpack/wrappers.f90",
+                "sha256": "261ae076a0c2d06dca88ef02612fc8a4c5847c1857b169207b89997959cb8ed6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqagi_wrapper",
+                "role": "public-entry-point",
+                "summary": "Public C-interoperable semi-infinite quadrature binding selected by INF=1.",
+                "signature": "CALL dqagi_wrapper(CFCN,BOUND,INF,EPSABS,EPSREL,RESULT,ABSERR, &\n NEVAL,IER,LIMIT,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 96,
+                    "line_end": 113
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 96,
+                "line_end": 122,
+                "module": "quadpack_wrappers",
+                "usage": "use quadpack_wrappers, only: dqagi_wrapper\n! With a valid C-interoperable callback FPTR, positive tolerances and\n! initialized C_DOUBLE ARGS plus IWORK(LIMIT), WORK(4*LIMIT):\ncall dqagi_wrapper(fptr,bound,1_c_int,epsabs,epsrel,result,abserr, &\n neval,ier,limit,iwork,work,args,nargs,last)\nif(ier/=0) error stop \"inspect infinite-interval quadrature diagnostics\"\n! Check convergence/error behavior; stored partitions use transformed coordinates.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment; import ISO_C_BINDING and declare all argument kinds as in the linked interface. The INF selection is part of this mapping, not an arbitrary function-family guarantee. No semi-infinite integral or transformed partition was tested."
+              },
+              {
+                "procedure": "infinite quadrature callback dispatch/state restoration",
+                "role": "implementation-helper",
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 114,
+                "line_end": 122
+              }
+            ]
+          },
+          {
+            "code": "H2a4a1",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "The reviewed binding converts a C function pointer to a module callback adapter and forwards arrays/controls to the bundled modern QUADPACK implementation. Integrands return C_DOUBLE and accept x by value plus an args-array pointer. Workspaces, callback/args lifetimes, compatible C_INT/default-integer and C_DOUBLE/native-real ABI and valid tolerances remain caller responsibilities. The implementation saves/restores callback slots around the call; OpenMP threadprivate directives only provide separate thread state when compiled with OpenMP. This is a source review of the binding/dispatch, not a new audit or numerical validation of QUADPACK or a guarantee of nested backend reentrancy. DQAGI_WRAPPER exposes whole-line adaptive quadrature through a transformed finite-interval problem. INF=2 selects (-infinity,+infinity); BOUND is not used by that selection. The work arrays again need LIMIT and 4*LIMIT entries; partition locations refer to the transformed variable, not original x. Require an actually convergent integrand and inspect IER/ABSERR; the wrapper does not infer convergence from tail decay or provide an oscillatory-infinite-integral certificate.",
+            "evidence": [
+              {
+                "path": "src/quadpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/quadpack/wrappers.f90",
+                "sha256": "261ae076a0c2d06dca88ef02612fc8a4c5847c1857b169207b89997959cb8ed6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dqagi_wrapper",
+                "role": "public-entry-point",
+                "summary": "Public C-interoperable whole-line quadrature binding selected by INF=2.",
+                "signature": "CALL dqagi_wrapper(CFCN,BOUND,INF,EPSABS,EPSREL,RESULT,ABSERR, &\n NEVAL,IER,LIMIT,IWORK,WORK,ARGS,NARGS,LAST)",
+                "declarations": [
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 96,
+                    "line_end": 113
+                  },
+                  {
+                    "path": "src/quadpack/wrappers.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 96,
+                "line_end": 122,
+                "module": "quadpack_wrappers",
+                "usage": "use quadpack_wrappers, only: dqagi_wrapper\n! With a valid C-interoperable callback FPTR, positive tolerances and\n! initialized C_DOUBLE ARGS plus IWORK(LIMIT), WORK(4*LIMIT):\ncall dqagi_wrapper(fptr,bound,2_c_int,epsabs,epsrel,result,abserr, &\n neval,ier,limit,iwork,work,args,nargs,last)\nif(ier/=0) error stop \"inspect infinite-interval quadrature diagnostics\"\n! Check convergence/error behavior; stored partitions use transformed coordinates.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment; import ISO_C_BINDING and declare all argument kinds as in the linked interface. The INF selection is part of this mapping, not an arbitrary function-family guarantee. No whole-line integral or transformed partition was tested."
+              },
+              {
+                "procedure": "infinite quadrature callback dispatch/state restoration",
+                "role": "implementation-helper",
+                "path": "src/quadpack/wrappers.f90",
+                "line_start": 114,
+                "line_end": 122
+              }
+            ]
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+            "reviewed_on": "2026-11-06",
+            "notes": "HYBRD_WRAPPER exposes a MINPACK local nonlinear-system solve without user Jacobian entries, using a finite-difference Powell-hybrid driver and an explicitly supplied C callback address. It constructs the simplified driver workspace/scaling/control defaults while allowing MAXFEV to be passed through, then maps backend INFO=5 to 4. The callback fills N residuals from N parameters; dimensions are not passed in that callback ABI and must be known by its implementation. INFO=1 is a step-tolerance termination, not independent proof that all residuals are small; other codes need MINPACK interpretation. The module stores callback/args pointers, uses optional OpenMP threadprivate state and does not save/restore that state in this particular root wrapper, unlike the reviewed quadrature bindings. Nested calls on the same thread can overwrite context, and parallel calls without the appropriate OpenMP build share it. Review covers the wrapper and adapter, not every native MINPACK algorithm path or a global root guarantee.",
+            "evidence": [
+              {
+                "path": "src/minpack/wrappers.f90",
+                "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/wrappers.f90",
+                "sha256": "68cc22e5a1b64d3b91912700c789d5bc03d97be2c64fa6da170bb49e8f4d60a2"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "hybrd_wrapper",
+                "role": "public-entry-point",
+                "summary": "Public C-interoperable finite-difference nonlinear-system root binding with explicit workspace/budget.",
+                "signature": "CALL hybrd_wrapper(CFCN,N,X,FVEC,TOL,MAXFEV,INFO,WA,LWA,ARGS,NARGS)",
+                "declarations": [
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 43,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "src/minpack/wrappers.f90",
+                    "line_start": 127,
+                    "line_end": 139
+                  }
+                ],
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 127,
+                "line_end": 164,
+                "module": "minpack_wrappers",
+                "usage": "use iso_c_binding\nuse minpack_wrappers, only: hybrd_wrapper\ninteger(c_int),parameter :: n=2,lwa=n*(3*n+13)/2\ninteger(c_int) :: info\nreal(c_double) :: x(n),fvec(n),wa(lwa),args(1)\ntype(c_funptr) :: fptr\n! Set FPTR to the matching callback: void f(x*,fvec*,args*), with N known to it.\nx=1._c_double; args=0._c_double\ncall hybrd_wrapper(fptr,n,x,fvec,1.e-8_c_double,500_c_int,info, &\n wa,lwa,args,1_c_int)\nif(info/=1) error stop \"inspect MINPACK termination diagnostics\"\n! Independently evaluate and inspect every residual at the returned X.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-callback-setup binding fragment. Keep callback/args alive, use exact C-sized kinds and avoid nested root calls through the shared slot. No root, Jacobian approximation, residual norm, concurrency or stopping tolerance was tested."
+              },
+              {
+                "procedure": "root callback adapter",
+                "role": "implementation-helper",
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 76,
+                "line_end": 82
+              },
+              {
+                "procedure": "callback state and threadprivate directive",
+                "role": "implementation-helper",
+                "path": "src/minpack/wrappers.f90",
+                "line_start": 62,
+                "line_end": 66
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause wrappers; bundled QUADPACK/MINPACK notices apply",
+          "spdx_expression": null,
+          "revision": "250c9a3992ce97b21cc63f4aa142a8c90358f8ea",
+          "reviewed_on": "2026-11-06",
+          "notes": "The project root licenses its own wrapper/glue code under BSD-3-Clause and explicitly preserves component terms. The selected QUADPACK copy has a BSD-style notice; MINPACK includes MIT contributor terms plus the retained University of Chicago/Argonne notice. Preserve component notices instead of flattening the entire bundled stack to a single unsupported expression.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/LICENSE",
+              "sha256": "b00a062f3aa595575f7354600053b75fdb4545c3a627565ec0f48f38b1742ebc"
+            },
+            {
+              "path": "src/quadpack/LICENSE",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/quadpack/LICENSE",
+              "sha256": "f38966793afb5b11d5cc07398324bf866fff4fb88bb41c26c5b1f896b7a69be9"
+            },
+            {
+              "path": "src/minpack/LICENSE.txt",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/src/minpack/LICENSE.txt",
+              "sha256": "8e51afb625ad0e8c069ed844c7c95eafe88cbecd4462971a03c3799e2de9ed18"
+            },
+            {
+              "path": "docs/credits.md",
+              "url": "https://github.com/Shmuel-Gilbaum/SciJit/blob/250c9a3992ce97b21cc63f4aa142a8c90358f8ea/docs/credits.md",
+              "sha256": "ce930a1dc3559a559dec5c717c4164122ce7d9521b80132fb871f596d60b8fab"
+            }
+          ]
         }
       },
       "imports": {}
