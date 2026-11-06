@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 440 repositories now have 643 source-reviewed
+Reviewed on 2026-11-06. 443 repositories now have 653 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-426 repository cards now identify public routines and link their usage lines
+429 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 440 independently source-reviewed repositories now have an
+separately. All 443 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -465,6 +465,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | ForTrilinos | `fortrilinos_hl::TrilinosSolver%setup_matrix`, `fortrilinos_hl::TrilinosSolver%setup_solver`, `fortrilinos_hl::TrilinosSolver%solve`, `fortrilinos_hl::TrilinosEigenSolver%setup_matrix`, `fortrilinos_hl::TrilinosEigenSolver%solve`, `fortrilinos_hl::TrilinosEigenSolver%converged`, `fortrilinos_hl::TrilinosEigenSolver%setup_matrix_rhs`, `fortrilinos_hl::NOXSolver%setup`, `fortrilinos_hl::NOXSolver%solve` | BSD-3-Clause ForTrilinos interfaces |
 | Skyborn | `dlinint1`, `linmsg_core::dlinmsg`, `dlinint2`, `compute_lanczos_weights`, `apply_filter_1d`, `apply_filter_1d_periodic`, `mann_kendall_core_mod::compute_s_value`, `mann_kendall_core_mod::compute_base_variance`, `mann_kendall_core_mod::compute_sen_slope` | BSD-3-Clause root; adapted component notices retain their scope |
 | PIPPy | `svdfit` | Apache-2.0 root; Numerical Recipes component provenance requires separate review |
+| ButterflyPACK | `d_BPACK_factor::d_BPACK_Factorization`, `d_BPACK_Solve_Mul::d_BPACK_Solution`, `z_BPACK_factor::z_BPACK_Factorization`, `z_BPACK_Solve_Mul::z_BPACK_Solution`, `d_BPACK_Solve_Mul::d_BPACK_Mult` | BSD-style root with additional enhancement-license clause |
+| AUTO-07p | `AE::AUTOAE`, `BVP::AUTOBV`, `MESH::ADAPT2`, `MESH::INTWTS`, `MESH::GENWTS`, `MESH::WINT` | BSD-3-Clause numerical core; optional plotting dependencies separately scoped |
+| Cedar | `BMG2_SymStd_restrict`, `BMG2_SymStd_interp_add` | BSD-3-Clause Cedar framework notices |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -925,6 +928,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [ForTrilinos](https://github.com/trilinos/fortrilinos) | D2a4; D4a2; D4b2; F2 | Sparse linear solves, ordinary/generalized eigenproblems and nonlinear systems through C++ backends | Runtime/maps, parameter-selected algorithms, enum/logical status distinctions and eigenvalue extraction capacity defect. |
 | [Skyborn](https://github.com/qianyesu/skyborn) | E1a; E2a; L10a1c2; L4a1d; L8a3 | Piecewise/grid linear interpolation, symmetric FIR filtering, sequence statistics and robust slopes | Sentinel/direction contracts, gap edges, reflection extents, clean-series buffers and unit-time slope semantics. |
 | [PIPPy](https://github.com/auto-mech/pippy) | D9a1 | Weighted truncated-SVD fit using initialized invariant-polynomial basis | MPI/COMMON/basis initialization, physical dimensions, unreturned diagnostics and Numerical Recipes component provenance. |
+| [ButterflyPACK](https://github.com/liuyangzhuan/butterflypack) | D2a1; D2c1; D1b4 | Real/complex general compressed solves and matrix-vector application | Precision-generated names/types, collective setup, local ordering, compression error and absent status outputs. |
+| [AUTO-07p](https://github.com/auto-07p/auto-07p) | F2; I1b2; I1c; E1a; H1; H2a1b2 | Nonlinear algebraic/BVP continuation, mesh adaptation, interpolation, differentiation and sampled quadrature | Framework callbacks/state, collocation scaling, order/shape limits and distinct interpolation/quadrature nodes. |
+| [Cedar](https://github.com/cedar-framework/cedar) | D2e | Native BoxMG restriction and residual-dependent prolongation components | Explicit BIND(C)/VALUE interfaces, initialized weights/ghosts, in-place residual scaling and correction semantics. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1688,3 +1694,14 @@ channels and the Anasazi extraction capacity defect remain explicit. The
 Skyborn nearest-grid assignment path is not promoted to an interpolation
 mapping: its nonexact regular-grid branch uses uninitialized planar offsets.
 Numerical Recipes provenance in pippy remains separately scoped.
+
+ButterflyPACK, AUTO-07p and Cedar have ten additional source-reviewed
+mappings. Calling sketches were not compiled or run. Reviews identify
+precision-generated real/complex compressed linear algebra, initialized
+continuation callbacks, collocation mesh services and independent polynomial
+interpolation/differentiation/quadrature weight generators. AUTO Newton-Cotes
+weights act on equally spaced samples, whereas its derivative weights are
+evaluated at interior collocation nodes. Cedar transfer kernels require exact
+C-interoperable interfaces and initialized BoxMG hierarchy data; correction
+prolongation scales RES in place and includes residual terms. License findings
+preserve the ButterflyPACK enhancement clause and optional dependency scope.

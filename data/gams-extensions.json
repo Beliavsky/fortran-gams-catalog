@@ -876,6 +876,18 @@
       "parent": "L8a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "I1b2": {
+      "label": "Nonlinear",
+      "parent": "I1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "I1c": {
+      "label": "Service routines (e.g., interpolation of solutions, error handling, test programs)",
+      "parent": "I1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }

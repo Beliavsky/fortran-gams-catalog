@@ -2368,12 +2368,245 @@
             ],
             "notes": "The README describes compression, factorization, direct solution and preconditioned TFQMR. The butterfly name does not make this an FFT package; MPI and sequential build variants are documented.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a1",
+            "level": "source-reviewed",
+            "revision": "a8cf81b9a2c95260931580f395db98bd6a2f319c",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are precision-generated Fortran APIs: the pinned template names are transformed by PrecisionPreprocessing.sh into d_ (DAT=1, REAL(8)) or z_ (DAT=0, COMPLEX(8)) module/procedure/type names. Use the matching generated module files, data kinds and BLAS/LAPACK/MPI ABI; template DT is not a Fortran type. Initialize the configured MPI environment or library MPI dummy layer, process tree, options, statistics, mesh/permutation and compressed matrix collectively before these calls. Local vectors must follow the constructed distributed ordering; undo the permutation for results in original coordinates. The selected real general square-system path sets OPTION%PRECON=DIRECT, factors a constructed HODLR, HMAT/BLR or HSS representation, then applies its stored inverse/factors to multiple right-hand sides. No symmetry or Hermitian property is required by this selected general interface. BPACK_Solution dispatches DIRECT to BPACK_Inv_Mult; other PRECON values invoke an iterative route whose local error/iteration diagnostics are not exposed as output arguments here. The factorization and solve are relative to a compressed approximation: rank tolerances and conditioning affect error, and this is not an exact uncompressed LU guarantee or a sparse-storage solver merely because the representation is compressed. No INFO dummy is returned; unsupported FORMAT has no default diagnostic in these selected dispatches. Preserve original operator/RHS for an independent residual and restrict calls to constructed, supported formats. Review covers public dispatch and precision generation, not every hierarchical factorization kernel or scalability/accuracy claims.",
+            "evidence": [
+              {
+                "path": "SRC/BPACK_solve_mul.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_solve_mul.f90",
+                "sha256": "d3eb06254e075cdb6c33f1f934c29de1b894197bb9fd2b8ba1b7c24546405fd8"
+              },
+              {
+                "path": "SRC/BPACK_factor.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_factor.f90",
+                "sha256": "af6555a27018d86f38e68e2f0fd595c5a9748619595f640ecec5864d45a4341b"
+              },
+              {
+                "path": "PrecisionPreprocessing.sh",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/PrecisionPreprocessing.sh",
+                "sha256": "3ab73177551c3774a4e9db68b53a12dcdff10ef65d1082dcabf18935a1bba77a"
+              },
+              {
+                "path": "SRC/BPACK_defs.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_defs.f90",
+                "sha256": "9a286b9d83e22e150f4d0920b23c79d5a23ccd4a6d67a89f121c98e56b83452b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "d_BPACK_Factorization",
+                "role": "public-entry-point",
+                "summary": "Generated real compressed-matrix factorization dispatch.",
+                "signature": "CALL d_BPACK_Factorization(BMAT,OPTION,STATS,PTREE,MSH)",
+                "declarations": [
+                  {
+                    "path": "SRC/BPACK_factor.f90",
+                    "line_start": 37,
+                    "line_end": 43
+                  },
+                  {
+                    "path": "PrecisionPreprocessing.sh",
+                    "line_start": 42,
+                    "line_end": 86
+                  }
+                ],
+                "path": "SRC/BPACK_factor.f90",
+                "line_start": 37,
+                "line_end": 61,
+                "module": "d_BPACK_factor"
+              },
+              {
+                "procedure": "d_BPACK_Solution",
+                "role": "public-entry-point",
+                "summary": "Generated real multiple-right-hand-side solve using constructed compressed factors.",
+                "signature": "CALL d_BPACK_Solution(BMAT,X,B,NLOC,NRHS,OPTION,PTREE,STATS)",
+                "declarations": [
+                  {
+                    "path": "SRC/BPACK_solve_mul.f90",
+                    "line_start": 471,
+                    "line_end": 488
+                  }
+                ],
+                "path": "SRC/BPACK_solve_mul.f90",
+                "line_start": 471,
+                "line_end": 508,
+                "module": "d_BPACK_Solve_Mul",
+                "usage": "use d_BPACK_factor, only: d_BPACK_Factorization\nuse d_BPACK_Solve_Mul, only: d_BPACK_Solution\n! After runtime/tree/mesh/compressed-matrix construction and declaring\n! matching generated types and REAL(8) X(NLOC,NRHS), B(NLOC,NRHS):\n! Set OPTION%PRECON to the matching generated DIRECT constant.\ncall d_BPACK_Factorization(bmat,option,stats,ptree,msh)\ncall d_BPACK_Solution(bmat,x,b,nloc,nrhs,option,ptree,stats)\n! Validate against the original operator and restore original ordering.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-construction DIRECT-path fragment. Complete distributed setup and matching generated constants/types are required; no compression, factorization, solve or residual was executed."
+              },
+              {
+                "procedure": "stored-factor inverse application dispatch",
+                "role": "implementation-helper",
+                "path": "SRC/BPACK_solve_mul.f90",
+                "line_start": 3315,
+                "line_end": 3336
+              }
+            ]
+          },
+          {
+            "code": "D2c1",
+            "level": "source-reviewed",
+            "revision": "a8cf81b9a2c95260931580f395db98bd6a2f319c",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are precision-generated Fortran APIs: the pinned template names are transformed by PrecisionPreprocessing.sh into d_ (DAT=1, REAL(8)) or z_ (DAT=0, COMPLEX(8)) module/procedure/type names. Use the matching generated module files, data kinds and BLAS/LAPACK/MPI ABI; template DT is not a Fortran type. Initialize the configured MPI environment or library MPI dummy layer, process tree, options, statistics, mesh/permutation and compressed matrix collectively before these calls. Local vectors must follow the constructed distributed ordering; undo the permutation for results in original coordinates. The selected complex general square-system path sets OPTION%PRECON=DIRECT, factors a constructed HODLR, HMAT/BLR or HSS representation, then applies its stored inverse/factors to multiple right-hand sides. No symmetry or Hermitian property is required by this selected general interface. BPACK_Solution dispatches DIRECT to BPACK_Inv_Mult; other PRECON values invoke an iterative route whose local error/iteration diagnostics are not exposed as output arguments here. The factorization and solve are relative to a compressed approximation: rank tolerances and conditioning affect error, and this is not an exact uncompressed LU guarantee or a sparse-storage solver merely because the representation is compressed. No INFO dummy is returned; unsupported FORMAT has no default diagnostic in these selected dispatches. Preserve original operator/RHS for an independent residual and restrict calls to constructed, supported formats. Review covers public dispatch and precision generation, not every hierarchical factorization kernel or scalability/accuracy claims.",
+            "evidence": [
+              {
+                "path": "SRC/BPACK_solve_mul.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_solve_mul.f90",
+                "sha256": "d3eb06254e075cdb6c33f1f934c29de1b894197bb9fd2b8ba1b7c24546405fd8"
+              },
+              {
+                "path": "SRC/BPACK_factor.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_factor.f90",
+                "sha256": "af6555a27018d86f38e68e2f0fd595c5a9748619595f640ecec5864d45a4341b"
+              },
+              {
+                "path": "PrecisionPreprocessing.sh",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/PrecisionPreprocessing.sh",
+                "sha256": "3ab73177551c3774a4e9db68b53a12dcdff10ef65d1082dcabf18935a1bba77a"
+              },
+              {
+                "path": "SRC/BPACK_defs.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_defs.f90",
+                "sha256": "9a286b9d83e22e150f4d0920b23c79d5a23ccd4a6d67a89f121c98e56b83452b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "z_BPACK_Factorization",
+                "role": "public-entry-point",
+                "summary": "Generated complex compressed-matrix factorization dispatch.",
+                "signature": "CALL z_BPACK_Factorization(BMAT,OPTION,STATS,PTREE,MSH)",
+                "declarations": [
+                  {
+                    "path": "SRC/BPACK_factor.f90",
+                    "line_start": 37,
+                    "line_end": 43
+                  },
+                  {
+                    "path": "PrecisionPreprocessing.sh",
+                    "line_start": 42,
+                    "line_end": 86
+                  }
+                ],
+                "path": "SRC/BPACK_factor.f90",
+                "line_start": 37,
+                "line_end": 61,
+                "module": "z_BPACK_factor"
+              },
+              {
+                "procedure": "z_BPACK_Solution",
+                "role": "public-entry-point",
+                "summary": "Generated complex multiple-right-hand-side solve using constructed compressed factors.",
+                "signature": "CALL z_BPACK_Solution(BMAT,X,B,NLOC,NRHS,OPTION,PTREE,STATS)",
+                "declarations": [
+                  {
+                    "path": "SRC/BPACK_solve_mul.f90",
+                    "line_start": 471,
+                    "line_end": 488
+                  }
+                ],
+                "path": "SRC/BPACK_solve_mul.f90",
+                "line_start": 471,
+                "line_end": 508,
+                "module": "z_BPACK_Solve_Mul",
+                "usage": "use z_BPACK_factor, only: z_BPACK_Factorization\nuse z_BPACK_Solve_Mul, only: z_BPACK_Solution\n! After runtime/tree/mesh/compressed-matrix construction and declaring\n! matching generated types and COMPLEX(8) X(NLOC,NRHS), B(NLOC,NRHS):\n! Set OPTION%PRECON to the matching generated DIRECT constant.\ncall z_BPACK_Factorization(bmat,option,stats,ptree,msh)\ncall z_BPACK_Solution(bmat,x,b,nloc,nrhs,option,ptree,stats)\n! Validate against the original operator and restore original ordering.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-construction DIRECT-path fragment. Complete distributed setup and matching generated constants/types are required; no compression, factorization, solve or residual was executed."
+              },
+              {
+                "procedure": "stored-factor inverse application dispatch",
+                "role": "implementation-helper",
+                "path": "SRC/BPACK_solve_mul.f90",
+                "line_start": 3315,
+                "line_end": 3336
+              }
+            ]
+          },
+          {
+            "code": "D1b4",
+            "level": "source-reviewed",
+            "revision": "a8cf81b9a2c95260931580f395db98bd6a2f319c",
+            "reviewed_on": "2026-11-06",
+            "notes": "These are precision-generated Fortran APIs: the pinned template names are transformed by PrecisionPreprocessing.sh into d_ (DAT=1, REAL(8)) or z_ (DAT=0, COMPLEX(8)) module/procedure/type names. Use the matching generated module files, data kinds and BLAS/LAPACK/MPI ABI; template DT is not a Fortran type. Initialize the configured MPI environment or library MPI dummy layer, process tree, options, statistics, mesh/permutation and compressed matrix collectively before these calls. Local vectors must follow the constructed distributed ordering; undo the permutation for results in original coordinates. BPACK_Mult applies an already constructed compressed HODLR, HMAT/BLR or HSS matrix to one or more local input columns and overwrites VOUT. The selected calling sketch uses one column and TRANS=N in the generated double-real API. Matrix construction is required but factorization is not; use a valid supported FORMAT and separate VIN/VOUT storage. USE_BLOCKCOPY is optional and passed to the HMAT/BLR path, defaulting to 1. The public dispatch has no default case or status output, so unsupported formats can leave VOUT undefined rather than diagnose the request. This is application of the compressed operator, not construction of a new matrix product, FFT evaluation or an error-bound certificate. Transpose/adjoint kernels and all communication internals are outside the selected N path review.",
+            "evidence": [
+              {
+                "path": "SRC/BPACK_solve_mul.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_solve_mul.f90",
+                "sha256": "d3eb06254e075cdb6c33f1f934c29de1b894197bb9fd2b8ba1b7c24546405fd8"
+              },
+              {
+                "path": "PrecisionPreprocessing.sh",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/PrecisionPreprocessing.sh",
+                "sha256": "3ab73177551c3774a4e9db68b53a12dcdff10ef65d1082dcabf18935a1bba77a"
+              },
+              {
+                "path": "SRC/BPACK_defs.f90",
+                "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_defs.f90",
+                "sha256": "9a286b9d83e22e150f4d0920b23c79d5a23ccd4a6d67a89f121c98e56b83452b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "d_BPACK_Mult",
+                "role": "public-entry-point",
+                "summary": "Generated double-real compressed matrix-vector/multivector application.",
+                "signature": "CALL d_BPACK_Mult(TRANS,NLOC,NVECT,VIN,VOUT,BMAT,PTREE,OPTION,STATS[,USE_BLOCKCOPY])",
+                "declarations": [
+                  {
+                    "path": "SRC/BPACK_solve_mul.f90",
+                    "line_start": 3364,
+                    "line_end": 3375
+                  },
+                  {
+                    "path": "PrecisionPreprocessing.sh",
+                    "line_start": 42,
+                    "line_end": 86
+                  }
+                ],
+                "path": "SRC/BPACK_solve_mul.f90",
+                "line_start": 3364,
+                "line_end": 3390,
+                "module": "d_BPACK_Solve_Mul",
+                "usage": "use d_BPACK_Solve_Mul, only: d_BPACK_Mult\n! After construction of a supported compressed matrix and distributed setup:\n! REAL(8) VIN(NLOC,1), VOUT(NLOC,1) are separate initialized/allocated buffers.\ncall d_BPACK_Mult(\"N\",nloc,1,vin,vout,bmat,ptree,option,stats)\n! Compare with the original matrix/operator independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-construction nontransposed one-vector fragment. Match local ordering and generated object types; no product, communication or approximation error was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-style root with additional enhancement-license clause",
+          "spdx_expression": null,
+          "revision": "a8cf81b9a2c95260931580f395db98bd6a2f319c",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root has three BSD-style redistribution/endorsement clauses and an additional paragraph granting LBNL rights to enhancements made available without a separate written agreement. It is retained as a scoped custom finding rather than flattened to ordinary BSD-3-Clause. Selected source headers also state US Government retained rights. BLAS/LAPACK/ScaLAPACK, compression and optional runtime/backend components retain their own notices; this review is not a full dependency-license audit.",
+          "evidence": [
+            {
+              "path": "license.txt",
+              "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/license.txt",
+              "sha256": "1451a11f9fd8e8c069871df8a87e8e93a41ce6faeefbae05b4f10cff8ee1c991",
+              "source_encoding": "cp1252"
+            },
+            {
+              "path": "SRC/BPACK_solve_mul.f90",
+              "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_solve_mul.f90",
+              "sha256": "d3eb06254e075cdb6c33f1f934c29de1b894197bb9fd2b8ba1b7c24546405fd8"
+            },
+            {
+              "path": "SRC/BPACK_factor.f90",
+              "url": "https://github.com/liuyangzhuan/ButterflyPACK/blob/a8cf81b9a2c95260931580f395db98bd6a2f319c/SRC/BPACK_factor.f90",
+              "sha256": "af6555a27018d86f38e68e2f0fd595c5a9748619595f640ecec5864d45a4341b"
+            }
+          ]
         }
       },
       "imports": {}
@@ -4955,12 +5188,408 @@
             ],
             "notes": "The manual title and preface explicitly describe continuation and bifurcation of ODEs, including homoclinic-orbit analysis. This is not presented as an ordinary initial-value time-stepper.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "AUTO is an initialized continuation application, not a drop-in stateless equation solver. Its framework supplies AUTOPARAMETERS, active parameter indices, weights, callbacks, restart/start data, output units and configured MPI state; prefer its supported run/CLUI workflow for ordinary use. Direct-call sketches below are post-framework-initialization contracts only. AE::AUTOAE controls continuation of real nonlinear algebraic systems through CNRLAE and SOLVAE. The corrector forms a bordered system from FUNI values/Jacobians and the continuation constraint, solves it with pivoted GEL, and tests relative parameter/state corrections against EPSL/EPSU within ITNW iterations. A failed corrector restores the old state and returns NIT=0 internally; AUTOAE itself has no scalar success dummy or returned solution array, since state and files are managed by the framework. The interface takes internal FUNI/STPNAEI/FNCI callbacks from interfaces.h, not the shorter user FUNC signature. Non-root ranks return immediately on this algebraic path. This mapping covers real nonlinear-system continuation and its Newton corrector, not a guarantee of finding every root, branch, bifurcation or global solution.",
+            "evidence": [
+              {
+                "path": "src/ae.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/ae.f90",
+                "sha256": "45c274fd46c4f0b78b55f55e84fc7489d66d8298fe8aad2b213f24d40229e979"
+              },
+              {
+                "path": "src/interfaces.h",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/interfaces.h",
+                "sha256": "f06b0d5f8346128f001e44eaa24d5a77627e0e64a077d48b6ee881dcc2182182"
+              },
+              {
+                "path": "src/main.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/main.f90",
+                "sha256": "9cc774e9b7d50c455f3fd55b47695010c350efdf9054f5a373a3e5b9c64127ca"
+              },
+              {
+                "path": "src/auto_constants.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/auto_constants.f90",
+                "sha256": "117a16935494c32bc03d8e3997b905a6132055033a9aed39c140c490dded7ffb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "AUTOAE",
+                "role": "public-entry-point",
+                "summary": "Public framework entry for algebraic-system continuation with internal callbacks.",
+                "signature": "CALL AUTOAE(AP,ICP,ICU,FUNI,STPNAEI,FNCI)",
+                "declarations": [
+                  {
+                    "path": "src/ae.f90",
+                    "line_start": 19,
+                    "line_end": 28
+                  },
+                  {
+                    "path": "src/interfaces.h",
+                    "line_start": 5,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/interfaces.h",
+                    "line_start": 54,
+                    "line_end": 70
+                  }
+                ],
+                "path": "src/ae.f90",
+                "line_start": 19,
+                "line_end": 38,
+                "module": "AE",
+                "usage": "use AE, only: AUTOAE\n! Inside a fully initialized AUTO framework integration, with internal\n! FUNI/STPNAEI/FNCI callback interfaces matching src/interfaces.h:\ncall AUTOAE(ap,icp,icu,funi,stpnaei,fnci)\n! Inspect framework branch/termination records and residuals separately.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-framework-initialization calling contract. Not a standalone user FUNC driver; no continuation, root, convergence or branch detection was executed."
+              },
+              {
+                "procedure": "continuation controller",
+                "role": "implementation-helper",
+                "path": "src/ae.f90",
+                "line_start": 41,
+                "line_end": 100
+              },
+              {
+                "procedure": "bordered Newton corrector and restoration on failure",
+                "role": "implementation-helper",
+                "path": "src/ae.f90",
+                "line_start": 434,
+                "line_end": 615
+              }
+            ]
+          },
+          {
+            "code": "I1b2",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "AUTO is an initialized continuation application, not a drop-in stateless equation solver. Its framework supplies AUTOPARAMETERS, active parameter indices, weights, callbacks, restart/start data, output units and configured MPI state; prefer its supported run/CLUI workflow for ordinary use. Direct-call sketches below are post-framework-initialization contracts only. BVP::AUTOBV dispatches to general nonlinear ODE boundary-value continuation. NEWTONBV forms predictor states and repeatedly calls SOLVBV for collocation linearizations, using parameter and state correction tolerances with configured Newton/chord refresh and iteration limits. SOLVBV constructs interpolation/derivative weights and divides derivative weights by each mesh interval length before building the equation blocks. The driver accepts boundary and integral-condition callbacks, starting/restart data and test functions through the explicit internal interfaces; satisfying the dimension/free-parameter/condition balance is the framework setup responsibility. Mesh values are normalized to the AUTO interval and physical period/scale enters through the problem formulation. No direct INFO/result-array dummy is provided by AUTOBV, and continuation stopping or small corrections do not replace an independent differential/boundary residual check. Periodic-orbit and bifurcation specialties require their own problem setup and are not certified by this general BVP entry review.",
+            "evidence": [
+              {
+                "path": "src/bvp.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/bvp.f90",
+                "sha256": "9f4b789c3f1b095cc88265b493f2a8ffc0b12d1a513c7950c98622163ef68a93"
+              },
+              {
+                "path": "src/solvebv.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/solvebv.f90",
+                "sha256": "19a38e02fa6f952d5d364d496b9fe554e4d98c7c070e9e799ce433d3c3122cdf"
+              },
+              {
+                "path": "src/mesh.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/mesh.f90",
+                "sha256": "841dca94dfd6d2dbcd549fafe8baca46c14d3b71b8283d69476f413d6e3a10d6"
+              },
+              {
+                "path": "src/interfaces.h",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/interfaces.h",
+                "sha256": "f06b0d5f8346128f001e44eaa24d5a77627e0e64a077d48b6ee881dcc2182182"
+              },
+              {
+                "path": "src/main.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/main.f90",
+                "sha256": "9cc774e9b7d50c455f3fd55b47695010c350efdf9054f5a373a3e5b9c64127ca"
+              },
+              {
+                "path": "src/auto_constants.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/auto_constants.f90",
+                "sha256": "117a16935494c32bc03d8e3997b905a6132055033a9aed39c140c490dded7ffb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "AUTOBV",
+                "role": "public-entry-point",
+                "summary": "Public general nonlinear ODE boundary-value continuation entry.",
+                "signature": "CALL AUTOBV(AP,ICP,ICU,FUNI,BCNI,ICNI,STPNBVI,FNCI)",
+                "declarations": [
+                  {
+                    "path": "src/bvp.f90",
+                    "line_start": 22,
+                    "line_end": 29
+                  },
+                  {
+                    "path": "src/interfaces.h",
+                    "line_start": 5,
+                    "line_end": 13
+                  },
+                  {
+                    "path": "src/interfaces.h",
+                    "line_start": 23,
+                    "line_end": 52
+                  },
+                  {
+                    "path": "src/interfaces.h",
+                    "line_start": 62,
+                    "line_end": 70
+                  }
+                ],
+                "path": "src/bvp.f90",
+                "line_start": 22,
+                "line_end": 33,
+                "module": "BVP",
+                "usage": "use BVP, only: AUTOBV\n! After AUTO initialization and consistent BVP/parameter/condition setup;\n! callbacks must use the internal src/interfaces.h contracts:\ncall AUTOBV(ap,icp,icu,funi,bcni,icni,stpnbvi,fnci)\n! Inspect branch status and independently evaluate ODE/boundary residuals.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-framework-initialization BVP contract. No boundary-value, collocation, mesh convergence or bifurcation computation was run."
+              },
+              {
+                "procedure": "Newton/chord BVP correction and stopping",
+                "role": "implementation-helper",
+                "path": "src/bvp.f90",
+                "line_start": 558,
+                "line_end": 741
+              },
+              {
+                "procedure": "collocation weights and physical interval scaling",
+                "role": "implementation-helper",
+                "path": "src/solvebv.f90",
+                "line_start": 299,
+                "line_end": 385
+              },
+              {
+                "procedure": "collocation residual/Jacobian assembly",
+                "role": "implementation-helper",
+                "path": "src/solvebv.f90",
+                "line_start": 431,
+                "line_end": 467
+              }
+            ]
+          },
+          {
+            "code": "I1c",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "MESH::ADAPT2 is a public service routine for retabulating AUTO solution/tangent data while changing the number of mesh intervals and/or collocation points. NEWMSH equidistributes a monitor based on differences of high-order derivative estimates; INTERP uses local Lagrange weights to transfer both UPSR and VPSR. If old and new counts agree it copies rather than adapts the mesh. Use positive strictly increasing interval meshes, at least two old intervals on the selected nonperiodic path, supported collocation orders 2..7, adequate zero-based sample storage and NDIM=NDOLD in the selected sketch. When dimensions differ only MIN(NDIM,NDOLD) components are assigned, so added components remain undefined. IPER selects periodic versus extrapolated endpoint monitor treatment, not a general interpolation extrapolation policy. No status or verified error bound is returned; the monitor and interpolation do not prove ODE/BVP solution accuracy. ADAPT2 is selected instead of ADAPT to avoid conflating this serial retabulation interface with the latter distributed scatter protocol.",
+            "evidence": [
+              {
+                "path": "src/mesh.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/mesh.f90",
+                "sha256": "841dca94dfd6d2dbcd549fafe8baca46c14d3b71b8283d69476f413d6e3a10d6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ADAPT2",
+                "role": "public-entry-point",
+                "summary": "Public continuation mesh redistribution and solution/tangent retabulation.",
+                "signature": "CALL ADAPT2(NOLD,NCOLD,NDOLD,NNEW,NCNEW,NDIM, &\n TMR,UPSR,VPSR,TM,UPS,VPS,IPER)",
+                "declarations": [
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 313,
+                    "line_end": 326
+                  },
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 8,
+                    "line_end": 14
+                  }
+                ],
+                "path": "src/mesh.f90",
+                "line_start": 313,
+                "line_end": 351,
+                "module": "MESH",
+                "usage": "use MESH, only: ADAPT2\n! Initialize increasing TMR(0:NOLD), UPSR/VPSR(NDIM,0:NOLD*NCOLD);\n! allocate TM(0:NNEW), UPS/VPS(NDIM,0:NNEW*NCNEW). NOLD>=2.\ncall ADAPT2(nold,ncold,ndim,nnew,ncnew,ndim, &\n            tmr,upsr,vpsr,tm,ups,vps,.false.)\n! Use equal component dimensions; this does not solve the ODE/BVP.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-array-setup nonperiodic retabulation fragment. Orders must be 2..7 and dimensions/storage consistent. No new mesh, interpolation or error indicator was executed."
+              },
+              {
+                "procedure": "piecewise polynomial data transfer",
+                "role": "implementation-helper",
+                "path": "src/mesh.f90",
+                "line_start": 354,
+                "line_end": 392
+              },
+              {
+                "procedure": "monitor-based mesh generation",
+                "role": "implementation-helper",
+                "path": "src/mesh.f90",
+                "line_start": 395,
+                "line_end": 448
+              },
+              {
+                "procedure": "high-derivative monitor and small-derivative fallback",
+                "role": "implementation-helper",
+                "path": "src/mesh.f90",
+                "line_start": 480,
+                "line_end": 551
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "MESH::INTWTS forms Lagrange cardinal weights for nodes numbered 0..N. The caller evaluates the interpolating polynomial by a dot product of WTS with N+1 nodal samples; DT1DT is expressed in node-index units, not normalized physical coordinates. For an interval [a,a+h] sampled at a+j*h/N, pass N*(x-a)/h. The public GENWTS companion generates value/derivative weights at fixed collocation points, while private INTERP demonstrates actual piecewise sample transfer using INTWTS. Restrict N to the small supported AUTO collocation orders (2..7 in the sketch): the integer factorial/product denominators are not overflow guarded and arbitrary high degree is unsafe. There is no barycentric stabilization, shape preservation, conditioning estimate or status output. This mapping is polynomial interpolation of already sampled values, not fitting noisy data or selecting an adaptive degree.",
+            "evidence": [
+              {
+                "path": "src/mesh.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/mesh.f90",
+                "sha256": "841dca94dfd6d2dbcd549fafe8baca46c14d3b71b8283d69476f413d6e3a10d6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "INTWTS",
+                "role": "public-entry-point",
+                "summary": "Public cardinal weights for interpolation at equally spaced node indices.",
+                "signature": "CALL INTWTS(N,DT1DT,WTS)",
+                "declarations": [
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 451,
+                    "line_end": 460
+                  },
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 8,
+                    "line_end": 14
+                  }
+                ],
+                "path": "src/mesh.f90",
+                "line_start": 451,
+                "line_end": 477,
+                "module": "MESH",
+                "usage": "use MESH, only: INTWTS\ndouble precision :: values(0:2),weights(0:2),estimate\n! Samples at normalized coordinates 0, 0.5, 1; target coordinate 0.25:\nvalues=[0.d0,0.25d0,1.d0]\ncall INTWTS(2,2.d0*0.25d0,weights)\nestimate=dot_product(weights,values)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Degree-two interpolation fragment with index-scaled query. No interpolant, reproduction property or extrapolation was tested."
+              },
+              {
+                "procedure": "actual Lagrange dot-product use during retabulation",
+                "role": "implementation-helper",
+                "path": "src/mesh.f90",
+                "line_start": 354,
+                "line_end": 392
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "MESH::GENWTS constructs both value weights WT and first-derivative weights WP of the polynomial through NCOL+1 equally spaced samples on the normalized interval [0,1], evaluated at NCOL interior Gauss-Legendre collocation points. The caller obtains derivatives by DOT_PRODUCT(WP(:,IC),VALUES); physical interval width h requires division by h, as shown in SOLVBV. This is numerical differentiation of sampled data through the interpolating polynomial, not automatic/symbolic differentiation of a user routine. Use NCOL in 2..7 and arrays with first index 0:NCOL. Unsupported orders are not rejected: the private CPNTS SELECT CASE has no default and leaves collocation nodes undefined. No accuracy, noise sensitivity or error estimate is returned. Integer products are safe for the selected small orders only; avoid extending the order contract based on the explicit-shape signature alone.",
+            "evidence": [
+              {
+                "path": "src/mesh.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/mesh.f90",
+                "sha256": "841dca94dfd6d2dbcd549fafe8baca46c14d3b71b8283d69476f413d6e3a10d6"
+              },
+              {
+                "path": "src/solvebv.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/solvebv.f90",
+                "sha256": "19a38e02fa6f952d5d364d496b9fe554e4d98c7c070e9e799ce433d3c3122cdf"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "GENWTS",
+                "role": "public-entry-point",
+                "summary": "Public value/first-derivative collocation weights from equally spaced nodal samples.",
+                "signature": "CALL GENWTS(NCOL,WT,WP)",
+                "declarations": [
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 35,
+                    "line_end": 49
+                  },
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 8,
+                    "line_end": 14
+                  }
+                ],
+                "path": "src/mesh.f90",
+                "line_start": 35,
+                "line_end": 82,
+                "module": "MESH",
+                "usage": "use MESH, only: GENWTS\ndouble precision :: wt(0:2,2),wp(0:2,2),values(0:2),derivative(2),h\nh=1.d0; values=[0.d0,0.25d0,1.d0]\ncall GENWTS(2,wt,wp)\nderivative=matmul(transpose(wp),values)/h\n! Derivatives correspond to the two interior collocation points.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Order-two sampled-polynomial derivative fragment. Supply physical sample spacing consistently; no derivative, accuracy or roundoff result was executed."
+              },
+              {
+                "procedure": "supported fixed collocation nodes",
+                "role": "implementation-helper",
+                "path": "src/mesh.f90",
+                "line_start": 85,
+                "line_end": 132
+              },
+              {
+                "procedure": "interval-width derivative scaling in collocation assembly",
+                "role": "implementation-helper",
+                "path": "src/solvebv.f90",
+                "line_start": 367,
+                "line_end": 382
+              }
+            ]
+          },
+          {
+            "code": "H2a1b2",
+            "level": "source-reviewed",
+            "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+            "reviewed_on": "2026-11-06",
+            "notes": "MESH::WINT returns fixed closed Newton-Cotes integration weights for NCOL+1 equally spaced values on [0,1], with hardcoded orders NCOL=2..7. The caller supplies the grid samples and forms their weighted sum, multiplying by physical interval width h; a composite rule sums those panel contributions. NCOL=2 gives the three-point Simpson weights. This is nonautomatic quadrature of grid data, not an adaptive integrand-callback driver or Gauss-Legendre quadrature merely because other routines in this module use Gauss collocation points. WINT has no default case or status: unsupported NCOL leaves WI undefined. No error estimator, tolerance control, singularity treatment or irregular-grid support is supplied; physical scaling and adequate smoothness must be assessed by the caller.",
+            "evidence": [
+              {
+                "path": "src/mesh.f90",
+                "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/src/mesh.f90",
+                "sha256": "841dca94dfd6d2dbcd549fafe8baca46c14d3b71b8283d69476f413d6e3a10d6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "WINT",
+                "role": "public-entry-point",
+                "summary": "Public fixed closed Newton-Cotes weights on equally spaced panel data.",
+                "signature": "CALL WINT(NCOL,WI)",
+                "declarations": [
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 160,
+                    "line_end": 168
+                  },
+                  {
+                    "path": "src/mesh.f90",
+                    "line_start": 8,
+                    "line_end": 14
+                  }
+                ],
+                "path": "src/mesh.f90",
+                "line_start": 160,
+                "line_end": 215,
+                "module": "MESH",
+                "usage": "use MESH, only: WINT\ndouble precision :: weights(0:2),values(0:2),integral,h\nh=1.d0; values=[0.d0,0.25d0,1.d0]\ncall WINT(2,weights)\nintegral=h*dot_product(weights,values)\n! Compare panel refinements independently for a general sampled integrand.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. One-panel sampled-data Simpson fragment. It is not a Gauss rule or adaptive error estimate; no integral or convergence check was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause numerical core; optional plotting dependencies separately scoped",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "44cc1c42a888179bdbd608a40613caee9cbc4675",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned manual license section identifies E. J. Doedel, Caltech and Concordia University and contains the three BSD redistribution/endorsement clauses and disclaimer. It separately warns that optional PLAUT04 dependencies Coin/SoQt/Qt can impose GPL terms on plotting binaries. This finding covers selected AUTO numerical-core interfaces, not a full audit of bundled BLAS/LAPACK, graphics or every dependency.",
+          "evidence": [
+            {
+              "path": "doc/auto.tex",
+              "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/doc/auto.tex",
+              "sha256": "df693a718ba77131e694f8c3e60a5192f431a8a5fc3c16e14cc3dd872371dff9"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/auto-07p/auto-07p/blob/44cc1c42a888179bdbd608a40613caee9cbc4675/README",
+              "sha256": "4b80e438b678741eab65c306331c338adaa44940df210c0ca1d32a020b03a7f1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -5670,12 +6299,128 @@
             ],
             "notes": "The README identifies variational multigrid and gives serial/MPI Poisson examples. No broader PDE equation families are assigned from the generic framework description.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2e",
+            "level": "source-reviewed",
+            "revision": "45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0",
+            "reviewed_on": "2026-11-06",
+            "notes": "The selected native BoxMG restriction and correction-prolongation entries are associated operations used inside a structured-grid multigrid linear solver. BMG2_SymStd_restrict accumulates a fine-grid vector to coarse interior points using transpose interpolation weights CI; periodic cases update input ghost cells in Q. BMG2_SymStd_interp_add adds coarse corrections to existing fine Q and also adds residual/diagonal terms at noninjection nodes: it is not pure interpolation of arbitrary data. It divides interior RES by the stencil diagonal in place, requiring nonzero diagonals and fresh residual storage before repeated calls. Provide matching BoxMG hierarchy extents/coarsening, initialized CI/stencil/boundary constants and ghost layers; these routines do not construct CI, solve a system, check convergence or return an error status. ModInterface defines len_t=C_INT and real_t=C_DOUBLE. Both external routines are BIND(C) with VALUE scalar dimensions/selectors, so Fortran callers need an exact explicit interface; USE ModInterface alone does not declare these external entries. The selected sketches cover serial 2-D transfer contracts, not MPI/3-D kernels or complete multigrid convergence.",
+            "evidence": [
+              {
+                "path": "src/2d/ftn/BMG2_SymStd_restrict.f90",
+                "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/src/2d/ftn/BMG2_SymStd_restrict.f90",
+                "sha256": "7c27479ba64febb1d04fc2ca4de5e22c226af18b64de2d526fc23f79e895a237"
+              },
+              {
+                "path": "src/2d/ftn/BMG2_SymStd_interp_add.f90",
+                "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/src/2d/ftn/BMG2_SymStd_interp_add.f90",
+                "sha256": "7e21f470d8d3ded7c17ca7d3e8c871c6f9049db94afe90bb78f4be86b305e50e"
+              },
+              {
+                "path": "src/2d/ftn/ModInterface.f90",
+                "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/src/2d/ftn/ModInterface.f90",
+                "sha256": "1ad46082aa772b1fde24c6b076273f909fe711079cc4e022dfb22f784728e1ca"
+              },
+              {
+                "path": "src/2d/ftn/BMG_stencils_f90.h",
+                "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/src/2d/ftn/BMG_stencils_f90.h",
+                "sha256": "139992434e6571e17fd5945b55d87d06a10433449f069f6ed6f69ca8a8af9a6d"
+              },
+              {
+                "path": "src/2d/ftn/BMG_parameters_f90.h",
+                "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/src/2d/ftn/BMG_parameters_f90.h",
+                "sha256": "15ea679141b5c0e2eac31d7cc99805218582d6d2fdb5d2eeed0995eda9a44ac4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BMG2_SymStd_restrict",
+                "role": "public-entry-point",
+                "summary": "External C-bound fine-to-coarse BoxMG transfer using initialized operator-dependent weights.",
+                "signature": "CALL BMG2_SymStd_restrict(Q,QC,CI,NX,NY,NXC,NYC,JPN)",
+                "declarations": [
+                  {
+                    "path": "src/2d/ftn/BMG2_SymStd_restrict.f90",
+                    "line_start": 1,
+                    "line_end": 4
+                  },
+                  {
+                    "path": "src/2d/ftn/BMG2_SymStd_restrict.f90",
+                    "line_start": 43,
+                    "line_end": 59
+                  },
+                  {
+                    "path": "src/2d/ftn/ModInterface.f90",
+                    "line_start": 26,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/2d/ftn/BMG2_SymStd_restrict.f90",
+                "line_start": 1,
+                "line_end": 135,
+                "usage": "use iso_c_binding, only: C_INT,C_DOUBLE\ninterface\n  subroutine BMG2_SymStd_restrict(q,qc,ci,nx,ny,nxc,nyc,jpn) &\n      bind(C,name=\"BMG2_SymStd_restrict\")\n    import C_INT,C_DOUBLE\n    integer(C_INT),value :: nx,ny,nxc,nyc,jpn\n    real(C_DOUBLE) :: q(nx,ny),qc(nxc,nyc),ci(nxc,nyc,8)\n  end subroutine\nend interface\n! After BoxMG hierarchy, boundary and CI setup, with ghosted buffers:\ncall BMG2_SymStd_restrict(q,qc,ci,nx,ny,nxc,nyc,jpn)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-hierarchy-initialization fragment with explicit C-interoperable VALUE interface. Q may be changed at periodic ghosts; no transfer, boundary or solver result was executed."
+              },
+              {
+                "procedure": "BMG2_SymStd_interp_add",
+                "role": "public-entry-point",
+                "summary": "External C-bound coarse correction plus residual-dependent fine-grid update.",
+                "signature": "CALL BMG2_SymStd_interp_add(Q,QC,RES,SO,CI,IIC,JJC,IIF,JJF,NSTNCL,JPN)",
+                "declarations": [
+                  {
+                    "path": "src/2d/ftn/BMG2_SymStd_interp_add.f90",
+                    "line_start": 1,
+                    "line_end": 4
+                  },
+                  {
+                    "path": "src/2d/ftn/BMG2_SymStd_interp_add.f90",
+                    "line_start": 58,
+                    "line_end": 74
+                  },
+                  {
+                    "path": "src/2d/ftn/ModInterface.f90",
+                    "line_start": 26,
+                    "line_end": 27
+                  }
+                ],
+                "path": "src/2d/ftn/BMG2_SymStd_interp_add.f90",
+                "line_start": 1,
+                "line_end": 160,
+                "usage": "! After hierarchy/CI/stencil setup, with the exact BIND(C) explicit interface\n! and VALUE dimensions/selectors from the linked declarations:\n! RES must be fresh, diagonals nonzero, and Q is the current fine iterate.\ncall BMG2_SymStd_interp_add(q,qc,res,so,ci,iic,jjc,iif,jjf,nstncl,jpn)\n! RES is scaled in place; do not reuse it as an untouched residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-hierarchy-initialization correction fragment. The explicit interface is required; this is not a complete multigrid cycle or arbitrary-data interpolator. No update or residual behavior was executed."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause Cedar framework notices",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0",
+          "reviewed_on": "2026-11-06",
+          "notes": "LICENSE.md names Cedar Developers and supplies the three-clause BSD text. COPYRIGHT.md retains LANL/UIUC notices, US Government rights and modification-marking guidance. Selected Fortran kernel comments reference a license flag rather than repeating full terms; this records the framework notices with their scope, not a complete provenance or third-party dependency audit.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/LICENSE.md",
+              "sha256": "98ec6e88ba1071ad140786e235cdc49d7d6d20ae9e2a96227ad0f1f5e45a1eab"
+            },
+            {
+              "path": "COPYRIGHT.md",
+              "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/COPYRIGHT.md",
+              "sha256": "5c131f762d121876c90971c08faaa6fea68556558c92aef439a4182473aabeb7"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/cedar-framework/cedar/blob/45a4d43328aa9b44c62cd5ebb1f3e1e5c85df7a0/README.md",
+              "sha256": "ac892cea664524c80179eb1983758d10303014fa58138cf14a4289a1c93c5a56"
+            }
+          ]
         }
       },
       "imports": {}
