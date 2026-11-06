@@ -308,6 +308,15 @@ class CatalogTests(unittest.TestCase):
                 self.assertIn('ForsytheMalcolmMoler::'+procedure, class_page)
             self.assertIn('continuation helper INTENT(OUT)', fmm)
             self.assertTrue((destination/'drivers/fmm-svd-ode/results.json').is_file())
+            self.assertIn('drivers/fmm-minimization/minimization.f90', fmm)
+            for artifact in ('minimization.f90', 'run.py', 'README.md', 'results.json'):
+                self.assertTrue((destination/'drivers/fmm-minimization'/artifact).is_file())
+            scalar_min_class = (destination/'classes/G1a1a/index.html').read_text(encoding='utf-8')
+            self.assertIn('ForsytheMalcolmMoler::BrentMin', scalar_min_class)
+            self.assertIn('ForsytheMalcolmMoler::Fmin', scalar_min_class)
+            self.assertIn('fmm.f90#L3268-L3274', fmm)
+            self.assertIn('fmm.f90#L3239-L3242', fmm)
+            self.assertIn('ERRCODE is not set on iteration exhaustion', fmm)
             minila = (destination/'projects/ghbrown/minila/index.html').read_text(encoding='utf-8')
             self.assertIn('drivers/minila-triangular/triangular.f90', minila)
             for procedure in ('diag_sub', 'fwd_sub', 'bck_sub'):

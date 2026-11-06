@@ -63139,9 +63139,122 @@
                 "line_end": 3045
               }
             ]
+          },
+          {
+            "code": "G1a1a",
+            "level": "source-reviewed",
+            "revision": "b850d06d29e348a803feaba58c0b68a8fdd5c5f1",
+            "reviewed_on": "2026-11-06",
+            "notes": "The public BrentMin and Fmin generics implement smooth scalar minimization without supplied derivatives. The inspected double overload searches a finite interval by safeguarded parabolic interpolation and golden-section steps, using only callback function values. G1a1a is the derivative-free smooth univariate class, not a multivariate, gradient-supplied or guaranteed global optimizer. Caller must supply an appropriate unimodal interval, ordered finite endpoints, positive tolerance and finite callback values. The stopping expression combines SQRT(EPSILON)*ABS(X) and TOL/3; TOL is not an achieved accuracy certificate. The complete unmodified-source main checks both APIs on quadratic, quartic, exp(t)-t-1 and asymmetric positive-quartic objectives, across three centers, widths and amplitude scales, totaling 216 known-minimum comparisons. Width-normalized location error must be <=5e-5, amplitude-normalized objective error <=1e-8, values finite and estimates inside the interval. Maximum errors were 7.381406e-8 and 2.664535e-15. Independently counted callback calls agree with NEVAL, and BrentMin returned values agree with fresh evaluations. Important source and executed limitation: BrentMin initializes ERRCODE=0 but never assigns the documented exhaustion code when MAXITER is reached. A deliberate one-iteration quadratic probe returns zero status while the minimizer location is wrong by 3.606801e-2. Fmin fixes its budget at 100 and discards error status and counts. Zero status is therefore not evidence of convergence. The probe is a reproduced defect, separate from successful known-minimum cases. GNU Fortran 17.0.0 20260510 experimental on Windows ran both module and main at O0 with bounds checks and floating-point traps; no upstream source was repaired. The callback uses SELECTED_REAL_KIND(10,50); single overloads, endpoint minima, multimodal/noisy/nonsmooth objectives, invalid brackets, extreme scales, optimized builds and other compilers remain unchecked. Existing RKF45 state-intent and inherited-source license findings remain in force.",
+            "evidence": [
+              {
+                "path": "fmm.f90",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/fmm.f90",
+                "sha256": "f2c3d0c63b0e126cd093df644f9720e16e50b8eb56e5219a418a5b9e4c634a10"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations/blob/b850d06d29e348a803feaba58c0b68a8fdd5c5f1/README.md",
+                "sha256": "9c075ca9db3582d6871c897940ae656c9ac7d4a6c860889cc91f08ad464fdd76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BrentMin",
+                "role": "public-entry-point",
+                "summary": "Public derivative-free scalar minimization subroutine. Selected double overload combines parabolic interpolation and golden-section steps. ERRCODE is not set on iteration exhaustion; zero is not a convergence guarantee.",
+                "signature": "CALL BrentMin(AX,BX,F,TOL,MAXITER,NEVAL,ERRCODE,XZERO,FZERO)",
+                "declarations": [
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3268,
+                    "line_end": 3274
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3259,
+                    "line_end": 3266
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 91,
+                    "line_end": 93
+                  }
+                ],
+                "path": "fmm.f90",
+                "line_start": 91,
+                "line_end": 93,
+                "module": "ForsytheMalcolmMoler",
+                "usage": "program minimization\n  use ForsytheMalcolmMoler, only: BrentMin, Fmin\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer, parameter :: dp=selected_real_kind(10,50)\n  real(dp), parameter :: centers(3)=[-3.0_dp,0.0_dp,4.0_dp]\n  real(dp), parameter :: widths(3)=[0.25_dp,1.0_dp,3.0_dp]\n  real(dp), parameter :: scales(3)=[1e-6_dp,1.0_dp,1e6_dp]\n  real(dp) :: center,width,amplitude,x,fx,a,b,location_error,value_error\n  real(dp) :: max_location,max_value,fresh\n  integer :: ic,iw,is,shape,api,calls,neval,status,count,total_calls,probe_calls\n  max_location=0; max_value=0; count=0; total_calls=0\n  do ic=1,3\n    center=centers(ic)\n    do iw=1,3\n      width=widths(iw); a=center-width; b=center+1.5_dp*width\n      do is=1,3\n        amplitude=scales(is)\n        do shape=1,4\n          do api=1,2\n            calls=0\n            if(api==1)then\n              call BrentMin(a,b,objective,1e-10_dp*width,500,neval,status,x,fx)\n              if(status/=0)error stop 'Unexpected minimizer status'\n              if(neval/=calls)error stop 'Objective evaluation count differs'\n            else\n              x=Fmin(a,b,objective,1e-10_dp*width)\n              fx=objective(x)\n            end if\n            total_calls=total_calls+calls\n            if(.not.ieee_is_finite(x).or..not.ieee_is_finite(fx))error stop 'Nonfinite result'\n            if(x<a.or.x>b)error stop 'Result outside search interval'\n            location_error=abs(x-center)/width\n            fresh=objective(x)\n            value_error=abs(fresh)/amplitude\n            if(location_error>5e-5_dp)error stop 'Known minimizer location check failed'\n            if(value_error>1e-8_dp)error stop 'Known minimum value check failed'\n            if(abs(fx-fresh)>1e-12_dp*amplitude)error stop 'Reported objective disagrees'\n            max_location=max(max_location,location_error)\n            max_value=max(max_value,value_error)\n            count=count+1\n          end do\n        end do\n      end do\n    end do\n  end do\n  ! Deliberately expose the pinned routine's misleading exhaustion status.\n  center=0.2_dp; width=1; amplitude=1; shape=1; calls=0\n  call BrentMin(-1.0_dp,1.0_dp,objective,1e-12_dp,1,neval,status,x,fx)\n  probe_calls=calls\n  if(status/=0.or.abs(x-center)<1e-3_dp)error stop 'Pinned exhaustion behavior changed'\n  if(neval/=probe_calls)error stop 'Probe evaluation count differs'\n  print '(a,i0)', 'Known-minimum API comparisons: ',count\n  print '(a,es14.6)', 'Maximum width-normalized location error: ',max_location\n  print '(a,es14.6)', 'Maximum amplitude-normalized objective error: ',max_value\n  print '(a,i0)', 'Normal-case objective calls (excluding independent fresh checks): ',total_calls\n  print '(a,i0,a,es14.6)', 'One-iteration probe status: ',status,'; location error: ',abs(x-center)\n  print '(a)', 'WARNING: BrentMin does not report iteration exhaustion; Fmin discards status.'\n  print '(a)', 'PASS minimization'\ncontains\n  function objective(arg) result(value)\n    real(dp), intent(in) :: arg\n    real(dp) :: value,t\n    calls=calls+1\n    t=(arg-center)/width\n    select case(shape)\n    case(1)\n      value=t*t\n    case(2)\n      value=t**4\n    case(3)\n      value=exp(t)-t-1.0_dp\n    case(4)\n      value=t*t*(1.0_dp+0.1_dp*t+0.05_dp*t*t)\n    end select\n    value=amplitude*value\n  end function\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Both unmodified module and main use -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. All 216 smooth known-minimum API comparisons passed independent location/objective checks. A separate intentionally exhausted one-iteration call reproduces zero ERRCODE despite a wrong minimizer; it is not counted as convergence. Fmin hides status entirely. Do not treat ERRCODE=0 as certification. See drivers/fmm-minimization/ for exact tolerances, source hashes, flags, compiler warnings, saved results and untested cases.",
+                "local_driver": {
+                  "path": "drivers/fmm-minimization/minimization.f90",
+                  "sha256": "77fe53f8cac3db00d7f866339c27ea02009fc83342e7455a3c544750f85fc563",
+                  "runner": "drivers/fmm-minimization/run.py",
+                  "runner_sha256": "dc70b8d9b5407f312f08f2d4d7d292ed139895db0556c809bb2705e23133e992",
+                  "report": "drivers/fmm-minimization/results.json",
+                  "report_sha256": "96a0f3b64484caeec0c4a5f7f8c0e2139cd4d03b32dcfded4704dbe6c244f141",
+                  "readme": "drivers/fmm-minimization/README.md",
+                  "check_name": "minimization"
+                }
+              },
+              {
+                "procedure": "Fmin",
+                "role": "public-entry-point",
+                "summary": "Public function wrapper for scalar minimization; double overload fixes MAX_ITER=100 and discards NEVAL and ERRCODE. Returns the final estimate without convergence status.",
+                "signature": "XOPT = Fmin(AX,BX,F,TOL)",
+                "declarations": [
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3239,
+                    "line_end": 3242
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 3230,
+                    "line_end": 3237
+                  },
+                  {
+                    "path": "fmm.f90",
+                    "line_start": 87,
+                    "line_end": 89
+                  }
+                ],
+                "path": "fmm.f90",
+                "line_start": 87,
+                "line_end": 89,
+                "module": "ForsytheMalcolmMoler",
+                "usage": "program minimization\n  use ForsytheMalcolmMoler, only: BrentMin, Fmin\n  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite\n  implicit none\n  integer, parameter :: dp=selected_real_kind(10,50)\n  real(dp), parameter :: centers(3)=[-3.0_dp,0.0_dp,4.0_dp]\n  real(dp), parameter :: widths(3)=[0.25_dp,1.0_dp,3.0_dp]\n  real(dp), parameter :: scales(3)=[1e-6_dp,1.0_dp,1e6_dp]\n  real(dp) :: center,width,amplitude,x,fx,a,b,location_error,value_error\n  real(dp) :: max_location,max_value,fresh\n  integer :: ic,iw,is,shape,api,calls,neval,status,count,total_calls,probe_calls\n  max_location=0; max_value=0; count=0; total_calls=0\n  do ic=1,3\n    center=centers(ic)\n    do iw=1,3\n      width=widths(iw); a=center-width; b=center+1.5_dp*width\n      do is=1,3\n        amplitude=scales(is)\n        do shape=1,4\n          do api=1,2\n            calls=0\n            if(api==1)then\n              call BrentMin(a,b,objective,1e-10_dp*width,500,neval,status,x,fx)\n              if(status/=0)error stop 'Unexpected minimizer status'\n              if(neval/=calls)error stop 'Objective evaluation count differs'\n            else\n              x=Fmin(a,b,objective,1e-10_dp*width)\n              fx=objective(x)\n            end if\n            total_calls=total_calls+calls\n            if(.not.ieee_is_finite(x).or..not.ieee_is_finite(fx))error stop 'Nonfinite result'\n            if(x<a.or.x>b)error stop 'Result outside search interval'\n            location_error=abs(x-center)/width\n            fresh=objective(x)\n            value_error=abs(fresh)/amplitude\n            if(location_error>5e-5_dp)error stop 'Known minimizer location check failed'\n            if(value_error>1e-8_dp)error stop 'Known minimum value check failed'\n            if(abs(fx-fresh)>1e-12_dp*amplitude)error stop 'Reported objective disagrees'\n            max_location=max(max_location,location_error)\n            max_value=max(max_value,value_error)\n            count=count+1\n          end do\n        end do\n      end do\n    end do\n  end do\n  ! Deliberately expose the pinned routine's misleading exhaustion status.\n  center=0.2_dp; width=1; amplitude=1; shape=1; calls=0\n  call BrentMin(-1.0_dp,1.0_dp,objective,1e-12_dp,1,neval,status,x,fx)\n  probe_calls=calls\n  if(status/=0.or.abs(x-center)<1e-3_dp)error stop 'Pinned exhaustion behavior changed'\n  if(neval/=probe_calls)error stop 'Probe evaluation count differs'\n  print '(a,i0)', 'Known-minimum API comparisons: ',count\n  print '(a,es14.6)', 'Maximum width-normalized location error: ',max_location\n  print '(a,es14.6)', 'Maximum amplitude-normalized objective error: ',max_value\n  print '(a,i0)', 'Normal-case objective calls (excluding independent fresh checks): ',total_calls\n  print '(a,i0,a,es14.6)', 'One-iteration probe status: ',status,'; location error: ',abs(x-center)\n  print '(a)', 'WARNING: BrentMin does not report iteration exhaustion; Fmin discards status.'\n  print '(a)', 'PASS minimization'\ncontains\n  function objective(arg) result(value)\n    real(dp), intent(in) :: arg\n    real(dp) :: value,t\n    calls=calls+1\n    t=(arg-center)/width\n    select case(shape)\n    case(1)\n      value=t*t\n    case(2)\n      value=t**4\n    case(3)\n      value=exp(t)-t-1.0_dp\n    case(4)\n      value=t*t*(1.0_dp+0.1_dp*t+0.05_dp*t*t)\n    end select\n    value=amplitude*value\n  end function\nend program",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Both unmodified module and main use -O0 -g -Wall -Wextra -ffree-line-length-none -fcheck=all -ffpe-trap=invalid,zero,overflow. All 216 smooth known-minimum API comparisons passed independent location/objective checks. A separate intentionally exhausted one-iteration call reproduces zero ERRCODE despite a wrong minimizer; it is not counted as convergence. Fmin hides status entirely. Do not treat ERRCODE=0 as certification. See drivers/fmm-minimization/ for exact tolerances, source hashes, flags, compiler warnings, saved results and untested cases.",
+                "local_driver": {
+                  "path": "drivers/fmm-minimization/minimization.f90",
+                  "sha256": "77fe53f8cac3db00d7f866339c27ea02009fc83342e7455a3c544750f85fc563",
+                  "runner": "drivers/fmm-minimization/run.py",
+                  "runner_sha256": "dc70b8d9b5407f312f08f2d4d7d292ed139895db0556c809bb2705e23133e992",
+                  "report": "drivers/fmm-minimization/results.json",
+                  "report_sha256": "96a0f3b64484caeec0c4a5f7f8c0e2139cd4d03b32dcfded4704dbe6c244f141",
+                  "readme": "drivers/fmm-minimization/README.md",
+                  "check_name": "minimization"
+                }
+              },
+              {
+                "procedure": "double Brent minimization implementation",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 3255,
+                "line_end": 3369
+              },
+              {
+                "procedure": "double function wrapper and discarded status",
+                "role": "implementation-helper",
+                "path": "fmm.f90",
+                "line_start": 3226,
+                "line_end": 3252
+              }
+            ]
           }
         ],
-        "notes": "Selected spline, quadrature, real SVD and explicit ODE configurations have complete locally checked drivers and saved results. The RKF45 continuation helper has an INTENT(OUT) state-retention issue: passing GNU -O0 tests is not portable continuation verification. The earlier Brent root calling sketch was not newly executed. Other textbook routines, optimized/single-precision/concurrent use and untested recovery paths retain separate scope; inherited-source/license findings remain available.",
+        "notes": "Selected spline, quadrature, real SVD and explicit ODE configurations have complete locally checked drivers and saved results. The RKF45 continuation helper has an INTENT(OUT) state-retention issue: passing GNU -O0 tests is not portable continuation verification. The earlier Brent root calling sketch was not newly executed. Other textbook routines, optimized/single-precision/concurrent use and untested recovery paths retain separate scope; inherited-source/license findings remain available. Scalar Brent minimization now has a complete checked main (216 known-minimum API comparisons); a separate exhausted-budget probe reproduces missing nonconvergence reporting. Neither BrentMin zero status nor the Fmin return alone guarantees convergence.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"

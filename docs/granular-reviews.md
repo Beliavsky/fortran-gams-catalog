@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 725 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 726 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -105,7 +105,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
 | fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
 | FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding), `fftpack::xcorr` | Bundled GPL notice without version; wrapper terms unresolved |
-| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8`, `::SVD`, `::RKF45` | MIT root; inherited source provenance recorded separately |
+| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8`, `::SVD`, `::RKF45`, `::BrentMin`, `::Fmin` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
 | PyIntegral | External `GaussLegendreQuadrature` (tabulated-data integration) | Custom noncommercial terms; redistribution requires permission |
@@ -966,6 +966,7 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
 | [FMM collection: real SVD](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | D6 | Householder/QR rectangular singular-value decomposition | 48 square/tall matrices; reconstruction, orthogonality, energy and selected known spectra; both vector flags true. |
 | [FMM collection: RKF45](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | I1a1a | Adaptive explicit nonstiff initial-value integration | 211 analytic-state comparisons at GNU -O0; preserved helper state has an INTENT(OUT) portability issue. |
+| [FMM: scalar minimization](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | G1a1a | Derivative-free Brent search and Fmin wrapper | 216 checked normal cases; exhausted-budget probe reproduces missing failure status. |
 | [FFTPack: cross-correlation](https://github.com/keurfonluu/FFTPack) | L10b2a | Raw finite cross-correlations, real/complex KIND=4/8 | 588 direct-sum comparisons; conjugated second vector, symmetric maximum-length lag range; legacy ABI limits. |
 | [minila: direct triangular solves](https://github.com/ghbrown/minila) | D2a3 | Default-REAL diagonal, forward and backward substitution | 108 known-solution/scaled-residual checks; 32-bit REAL, correct structure and nonzero pivots required. |
 
@@ -1929,3 +1930,18 @@ checks and traps passed under GNU Fortran 17 O0 on Windows. The unchanged
 legacy kernel still uses permissive argument matching without bounds checks;
 its implicit storage ABI, large lengths, optimized builds and other compilers
 remain unverified. Existing source and license findings are retained.
+
+The FMM collection now has a [complete scalar-minimization main](../drivers/fmm-minimization/README.md)
+for G1a1a using `ForsytheMalcolmMoler::BrentMin` and `::Fmin`. Both double
+APIs passed 216 known-minimum tests on four smooth unimodal objectives,
+three centers, widths and amplitude scales. Maximum width-normalized location
+error was 7.381406e-8 and amplitude-normalized value error 2.664535e-15.
+The main also checks callback counts and independently reevaluates the
+reported function values. A deliberately exhausted one-iteration quadratic
+probe reproduces a source defect: BrentMin leaves ERRCODE=0 although its
+minimizer is wrong by about .036. Fmin hides status entirely. The mapping,
+usage notes and driver README explicitly distinguish this probe from the
+successful normal cases. Full bounds checks and floating-point traps passed
+under GNU Fortran 17 O0 on Windows; no upstream source was modified.
+No endpoint/global/non-smooth guarantee, optimized-build certification or
+repair of the existing RKF45 continuation issue follows from these checks.
