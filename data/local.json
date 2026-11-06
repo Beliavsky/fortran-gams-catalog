@@ -26768,12 +26768,94 @@
             ],
             "notes": "The README describes tests of equality/order constraints using fitted statistical models. This is an R-facing package, not a standalone Fortran API; model assumptions and calibration are not independently checked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L6b3",
+            "level": "source-reviewed",
+            "revision": "c867d02344918cee661ebf4a73a5b63664c6bf4c",
+            "reviewed_on": "2026-11-05",
+            "notes": "DRAW_JU generates correlation-matrix draws using sequential beta-distributed partial correlations and the Joe construction. The output stores the strict lower-triangle correlations in row-by-row order (2,1),(3,1),(3,2),(4,1),(4,2),(4,3),..., with unit diagonal implicit; NUMCORRGROUP must equal P*(P-1)/2. FISHER=1 transforms each correlation with atanh. Internal RANDOM_BETA draws from the R UNIF_RAND stream, so a running/initialized R runtime and GetRNGstate/PutRNGstate lifecycle are required. FINDINV uses LAPACK LU/inversion on intermediate correlation blocks, but its ERROR1 output is not checked by the caller, and no status is returned to users for invalid dimensions, roundoff-induced square-root failure or extreme Fisher transforms. This maps the concrete random-correlation generator, not all Bayes-factor hypotheses supported by the R package. Review covers the selected full generator and its contained numerical helpers.",
+            "evidence": [
+              {
+                "path": "src/bct_prior.f90",
+                "url": "https://github.com/jomulder/BFpack/blob/c867d02344918cee661ebf4a73a5b63664c6bf4c/src/bct_prior.f90",
+                "sha256": "560e1c42d5544b35efc72019523a2c2f58461a740c48ba77b696217eca9a394a"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/jomulder/BFpack/blob/c867d02344918cee661ebf4a73a5b63664c6bf4c/DESCRIPTION",
+                "sha256": "c5abc6f71f9f5fc16a7e7a44b79fbd31527ae1adc9e68684774e48a19d190b58"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "draw_ju",
+                "role": "public-entry-point",
+                "summary": "External REAL64/INT32 correlation-matrix sampler using R RNG state and LAPACK support.",
+                "signature": "CALL draw_ju(P,DRAWS,SAMSIZE,NUMCORRGROUP,FISHER)",
+                "declarations": [
+                  {
+                    "path": "src/bct_prior.f90",
+                    "line_start": 39,
+                    "line_end": 55
+                  },
+                  {
+                    "path": "src/bct_prior.f90",
+                    "line_start": 10,
+                    "line_end": 23
+                  },
+                  {
+                    "path": "src/bct_prior.f90",
+                    "line_start": 62,
+                    "line_end": 68
+                  }
+                ],
+                "path": "src/bct_prior.f90",
+                "line_start": 39,
+                "line_end": 55,
+                "usage": "use rkinds1, only: rint,rdp\nuse rngfuncs1, only: getrngstate,putrngstate\nexternal :: draw_ju\nreal(rdp) :: draws(100,3)\n! Execute within an initialized R process, with a valid R RNG seed/state.\ncall getrngstate()\ncall draw_ju(3_rint,draws,100_rint,3_rint,0_rint)\ncall putrngstate()\n! For P=3 the columns are correlations (2,1), (3,1), (3,2).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is an R-hosted/embedded calling fragment, not a standalone linked executable. Link matching R/LAPACK ABIs, use P>=2 and the exact triangle width, and preserve the RNG lifecycle. Check finite values and positive definiteness independently; the internal inversion status is ignored. No draw distribution, matrix or Fisher-transform result was tested."
+              },
+              {
+                "procedure": "FINDinv",
+                "role": "implementation-helper",
+                "path": "src/bct_prior.f90",
+                "line_start": 130,
+                "line_end": 163
+              },
+              {
+                "procedure": "random_beta",
+                "role": "implementation-helper",
+                "path": "src/bct_prior.f90",
+                "line_start": 167,
+                "line_end": 250
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0-or-later",
+          "spdx_expression": "GPL-3.0-or-later",
+          "revision": "c867d02344918cee661ebf4a73a5b63664c6bf4c",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION specifies GPL (>=3). The selected source retains Alan Miller/Dagpunar beta-generator attribution. Preserve these notices and the separate R/LAPACK dependency terms; this is not a clearance of every statistical component in the R package.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/jomulder/BFpack/blob/c867d02344918cee661ebf4a73a5b63664c6bf4c/DESCRIPTION",
+              "sha256": "c5abc6f71f9f5fc16a7e7a44b79fbd31527ae1adc9e68684774e48a19d190b58"
+            },
+            {
+              "path": "src/bct_prior.f90",
+              "url": "https://github.com/jomulder/BFpack/blob/c867d02344918cee661ebf4a73a5b63664c6bf4c/src/bct_prior.f90",
+              "sha256": "560e1c42d5544b35efc72019523a2c2f58461a740c48ba77b696217eca9a394a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -27176,12 +27258,78 @@
             ],
             "notes": "The README describes research studies with independent normal-Wishart priors and forecasting applications. No support for arbitrary priors, all VAR specifications or generic time-series models is inferred.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10c",
+            "level": "source-reviewed",
+            "revision": "b68a4001d2f9c67cad4b904ee81136c3f74423da",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public VARUTILS VARFORECAST routine recursively forecasts a vector autoregression from a supplied lag vector and coefficient matrix, optionally adding multivariate-normal innovations. Deterministic regressors enter through optional X; absence of VC/VCROOT/VCDIAG selects deterministic point forecasts. Optional variance selection prefers VCDIAG, then VCROOT, then VC. The lag vector groups the most recent M-vector first, and B uses matching coefficient rows; each forecast replaces the first lag block and shifts older values. Dimension checks use STOP and do not validate all zero-lag/finite/covariance cases; the full-covariance branch computes a Cholesky factor via IMSL without enforcing returned rank. The sketch uses a stable two-series VAR(1) with no deterministic regressors or stochastic innovations. The module itself includes Intel/IMSL linkage and other routines, so absence of optional noise does not make the whole object dependency-free. Review covers recursive forecasting and the associated AR-to-MA recurrence, not Bayesian variable selection or model estimation.",
+            "evidence": [
+              {
+                "path": "BVARmml/VARUtlis.f90",
+                "url": "https://github.com/dingshutong/BVARmml/blob/b68a4001d2f9c67cad4b904ee81136c3f74423da/BVARmml/VARUtlis.f90",
+                "sha256": "e9205263d80b209b311560cd5bfdbb2e484be82d7982245f37afd684e044cfa1"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/dingshutong/BVARmml/blob/b68a4001d2f9c67cad4b904ee81136c3f74423da/README.md",
+                "sha256": "c8405bf04de320e4d4571e4a5fbfe6756fc7480654aa0cebcb08dcbd0487fb72"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "VARforecast",
+                "role": "public-entry-point",
+                "summary": "Public module deterministic or innovation-driven multivariate autoregression forecasting.",
+                "signature": "CALL VARforecast(Z,B,FORECAST,X,VC,VCROOT,VCDIAG)",
+                "declarations": [
+                  {
+                    "path": "BVARmml/VARUtlis.f90",
+                    "line_start": 491,
+                    "line_end": 499
+                  }
+                ],
+                "path": "BVARmml/VARUtlis.f90",
+                "line_start": 466,
+                "line_end": 583,
+                "module": "VARutils",
+                "usage": "use VARutils, only: VARforecast\ndouble precision :: z(2),b(2,2),forecast(4,2)\nz=[1d0,2d0]\nb=reshape([0.5d0,0d0,0d0,0.25d0],[2,2])\ncall VARforecast(z,b,forecast)\n! Rows of FORECAST are successive horizons; columns are series.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the author module graph with matching Intel/IMSL headers, libraries and ABI, or separately port the selected routine and its dependencies. Supply at least one lag and finite conforming arrays; stochastic/covariance branches need additional validation. No forecast, covariance or model-selection result was run."
+              },
+              {
+                "procedure": "MA_polynomial",
+                "role": "implementation-helper",
+                "path": "BVARmml/VARUtlis.f90",
+                "line_start": 416,
+                "line_end": 462
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "b68a4001d2f9c67cad4b904ee81136c3f74423da",
+          "reviewed_on": "2026-11-05",
+          "notes": "No root LICENSE/COPYING file or explicit permission grant was identified in the selected README/module. Intel/IMSL dependencies are separately licensed; availability of project source does not grant redistribution rights to those libraries or the project.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/dingshutong/BVARmml/blob/b68a4001d2f9c67cad4b904ee81136c3f74423da/README.md",
+              "sha256": "c8405bf04de320e4d4571e4a5fbfe6756fc7480654aa0cebcb08dcbd0487fb72"
+            },
+            {
+              "path": "BVARmml/VARUtlis.f90",
+              "url": "https://github.com/dingshutong/BVARmml/blob/b68a4001d2f9c67cad4b904ee81136c3f74423da/BVARmml/VARUtlis.f90",
+              "sha256": "e9205263d80b209b311560cd5bfdbb2e484be82d7982245f37afd684e044cfa1"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29911,12 +30059,104 @@
             ],
             "notes": "The README identifies single/double-layer potentials and the associated discretization paper. Operator discretization is not taken as evidence of a complete general integral-equation solver.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "H2b2a1",
+            "level": "source-reviewed",
+            "revision": "8286a9a394cf6237496d5d7b4a67ad0e8ced6b65",
+            "reviewed_on": "2026-11-05",
+            "notes": "CADAPTRI adaptively integrates a complex-valued callback over a planar triangle. It compares a parent integral against the sum over four midpoint subtriangles, accepts the parent when the absolute difference is below EPS, otherwise recursively processes children through an explicit stack. The one-triangle kernel maps a hardcoded 82-node rule by an affine transformation and absolute Jacobian determinant. Header claims of a 60-point rule and approximately 30 digits are not accepted as precision evidence; the implementation uses double precision. EPS is a local parent/children comparison, not an apportioned bound on accumulated global error. NQUAD adds 79 per accepted parent and is inconsistent with the 82-node kernel and refinement evaluations, so it is not an actual function-evaluation counter. IER=4/16 report stack/depth exhaustion and partial VAL must not be treated as a complete integral. The source file begins with a debugging main; extract the documented library section to avoid duplicate main programs. Review covers this planar adaptive kernel, not the full singular surface-operator solver.",
+            "evidence": [
+              {
+                "path": "cadaptri.f",
+                "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/cadaptri.f",
+                "sha256": "39c4e05975ff2f2a40de2bb27bb3428be301d97a190fb5f1f4c1270782ccf467"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/README.md",
+                "sha256": "51db0bd5ac4c6d48d234f85c808b82a2f6c52bc234e25ab6400dd86a90ce939e"
+              },
+              {
+                "path": "Documentation",
+                "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/Documentation",
+                "sha256": "ab3d7c4d7180659a15116887a9ccde0622fe6d0a132ca284b71b5bad95c0dbcd"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "cadaptri",
+                "role": "public-entry-point",
+                "summary": "External double-precision triangle cubature with a double-complex integrand callback and explicit stack/depth status.",
+                "signature": "CALL cadaptri(IER,EPS,VERTS,FUNUSER,PAR1,PAR2,PAR3,PAR4, &\n PAR5,PAR6,PAR7,PAR8,VALUE,NQUAD)",
+                "declarations": [
+                  {
+                    "path": "cadaptri.f",
+                    "line_start": 90,
+                    "line_end": 96
+                  },
+                  {
+                    "path": "cadaptri.f",
+                    "line_start": 112,
+                    "line_end": 127
+                  },
+                  {
+                    "path": "cadaptri.f",
+                    "line_start": 276,
+                    "line_end": 288
+                  }
+                ],
+                "path": "cadaptri.f",
+                "line_start": 90,
+                "line_end": 96,
+                "usage": "! Caller fragment after extracting the source library section (not its debug main).\nexternal :: triangle_integrand\ninteger :: ier,nquad\ndouble precision :: vertices(2,3),parameters(8)\ncomplex(kind(0d0)) :: value\nvertices=reshape([0d0,0d0,1d0,0d0,0d0,1d0],[2,3]); parameters=0d0\ncall cadaptri(ier,1d-8,vertices,triangle_integrand, &\n parameters(1),parameters(2),parameters(3),parameters(4), &\n parameters(5),parameters(6),parameters(7),parameters(8),value,nquad)\nif(ier/=0) error stop \"triangle integration incomplete\"\n! Supply external TRIANGLE_INTEGRAND(X,Y,P1,...,P8,VALUE), using DOUBLE\n! PRECISION inputs/parameters and a DOUBLE COMPLEX output; e.g. VALUE=(1d0,0d0).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback body omitted; use a nondegenerate finite triangle and matching parameter ABI. IER=0 only means the local adaptive comparisons accepted, not a rigorous global error bound. NQUAD is inconsistent with actual callback work; do not use it for benchmarking. No cubature, tolerance or singular-kernel result was run."
+              },
+              {
+                "procedure": "cadaptri_oneint",
+                "role": "implementation-helper",
+                "path": "cadaptri.f",
+                "line_start": 276,
+                "line_end": 288
+              },
+              {
+                "procedure": "cadaptri_oneint affine evaluation",
+                "role": "implementation-helper",
+                "path": "cadaptri.f",
+                "line_start": 539,
+                "line_end": 562
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0 text; later-version election not established",
+          "spdx_expression": null,
+          "revision": "8286a9a394cf6237496d5d7b4a67ad0e8ced6b65",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root license is GPL version 2 text. No reviewed project-specific later-version election was identified in the selected files, so an or-later expression is not inferred. This scoped finding is not a license audit of every generated quadrature/data file or auxiliary component.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/LICENSE",
+              "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/README.md",
+              "sha256": "51db0bd5ac4c6d48d234f85c808b82a2f6c52bc234e25ab6400dd86a90ce939e"
+            },
+            {
+              "path": "cadaptri.f",
+              "url": "https://github.com/JamesCBremerJr/Surfaces/blob/8286a9a394cf6237496d5d7b4a67ad0e8ced6b65/cadaptri.f",
+              "sha256": "39c4e05975ff2f2a40de2bb27bb3428be301d97a190fb5f1f4c1270782ccf467"
+            }
+          ]
         }
       },
       "imports": {}
@@ -35717,12 +35957,129 @@
             ],
             "notes": "The README describes Gaussian resampling and NL2SOL-based fitting, with the model supplied by editing routines. It assumes the provided observation errors and resampling model; uncertainty estimates have not been independently validated.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8e1b3",
+            "level": "source-reviewed",
+            "revision": "1be7856901a3d11bcbbb1d880a71ebbf4a218ecc",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public BOOTSTRAP workflow reads (x,y,sigma_y) observations, forms residuals (y-model)/sigma_y and invokes NL2SNO twice per fit, using finite-difference Jacobians rather than supplied derivatives. MONTE_CARLO_FIT_DATA first fits original data, then repeatedly perturbs each observation by independent Gaussian error scaled by its supplied sigma and refits, accumulating parameter/derived-property dispersion. These are parametric Monte Carlo perturbations, not resampling empirical rows. The pinned model is a+b*exp(-alpha*x); changing it requires editing private model/initialization/property procedures, not passing a callback to the public workflow. The fixed replication count is 100000. NL2SNO status IV is not checked between/after the two calls, so failed fits can enter reported summaries. Require positive observation errors and more observations than parameters for reduced chi-squared reporting. This is weighted nonlinear least-squares parameter estimation with model-specific simulation uncertainty, not a universal accuracy claim or the standard error of the Monte Carlo mean.",
+            "evidence": [
+              {
+                "path": "bootstrap.f90",
+                "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/bootstrap.f90",
+                "sha256": "24cb38d9f44ddd5f82e593f540bdc3a56f244a9da58455885850aa577ef469b6"
+              },
+              {
+                "path": "toms573.f90",
+                "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/toms573.f90",
+                "sha256": "dee18b7a69ca40535c83f3634b34f6e0250a73e85a42173d1e23ce292f84e973"
+              },
+              {
+                "path": "fitter_mc.f90",
+                "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/fitter_mc.f90",
+                "sha256": "6283e940437baa08c7ddd0841f7966de5c867d489f514060e54618baf1c81ed1"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/README",
+                "sha256": "60dc0b30e91f0268597acb6f64d5c3699146ce1b4110516303a472a67af6ce55"
+              },
+              {
+                "path": "utils.f90",
+                "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/utils.f90",
+                "sha256": "5b68b460846dc31d2eff3f3a79880109e86c5184fb2f0043056de18c9e546d01"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "monte_carlo_fit_data",
+                "role": "public-entry-point",
+                "summary": "Public module file-initialized weighted nonlinear fitting and parametric Monte Carlo summary workflow.",
+                "signature": "CALL initialise_rng()\nCALL get_data()\nCALL monte_carlo_fit_data()",
+                "declarations": [
+                  {
+                    "path": "bootstrap.f90",
+                    "line_start": 1,
+                    "line_end": 24
+                  },
+                  {
+                    "path": "bootstrap.f90",
+                    "line_start": 253,
+                    "line_end": 267
+                  },
+                  {
+                    "path": "bootstrap.f90",
+                    "line_start": 229,
+                    "line_end": 248
+                  }
+                ],
+                "path": "bootstrap.f90",
+                "line_start": 253,
+                "line_end": 362,
+                "module": "bootstrap",
+                "usage": "program fit_sketch\n use utils, only: initialise_rng\n use bootstrap, only: get_data,monte_carlo_fit_data\n call initialise_rng()\n call get_data()\n call monte_carlo_fit_data()\nend program\n! Run with the data-file path as command argument 1 (x, y, positive sigma_y).\n! The pinned source uses a+b*exp(-alpha*x) and 100000 perturbation fits.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. File-driven module workflow; edit the private model and replication parameter for another problem. Link the complete numerical/RNG modules and preserve original inputs. Histograms/output files are written, and solver status needs checking before trusting summaries. No fit, parameter uncertainty, bootstrap coverage or parallel execution was tested."
+              },
+              {
+                "procedure": "fit_data",
+                "role": "implementation-helper",
+                "path": "bootstrap.f90",
+                "line_start": 215,
+                "line_end": 226
+              },
+              {
+                "procedure": "madr",
+                "role": "implementation-helper",
+                "path": "bootstrap.f90",
+                "line_start": 229,
+                "line_end": 250
+              },
+              {
+                "procedure": "nl2sno",
+                "role": "implementation-helper",
+                "path": "toms573.f90",
+                "line_start": 590,
+                "line_end": 615
+              },
+              {
+                "procedure": "model_y",
+                "role": "implementation-helper",
+                "path": "bootstrap.f90",
+                "line_start": 390,
+                "line_end": 396
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 text with retained numerical-component notices",
+          "spdx_expression": null,
+          "revision": "1be7856901a3d11bcbbb1d880a71ebbf4a218ecc",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root LICENCE contains GPL version 3 text without a reviewed explicit or-later election. README/source retain NL2SOL/TOMS573, ORDERPACK and RANLUX provenance. Preserve component notices; do not replace every inherited numerical grant with an inferred blanket SPDX expression.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/LICENCE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/README",
+              "sha256": "60dc0b30e91f0268597acb6f64d5c3699146ce1b4110516303a472a67af6ce55"
+            },
+            {
+              "path": "toms573.f90",
+              "url": "https://github.com/ndd21/Fitter_MC/blob/1be7856901a3d11bcbbb1d880a71ebbf4a218ecc/toms573.f90",
+              "sha256": "dee18b7a69ca40535c83f3634b34f6e0250a73e85a42173d1e23ce292f84e973"
+            }
+          ]
         }
       },
       "imports": {}
@@ -40123,12 +40480,153 @@
             ],
             "notes": "The README documents MPFUN-Fort or MPFUN-MPFR, configurable precision and optional blend-to-zero operators. This constructs continuation tables/operators rather than a standalone general FFT implementation; timings and accuracy remain unverified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D5",
+            "level": "source-reviewed",
+            "revision": "6730439ef201a6ee04862ad1a2e2dc686b41fc32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MPRQR routine computes a square real arbitrary-precision QR factorization using classical Gram-Schmidt: projection coefficients are formed against the original current column, then the combined projection is subtracted and the result normalized. There is no reorthogonalization, pivoting, numerical-rank test or status output; a zero/dependent column can cause division by zero. Nonsquare input terminates with STOP. MPFUN MP_REAL arithmetic is used throughout. This maps the inspected table-generation support kernel to QR factorization, not all of FC-Gram continuation or a rank-revealing least-squares solver. Review covers the full small QR kernel and its matrix-vector helper.",
+            "evidence": [
+              {
+                "path": "mprlinalg_mod.f03",
+                "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/mprlinalg_mod.f03",
+                "sha256": "3281db91e1b543b2caf709193bc6a4ce57da341f99bbde5b8c01c2b17cd91013"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/README.md",
+                "sha256": "0feff1c75fb9e2c5861499ec453ed2f0e7b00cbcc4ba72719ffa3408cf033d62"
+              },
+              {
+                "path": "Makefile.in",
+                "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/Makefile.in",
+                "sha256": "fefc99527c29156b29d8ada43850f42824d07431705eef327c4822200e60a48b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mprqr",
+                "role": "public-entry-point",
+                "summary": "Public module square classical Gram-Schmidt QR in MPFUN arbitrary-precision real arithmetic.",
+                "signature": "CALL mprqr(A,Q,R)",
+                "declarations": [
+                  {
+                    "path": "mprlinalg_mod.f03",
+                    "line_start": 254,
+                    "line_end": 260
+                  }
+                ],
+                "path": "mprlinalg_mod.f03",
+                "line_start": 239,
+                "line_end": 310,
+                "module": "mprlinalg",
+                "usage": "use mpmodule\nuse mprlinalg, only: mprqr\ntype(mp_real) :: a(2,2),q(2,2),r(2,2)\na(1,1)=mpreal(\"1.\"); a(2,1)=mpreal(\"1.\")\na(1,2)=mpreal(\"0.\"); a(2,2)=mpreal(\"1.\")\ncall mprqr(a,q,r)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build MPFUN and the module with one consistent configured precision/backend. Supply a nonempty full-rank square matrix and inspect orthogonality/reconstruction independently. Arbitrary precision does not remove rank failure or classical Gram-Schmidt sensitivity. No factorization or numerical-rank case was run."
+              },
+              {
+                "procedure": "MPRMATVEC",
+                "role": "implementation-helper",
+                "path": "mprlinalg_mod.f03",
+                "line_start": 54,
+                "line_end": 96
+              }
+            ]
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "6730439ef201a6ee04862ad1a2e2dc686b41fc32",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MPRSVDPLAN type exposes initialization, a fixed number of one-sided Jacobi sweeps, normalization into singular values/vectors, and cleanup. Pairwise column inner products determine rotations that update U and V; TO_SVD takes column norms, normalizes retained columns and zeros singular values below EIGENMIN. Singular values are not explicitly sorted. The stored V is accumulated as right-vector columns, with A=U*diag(sigma)*transpose(V) after sufficient orthogonalization. Sweep topology requires an even column count; this sketch uses four columns and a tall/full-rank matrix. ITERATE performs the requested sweep count without a convergence flag; its first progress-rate print divides by the initial zero step count and needs repair before use with invalid/divide-by-zero traps. Rank truncation, fixed precision and fixed sweeps are user controls rather than accuracy certification. Review covers initialization, rotation/normalization and cleanup, not all continuation operators or least-squares solve modes.",
+            "evidence": [
+              {
+                "path": "mprlinalg_mod.f03",
+                "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/mprlinalg_mod.f03",
+                "sha256": "3281db91e1b543b2caf709193bc6a4ce57da341f99bbde5b8c01c2b17cd91013"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/README.md",
+                "sha256": "0feff1c75fb9e2c5861499ec453ed2f0e7b00cbcc4ba72719ffa3408cf033d62"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "iterate",
+                "role": "public-entry-point",
+                "summary": "Public type-bound fixed-sweep one-sided Jacobi iteration; initialize and normalize through the same plan.",
+                "signature": "CALL plan%init_plan(A,EIGENMIN,EPS)\nCALL plan%iterate(ITERS)\nCALL plan%to_svd()\nCALL plan%destroy_plan()",
+                "declarations": [
+                  {
+                    "path": "mprlinalg_mod.f03",
+                    "line_start": 19,
+                    "line_end": 46
+                  },
+                  {
+                    "path": "mprlinalg_mod.f03",
+                    "line_start": 339,
+                    "line_end": 341
+                  },
+                  {
+                    "path": "mprlinalg_mod.f03",
+                    "line_start": 552,
+                    "line_end": 553
+                  },
+                  {
+                    "path": "mprlinalg_mod.f03",
+                    "line_start": 658,
+                    "line_end": 664
+                  }
+                ],
+                "path": "mprlinalg_mod.f03",
+                "line_start": 523,
+                "line_end": 640,
+                "module": "mprlinalg",
+                "derived_type": "MPRSVDPLAN",
+                "usage": "use mpmodule\nuse mprlinalg, only: MPRSVDPLAN\ntype(MPRSVDPLAN) :: plan\ntype(mp_real) :: a(4,4)\ninteger :: i\na=mpreal(\"0.\")\ndo i=1,4\n a(i,i)=i*mpreal(\"1.\")\nend do\ncall plan%init_plan(a,eigenmin=mpreal(\"1.e-40\"),eps=mpreal(\"1.e-30\"))\ncall plan%iterate(20)\ncall plan%to_svd()\n! Inspect PLAN%U, PLAN%SIGMA and PLAN%V; preserve A for residual checks.\ncall plan%destroy_plan()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use an even column count and compatible MPFUN precision; fix the first progress-print division before enabling arithmetic traps. Fixed sweeps are not proof of convergence, singular values are unsorted, and discarded columns are zeroed rather than completed to an orthogonal basis. No SVD, rank-truncation or residual result was tested."
+              },
+              {
+                "procedure": "svd_init_plan",
+                "role": "implementation-helper",
+                "path": "mprlinalg_mod.f03",
+                "line_start": 313,
+                "line_end": 397
+              },
+              {
+                "procedure": "svd_to_svd",
+                "role": "implementation-helper",
+                "path": "mprlinalg_mod.f03",
+                "line_start": 645,
+                "line_end": 687
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified for selected project code",
+          "spdx_expression": null,
+          "revision": "6730439ef201a6ee04862ad1a2e2dc686b41fc32",
+          "reviewed_on": "2026-11-05",
+          "notes": "The project README and selected module name the author but provide no permission grant, and the root tree has no standalone license file. Bundled MPFUN/GMP/MPFR notices apply to their components and do not establish a license for the FC Tables project code.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/README.md",
+              "sha256": "0feff1c75fb9e2c5861499ec453ed2f0e7b00cbcc4ba72719ffa3408cf033d62"
+            },
+            {
+              "path": "mprlinalg_mod.f03",
+              "url": "https://github.com/mfontanaar/fctables/blob/6730439ef201a6ee04862ad1a2e2dc686b41fc32/mprlinalg_mod.f03",
+              "sha256": "3281db91e1b543b2caf709193bc6a4ce57da341f99bbde5b8c01c2b17cd91013"
+            }
+          ]
         }
       },
       "imports": {}
@@ -41268,12 +41766,90 @@
             ],
             "notes": "The README documents rank-local reduction, reduced-system exchange/solve and reconstruction, with a single-rank Thomas path. It distinguishes the published Fortran implementation from later C++ extensions; performance is hardware/problem dependent and was not measured here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2a2a",
+            "level": "source-reviewed",
+            "revision": "7d118e3a2253ed1332ae3bdd37801387560ae17b",
+            "reviewed_on": "2026-11-05",
+            "notes": "PASCAL_SOLVER solves batches of real tridiagonal systems using CUDA Fortran device arrays, with one system per GPU thread in the single-rank Thomas path. The multi-rank dispatcher reduces each local row segment to two interface rows, redistributes and solves reduced systems using CUDA-aware MPI, then reconstructs each local solution. A/B/C are lower/main/upper diagonals and D is overwritten by solutions; C is destroyed even on the single-rank path, and A is also changed on the distributed path. No pivoting or caller-visible numerical INFO is supplied, so matrices must avoid zero/unstable elimination pivots. Public plan creation and cleanup bracket repeated solves. Distributed calls require compatible system counts/decomposition and at least two local rows, with CUDA-aware MPI rather than a host-staging fallback. The sketch uses only one rank, while the evidence records distributed dispatch without claiming a tested parallel solve. This is a general real tridiagonal mapping, not an SPD-only or cyclic solver claim.",
+            "evidence": [
+              {
+                "path": "src/pascal_tdma_cuda.f90",
+                "url": "https://github.com/MPMC-Lab/PaScaL_TDMA/blob/7d118e3a2253ed1332ae3bdd37801387560ae17b/src/pascal_tdma_cuda.f90",
+                "sha256": "141bae5a1945f5009614ce299fcb262e40cd29fd396e0b54633cfd005c9ec726"
+              },
+              {
+                "path": "doc/fortran.md",
+                "url": "https://github.com/MPMC-Lab/PaScaL_TDMA/blob/7d118e3a2253ed1332ae3bdd37801387560ae17b/doc/fortran.md",
+                "sha256": "a1a3cc5670ca33a92d379712effea683255290c2aaed0529c145ad444db213b0"
+              },
+              {
+                "path": "examples/ex_tdma_zdirection.f90",
+                "url": "https://github.com/MPMC-Lab/PaScaL_TDMA/blob/7d118e3a2253ed1332ae3bdd37801387560ae17b/examples/ex_tdma_zdirection.f90",
+                "sha256": "064d1d45a696196beedeeab292af676f5eb95fe0dcc3e07933c60afb0e4db636"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "pascal_solver",
+                "role": "public-entry-point",
+                "summary": "Public CUDA Fortran batch tridiagonal solver using reusable MPI/GPU plan state.",
+                "signature": "CALL pascal_plan_create(PLAN,NSYS,COMM,RANK,NRANKS,THREADS,REDUCED_THREADS)\nCALL pascal_solver(PLAN,A,B,C,D,NSYS,NROW)\nCALL pascal_plan_clean(PLAN)",
+                "declarations": [
+                  {
+                    "path": "src/pascal_tdma_cuda.f90",
+                    "line_start": 133,
+                    "line_end": 140
+                  },
+                  {
+                    "path": "src/pascal_tdma_cuda.f90",
+                    "line_start": 318,
+                    "line_end": 322
+                  }
+                ],
+                "path": "src/pascal_tdma_cuda.f90",
+                "line_start": 318,
+                "line_end": 416,
+                "module": "PaScaL_TDMA_cuda",
+                "usage": "use mpi\nuse cudafor\nuse PaScaL_TDMA_cuda, only: ptdma_plan_cuda,pascal_plan_create,pascal_solver,pascal_plan_clean\ntype(ptdma_plan_cuda) :: plan\ninteger :: rank,nranks,ierr,istat\nreal(8),device :: a(0:1,0:3),b(0:1,0:3),c(0:1,0:3),d(0:1,0:3)\nreal(8) :: solution(0:1,0:3)\ncall MPI_Init(ierr)\ncall MPI_Comm_rank(MPI_COMM_WORLD,rank,ierr)\ncall MPI_Comm_size(MPI_COMM_WORLD,nranks,ierr)\n! Launch this sketch with one MPI rank and a visible GPU.\nif(nranks/=1) error stop \"single-rank sketch\"\nistat=cudaSetDevice(0)\nif(istat/=0) error stop \"device selection failed\"\na=-1d0; b=4d0; c=-1d0; d=2d0\na(:,0)=0d0; c(:,3)=0d0; d(:,0)=3d0; d(:,3)=3d0\ncall pascal_plan_create(plan,2,MPI_COMM_WORLD,rank,nranks,32,32)\ncall pascal_solver(plan,a,b,c,d,2,4)\nistat=cudaDeviceSynchronize()\nif(istat/=0) error stop \"GPU solve failed\"\nsolution=d\ncall pascal_plan_clean(plan)\ncall MPI_Finalize(ierr)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Requires NVIDIA CUDA Fortran, compatible GPU/runtime and MPI modules. A/B/C/D follow the exact zero-based system-first layout. Preserve coefficients/RHS and check a residual independently; the solver has no pivot/status guarantee. Restore destroyed coefficients before reusing a plan. No serial or distributed solve, pivot case or timing was tested."
+              },
+              {
+                "procedure": "tdma_many_cuda",
+                "role": "implementation-helper",
+                "path": "src/pascal_tdma_cuda.f90",
+                "line_start": 652,
+                "line_end": 706
+              },
+              {
+                "procedure": "pascal_plan_create",
+                "role": "implementation-helper",
+                "path": "src/pascal_tdma_cuda.f90",
+                "line_start": 133,
+                "line_end": 251
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "7d118e3a2253ed1332ae3bdd37801387560ae17b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned MIT grant names the Yonsei/KISTI group and Ki-Ha Kim. NVIDIA compiler/runtime and MPI dependencies retain separate terms; the finding covers repository solver code rather than bundled third-party binary redistribution.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/MPMC-Lab/PaScaL_TDMA/blob/7d118e3a2253ed1332ae3bdd37801387560ae17b/LICENSE",
+              "sha256": "b2fc15567fdfe4fa756fc44d394b30b5c7e7fb6f9eaba18472fc76b01d2a3996"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45448,12 +46024,105 @@
             ],
             "notes": "Evidence is the optimisers module comments and public Optimise_SA, Optimise_GA and Optimise_ES interfaces because no top-level README was found. An interface review supports the broad optimization category, not a correctness or global-optimality guarantee for each implementation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2i",
+            "level": "source-reviewed",
+            "revision": "2919b284f29b413d3b3ab7fb39238306deae3e23",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public OPT_RUNSA routine performs bounded real-vector simulated annealing with a user scalar objective, sparse Gaussian coordinate perturbations clipped to shared scalar bounds, Metropolis acceptance, geometric cooling and optional reheating. It returns the best visited vector, not a convergence or global-optimality status. A sampled objective-difference scale determines initial temperature; constant sampled objectives can make this zero and subsequent temperature formulas unsafe. NPRINT must be positive because MOD(ITERNUM,NPRINT) is unguarded; initialization bounds must lie inside the search bounds. The routine reseeds the intrinsic RNG from SYSTEM_CLOCK on every call, so a caller seed alone does not control reproducibility. The mapping is heuristic global/nonconvex optimization rather than a deterministic smooth constrained leaf. Review covers the annealing entry, proposal helper, callback and seed setup, not all genetic/evolutionary methods in this repo.",
+            "evidence": [
+              {
+                "path": "src/optimisers/sa.f90",
+                "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/optimisers/sa.f90",
+                "sha256": "982da83dbce9e80b7a4294d56d5670def4414b3a58bfb57de4b4f52fdf4c60be"
+              },
+              {
+                "path": "src/functional/interface.f90",
+                "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/functional/interface.f90",
+                "sha256": "81db3859be8fe4ef905cb687b988786d3050b7aa81172f7d77394d0c8eb43e0f"
+              },
+              {
+                "path": "src/functional/stochastic.f90",
+                "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/functional/stochastic.f90",
+                "sha256": "a8e170bf4161682ae14f8e039f4d3ce72d6de796b8ef2927c4937ba0d0bec172"
+              },
+              {
+                "path": "src/precision.f90",
+                "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/precision.f90",
+                "sha256": "765510adb24b6f58063def8bb3a9e560213adc9a9a7408f4ef137040ba1a21ee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "opt_runSA",
+                "role": "public-entry-point",
+                "summary": "Public module bounded simulated-annealing routine with an assumed-shape objective callback.",
+                "signature": "CALL opt_runSA(FITNESS,NDIMS,LBOUND,UBOUND,LBOUNDI,UBOUNDI, &\n INNERMAX,OUTERMAX,NREHEAT,ALPHA,NPRINT,XOPT)",
+                "declarations": [
+                  {
+                    "path": "src/optimisers/sa.f90",
+                    "line_start": 80,
+                    "line_end": 108
+                  },
+                  {
+                    "path": "src/functional/interface.f90",
+                    "line_start": 48,
+                    "line_end": 63
+                  },
+                  {
+                    "path": "src/precision.f90",
+                    "line_start": 33,
+                    "line_end": 45
+                  }
+                ],
+                "path": "src/optimisers/sa.f90",
+                "line_start": 80,
+                "line_end": 108,
+                "module": "mod_optSA",
+                "usage": "program anneal_sketch\n use precision, only: WP\n use mod_optSA, only: opt_runSA\n real(WP) :: best(2)\n call opt_runSA(objective,2,-2._WP,2._WP,-1._WP,1._WP, &\n  100,20,5,0.1_WP,100,best)\ncontains\n function objective(z) result(f)\n  real(WP),intent(in) :: z(:)\n  real(WP) :: f\n  f=sum((z-0.25_WP)**2)\n end function\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Positive iteration/print/reheat controls and finite nonconstant objective samples are assumed. The module reseeds randomness internally and emits initialization/progress output. Supply compatible WP/WI kinds and validate returned bounds/objective independently; no annealing run or optimality result was tested."
+              },
+              {
+                "procedure": "neighbouringVector",
+                "role": "implementation-helper",
+                "path": "src/optimisers/sa.f90",
+                "line_start": 368,
+                "line_end": 413
+              },
+              {
+                "procedure": "STOCHASTIC_SeedInit",
+                "role": "implementation-helper",
+                "path": "src/functional/stochastic.f90",
+                "line_start": 28,
+                "line_end": 54
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license identified",
+          "spdx_expression": null,
+          "revision": "2919b284f29b413d3b3ab7fb39238306deae3e23",
+          "reviewed_on": "2026-11-05",
+          "notes": "No LICENSE/COPYING or README permission grant appears in the pinned tree. The selected module credits Rob Watson, but authorship/public source access alone is not a redistribution license.",
+          "evidence": [
+            {
+              "path": "src/optimisers/sa.f90",
+              "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/optimisers/sa.f90",
+              "sha256": "982da83dbce9e80b7a4294d56d5670def4414b3a58bfb57de4b4f52fdf4c60be"
+            },
+            {
+              "path": "src/functional/interface.f90",
+              "url": "https://github.com/RWatson54/OptimusPrime/blob/2919b284f29b413d3b3ab7fb39238306deae3e23/src/functional/interface.f90",
+              "sha256": "81db3859be8fe4ef905cb687b988786d3050b7aa81172f7d77394d0c8eb43e0f"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45824,12 +46493,147 @@
             ],
             "notes": "The README identifies modified Fortran UOBYQA, NEWUOA, BOBYQA, LINCOA and COBYLA sources. Interfaces and underlying solvers are distinguished; individual constraint classes and numerical results are deferred to deeper review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "G2h1a1",
+            "level": "source-reviewed",
+            "revision": "76e12cbf798c4ed583c37e547513da4396db928f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected modified BOBYQA entry minimizes a real smooth objective with bound constraints through interpolation-based quadratic trust-region models, without user derivatives. It partitions workspace, adjusts an initial point/radii against bounds and dispatches BOBYQB, which evaluates named external CALFUN and computes constrained model steps through TRSBOX. Unlike the original Powell interface, this variant adds F, INFO and FTARGET; callers must use the pinned signature and matching modified dependency set. N>=2, N+2<=NPT<=(N+1)*(N+2)/2, adequate workspace and positive ordered radii are required; RHOBEG/RHOEND can be overwritten. INFO distinguishes radius/target termination, evaluation cap, invalid inputs and numerical failures. Radius/target success does not establish a global optimum or objective error bound. Review covers public workspace/adjustment dispatch and selected evaluation/trust-step/status paths, not a complete trust-region proof or every PDFO front end.",
+            "evidence": [
+              {
+                "path": "fsrc/bobyqa/bobyqa.f",
+                "url": "https://github.com/pdfo/pdfo/blob/76e12cbf798c4ed583c37e547513da4396db928f/fsrc/bobyqa/bobyqa.f",
+                "sha256": "d32372195c3ad2a040307f6f0296e63b1e228e9ad21b8f604d08ff3fb7f5ed10"
+              },
+              {
+                "path": "fsrc/bobyqa/bobyqb.f",
+                "url": "https://github.com/pdfo/pdfo/blob/76e12cbf798c4ed583c37e547513da4396db928f/fsrc/bobyqa/bobyqb.f",
+                "sha256": "f06c14357302d20a9d0ab4f6b28a845c3cf6f0108021bb7c2468cb2f9110fc17"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "BOBYQA",
+                "role": "public-entry-point",
+                "summary": "External bound-constrained derivative-free quadratic-model optimizer with PDFO-specific output arguments.",
+                "signature": "CALL BOBYQA(N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,W,F,INFO,FTARGET)",
+                "declarations": [
+                  {
+                    "path": "fsrc/bobyqa/bobyqa.f",
+                    "line_start": 1,
+                    "line_end": 11
+                  },
+                  {
+                    "path": "fsrc/bobyqa/bobyqa.f",
+                    "line_start": 45,
+                    "line_end": 72
+                  }
+                ],
+                "path": "fsrc/bobyqa/bobyqa.f",
+                "line_start": 1,
+                "line_end": 11,
+                "usage": "external :: BOBYQA\ninteger,parameter :: n=2,npt=5,lwork=(npt+5)*(npt+n)+3*n*(n+5)/2\ninteger :: info,maxfun\ndouble precision :: x(n),lower(n),upper(n),w(lwork),f,rhobeg,rhoend,target\nx=0d0; lower=-2d0; upper=2d0; rhobeg=0.5d0; rhoend=1d-6\nmaxfun=1000; target=-1d100\ncall BOBYQA(n,npt,x,lower,upper,rhobeg,rhoend,0,maxfun,w,f,info,target)\nif(info/=0.and.info/=1) error stop \"inspect BOBYQA termination\"\n! Supply a separately linked external CALFUN(N,X,F) matching DOUBLE PRECISION.\n! For example set F=SUM((X(1:N)-0.25D0)**2) in that routine.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback body omitted. Link the modified non-classical BOBYQA source set; do not mix it with original/classical entry signatures. Keep mutable radius arguments and inspect INFO/returned point independently. No optimization, bound or evaluation-limit case was tested."
+              },
+              {
+                "procedure": "BOBYQB",
+                "role": "implementation-helper",
+                "path": "fsrc/bobyqa/bobyqb.f",
+                "line_start": 1,
+                "line_end": 14
+              },
+              {
+                "procedure": "BOBYQB trust-region dispatch",
+                "role": "implementation-helper",
+                "path": "fsrc/bobyqa/bobyqb.f",
+                "line_start": 179,
+                "line_end": 181
+              }
+            ]
+          },
+          {
+            "code": "G2h3b1a",
+            "level": "source-reviewed",
+            "revision": "76e12cbf798c4ed583c37e547513da4396db928f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected modified COBYLA entry minimizes an objective under nonlinear inequality constraints CON(i)>=0 using simplex interpolation and local linear trust-region approximations, without derivatives. The wrapper partitions real/integer workspace and returns F, INFO, RESMAX and constraint values in addition to overwriting X and the MAXFUN evaluation-count argument. Named external CALCFC must compute objective and every constraint at each trial. Equality constraints are not a separate exact interface; no equality support is inferred from this mapping. The implementation computes violation as max(0,-CON), tracks simplex geometry/model steps and distinguishes target/radius/cap/numerical termination. A small final radius alone does not imply feasible or globally optimal output; inspect RESMAX and original constraints. The signature differs from original Powell/classical COBYLA and must match this source set. Review covers wrapper, callback/violation handling and selected trust-region/status paths, not all PDFO preprocessing or the complete LP kernel.",
+            "evidence": [
+              {
+                "path": "fsrc/cobyla/cobyla.f",
+                "url": "https://github.com/pdfo/pdfo/blob/76e12cbf798c4ed583c37e547513da4396db928f/fsrc/cobyla/cobyla.f",
+                "sha256": "efaa1457cce4992f0befcb9442807126f0ad4a005864fd6e4338a4590673c4b6"
+              },
+              {
+                "path": "fsrc/cobyla/cobylb.f",
+                "url": "https://github.com/pdfo/pdfo/blob/76e12cbf798c4ed583c37e547513da4396db928f/fsrc/cobyla/cobylb.f",
+                "sha256": "d895c94b392b02270f6ab9a4dd5b5e589344e6ecfd479f16215dda3a4d886def"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "COBYLA",
+                "role": "public-entry-point",
+                "summary": "External nonlinear inequality-constrained derivative-free simplex-model optimizer with PDFO-specific results.",
+                "signature": "CALL COBYLA(N,M,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,IACT,F,INFO,FTARGET,RESMAX,CON)",
+                "declarations": [
+                  {
+                    "path": "fsrc/cobyla/cobyla.f",
+                    "line_start": 4,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "fsrc/cobyla/cobyla.f",
+                    "line_start": 46,
+                    "line_end": 51
+                  },
+                  {
+                    "path": "fsrc/cobyla/cobyla.f",
+                    "line_start": 73,
+                    "line_end": 81
+                  }
+                ],
+                "path": "fsrc/cobyla/cobyla.f",
+                "line_start": 4,
+                "line_end": 8,
+                "usage": "external :: COBYLA\ninteger,parameter :: n=2,m=1,lwork=n*(3*n+2*m+11)+4*m+6\ninteger :: maxfun,info,iact(m+1)\ndouble precision :: x(n),w(lwork),f,rhobeg,rhoend,target,resmax,con(m)\nx=0d0; rhobeg=0.5d0; rhoend=1d-6; maxfun=1000; target=-1d100\ncall COBYLA(n,m,x,rhobeg,rhoend,0,maxfun,w,iact,f,info,target,resmax,con)\nif(info/=0.and.info/=1) error stop \"inspect COBYLA termination\"\nif(resmax>1d-6) error stop \"constraint violation\"\n! Supply separate external CALCFC(N,M,X,F,CON) with DOUBLE PRECISION arrays.\n! One possible model is F=SUM((X(1:N)-1D0)**2), CON(1)=1D0-SUM(X(1:N)**2).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback body omitted. Nonnegative CON is feasible; reversing its sign changes the problem. Link this modified source family and validate dimensions/radii beforehand. Preserve the input evaluation budget separately because MAXFUN is overwritten. No constrained solve, feasibility or convergence result was tested."
+              },
+              {
+                "procedure": "COBYLB",
+                "role": "implementation-helper",
+                "path": "fsrc/cobyla/cobylb.f",
+                "line_start": 4,
+                "line_end": 22
+              },
+              {
+                "procedure": "COBYLB callback and violation handling",
+                "role": "implementation-helper",
+                "path": "fsrc/cobyla/cobylb.f",
+                "line_start": 96,
+                "line_end": 118
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "76e12cbf798c4ed583c37e547513da4396db928f",
+          "reviewed_on": "2026-11-05",
+          "notes": "Root BSD three-clause license credits Ragonneau and Zhang. Selected numerical files retain Powell algorithm provenance and interface modification history; this finding covers the reviewed PDFO source family rather than every external MATLAB/Python toolchain dependency.",
+          "evidence": [
+            {
+              "path": "LICENCE.txt",
+              "url": "https://github.com/pdfo/pdfo/blob/76e12cbf798c4ed583c37e547513da4396db928f/LICENCE.txt",
+              "sha256": "3788ecf265bb1b6836cfd826ff325a7db6aa958cf97281b680dc10fa1b4a49b2"
+            }
+          ]
         }
       },
       "imports": {}

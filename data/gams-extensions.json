@@ -624,6 +624,60 @@
       "parent": "G2",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L6b3": {
+      "label": "Contingency table, correlation matrix",
+      "parent": "L6b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10c": {
+      "label": "Multivariate time series (search also classes J1, L3e3 and L10b)",
+      "parent": "L10",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "H2b2": {
+      "label": "n-dimensional quadrature on a nonrectangular region",
+      "parent": "H2b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "H2b2a": {
+      "label": "Integrand available via user-defined procedure",
+      "parent": "H2b2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "H2b2a1": {
+      "label": "Automatic (user need only specify required accuracy)",
+      "parent": "H2b2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8e": {
+      "label": "Nonlinear (i.e., y = F(X,b)) (search also class L8h)",
+      "parent": "L8",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8e1": {
+      "label": "Ordinary least squares",
+      "parent": "L8e",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8e1b": {
+      "label": "Parameter estimation (search also class L8e1a)",
+      "parent": "L8e1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8e1b3": {
+      "label": "Weighted data, user provides no derivatives",
+      "parent": "L8e1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

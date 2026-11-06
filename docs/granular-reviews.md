@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 356 repositories now have 474 source-reviewed
+Reviewed on 2026-11-05. 364 repositories now have 484 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-344 repository cards now identify public routines and link their usage lines
+352 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 356 independently source-reviewed repositories now have an
+separately. All 364 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -380,6 +380,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Sparse Iterative Parallel Linear Solver | `mSolver::SolverAxB` | MIT |
 | npregfast | `Reg1D`, `lsq::startup` | MIT package declaration with inherited LSQ attribution |
 | rrelaxiv | `RELAXALG` | Custom academic-institution license |
+| BFpack | `draw_ju` | GPL-3.0-or-later |
+| BVARmml | `VARutils::VARforecast` | No license identified |
+| Singular surface operators | `cadaptri` | GPL-2.0 text; later-version election not established |
+| Fitter MC | `bootstrap::monte_carlo_fit_data` | GPL-3.0 text with retained numerical-component notices |
+| FC Tables | `mprlinalg::mprqr`, `mprlinalg::MPRSVDPLAN%iterate` | No license grant identified for selected project code |
+| PaScaL TDMA | `PaScaL_TDMA_cuda::pascal_solver` | MIT |
+| OptimusPrime | `mod_optSA::opt_runSA` | No license identified |
+| PDFO | `BOBYQA`, `COBYLA` | BSD-3-Clause |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -755,6 +763,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Sparse Iterative Parallel Linear Solver](https://github.com/tueboesen/sparse-iterative-parallel-linear-solver) | D2b4 | Real sparse preconditioned conjugate-gradient solve | CSR/OpenMP setup, optional-argument defects and public convergence-status limitations. |
 | [npregfast](https://github.com/sestelo/npregfast) | K5; L8c1b1 | Local polynomial smoothing and sequential multiple-linear coefficient estimation | Bandwidth/packed coefficient semantics, overwritten rows and shared LSQ state. |
 | [rrelaxiv](https://github.com/josherrickson/rrelaxiv) | G2d | Integer capacitated minimum-cost network flow | Supply sign conversion, destructive residual arrays, integer ranges and early-return flag caveat. |
+| [BFpack](https://github.com/jomulder/bfpack) | L6b3 | Joe random correlation-matrix generation | R-hosted RNG lifecycle, row-wise triangle packing and unchecked internal inversion status. |
+| [BVARmml](https://github.com/dingshutong/bvarmml) | L10c | Recursive multivariate autoregression forecasts | Lag/coefficient layout, deterministic versus innovation forecasts and Intel/IMSL requirements. |
+| [Singular surface operators](https://github.com/jamescbremerjr/surfaces) | H2b2a1 | Adaptive complex-valued integration over a planar triangle | Local tolerance test, inconsistent node count, stack/depth status and embedded debugging main. |
+| [Fitter MC](https://github.com/ndd21/fitter_mc) | L8e1b3 | Weighted derivative-free nonlinear fits with parametric Monte Carlo uncertainty | File-driven model-specific workflow, fixed replication count and unchecked fit status. |
+| [FC Tables](https://github.com/mfontanaar/fctables) | D5; D6 | Arbitrary-precision QR and one-sided Jacobi SVD support | Classical Gram-Schmidt rank limits, even-column sweeps, unsorted singular values and progress-print defect. |
+| [PaScaL TDMA](https://github.com/mpmc-lab/pascal_tdma) | D2a2a | Batched real tridiagonal systems on GPU/MPI | Destructive device arrays, reusable plans, CUDA-aware MPI and no pivot/status guarantee. |
+| [OptimusPrime](https://github.com/rwatson54/optimusprime) | G2i | Bounded simulated annealing with a scalar objective callback | Clock reseeding, positive print interval, temperature degeneracy and heuristic termination. |
+| [PDFO](https://github.com/pdfo/pdfo) | G2h1a1; G2h3b1a | Bounded quadratic-model and nonlinear inequality-constrained derivative-free optimization | Modified BOBYQA/COBYLA signatures, named callbacks, mutable controls and explicit termination/feasibility results. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1374,3 +1390,12 @@ Fortran descriptors, accessible status from actual convergence, coefficients
 from derivatives, and integration examples from numerical implementations.
 The MUMPS example remains a program entry point. The GPU mapping covers only
 the inspected 2D round-trip path, with the unfinished 3D path explicitly excluded.
+
+PaScaL TDMA, FC Tables, OptimusPrime, BFpack, BVARmml, Fitter MC, Singular
+surface operators and PDFO now have ten additional pinned mappings with
+source calling sketches. These were not compiled or run. The review separates
+GPU device/MPI contracts, R RNG state, file-driven model fitting and
+Intel/IMSL linkage from ordinary standalone calling interfaces. It records
+local adaptive tolerance rather than a global quadrature bound, derivative-free
+optimization termination rather than proof of optimality, and explicitly
+documents source status, counter and progress-reporting limitations.
