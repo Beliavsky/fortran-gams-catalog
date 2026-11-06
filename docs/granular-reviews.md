@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 437 repositories now have 633 source-reviewed
+Reviewed on 2026-11-06. 440 repositories now have 643 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-423 repository cards now identify public routines and link their usage lines
+426 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 437 independently source-reviewed repositories now have an
+separately. All 440 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -462,6 +462,9 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | SAM Fortran library | `SKYSOLVE` | Apache-2.0 root and selected source notices |
 | TOOLIB | `cholesky::choldc`, `cholesky::cholsl`, `least_squares::moindres_carres_lineaire`, `least_squares::moindres_carres`, `intpl::interp1D`, `intpl::interp2D`, `fftw3::tab_init_fftw3`, `fftw3::tab_calc_fftw3`, `fftw3::tab_end_fftw3`, `sort_arrays::sort_array2`, `tchebychev::tcheby`, `tchebychev::tab_tcheby` | GPL-3.0 root text; component notices and Numerical Recipes provenance retained |
 | chunkmatc | `adapgauss`, `legewhts`, `legepol` | BSD-3-Clause-Modification for selected Rokhlin numerical sources |
+| ForTrilinos | `fortrilinos_hl::TrilinosSolver%setup_matrix`, `fortrilinos_hl::TrilinosSolver%setup_solver`, `fortrilinos_hl::TrilinosSolver%solve`, `fortrilinos_hl::TrilinosEigenSolver%setup_matrix`, `fortrilinos_hl::TrilinosEigenSolver%solve`, `fortrilinos_hl::TrilinosEigenSolver%converged`, `fortrilinos_hl::TrilinosEigenSolver%setup_matrix_rhs`, `fortrilinos_hl::NOXSolver%setup`, `fortrilinos_hl::NOXSolver%solve` | BSD-3-Clause ForTrilinos interfaces |
+| Skyborn | `dlinint1`, `linmsg_core::dlinmsg`, `dlinint2`, `compute_lanczos_weights`, `apply_filter_1d`, `apply_filter_1d_periodic`, `mann_kendall_core_mod::compute_s_value`, `mann_kendall_core_mod::compute_base_variance`, `mann_kendall_core_mod::compute_sen_slope` | BSD-3-Clause root; adapted component notices retain their scope |
+| PIPPy | `svdfit` | Apache-2.0 root; Numerical Recipes component provenance requires separate review |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -919,6 +922,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [SAM Fortran library](https://github.com/sap-archive/sam-lib) | D2b4 | Symmetric skyline LDL-transpose full-system solve | Packed profile bounds, pivot corrections, correction initialization, operation flags and overwritten storage. |
 | [TOOLIB](https://github.com/tribo-pprime/toolib) | D2b1b; D9a1; K1b1a2; E1a; E2a; J1b; N6a2a; N6a2b; C3a2 | Dense SPD solves, linear/nonlinear fits, grid prolongation, FFTs, sorting and Chebyshev values | Mixed factor storage, fit termination/status, zero-based bounds, FFT signs/lifecycle and component terms. |
 | [chunkmatc](https://github.com/zgimbutas/chunkmatc) | H2a1a1; H2a1a2; C3a2 | Adaptive/fixed Gauss-Legendre quadrature and Legendre polynomial values/derivatives | Per-leaf tolerance, callback ABI, legacy array extents, Newton limits and endpoint derivatives. |
+| [ForTrilinos](https://github.com/trilinos/fortrilinos) | D2a4; D4a2; D4b2; F2 | Sparse linear solves, ordinary/generalized eigenproblems and nonlinear systems through C++ backends | Runtime/maps, parameter-selected algorithms, enum/logical status distinctions and eigenvalue extraction capacity defect. |
+| [Skyborn](https://github.com/qianyesu/skyborn) | E1a; E2a; L10a1c2; L4a1d; L8a3 | Piecewise/grid linear interpolation, symmetric FIR filtering, sequence statistics and robust slopes | Sentinel/direction contracts, gap edges, reflection extents, clean-series buffers and unit-time slope semantics. |
+| [PIPPy](https://github.com/auto-mech/pippy) | D9a1 | Weighted truncated-SVD fit using initialized invariant-polynomial basis | MPI/COMMON/basis initialization, physical dimensions, unreturned diagnostics and Numerical Recipes component provenance. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1671,3 +1677,14 @@ from arbitrary-coordinate interpolation, fixed from adaptive quadrature and
 per-leaf tolerance from global error control. FFT sign/normalization conventions,
 legacy array extents, nonlinear-fit termination limits and skyline pivot
 corrections remain explicit. Component license findings retain their scope.
+
+Skyborn, ForTrilinos and pippy have ten additional source-reviewed mappings.
+Calling sketches were not compiled or run. The review distinguishes native
+Fortran numeric components from Python dispatch, statistics from complete
+hypothesis tests, unit-index slopes from irregular-time regression, and public
+Fortran wrappers from the C++ solver algorithms they select. Interpolation
+directions, filter boundaries, initialized model state, solver error/status
+channels and the Anasazi extraction capacity defect remain explicit. The
+Skyborn nearest-grid assignment path is not promoted to an interpolation
+mapping: its nonexact regular-grid branch uses uninitialized planar offsets.
+Numerical Recipes provenance in pippy remains separately scoped.

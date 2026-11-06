@@ -31826,12 +31826,439 @@
             ],
             "notes": "The README distinguishes the SWIG-generated interface effort from older Trilinos Fortran interfaces and lists backend packages. Version compatibility and coverage depend on the relevant Trilinos configuration.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "6a90c60914e089f2b89a4444128198824ea0cbfe",
+            "reviewed_on": "2026-11-06",
+            "notes": "Initialize the configured Trilinos/MPI execution environment and communicator, construct valid compatible Tpetra objects, check FORTRILINOS_IERR/exception text after wrapper calls, and release owned handles before finalizing MPI. Match the generated bindings to the installed C++ Trilinos build; these are dispatch interfaces, not standalone numerical kernels. TrilinosSolver%setup_matrix retains a sparse Tpetra matrix and %setup_solver builds a Stratimikos/Thyra solve strategy from a ParameterList. %solve applies NOTRANS to one or more right-hand sides using compatible domain/range-map TpetraMultiVectors. The optional third Fortran argument is a LOGICAL convergence result: this is a subroutine call, not a logical function. Backend errors still require the separate wrapper error check. The selected algorithm and optional Ifpack2/MueLu preconditioner depend on the parameter list and build; no specific iteration, sparse direct method or accuracy follows from the wrapper name. Preserve original A/B and check residuals independently.",
+            "evidence": [
+              {
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "sha256": "cd21126fd2148c7c55ea6e151c476c7e8797257ecf253bcd4182fc7abfeb8de4"
+              },
+              {
+                "path": "src/fortrilinos_hl/solver_handle.cpp",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/solver_handle.cpp",
+                "sha256": "664653ffd25b7531ec33d07edaf54e38cf199acdf82a8de7c141ca1622a43320"
+              },
+              {
+                "path": "src/ForTrilinos.h",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/ForTrilinos.h",
+                "sha256": "a3f0d9d5a3eb766c4dacc211f5b66af7d744c246683ca6e8e1b01b7caeb34bd4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup_matrix",
+                "role": "public-entry-point",
+                "summary": "Public sparse matrix attachment for the high-level linear solver.",
+                "signature": "CALL solver%setup_matrix(A)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 569,
+                    "line_end": 574
+                  },
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 29,
+                    "line_end": 39
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 569,
+                "line_end": 579,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosSolver"
+              },
+              {
+                "procedure": "setup_solver",
+                "role": "public-entry-point",
+                "summary": "Public parameter-driven Stratimikos solver setup.",
+                "signature": "CALL solver%setup_solver(PARAMLIST)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 593,
+                    "line_end": 598
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 593,
+                "line_end": 603,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosSolver"
+              },
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public multiple-right-hand-side solve with optional logical status output.",
+                "signature": "CALL solver%solve(RHS,LHS,CONVERGED)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 613,
+                    "line_end": 622
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 613,
+                "line_end": 632,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosSolver",
+                "usage": "use fortrilinos_hl, only: TrilinosSolver\n! After runtime/communicator initialization and matrix/map/vector setup:\n! SOLVER is constructed with TrilinosSolver(COMM); A is fill-complete.\ncall solver%setup_matrix(a)\n! Check FORTRILINOS_IERR after each wrapper call.\ncall solver%setup_solver(params)\ncall solver%solve(rhs,lhs,converged)\n! CONVERGED is LOGICAL. Check wrapper errors and an independent residual.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-construction fragment, requiring declared Tpetra/Teuchos objects and error handling after every call. Runtime initialization, solver selection, solution and residual were not executed."
+              },
+              {
+                "procedure": "Stratimikos setup and Thyra NOTRANS solve dispatch",
+                "role": "implementation-helper",
+                "path": "src/fortrilinos_hl/solver_handle.cpp",
+                "line_start": 32,
+                "line_end": 97
+              }
+            ]
+          },
+          {
+            "code": "D4a2",
+            "level": "source-reviewed",
+            "revision": "6a90c60914e089f2b89a4444128198824ea0cbfe",
+            "reviewed_on": "2026-11-06",
+            "notes": "Initialize the configured Trilinos/MPI execution environment and communicator, construct valid compatible Tpetra objects, check FORTRILINOS_IERR/exception text after wrapper calls, and release owned handles before finalizing MPI. Match the generated bindings to the installed C++ Trilinos build; these are dispatch interfaces, not standalone numerical kernels. TrilinosEigenSolver exposes A*x=lambda*x without an M operator through Anasazi::BasicEigenproblem. Setup requires NumEV, Solver Type and a matching named solver sublist; initial vectors are randomized. The selected general real interface does not set a Hermitian flag, so no symmetric specialization is inferred. Eigenvalues are written as alternating real/imaginary C_DOUBLE entries, with C_INT eigenindex encoding and a TpetraMultiVector for vectors. The integer function result is the returned value count; use %converged() separately and check independent residuals. Critical source finding: the C++ buffer guard tests 2*capacity<count rather than capacity<2*count and compares the requested/clipped count, while copy loops use the full returned Evals/index sizes. Requested NumEV alone therefore does not ensure adequate buffers, especially around conjugate pairs. Repair guards/copy bounds against actual returned sizes before treating the sketch as an executable driver. This review records the implemented dispatch and interface, not a verified or memory-safe eigensolve.",
+            "evidence": [
+              {
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "sha256": "cd21126fd2148c7c55ea6e151c476c7e8797257ecf253bcd4182fc7abfeb8de4"
+              },
+              {
+                "path": "src/fortrilinos_hl/eigen_handle.cpp",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/eigen_handle.cpp",
+                "sha256": "59400ec0705c6a19f3d01b670b95f52e2395baa80fcf9a8784be2220cb991925"
+              },
+              {
+                "path": "src/ForTrilinos.h",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/ForTrilinos.h",
+                "sha256": "a3f0d9d5a3eb766c4dacc211f5b66af7d744c246683ca6e8e1b01b7caeb34bd4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup_matrix",
+                "role": "public-entry-point",
+                "summary": "Public primary matrix attachment for an Anasazi eigenproblem.",
+                "signature": "CALL eig%setup_matrix(A)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 684,
+                    "line_end": 688
+                  },
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 45,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 684,
+                "line_end": 694,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver"
+              },
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public real-buffer eigenvalue/eigenvector extraction; backend capacity guards need repair.",
+                "signature": "COUNT = eig%solve(EIGENVALUES,EIGENVECTORS,EIGENINDEX)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 789,
+                    "line_end": 801
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 789,
+                "line_end": 809,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver",
+                "usage": "! Commented post-repair contract: fix C++ capacity guards and copy bounds;\n! declare real(C_DOUBLE) value storage and integer(C_INT) index storage,\n! with sizes validated against the actual returned Anasazi spectrum.\n! Construct EIG, initialize runtime/maps, attach A and configure solver.\n! call eig%setup_matrix(a)\n! call eig%setup_solver(params)\n! count=eig%solve(eigenvalues,eigenvectors,eigenindex)\n! converged=eig%converged()\n! Check wrapper errors and eigenpair residuals before using results.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Commented post-repair sketch. The pinned extraction guards are insufficient; no eigensolve, conjugate-pair storage, residual or memory-safety test was executed."
+              },
+              {
+                "procedure": "converged",
+                "role": "public-entry-point",
+                "summary": "Public Anasazi solve-convergence query distinct from returned eigenvalue count.",
+                "signature": "CONVERGED = eig%converged()",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 811,
+                    "line_end": 818
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 811,
+                "line_end": 822,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver"
+              },
+              {
+                "procedure": "Anasazi problem setup, extraction and capacity-guard finding",
+                "role": "implementation-helper",
+                "path": "src/fortrilinos_hl/eigen_handle.cpp",
+                "line_start": 36,
+                "line_end": 171
+              }
+            ]
+          },
+          {
+            "code": "D4b2",
+            "level": "source-reviewed",
+            "revision": "6a90c60914e089f2b89a4444128198824ea0cbfe",
+            "reviewed_on": "2026-11-06",
+            "notes": "Initialize the configured Trilinos/MPI execution environment and communicator, construct valid compatible Tpetra objects, check FORTRILINOS_IERR/exception text after wrapper calls, and release owned handles before finalizing MPI. Match the generated bindings to the installed C++ Trilinos build; these are dispatch interfaces, not standalone numerical kernels. TrilinosEigenSolver exposes A*x=lambda*M*x with an explicit mass/right-hand operator M through Anasazi::BasicEigenproblem. Setup requires NumEV, Solver Type and a matching named solver sublist; initial vectors are randomized. The selected general real interface does not set a Hermitian flag, so no symmetric specialization is inferred. Eigenvalues are written as alternating real/imaginary C_DOUBLE entries, with C_INT eigenindex encoding and a TpetraMultiVector for vectors. The integer function result is the returned value count; use %converged() separately and check independent residuals. Critical source finding: the C++ buffer guard tests 2*capacity<count rather than capacity<2*count and compares the requested/clipped count, while copy loops use the full returned Evals/index sizes. Requested NumEV alone therefore does not ensure adequate buffers, especially around conjugate pairs. Repair guards/copy bounds against actual returned sizes before treating the sketch as an executable driver. This review records the implemented dispatch and interface, not a verified or memory-safe eigensolve.",
+            "evidence": [
+              {
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "sha256": "cd21126fd2148c7c55ea6e151c476c7e8797257ecf253bcd4182fc7abfeb8de4"
+              },
+              {
+                "path": "src/fortrilinos_hl/eigen_handle.cpp",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/eigen_handle.cpp",
+                "sha256": "59400ec0705c6a19f3d01b670b95f52e2395baa80fcf9a8784be2220cb991925"
+              },
+              {
+                "path": "src/ForTrilinos.h",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/ForTrilinos.h",
+                "sha256": "a3f0d9d5a3eb766c4dacc211f5b66af7d744c246683ca6e8e1b01b7caeb34bd4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup_matrix",
+                "role": "public-entry-point",
+                "summary": "Public primary matrix attachment for an Anasazi eigenproblem.",
+                "signature": "CALL eig%setup_matrix(A)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 684,
+                    "line_end": 688
+                  },
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 45,
+                    "line_end": 60
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 684,
+                "line_end": 694,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver"
+              },
+              {
+                "procedure": "setup_matrix_rhs",
+                "role": "public-entry-point",
+                "summary": "Public mass/right-hand matrix attachment for a generalized eigenproblem.",
+                "signature": "CALL eig%setup_matrix_rhs(M)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 696,
+                    "line_end": 700
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 696,
+                "line_end": 706,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver"
+              },
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public real-buffer eigenvalue/eigenvector extraction; backend capacity guards need repair.",
+                "signature": "COUNT = eig%solve(EIGENVALUES,EIGENVECTORS,EIGENINDEX)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 789,
+                    "line_end": 801
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 789,
+                "line_end": 809,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver",
+                "usage": "! Commented post-repair contract: fix C++ capacity guards and copy bounds;\n! declare real(C_DOUBLE) value storage and integer(C_INT) index storage,\n! with sizes validated against the actual returned Anasazi spectrum.\n! Construct EIG, initialize runtime/maps, attach A and M and configure solver.\n! call eig%setup_matrix(a)\n! call eig%setup_matrix_rhs(m)\n! call eig%setup_solver(params)\n! count=eig%solve(eigenvalues,eigenvectors,eigenindex)\n! converged=eig%converged()\n! Check wrapper errors and eigenpair residuals before using results.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Commented post-repair sketch. The pinned extraction guards are insufficient; no eigensolve, conjugate-pair storage, residual or memory-safety test was executed."
+              },
+              {
+                "procedure": "converged",
+                "role": "public-entry-point",
+                "summary": "Public Anasazi solve-convergence query distinct from returned eigenvalue count.",
+                "signature": "CONVERGED = eig%converged()",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 811,
+                    "line_end": 818
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 811,
+                "line_end": 822,
+                "module": "fortrilinos_hl",
+                "derived_type": "TrilinosEigenSolver"
+              },
+              {
+                "procedure": "Anasazi problem setup, extraction and capacity-guard finding",
+                "role": "implementation-helper",
+                "path": "src/fortrilinos_hl/eigen_handle.cpp",
+                "line_start": 36,
+                "line_end": 171
+              }
+            ]
+          },
+          {
+            "code": "F2",
+            "level": "source-reviewed",
+            "revision": "6a90c60914e089f2b89a4444128198824ea0cbfe",
+            "reviewed_on": "2026-11-06",
+            "notes": "Initialize the configured Trilinos/MPI execution environment and communicator, construct valid compatible Tpetra objects, check FORTRILINOS_IERR/exception text after wrapper calls, and release owned handles before finalizing MPI. Match the generated bindings to the installed C++ Trilinos build; these are dispatch interfaces, not standalone numerical kernels. NOXSolver binds NOX/Thyra nonlinear system solving to a model evaluator supplying residuals, an initial guess and linear-solver factory, plus analytic Jacobian operators or the configured Matrix Free Newton path. For a Fortran subclass, construct the base ForModelEvaluator and call init_ForModelEvaluator before setup, as documented in the binding and author test; keep the model alive during solver use. %setup consumes Jacobian Settings and Nonlinear Solver Settings; unknown Jacobian types throw. This wrapper hardcodes a 20-iteration limit and a combined NormF(1e-8)/NormWRMS(1e-2,1e-8) convergence test with finite-value termination. Those thresholds are not exposed by the selected wrapper parameter path. %solve is a function returning the named NOX status enum, not a logical success or a solution vector. NOXConverged still warrants an independent model residual check. Review covers nonlinear-system dispatch rather than all NOX algorithms or the application-specific demonstration PDE.",
+            "evidence": [
+              {
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "sha256": "cd21126fd2148c7c55ea6e151c476c7e8797257ecf253bcd4182fc7abfeb8de4"
+              },
+              {
+                "path": "src/fortrilinos_hl/nox_solver_def.hpp",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/nox_solver_def.hpp",
+                "sha256": "6e6088d68d87a0999a29c2075ab98ce4de285eafe059c0ecf4d34b90721fe869"
+              },
+              {
+                "path": "src/ForTrilinos.h",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/ForTrilinos.h",
+                "sha256": "a3f0d9d5a3eb766c4dacc211f5b66af7d744c246683ca6e8e1b01b7caeb34bd4"
+              },
+              {
+                "path": "test/fortrilinos_hl/test_nox.F90",
+                "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/test/fortrilinos_hl/test_nox.F90",
+                "sha256": "8e03e673d76f1bc677b0a4349926a08a78c7bbe7c094bc730ed63a613d0e90bc"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "setup",
+                "role": "public-entry-point",
+                "summary": "Public NOX solver setup from a model-associated parameter list.",
+                "signature": "CALL solver%setup(PLIST)",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 1331,
+                    "line_end": 1336
+                  },
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 118,
+                    "line_end": 126
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 1331,
+                "line_end": 1341,
+                "module": "fortrilinos_hl",
+                "derived_type": "NOXSolver"
+              },
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public nonlinear-system solve returning a NOX status enumeration.",
+                "signature": "STATUS = solver%solve()",
+                "declarations": [
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 1343,
+                    "line_end": 1349
+                  },
+                  {
+                    "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                    "line_start": 100,
+                    "line_end": 108
+                  }
+                ],
+                "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+                "line_start": 1343,
+                "line_end": 1354,
+                "module": "fortrilinos_hl",
+                "derived_type": "NOXSolver",
+                "examples": [
+                  {
+                    "path": "test/fortrilinos_hl/test_nox.F90",
+                    "line_start": 59,
+                    "line_end": 98
+                  }
+                ],
+                "usage": "use fortrilinos_hl, only: NOXSolver,NOXStatusType,NOXConverged\ninteger(NOXStatusType) :: status\n! After constructing/initializing a live model evaluator and runtime:\nsolver=NOXSolver(evaluator)\ncall solver%setup(params)\n! Check FORTRILINOS_IERR after each wrapper call.\nstatus=solver%solve()\n! Check wrapper error state before interpreting STATUS.\nif(status/=NOXConverged) error stop \"NOX did not converge\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-model-initialization fragment, requiring declared objects, callbacks, compatible maps and explicit wrapper error checks. The linked author test is evidence of setup usage, not a test run for this catalog."
+              },
+              {
+                "procedure": "NOX Jacobian dispatch and hardcoded status tests",
+                "role": "implementation-helper",
+                "path": "src/fortrilinos_hl/nox_solver_def.hpp",
+                "line_start": 23,
+                "line_end": 118
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause ForTrilinos interfaces",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "6a90c60914e089f2b89a4444128198824ea0cbfe",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root BSD-3-Clause and selected generated/native headers retain UT-Battelle notices. This records the ForTrilinos binding sources; Trilinos packages, MPI, preconditioner backends and SWIG/runtime components must retain their own applicable terms. No complete dependency-license audit is implied.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/LICENSE",
+              "sha256": "aad020c4e2825b2b91c0cab51226d8499c318f53b55032c473fa3dabbe1d3c64"
+            },
+            {
+              "path": "src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+              "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/generated/fortrilinos_hl.F90",
+              "sha256": "cd21126fd2148c7c55ea6e151c476c7e8797257ecf253bcd4182fc7abfeb8de4"
+            },
+            {
+              "path": "src/fortrilinos_hl/solver_handle.cpp",
+              "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/solver_handle.cpp",
+              "sha256": "664653ffd25b7531ec33d07edaf54e38cf199acdf82a8de7c141ca1622a43320"
+            },
+            {
+              "path": "src/fortrilinos_hl/eigen_handle.cpp",
+              "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/eigen_handle.cpp",
+              "sha256": "59400ec0705c6a19f3d01b670b95f52e2395baa80fcf9a8784be2220cb991925"
+            },
+            {
+              "path": "src/fortrilinos_hl/nox_solver_def.hpp",
+              "url": "https://github.com/trilinos/ForTrilinos/blob/6a90c60914e089f2b89a4444128198824ea0cbfe/src/fortrilinos_hl/nox_solver_def.hpp",
+              "sha256": "6e6088d68d87a0999a29c2075ab98ce4de285eafe059c0ecf4d34b90721fe869"
+            }
+          ]
         }
       },
       "imports": {}
@@ -70735,12 +71162,339 @@
             ],
             "notes": "The README describes trend/regression analysis, grid filling and modernized Fortran components. The package is mixed-language and not every operation is asserted to be implemented in Fortran. Platform support, Poisson gap-filling accuracy and advertised speed improvements were not independently tested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "reviewed_on": "2026-11-06",
+            "notes": "DLININT1 evaluates piecewise-linear interpolation on strictly monotone coordinates, with exact sentinel handling and optional removal of missing input values. The selected sketch uses ascending coordinates, ICYCX=0 and IOPT=0: no extrapolation is performed; out-of-range outputs and intervals touching missing data stay XMSG. Provide NXI>=2, NXO>=1 and separate work arrays, conservatively NXI2>=NXI+2; supported IOPT values are 0/1, with no rejection of other values. Independently validate coordinates and retained sample count: missing-value filtering can leave fewer than two nodes while the interpolation kernel accesses a pair. Single output coordinates are treated as ascending by the validator, so decreasing inputs with a single query can be rejected. DLINMSG separately fills interior missing runs on equally spaced sample indices in place. Its length threshold applies to interior and leading gaps, but the trailing MFLAG<0 continuation branch ignores MPTCRT. All-missing input remains missing. Missing values use exact sentinel equality, not NaN semantics. Cyclic extension and the internal short-gap optimization are outside the selected calling paths.",
+            "evidence": [
+              {
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/interp/fortran/linint2.f90",
+                "sha256": "ce998b1fdbdc67e2d573d8f269420ece74251179d3952dd970320b27521d31f7"
+              },
+              {
+                "path": "src/skyborn/interp/fortran/linmsg_dp.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/interp/fortran/linmsg_dp.f90",
+                "sha256": "422be3de254a9623fe7c857153416fb8213714139f726ae7200d350480f39e98"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dlinint1",
+                "role": "public-entry-point",
+                "summary": "External coordinate-based piecewise-linear interpolation driver.",
+                "signature": "CALL dlinint1(NXI,XI,FI,ICYCX,NXO,XO,FO,XIW,FXIW,NXI2,XMSG,IOPT,IER)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/interp/fortran/linint2.f90",
+                    "line_start": 34,
+                    "line_end": 40
+                  }
+                ],
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 34,
+                "line_end": 108,
+                "usage": "double precision :: xi(3),fi(3),xo(1),fo(1),xiw(5),fxiw(5)\ninteger :: ier\nxi=[0.d0,1.d0,2.d0]; fi=[0.d0,2.d0,4.d0]; xo=[0.5d0]\ncall dlinint1(3,xi,fi,0,1,xo,fo,xiw,fxiw,5,-9999.d0,0,ier)\nif(ier/=0) error stop \"coordinate interpolation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Noncyclic complete-data fragment with separate buffers and an ascending in-range query. IER=0 is not an accuracy check; no interpolation or missing-data behavior was tested."
+              },
+              {
+                "procedure": "dlinmsg",
+                "role": "public-entry-point",
+                "summary": "Public in-place short-gap interpolation on unit-spaced sample indices.",
+                "signature": "CALL dlinmsg(X,NPTS,XMSG,MFLAG,MPTCRT)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/interp/fortran/linmsg_dp.f90",
+                    "line_start": 35,
+                    "line_end": 41
+                  }
+                ],
+                "path": "src/skyborn/interp/fortran/linmsg_dp.f90",
+                "line_start": 35,
+                "line_end": 90,
+                "module": "linmsg_core",
+                "usage": "use linmsg_core, only: dlinmsg,real64\nreal(real64) :: values(4)\nvalues=[1._real64,-9999._real64,3._real64,4._real64]\ncall dlinmsg(values,4,-9999._real64,0,1)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interior one-sample gap fragment. No status is returned; negative MFLAG also enables trailing continuation without the gap-length limit. No fill or edge case was executed."
+              },
+              {
+                "procedure": "linear sweep and missing/out-of-range semantics",
+                "role": "implementation-helper",
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 270,
+                "line_end": 323
+              },
+              {
+                "procedure": "coordinate direction validation",
+                "role": "implementation-helper",
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 384,
+                "line_end": 445
+              }
+            ]
+          },
+          {
+            "code": "E2a",
+            "level": "source-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "reviewed_on": "2026-11-06",
+            "notes": "DLININT2 performs separable linear interpolation on a rectilinear two-dimensional grid: X interpolation of each input row followed by Y interpolation of the intermediate field. FI is dimensioned (NXI,NYI), FO (NXO,NYO). Require at least two nodes on each input axis, nonempty output axes, strictly monotone coordinates with matching input/output direction, finite exact missing sentinel, and supported IOPT=0/1. The reviewed calling path uses ascending complete data, ICYCX=0, IOPT=0 and separate NXI+2 work arrays. IER=1 reports dimensions, 2 X-coordinate validation and 3 Y validation. Outputs outside the coordinate ranges or lacking valid bracketing values remain missing. Filtering IOPT=1 can leave fewer than two valid nodes and must be guarded by the caller; it is not a scattered-data method, conservative remapper or missing-data extrapolator. The same direction flag is reused after both coordinate checks and passed into both interpolation stages: use axes with the same direction, as in the sketch; independently increasing X and decreasing Y is not safely supported by that implementation.",
+            "evidence": [
+              {
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/interp/fortran/linint2.f90",
+                "sha256": "ce998b1fdbdc67e2d573d8f269420ece74251179d3952dd970320b27521d31f7"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "dlinint2",
+                "role": "public-entry-point",
+                "summary": "External two-stage linear interpolation of a rectilinear field.",
+                "signature": "CALL dlinint2(NXI,XI,NYI,YI,FI,ICYCX,NXO,XO,NYO,YO,FO, &\n XIW,FXIW,NXI2,XMSG,IOPT,IER)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/interp/fortran/linint2.f90",
+                    "line_start": 115,
+                    "line_end": 125
+                  }
+                ],
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 115,
+                "line_end": 263,
+                "usage": "double precision :: xi(2),yi(2),fi(2,2),xo(1),yo(1),fo(1,1)\ndouble precision :: xiw(4),fxiw(4)\ninteger :: ier\nxi=[0.d0,1.d0]; yi=xi; fi=reshape([0.d0,1.d0,1.d0,2.d0],[2,2])\nxo=[0.5d0]; yo=xo\ncall dlinint2(2,xi,2,yi,fi,0,1,xo,1,yo,fo,xiw,fxiw,4,-9999.d0,0,ier)\nif(ier/=0) error stop \"grid interpolation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Ascending complete-data noncyclic fragment. Both axes use the same direction. No bilinear value, missing-data or mixed-direction behavior was executed."
+              },
+              {
+                "procedure": "one-dimensional stage implementation",
+                "role": "implementation-helper",
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 270,
+                "line_end": 323
+              },
+              {
+                "procedure": "coordinate validation",
+                "role": "implementation-helper",
+                "path": "src/skyborn/interp/fortran/linint2.f90",
+                "line_start": 384,
+                "line_end": 445
+              }
+            ]
+          },
+          {
+            "code": "L10a1c2",
+            "level": "source-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "reviewed_on": "2026-11-06",
+            "notes": "COMPUTE_LANCZOS_WEIGHTS constructs an odd-length symmetric windowed-sinc FIR filter. PASS_TYPE=1 normalizes low-pass weights to unit sum; 2 forms the high-pass delta complement. CUTOFF_FREQ is in cycles per sample and must lie strictly between 0 and 0.5; NWT must be odd and >=3. IERR=1/2/3/4/5 reports short/even window, invalid cutoff, near-zero normalization or unsupported pass type; do not apply weights after failure. APPLY_FILTER_1D reflects indices once at each boundary, requiring N>1 and half-window <=N-1; larger windows can access outside DATA. APPLY_FILTER_1D_PERIODIC wraps with MODULO and requires N>0. Use separate input/output arrays, generated symmetric weights and finite complete data: there is no missing/NaN policy or application status. The routines use REAL(8), which must be matched to the compiler build, rather than a portable named kind. This classification covers symmetric linear filtering, not a spectral estimator or certified frequency-response design.",
+            "evidence": [
+              {
+                "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/calc/filter/_lanczos_core.f90",
+                "sha256": "8b8d06013585dd139778d65c12566c2cf5a292445e4d5ac042c937a81d24afe3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "compute_lanczos_weights",
+                "role": "public-entry-point",
+                "summary": "External symmetric low/high-pass Lanczos FIR weight construction.",
+                "signature": "CALL compute_lanczos_weights(CUTOFF_FREQ,NWT,PASS_TYPE,WEIGHTS,IERR)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                    "line_start": 8,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                "line_start": 8,
+                "line_end": 82,
+                "usage": "real(8) :: weights(5)\ninteger :: ierr\ncall compute_lanczos_weights(0.2_8,5,1,weights,ierr)\nif(ierr/=0) error stop \"filter weight construction failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Five-weight low-pass fragment. Kind 8 must match the built source. No normalization or frequency-response check was run."
+              },
+              {
+                "procedure": "apply_filter_1d",
+                "role": "public-entry-point",
+                "summary": "External symmetric FIR application with single-reflection boundaries.",
+                "signature": "CALL apply_filter_1d(DATA,N,WEIGHTS,NWT,FILTERED)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                    "line_start": 86,
+                    "line_end": 97
+                  }
+                ],
+                "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                "line_start": 86,
+                "line_end": 125,
+                "usage": "! After successful construction of symmetric REAL(8) WEIGHTS(5),\n! and initialization of separate DATA(9), FILTERED(9):\ncall apply_filter_1d(data,9,weights,5,filtered)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization fragment satisfying the one-reflection extent bound. No filtering or boundary result was executed."
+              },
+              {
+                "procedure": "apply_filter_1d_periodic",
+                "role": "public-entry-point",
+                "summary": "External symmetric FIR application with periodic index wrapping.",
+                "signature": "CALL apply_filter_1d_periodic(DATA,N,WEIGHTS,NWT,FILTERED)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                    "line_start": 129,
+                    "line_end": 140
+                  }
+                ],
+                "path": "src/skyborn/calc/filter/_lanczos_core.f90",
+                "line_start": 129,
+                "line_end": 159,
+                "usage": "! After weight construction and initialization of separate REAL(8) buffers:\ncall apply_filter_1d_periodic(data,9,weights,5,periodic_filtered)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization periodic fragment. The caller must choose a meaningful periodic extension; no result was tested."
+              }
+            ]
+          },
+          {
+            "code": "L4a1d",
+            "level": "source-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "reviewed_on": "2026-11-06",
+            "notes": "COMPUTE_S_VALUE sums pairwise signs in a clean ordered scalar series to obtain the Mann-Kendall S statistic. COMPUTE_BASE_VARIANCE copies and sorts the series, then computes the conventional independent-observation variance with equal-value tie correction. Both are public components of sequence analysis: these two entries do not return a p-value, significance decision, continuity-corrected Z or serial-correlation correction, and they do not establish general stationarity. Require finite, missing-free REAL64 data and a distinct sorted workspace with at least SIZE(Y) entries. Exact equality defines ties. S accumulation is quadratic in sample count; no missing filtering or time-coordinate vector is provided at these entry points. Preserve the original time ordering for S; sorting is only on the separate variance workspace.",
+            "evidence": [
+              {
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "sha256": "51663646bc285c784c4ebc5945b60efb0f95553ba4c9569f5a8242ce06bb001f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "compute_s_value",
+                "role": "public-entry-point",
+                "summary": "Public Mann-Kendall pairwise-sign statistic for a clean ordered series.",
+                "signature": "CALL compute_s_value(Y,S_VALUE)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                    "line_start": 350,
+                    "line_end": 356
+                  },
+                  {
+                    "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                    "line_start": 13,
+                    "line_end": 34
+                  }
+                ],
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "line_start": 350,
+                "line_end": 368,
+                "module": "mann_kendall_core_mod",
+                "usage": "use mann_kendall_core_mod, only: real64,compute_s_value,compute_base_variance\nreal(real64) :: y(4),s_value,var_s,sorted_work(4)\ny=[1._real64,2._real64,2._real64,4._real64]\ncall compute_s_value(y,s_value)\ncall compute_base_variance(y,sorted_work,var_s)\n! Supply an appropriate test distribution/correlation treatment separately.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Statistic-and-base-variance fragment only. No trend significance, p-value or stationarity claim was tested."
+              },
+              {
+                "procedure": "compute_base_variance",
+                "role": "public-entry-point",
+                "summary": "Public tie-corrected independent-observation variance component.",
+                "signature": "CALL compute_base_variance(Y,SORTED_WORK,VAR_S)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                    "line_start": 438,
+                    "line_end": 441
+                  }
+                ],
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "line_start": 438,
+                "line_end": 449,
+                "module": "mann_kendall_core_mod",
+                "usage": "! With clean REAL64 Y and separate SORTED_WORK of at least SIZE(Y):\ncall compute_base_variance(y,sorted_work,var_s)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-initialization variance fragment. Serial-correlation corrections and significance calculations are outside this selected path; no variance was tested."
+              },
+              {
+                "procedure": "tie-run variance formula",
+                "role": "implementation-helper",
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "line_start": 383,
+                "line_end": 421
+              }
+            ]
+          },
+          {
+            "code": "L8a3",
+            "level": "source-reviewed",
+            "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+            "reviewed_on": "2026-11-06",
+            "notes": "COMPUTE_SEN_SLOPE returns the median of all pairwise slopes (Y(j)-Y(i))/(j-i), a robust simple trend-slope estimate for unit-spaced observations. It constructs reciprocal index lags and dispatches to the public precomputed-lag variant, which materializes N*(N-1)/2 slopes and uses selection rather than a full sort; even counts average the two middle values. Require clean finite REAL64 data, a separate slope workspace of that size, and sample counts whose integer products/indices fit the compiler integer kind. N<2 returns quiet NaN. This is a slope per sample interval, not a full regression result: no intercept, confidence interval, p-value, time-coordinate array or missing-value removal is returned. Removing gaps before calling changes the time spacing and therefore the problem. Memory and pair construction are quadratic; no large-series performance claim was executed.",
+            "evidence": [
+              {
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "sha256": "51663646bc285c784c4ebc5945b60efb0f95553ba4c9569f5a8242ce06bb001f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "compute_sen_slope",
+                "role": "public-entry-point",
+                "summary": "Public median pairwise index-slope estimator with caller-owned workspace.",
+                "signature": "CALL compute_sen_slope(Y,SLOPE,SLOPE_WORK)",
+                "declarations": [
+                  {
+                    "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                    "line_start": 495,
+                    "line_end": 501
+                  },
+                  {
+                    "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                    "line_start": 13,
+                    "line_end": 34
+                  }
+                ],
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "line_start": 495,
+                "line_end": 514,
+                "module": "mann_kendall_core_mod",
+                "usage": "use mann_kendall_core_mod, only: real64,compute_sen_slope\nreal(real64) :: y(4),slope,slope_work(6)\ny=[1._real64,2._real64,4._real64,8._real64]\ncall compute_sen_slope(y,slope,slope_work)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Small unit-spacing slope fragment. No slope, robustness property or confidence interval was tested."
+              },
+              {
+                "procedure": "pairwise slope materialization and median selection",
+                "role": "implementation-helper",
+                "path": "src/skyborn/calc/mann_kendall/fortran/mann_kendall_core.f90",
+                "line_start": 538,
+                "line_end": 575
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root; adapted component notices retain their scope",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "a4eb5af00965b26e234c8bc25a565f7314a7b650",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root BSD-3-Clause names Qianye Su; selected modernized sources carry author/copyright notices. LINMSG explicitly preserves NCL legacy semantics and other bundled components have their own provenance. The root license is recorded without treating it as a complete third-party permission audit or as overriding inherited component notices.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/LICENSE",
+              "sha256": "f9ecf698dcba9aaaede64f16c3f6f80490880c7bda8c9ead9e501035234437b6"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/README.md",
+              "sha256": "fcbcfd49f7676ad328c9215b4505f276ef957a5eae9a9930c5d34b2323ff7afb"
+            },
+            {
+              "path": "src/skyborn/interp/fortran/linmsg_dp.f90",
+              "url": "https://github.com/QianyeSu/Skyborn/blob/a4eb5af00965b26e234c8bc25a565f7314a7b650/src/skyborn/interp/fortran/linmsg_dp.f90",
+              "sha256": "422be3de254a9623fe7c857153416fb8213714139f726ae7200d350480f39e98"
+            }
+          ]
         }
       },
       "imports": {}
@@ -81399,13 +82153,136 @@
             ],
             "notes": "The README uses the current PIPPy name and documents training/test data, polynomial basis controls and a standalone Fortran executable. The older autofit discovery address is retained. Claimed unrestricted expansion complexity does not remove finite data/memory limits; fits and physical extrapolation were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D9a1",
+            "level": "source-reviewed",
+            "revision": "31d75a0100c61bb69c9280a288e6b6184cf75dea",
+            "reviewed_on": "2026-11-06",
+            "notes": "SVDFIT forms a weighted linear least-squares design from the built-in FUNCS1 ENTRY, divides each row and response by SIG(i), factors it through local SVDCMP, zeros singular values below 1e-14 of the maximum, and applies SVBKSB. It is linear in fitted coefficients of a permutationally invariant polynomial basis in exp(-distance), not nonlinear parameter fitting or a generic callback-based fitter. PREPOT must previously initialize saved basis tables, MPI state and COMMON model/training distances as in the application driver; FUNCS1 is an ENTRY in that initialized routine. Require positive finite weights/scales, 1<=MA<=NDATA<=MAXDATA, MA<=MAXTERM and MA<=MAXDATA for local SVD buffers, MP>=NDATA and NP>=MA, matching includes/COMMON layout and sufficient memory for U(MP,NP), V(NP,NP) and large static model arrays. The safest selected dimensions are MP=NDATA, NP=MA, matching the author call and avoiding the oversized NP dummy contract in SVBKSB. Only coefficients A are returned: CHISQ, U/V/W are local despite stale comments suggesting outputs. There is no exposed convergence/rank/error status; SVDCMP has a finite iteration loop but its nonconvergence PAUSE diagnostic is commented out. Recompute weighted residuals and assess rank independently; this is not a certified robust or converged fit.",
+            "evidence": [
+              {
+                "path": "src/svdfit.f",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/svdfit.f",
+                "sha256": "f855f975768e0ea805c0fb0618fc9aac46658df63e2fd313cc9d6b675e776bf5"
+              },
+              {
+                "path": "src/func.f",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/func.f",
+                "sha256": "a1370069b591958c930b1e409be28adb216a49d033b5b212a2f5babf7720e808"
+              },
+              {
+                "path": "src/svdcmp.f",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/svdcmp.f",
+                "sha256": "033c8b66378e8913a938799ba94dcda2b6f77e3439db594e499f136b9fcfbc70"
+              },
+              {
+                "path": "src/svbksb.f",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/svbksb.f",
+                "sha256": "5bb333bc434fec3a7a26f24f4ae029c9a20ad2610f25a1980543d3a8ff8140a4"
+              },
+              {
+                "path": "src/pip.f",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/pip.f",
+                "sha256": "44677f8e3c8bb8fd09201f96c7d304d3a259ca5749b15a03e4e028fa049f0130"
+              },
+              {
+                "path": "src/param.inc",
+                "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/param.inc",
+                "sha256": "35a04dd5b164c7d92f5822205471a18282970507a3c4ef8661222150b5c7b55c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "svdfit",
+                "role": "public-entry-point",
+                "summary": "External weighted truncated-SVD coefficient fit with a fixed initialized PIP basis.",
+                "signature": "CALL svdfit(Y,SIG,NDATA,A,MA,MP,NP)",
+                "declarations": [
+                  {
+                    "path": "src/svdfit.f",
+                    "line_start": 1,
+                    "line_end": 8
+                  },
+                  {
+                    "path": "src/svdfit.f",
+                    "line_start": 27,
+                    "line_end": 28
+                  }
+                ],
+                "path": "src/svdfit.f",
+                "line_start": 1,
+                "line_end": 58,
+                "examples": [
+                  {
+                    "path": "src/pip.f",
+                    "line_start": 93,
+                    "line_end": 151
+                  }
+                ],
+                "usage": "! After MPI/PREPOT basis initialization, loading the matching COMMON\n! training distances and declaring DOUBLE PRECISION Y/SIG/A:\n! require 1<=MA<=NDATA, positive SIG and repository parameter limits.\ncall svdfit(y,sig,ndata,a,ma,ndata,ma)\n! Only A is returned. Independently recompute weighted residuals/rank.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-application-initialization fragment matching the author physical dimensions. This is not a standalone fitter; no basis generation, SVD convergence, fitted coefficients or residual was tested."
+              },
+              {
+                "procedure": "PREPOT saved basis and COMMON/MPI initialization contract",
+                "role": "implementation-helper",
+                "path": "src/func.f",
+                "line_start": 3,
+                "line_end": 42
+              },
+              {
+                "procedure": "FUNCS1 built-in exponential-distance polynomial basis ENTRY",
+                "role": "implementation-helper",
+                "path": "src/func.f",
+                "line_start": 686,
+                "line_end": 712
+              },
+              {
+                "procedure": "local SVD implementation and disabled failure diagnostic",
+                "role": "implementation-helper",
+                "path": "src/svdcmp.f",
+                "line_start": 1,
+                "line_end": 228
+              },
+              {
+                "procedure": "truncated SVD back substitution",
+                "role": "implementation-helper",
+                "path": "src/svbksb.f",
+                "line_start": 1,
+                "line_end": 31
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825",
           "listed_repository": "https://github.com/Auto-Mech/autofit"
+        },
+        "license": {
+          "label": "Apache-2.0 root; Numerical Recipes component provenance requires separate review",
+          "spdx_expression": null,
+          "revision": "31d75a0100c61bb69c9280a288e6b6184cf75dea",
+          "reviewed_on": "2026-11-06",
+          "notes": "The root contains Apache-2.0, but the selected SVDCMP footer explicitly credits copyrighted Numerical Recipes Software (1986-92), and SVDFIT comments follow that algorithm/interface lineage. The root is not treated as resolving redistribution rights for those adapted numerical routines. Preserve notices and determine component permissions separately; no single unqualified SPDX expression is assigned to this selected bundle.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/LICENSE",
+              "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+            },
+            {
+              "path": "src/svdcmp.f",
+              "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/svdcmp.f",
+              "sha256": "033c8b66378e8913a938799ba94dcda2b6f77e3439db594e499f136b9fcfbc70"
+            },
+            {
+              "path": "src/svdfit.f",
+              "url": "https://github.com/Auto-Mech/PIPPy/blob/31d75a0100c61bb69c9280a288e6b6184cf75dea/src/svdfit.f",
+              "sha256": "f855f975768e0ea805c0fb0618fc9aac46658df63e2fd313cc9d6b675e776bf5"
+            }
+          ]
         }
       },
       "imports": {}

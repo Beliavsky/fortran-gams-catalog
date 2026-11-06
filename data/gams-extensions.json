@@ -858,6 +858,24 @@
       "parent": "M1",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "L10a1c2": {
+      "label": "Symmetric linear (e.g., moving averages)",
+      "parent": "L10a1c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L4a1d": {
+      "label": "Analysis of a sequence of numbers (search also class L10a)",
+      "parent": "L4a1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
+    },
+    "L8a3": {
+      "label": "Robust",
+      "parent": "L8a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }
