@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 718 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 721 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -105,7 +105,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Jacobi theta functions | `jacobitheta::theta3` | No license identified in reviewed material |
 | fastspline | `mcspline::cspline` | MIT-form grant with unresolved copyright placeholders |
 | FFTPack | `fftpack::fft`, `fftpack::ifft` (complex-double bindings), `fftpack::conv`, `fftpack::hilbert`, `fftpack::fft` (real-double binding) | Bundled GPL notice without version; wrapper terms unresolved |
-| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero` | MIT root; inherited source provenance recorded separately |
+| Computer Methods for Mathematical Computations | `ForsytheMalcolmMoler::BrentZero`, `::FMMspline`, `::NaturalSpline`, `::Seval`, `::Seval3`, `::Quanc8` | MIT root; inherited source provenance recorded separately |
 | AFNL | `Integration::Trapecio`, `Integration::Simpson` (DP bindings) | GPL-2.0-or-later |
 | fast_math | `fast_erf::ferf` (elemental real32/real64 generic) | MIT |
 | PyIntegral | External `GaussLegendreQuadrature` (tabulated-data integration) | Custom noncommercial terms; redistribution requires permission |
@@ -961,6 +961,9 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FFTPack: finite convolution](https://github.com/keurfonluu/FFTPack) | J2 | Real/complex binary64 linear convolution | 98 direct-sum comparisons, unequal/length-one inputs; no conjugation or circular-convolution claim. |
 | [FFTPack: periodic analytic signal](https://github.com/keurfonluu/FFTPack) | J4 | Double-precision Hilbert/analytic-signal FFT mask | 44 Fourier-mode/DC/Nyquist checks; single-precision overload discards the imaginary result. |
 | [FFTPack: real-input Fourier transform](https://github.com/keurfonluu/FFTPack) | J1a1 | Full complex spectrum via complex backend | 33 independent DFT comparisons with padding/truncation; unscaled negative-exponent convention. |
+| [FMM collection: cubic splines](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | E1a | FMM and natural cubic construction with value evaluation | 499 analytic polynomial/piecewise checks; distinct endpoint conditions, nonuniform knots and extrapolation. |
+| [FMM collection: spline derivatives](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | E3a2 | Value and first/second/third derivatives of fitted cubics | 499 checked output vectors; right-hand third derivative at an interior natural-spline knot. |
+| [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1866,3 +1869,18 @@ imaginary result and is outside the checked API. The original complex-wrapper
 review remains historical source evidence; these finite checks do not certify
 all kernels or arbitrarily sized transforms. Existing GPL/version and wrapper
 license-scope findings are retained, and upstream source is not bundled.
+
+Three Forsythe?Malcolm?Moler mappings now have [complete locally checked drivers](../drivers/fmm-interpolation-quadrature/README.md):
+cubic spline construction/value evaluation (E1a), spline derivatives (E3a2),
+and adaptive closed Newton-Cotes quadrature (H2a1a1). GNU Fortran 17.0.0
+20260510 (experimental) on Windows passed 499 spline-value checks, 499
+value/derivative vectors and 55 analytic integrals, with bounds checks and
+floating-point traps on both the full module and the mains. Maximum normalized
+errors were 2.220446e-16, 5.667141e-15 and 9.219847e-13. The spline reference
+includes an independently derived non-affine natural spline; endpoint
+conditions, extrapolation and a third-derivative jump remain explicit. Quadrature
+uses 1,738 callbacks and checks reliability/evaluation outputs alongside analytic
+values. Error estimates are not certified bounds; cached interval indices and
+persistent resource-limit state constrain concurrency/history claims. Other
+textbook algorithms and their earlier source reviews remain separate, and the
+root MIT/inherited-source license finding is unchanged.

@@ -288,6 +288,13 @@ class CatalogTests(unittest.TestCase):
                 class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
                 self.assertIn('fftpack::'+procedure, class_page)
             self.assertTrue((destination/'drivers/fftpack-signals/results.json').is_file())
+            fmm = (destination/'projects/beliavsky/computer-methods-for-mathematical-computations/index.html').read_text(encoding='utf-8')
+            for name, code, procedure in [('spline', 'E1a', 'FMMspline'), ('derivatives', 'E3a2', 'Seval3'), ('quadrature', 'H2a1a1', 'Quanc8')]:
+                self.assertIn('drivers/fmm-interpolation-quadrature/'+name+'.f90', fmm)
+                self.assertTrue((destination/'drivers/fmm-interpolation-quadrature'/f'{name}.f90').is_file())
+                class_page = (destination/'classes'/code/'index.html').read_text(encoding='utf-8')
+                self.assertIn('ForsytheMalcolmMoler::'+procedure, class_page)
+            self.assertTrue((destination/'drivers/fmm-interpolation-quadrature/results.json').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)
