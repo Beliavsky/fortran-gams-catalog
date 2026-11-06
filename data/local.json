@@ -6038,12 +6038,101 @@
             ],
             "notes": "The README documents nested-sampling output and Fortran/C++/Python likelihood interfaces. Kept at statistics/probability until a suitable narrower taxonomy mapping and procedure review are established.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L",
+            "level": "source-reviewed",
+            "revision": "370f6af5d59a4d3af2ed3333acfba152fdb7a4cf",
+            "reviewed_on": "2026-11-05",
+            "notes": "RUN_POLYCHORD exposes nested sampling for Bayesian evidence/posterior exploration using user log-likelihood and unit-hypercube-to-prior transformations. The full wrapper copies/initializes settings, initializes randomness, and dispatches NESTEDSAMPLING; constrained slice sampling supplies replacement live points. A custom DUMPER receives live/dead points, logweights and log-evidence/error estimates; the public wrapper does not return those as scalar output dummies. Prior normalization, finite log-likelihoods and derived-output dimensions are caller responsibilities. Stopping combines maximum dead points and a live-evidence precision criterion, which is an estimate rather than a correctness certificate. Output files and MPI/random-state lifecycle are part of the configured workflow. Broad statistics L is retained instead of treating Bayesian sampling as deterministic quadrature or optimization. Review covers interface, selected iteration/stopping and slice dispatch, not multimodal completeness or uncertainty calibration.",
+            "evidence": [
+              {
+                "path": "src/polychord/interfaces.F90",
+                "url": "https://github.com/PolyChord/PolyChordLite/blob/370f6af5d59a4d3af2ed3333acfba152fdb7a4cf/src/polychord/interfaces.F90",
+                "sha256": "5fb93fe02e4d6ae46e899b9e428b3bb793c87d453cb0de226e838e9f82cef8e8"
+              },
+              {
+                "path": "src/polychord/settings.f90",
+                "url": "https://github.com/PolyChord/PolyChordLite/blob/370f6af5d59a4d3af2ed3333acfba152fdb7a4cf/src/polychord/settings.f90",
+                "sha256": "602bc809d90de559b5860d54a70b95dc866dc778eebeb782835a63b7c27be35d"
+              },
+              {
+                "path": "src/polychord/nested_sampling.F90",
+                "url": "https://github.com/PolyChord/PolyChordLite/blob/370f6af5d59a4d3af2ed3333acfba152fdb7a4cf/src/polychord/nested_sampling.F90",
+                "sha256": "850ab9aaabfd0c2747177fcca619baab322409a407e673bfcbc51fb3905a16bf"
+              },
+              {
+                "path": "src/polychord/chordal_sampling.f90",
+                "url": "https://github.com/PolyChord/PolyChordLite/blob/370f6af5d59a4d3af2ed3333acfba152fdb7a4cf/src/polychord/chordal_sampling.f90",
+                "sha256": "78ae8d6076810e067d7f971c3fef071d2912b773ee9d6309dd097b1d6bc108a3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "run_polychord",
+                "role": "public-entry-point",
+                "summary": "Public module generic full overload with log-likelihood, prior and dumper callbacks.",
+                "signature": "CALL run_polychord(LOGLIKELIHOOD,PRIOR_TRANSFORM,DUMPER,SETTINGS,MPI_COMMUNICATOR)",
+                "declarations": [
+                  {
+                    "path": "src/polychord/interfaces.F90",
+                    "line_start": 10,
+                    "line_end": 12
+                  },
+                  {
+                    "path": "src/polychord/interfaces.F90",
+                    "line_start": 79,
+                    "line_end": 106
+                  },
+                  {
+                    "path": "src/polychord/settings.f90",
+                    "line_start": 62,
+                    "line_end": 69
+                  }
+                ],
+                "path": "src/polychord/interfaces.F90",
+                "line_start": 67,
+                "line_end": 135,
+                "module": "interfaces_module",
+                "usage": "use settings_module, only: program_settings\nuse interfaces_module, only: run_polychord\ntype(program_settings) :: config\nconfig%nDims=2; config%nDerived=0; config%nlive=100\nconfig%num_repeats=10; config%seed=12345; config%max_ndead=1000\nconfig%base_dir=\"chains\"; config%file_root=\"example\"\n! Supply LOG_LIKELIHOOD(THETA(:),PHI(:)), PRIOR_MAP(CUBE(:)) and DUMP callbacks.\n! Create a writable output directory and match callback real kind to PolyChord DP.\ncall run_polychord(log_likelihood,prior_map,dump,config)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback bodies omitted; DUMP must match the pinned argument declarations to capture results. Use normalized priors and a consistent serial/MPI build/communicator, and avoid assuming an iteration cap proves convergence. No sampler run, evidence estimate or posterior was tested."
+              },
+              {
+                "procedure": "run_polychord_no_dumper",
+                "role": "implementation-helper",
+                "path": "src/polychord/interfaces.F90",
+                "line_start": 172,
+                "line_end": 203
+              },
+              {
+                "procedure": "SliceSampling",
+                "role": "implementation-helper",
+                "path": "src/polychord/chordal_sampling.f90",
+                "line_start": 7,
+                "line_end": 45
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Custom PolyChord noncommercial academic/research license",
+          "spdx_expression": null,
+          "revision": "370f6af5d59a4d3af2ed3333acfba152fdb7a4cf",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned agreement permits academic/research and similar noncommercial use, includes attribution/indemnity and modified-distribution notification/no-charge conditions, and requires a separate arrangement for commercial use. It is not a standard permissive license or an unrestricted open-source grant.",
+          "evidence": [
+            {
+              "path": "LICENCE",
+              "url": "https://github.com/PolyChord/PolyChordLite/blob/370f6af5d59a4d3af2ed3333acfba152fdb7a4cf/LICENCE",
+              "sha256": "0b83a16772dc05b26d3adfd21ff3be436c86407c6e9e02b59eae9417815b1c92",
+              "source_encoding": "cp1252"
+            }
+          ]
         }
       },
       "imports": {}
@@ -14223,12 +14312,129 @@
             ],
             "notes": "The README identifies TRIPACK/STRIPACK triangulation and SRFPACK/SSRFPACK interpolation/derivatives. These are Python-facing interfaces with Fortran kernels, not a standalone Python-free Fortran API.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "f87add7efe4db23165d820bfb5394c83596c18da",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected fixed-form TRIPACK TRMESH routine incrementally constructs an unconstrained planar Delaunay triangulation in linked adjacency storage. It initializes a noncollinear triangle, inserts nodes and swaps edges using orientation/circumcircle tests and nearest-node search starts. Require distinct coordinates and a noncollinear first triple. LIST/LPTR need 6*N-12 storage, LEND/NEAR/NEXT/DIST need N. IER distinguishes invalid size, initial collinearity, duplicate nodes and internal swap failure; partial adjacency is not a completed mesh on failure. This is planar triangulation rather than spherical geometry or a PDE discretization. The selected fixed-form source uses default REAL and is included by SRFPACK; the separate tripack.f90 variant uses REAL(8) and must not be mixed blindly with these call declarations. Review covers construction and storage contracts, not robust exact predicates or every constrained-edge operation.",
+            "evidence": [
+              {
+                "path": "src/tripack.f",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/tripack.f",
+                "sha256": "6acec18fc4b85d9b2526506367b48cae095d63d34be955b771b3a53ff2d8329d"
+              },
+              {
+                "path": "src/srfpack.f",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/srfpack.f",
+                "sha256": "b9a816237a3edfcbca5563828db29ca62d12cbcfd58eaf0362090e5585df754e"
+              },
+              {
+                "path": "setup.py",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/setup.py",
+                "sha256": "6e870e3e1e524e4acfc4bc0d66b94991205ae704c6bdf9db579c7b6bdd617494"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TRMESH",
+                "role": "public-entry-point",
+                "summary": "External fixed-form default-REAL planar Delaunay mesh constructor with linked adjacency output.",
+                "signature": "CALL TRMESH(N,X,Y,LIST,LPTR,LEND,LNEW,NEAR,NEXT,DIST,IER)",
+                "declarations": [
+                  {
+                    "path": "src/tripack.f",
+                    "line_start": 4502,
+                    "line_end": 4507
+                  }
+                ],
+                "path": "src/tripack.f",
+                "line_start": 4502,
+                "line_end": 4507,
+                "usage": "external :: TRMESH\ninteger,parameter :: n=4\ninteger :: list(6*n-12),lptr(6*n-12),lend(n),lnew,near(n),next(n),ier\nreal :: x(n),y(n),dist(n)\nx=[0.,1.,0.,1.]; y=[0.,0.,1.,1.]\ncall TRMESH(n,x,y,list,lptr,lend,lnew,near,next,dist,ier)\nif(ier/=0) error stop \"triangulation failed\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build a consistent fixed-form SRFPACK/TRIPACK source set and precision. SRFPACK includes TRIPACK, so avoid linking another duplicate copy. No triangulation, degeneracy or Delaunay property was tested."
+              }
+            ]
+          },
+          {
+            "code": "E2b",
+            "level": "source-reviewed",
+            "revision": "f87add7efe4db23165d820bfb5394c83596c18da",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected SRFPACK INTRC0 routine locates a triangle and evaluates a barycentric piecewise-linear interpolant of scattered planar nodal values. Outside the convex hull, it returns the value at the nearest boundary point rather than unconstrained linear extrapolation. IST is a mutable triangle-search start; NCC/LCC describe optional constraint curves, with a one-element dummy LCC for NCC=0. IER=0 denotes ordinary interpolation, 1 a constraint-region result, 2 extrapolation, and negatives invalid/degenerate cases. The sketch uses the matching default-REAL fixed-form TRIPACK included by SRFPACK, not the distinct REAL(8) mesh extension. Review covers triangle location/barycentric assembly and boundary behavior, not smooth cubic interpolation or gradient estimation.",
+            "evidence": [
+              {
+                "path": "src/srfpack.f",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/srfpack.f",
+                "sha256": "b9a816237a3edfcbca5563828db29ca62d12cbcfd58eaf0362090e5585df754e"
+              },
+              {
+                "path": "src/tripack.f",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/tripack.f",
+                "sha256": "6acec18fc4b85d9b2526506367b48cae095d63d34be955b771b3a53ff2d8329d"
+              },
+              {
+                "path": "setup.py",
+                "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/setup.py",
+                "sha256": "6e870e3e1e524e4acfc4bc0d66b94991205ae704c6bdf9db579c7b6bdd617494"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "INTRC0",
+                "role": "public-entry-point",
+                "summary": "External scattered-data linear interpolation using an existing matching TRIPACK triangulation.",
+                "signature": "CALL INTRC0(PX,PY,NCC,LCC,N,X,Y,Z,LIST,LPTR,LEND,IST,PZ,IER)",
+                "declarations": [
+                  {
+                    "path": "src/srfpack.f",
+                    "line_start": 2995,
+                    "line_end": 2999
+                  }
+                ],
+                "path": "src/srfpack.f",
+                "line_start": 2995,
+                "line_end": 2999,
+                "usage": "! First prepare the fixed-form default-REAL mesh using TRMESH.\n! Z(N) contains nodal values; X/Y, LIST/LPTR/LEND match that mesh.\n! Use integer LCC(1) dummy when NCC=0, integer IST and REAL VALUE.\nist=1; lcc=0\ncall INTRC0(0.2,0.3,0,lcc,n,x,y,z,list,lptr,lend,ist,value,ier)\nif(ier/=0) error stop \"query was not ordinary interior interpolation\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-triangulation fragment. Check the status meanings instead of treating positive values as generic success/failure; constraint/exterior results have different semantics. Preserve a consistent REAL kind across included source and caller. No interpolation or extrapolation value was run."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0 text plus retained Renka source notices",
+          "spdx_expression": null,
+          "revision": "f87add7efe4db23165d820bfb5394c83596c18da",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root COPYING.LESSER contains LGPL version 3 text; bundled TRIPACK/SRFPACK retain Robert Renka and historical source notices. This scoped finding does not infer an or-later clause or replace component notices with a root-only expression.",
+          "evidence": [
+            {
+              "path": "COPYING.LESSER",
+              "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/COPYING.LESSER",
+              "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/README.md",
+              "sha256": "91e5e6fe296db7e63fc0d7d9d0781bad005995ca19d01e9ab4dd8402f8e1fdd9"
+            },
+            {
+              "path": "src/tripack.f",
+              "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/tripack.f",
+              "sha256": "6acec18fc4b85d9b2526506367b48cae095d63d34be955b771b3a53ff2d8329d"
+            },
+            {
+              "path": "src/srfpack.f",
+              "url": "https://github.com/underworldcode/stripy/blob/f87add7efe4db23165d820bfb5394c83596c18da/src/srfpack.f",
+              "sha256": "b9a816237a3edfcbca5563828db29ca62d12cbcfd58eaf0362090e5585df754e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -22888,12 +23094,100 @@
             ],
             "notes": "The README describes the specialized hyperbolic SVD, libpvn dependency and compiler-specific build adjustments. General SVD conventions and modern GNU compiler behavior are not assumed interchangeable with this algorithm.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D",
+            "level": "source-reviewed",
+            "revision": "5d29c303592cdaf46c7b44e475e9d07a6ee27cfb",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public DHSVD2 module procedure performs a two-by-two real hyperbolic singular-value transformation, using a signature J with entries +/-1. It scales the input, triangularizes/pivots it, dispatches the specialized KHSVD2 transformation if needed, accumulates left/right transforms and handles signature-dependent sorting. This is a small signature-metric decomposition building block, not an ordinary Euclidean SVD for arbitrary matrix dimensions; broad D is retained. A is overwritten, U/Z are outputs, and positive INFO values encode transformation/exceptional-case bits rather than failure under a simple INFO/=0 rule. Negative INFO reports invalid signature/nonfinite/error paths; signature checks can be compiled out with NDEBUG. TH1 controls an exceptional near-unit-hyperbolic-parameter path that may retain off-diagonals. Preserve original A and use author transformation conventions for reconstruction and signature checks. Review covers the small dispatcher/triangularization/sorting and selected hyperbolic recurrence, not the complete parallel J-Kogbetliantz sweep driver.",
+            "evidence": [
+              {
+                "path": "src/D/dtransf.F90",
+                "url": "https://github.com/venovako/JKogb/blob/5d29c303592cdaf46c7b44e475e9d07a6ee27cfb/src/D/dtransf.F90",
+                "sha256": "7558d8688c2a5b06fa77644527134020ae2a2764fc52c70ff1a3e0e800a4be65"
+              },
+              {
+                "path": "src/shared/ktransf.F90",
+                "url": "https://github.com/venovako/JKogb/blob/5d29c303592cdaf46c7b44e475e9d07a6ee27cfb/src/shared/ktransf.F90",
+                "sha256": "88f3738e09597793b0720872f5a1122e730b089cd87a105a2a7ca466d4d2bd40"
+              },
+              {
+                "path": "src/shared/params.F90",
+                "url": "https://github.com/venovako/JKogb/blob/5d29c303592cdaf46c7b44e475e9d07a6ee27cfb/src/shared/params.F90",
+                "sha256": "3f5d49964f7781962621a059dc83e1b27bc9039e1ca1c1644ac4b93465a78c65"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/venovako/JKogb/blob/5d29c303592cdaf46c7b44e475e9d07a6ee27cfb/README.md",
+                "sha256": "fd61d6a02c91af77f1c6b074689b13da0f71f156ab403559b8d9b8a90a0b2fc3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DHSVD2",
+                "role": "public-entry-point",
+                "summary": "Public pure module two-by-two signature-metric decomposition kernel with bit-encoded nonnegative status.",
+                "signature": "CALL DHSVD2(A,J,U,Z,TH1,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/D/dtransf.F90",
+                    "line_start": 614,
+                    "line_end": 620
+                  },
+                  {
+                    "path": "src/shared/params.F90",
+                    "line_start": 9,
+                    "line_end": 14
+                  },
+                  {
+                    "path": "src/shared/params.F90",
+                    "line_start": 31,
+                    "line_end": 34
+                  }
+                ],
+                "path": "src/D/dtransf.F90",
+                "line_start": 614,
+                "line_end": 683,
+                "module": "dtransf",
+                "usage": "use params, only: DWP,TH1FIX\nuse dtransf, only: DHSVD2\nreal(DWP) :: a(2,2),u(2,2),z(2,2)\ninteger :: signature(2),info\na=reshape([2._DWP,0.1_DWP,0.2_DWP,1._DWP],[2,2])\nsignature=[1,-1]\ncall DHSVD2(a,signature,u,z,TH1FIX,info)\nif(info<0) error stop \"hyperbolic transformation failed\"\n! Decode nonnegative INFO bits before assuming A has become diagonal.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Compile the complete preprocessed module graph and configured low-level support, matching DWP. Positive INFO is not automatically an error; near-singular/exceptional paths need independent reconstruction/signature-preservation checks. No decomposition or status branch was executed."
+              },
+              {
+                "procedure": "DHSVD2T",
+                "role": "implementation-helper",
+                "path": "src/D/dtransf.F90",
+                "line_start": 352,
+                "line_end": 532
+              },
+              {
+                "procedure": "DHSVD2S",
+                "role": "implementation-helper",
+                "path": "src/D/dtransf.F90",
+                "line_start": 536,
+                "line_end": 577
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT with named inherited components",
+          "spdx_expression": "MIT",
+          "revision": "5d29c303592cdaf46c7b44e475e9d07a6ee27cfb",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT notice names Vedran Novakovic and identifies additional historical authors and Netlib-derived components in old test generators. Those component notices are retained; this review uses the current small transformation module rather than claiming a clearance of all historical bundles.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/venovako/JKogb/blob/5d29c303592cdaf46c7b44e475e9d07a6ee27cfb/LICENSE",
+              "sha256": "064f6594aa1931ad15904aac80af4f29eaf53410a9697ebae66092721da4a81a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29647,12 +29941,195 @@
             ],
             "notes": "The README identifies a JAMS-derived library and separates optional NetCDF/optimization configurations. Broad library coverage does not establish that every configuration includes every advertised module.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L1a1a",
+            "level": "source-reviewed",
+            "revision": "db2a6b255a2540b910cec369ed52144dd21867dd",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public MEAN generic selects single/double precision implementations computing an optionally masked arithmetic mean. The selected DP function divides SUM(DAT,MASK)/COUNT(MASK), without missing-value recognition beyond the caller mask. It checks mask shape via STOP but has no guard against an empty/all-false selection, whose count becomes zero. NaN handling and overflow/compensated summation are not supplied by this interface. This is location summarization, not an estimator of a fitted probability distribution. Review covers the double-precision masked mean and public generic, not every statistical utility.",
+            "evidence": [
+              {
+                "path": "src/mo_moment.f90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_moment.f90",
+                "sha256": "57a982f102d6eb6d59896c2ada838d4286671eda889b0a3fa5ee51ee8b356caf"
+              },
+              {
+                "path": "src/mo_kind.F90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_kind.F90",
+                "sha256": "28e179d83f979dad9922105797638bdc5810816d9053f52c50ab15cdf4fbf887"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "mean",
+                "role": "public-entry-point",
+                "summary": "Public precision-generic module arithmetic mean with an optional logical inclusion mask.",
+                "signature": "VALUE = mean(DAT,MASK)",
+                "declarations": [
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 349,
+                    "line_end": 356
+                  },
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 1109,
+                    "line_end": 1119
+                  }
+                ],
+                "path": "src/mo_moment.f90",
+                "line_start": 1109,
+                "line_end": 1133,
+                "module": "mo_moment",
+                "usage": "use mo_kind, only: dp\nuse mo_moment, only: mean\nreal(dp) :: x(4),value\nlogical :: keep(4)\nx=[1._dp,2._dp,3._dp,100._dp]; keep=[.true.,.true.,.true.,.false.]\nif(count(keep)==0) error stop \"empty mean selection\"\nvalue=mean(x,mask=keep)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use finite included data and a nonempty shape-matching mask. This does not omit NaN automatically or certify summation accuracy. No mean or mask case was tested."
+              }
+            ]
+          },
+          {
+            "code": "L1a1b",
+            "level": "source-reviewed",
+            "revision": "db2a6b255a2540b910cec369ed52144dd21867dd",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public VARIANCE generic computes sample variance of optionally masked data using centered sums and the correction (SUM((x-mean)^2)-SUM(x-mean)^2/n)/(n-1). At least two selected observations are required; violations/mask mismatches use STOP rather than an INFO return. This selected function always uses n-1 and does not expose the population option of the separate MOMENT subroutine. Floating-point cancellation, nonfinite data and near-zero negative rounding outcomes are not independently validated. Review covers the DP function, not all optional-output combinations of MOMENT.",
+            "evidence": [
+              {
+                "path": "src/mo_moment.f90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_moment.f90",
+                "sha256": "57a982f102d6eb6d59896c2ada838d4286671eda889b0a3fa5ee51ee8b356caf"
+              },
+              {
+                "path": "src/mo_kind.F90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_kind.F90",
+                "sha256": "28e179d83f979dad9922105797638bdc5810816d9053f52c50ab15cdf4fbf887"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "variance",
+                "role": "public-entry-point",
+                "summary": "Public precision-generic module n-1 sample variance with optional logical mask.",
+                "signature": "VALUE = variance(DAT,MASK)",
+                "declarations": [
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 598,
+                    "line_end": 606
+                  },
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 1673,
+                    "line_end": 1685
+                  }
+                ],
+                "path": "src/mo_moment.f90",
+                "line_start": 1673,
+                "line_end": 1706,
+                "module": "mo_moment",
+                "usage": "use mo_kind, only: dp\nuse mo_moment, only: variance\nreal(dp) :: x(4),value\nx=[1._dp,2._dp,3._dp,4._dp]\nvalue=variance(x)\n! This is the sample variance with denominator SIZE(X)-1.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Provide at least two finite selected observations; domain failures terminate execution. Do not substitute the population covariance normalization when comparing results. No variance, cancellation or rejection case was run."
+              }
+            ]
+          },
+          {
+            "code": "L1b",
+            "level": "source-reviewed",
+            "revision": "db2a6b255a2540b910cec369ed52144dd21867dd",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public COVARIANCE generic summarizes two arrays with an optional shared mask, subtracting each selected mean and dividing the product sum by n (population-style normalization). It requires at least two selected values and matching array/mask lengths. The CORRELATION sibling divides this n-normalized covariance by sample standard deviations from MOMENT, so its output is attenuated by (n-1)/n relative to the usual Pearson coefficient on finite nonconstant data; that normalization requires review before interpreting it as Pearson r. The promoted calling sketch therefore uses COVARIANCE only. No hypothesis test, missing-data policy beyond masking, or statistical inference is provided by this summary interface.",
+            "evidence": [
+              {
+                "path": "src/mo_moment.f90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_moment.f90",
+                "sha256": "57a982f102d6eb6d59896c2ada838d4286671eda889b0a3fa5ee51ee8b356caf"
+              },
+              {
+                "path": "src/mo_kind.F90",
+                "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_kind.F90",
+                "sha256": "28e179d83f979dad9922105797638bdc5810816d9053f52c50ab15cdf4fbf887"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "covariance",
+                "role": "public-entry-point",
+                "summary": "Public precision-generic bivariate covariance summary using denominator n.",
+                "signature": "VALUE = covariance(X,Y,MASK)",
+                "declarations": [
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 274,
+                    "line_end": 282
+                  },
+                  {
+                    "path": "src/mo_moment.f90",
+                    "line_start": 961,
+                    "line_end": 973
+                  }
+                ],
+                "path": "src/mo_moment.f90",
+                "line_start": 961,
+                "line_end": 990,
+                "module": "mo_moment",
+                "usage": "use mo_kind, only: dp\nuse mo_moment, only: covariance\nreal(dp) :: x(3),y(3),value\nx=[1._dp,2._dp,3._dp]; y=[2._dp,4._dp,6._dp]\nvalue=covariance(x,y)\n! Denominator is 3 here, unlike the n-1 VARIANCE function.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. At least two finite observations and nonempty shared selection are required. The reviewed correlation normalization is not silently treated as standard Pearson r. No covariance or coefficient value was checked."
+              },
+              {
+                "procedure": "correlation_dp",
+                "role": "implementation-helper",
+                "path": "src/mo_moment.f90",
+                "line_start": 890,
+                "line_end": 922
+              },
+              {
+                "procedure": "moment_dp",
+                "role": "implementation-helper",
+                "path": "src/mo_moment.f90",
+                "line_start": 1358,
+                "line_end": 1432
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Conflicting Apache/GPL/LGPL notices; selected module says LGPLv3+",
+          "spdx_expression": null,
+          "revision": "db2a6b255a2540b910cec369ed52144dd21867dd",
+          "reviewed_on": "2026-11-05",
+          "notes": "LICENSE.md contains Apache-2.0 text, README says LGPLv3, the reviewed module says LGPLv3+, and the referenced license_note text names GPL version 3-or-later while also referring to the Lesser GPL files. Preserve this inconsistency and seek clarification for redistribution; do not infer one blanket SPDX expression from the root filename.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/LICENSE.md",
+              "sha256": "44c334d60837405c5129eb01bef1095a315eb7483948423a397771426878ff0c"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/README.md",
+              "sha256": "82d06f62d420f526eefdcdcb67e6dbac03f2c970211b60ce71084f305e2351ec"
+            },
+            {
+              "path": "COPYING.LESSER",
+              "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/COPYING.LESSER",
+              "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+            },
+            {
+              "path": "doc/license_note.txt",
+              "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/doc/license_note.txt",
+              "sha256": "e3e6991b086f0e16352a5cb9b421d91ef9ca4c0065e9c1a1ddff5d4404ad0c04"
+            },
+            {
+              "path": "src/mo_moment.f90",
+              "url": "https://github.com/mhm-ufz/FORCES/blob/db2a6b255a2540b910cec369ed52144dd21867dd/src/mo_moment.f90",
+              "sha256": "57a982f102d6eb6d59896c2ada838d4286671eda889b0a3fa5ee51ee8b356caf"
+            }
+          ]
         }
       },
       "imports": {}
@@ -30568,12 +31045,155 @@
             ],
             "notes": "DESCRIPTION identifies Kitagawa-methodology state-space analysis. It does not establish coverage of every time-series model or a standalone Fortran user interface.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "0490ac263bf000e7baa3573dd0fe75c5cfd88b2e",
+            "reviewed_on": "2026-11-05",
+            "notes": "UNICORF dispatches univariate autocovariance, normalized autocorrelation and estimated error-bound calculations. The underlying AUTCOV centers using observations strictly between OUTMIN/OUTMAX and divides each lag sum by the total accepted-observation count, not the number of accepted pairs at that lag. Missing/out-of-bound pairs are skipped; zero accepted count or zero lag-zero variance causes unguarded divisions in mean/correlation calculations. Output COV(0:LAG,1:4) holds covariance, correlation and two error-bound arrays. Choose nonconstant finite accepted data and 0<=LAG<N. Review covers wrapper dispatch and mean/autocovariance/correlation calculations; error-bound coverage is not statistically validated.",
+            "evidence": [
+              {
+                "path": "src/unicorf.f",
+                "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/src/unicorf.f",
+                "sha256": "d6e9b5834b46b6d0421717122717676c63153b208bea9c073f4d068b52ec4911"
+              },
+              {
+                "path": "src/comsub.f",
+                "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/src/comsub.f",
+                "sha256": "fdef11075da578b0b2d9fc3c3bd07f78925100388343859a9edbbbe40cd69fd4"
+              },
+              {
+                "path": "R/unicor.R",
+                "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/R/unicor.R",
+                "sha256": "dd1c37cba4a0fc19c3fcef8b1687442345d972f3ccaed302fb6e412f66688aab"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "UNICORF",
+                "role": "public-entry-point",
+                "summary": "External double-precision univariate lag-summary driver with a four-column output array.",
+                "signature": "CALL UNICORF(Y,N,LAG,OUTMIN,OUTMAX,COV,YMEAN)",
+                "declarations": [
+                  {
+                    "path": "src/unicorf.f",
+                    "line_start": 2,
+                    "line_end": 2
+                  },
+                  {
+                    "path": "src/unicorf.f",
+                    "line_start": 25,
+                    "line_end": 26
+                  },
+                  {
+                    "path": "src/comsub.f",
+                    "line_start": 1116,
+                    "line_end": 1137
+                  }
+                ],
+                "path": "src/unicorf.f",
+                "line_start": 2,
+                "line_end": 42,
+                "usage": "external :: UNICORF\ndouble precision :: y(8),cov(0:2,4),average\ny=[1d0,2d0,1d0,3d0,2d0,4d0,3d0,5d0]\ncall UNICORF(y,8,2,-1d30,1d30,cov,average)\n! COV(:,1:2) contain covariance/correlation; columns 3:4 are estimated error bounds.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the package support routines and match double/default-integer kinds. Boundaries are exclusive; a successful return is not protection against empty selections or constant-series division by zero. No lag estimate or confidence/error coverage was tested."
+              },
+              {
+                "procedure": "AUTCOV",
+                "role": "implementation-helper",
+                "path": "src/comsub.f",
+                "line_start": 1074,
+                "line_end": 1114
+              },
+              {
+                "procedure": "AUTCOR",
+                "role": "implementation-helper",
+                "path": "src/comsub.f",
+                "line_start": 1050,
+                "line_end": 1072
+              }
+            ]
+          },
+          {
+            "code": "L10b2a",
+            "level": "source-reviewed",
+            "revision": "0490ac263bf000e7baa3573dd0fe75c5cfd88b2e",
+            "reviewed_on": "2026-11-05",
+            "notes": "CRSCORF computes lagged covariance/correlation between channels; the selected sketch uses two time series. Means are formed separately from values strictly within each channel bounds. C(L,I,J) pairs channel I at time t with channel J at t-L, dividing by sqrt(NSUM(I)*NSUM(J)); it is not recomputed with a pairwise-complete denominator per lag. R normalizes by lag-zero channel variances. Output includes both channel orders for nonnegative lags, so cross-lag orientation must be retained when comparing implementations. All-rejected/constant channels and large integer count products need validation because no error status guards their divisions. Review covers the two-channel wrapper and core normalization/lag loops, not every multivariate statistical model.",
+            "evidence": [
+              {
+                "path": "src/crscorf.f",
+                "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/src/crscorf.f",
+                "sha256": "94dc9d40ea892f89890b33ab3c584e770728f0371cef33aef8e3c9e10fb52748"
+              },
+              {
+                "path": "src/comsub.f",
+                "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/src/comsub.f",
+                "sha256": "fdef11075da578b0b2d9fc3c3bd07f78925100388343859a9edbbbe40cd69fd4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "CRSCORF",
+                "role": "public-entry-point",
+                "summary": "External double-precision channel cross-covariance/correlation driver.",
+                "signature": "CALL CRSCORF(Y,N,L,LAG,OUTMIN,OUTMAX,C,R,YMEAN)",
+                "declarations": [
+                  {
+                    "path": "src/crscorf.f",
+                    "line_start": 2,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "src/crscorf.f",
+                    "line_start": 25,
+                    "line_end": 31
+                  },
+                  {
+                    "path": "src/comsub.f",
+                    "line_start": 971,
+                    "line_end": 973
+                  }
+                ],
+                "path": "src/crscorf.f",
+                "line_start": 2,
+                "line_end": 48,
+                "usage": "external :: CRSCORF\ndouble precision :: y(8,2),lower(2),upper(2),c(0:2,2,2),r(0:2,2,2),average(2)\ny(:,1)=[1d0,2d0,1d0,3d0,2d0,4d0,3d0,5d0]\ny(:,2)=[2d0,1d0,3d0,2d0,4d0,3d0,5d0,4d0]\nlower=-1d30; upper=1d30\ncall CRSCORF(y,8,2,2,lower,upper,c,r,average)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The lag dimension starts at zero and observations occupy array rows. Preserve C(L,I,J) orientation and do not assume lag-specific pair-count normalization. No cross-correlation, missing-value or error case was executed."
+              },
+              {
+                "procedure": "CRSCOR",
+                "role": "implementation-helper",
+                "path": "src/comsub.f",
+                "line_start": 946,
+                "line_end": 1016
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "0490ac263bf000e7baa3573dd0fe75c5cfd88b2e",
+          "reviewed_on": "2026-11-05",
+          "notes": "DESCRIPTION declares GPL (>=2); COPYRIGHTS identifies the statistical-software provenance. This is a package-level finding, not a clearance of every separately linked R/runtime numerical component.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/DESCRIPTION",
+              "sha256": "62523965d49e97678b4191242f264264d319d67e6effe1a7dcc68ada670c85f8"
+            },
+            {
+              "path": "inst/COPYRIGHTS",
+              "url": "https://github.com/cran/TSSS/blob/0490ac263bf000e7baa3573dd0fe75c5cfd88b2e/inst/COPYRIGHTS",
+              "sha256": "9ebd6f97e1227170c3d054253a17ed19f72856848691e2db8eddc24f127b334a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -57708,12 +58328,97 @@
             ],
             "notes": "The README identifies modified distance calculations, Euclidean/great-circle choices and kd-tree controls. This supports spatial regression, not a standalone universal spatial-index library or verified prediction accuracy.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "K5",
+            "level": "source-reviewed",
+            "revision": "fdf9fe62d3469be1a52439e4771ec912c247606a",
+            "reviewed_on": "2026-11-05",
+            "notes": "LOWESD initializes the packed LOESS workspace and LOWESF evaluates direct local polynomial fits through nearest-neighbor selection, distance weights, a local design matrix and QR/SVD-based least-squares work. XTDIST=1 selects Euclidean distances; XTDIST=0 selects the modified great-circle distance calculation with its assumed angular convention. The sketch restricts itself to Euclidean fits, finite data, positive span, valid degree 0..2 and initialized workspace. LOWESD version must be 106; IV/WV layout and per-coordinate degree controls must match the C workspace setup. LOWESF is an evaluation pass using supplied observation weights, not by itself the complete robust-reweighting workflow. Diagnostics call C/R EHG182/printing support rather than returning a general INFO dummy. Review covers setup/direct-fit dispatch and selected local weighting/design/solve paths, not the optional spatial distance model or validated smoothness/fit accuracy.",
+            "evidence": [
+              {
+                "path": "src/spaloessf.f",
+                "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/src/spaloessf.f",
+                "sha256": "0dae4716812db8a8551a23b20d354fb64fb37601f9c3cc7f9227f2f145d8730e"
+              },
+              {
+                "path": "src/spaloessc.c",
+                "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/src/spaloessc.c",
+                "sha256": "56cac54c79a9eb27a8bee55cb07991ff7cedad12eea1d145b2809df014a4ace9"
+              },
+              {
+                "path": "DESCRIPTION",
+                "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/DESCRIPTION",
+                "sha256": "2f04e9bc122a0d0c20b54da686dd09224bec3da61d934205b6ef804a6b283cef"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lowesf",
+                "role": "public-entry-point",
+                "summary": "External direct LOESS-fit entry requiring initialized IV/WV workspaces and C/R diagnostic support.",
+                "signature": "CALL lowesd(VERSIO,IV,LIV,LV,WV,D,N,SPAN,DEGREE,NVMAX,SETLF)\nCALL lowesf(X,Y,WEIGHTS,IV,LIV,LV,WV,M,Z,L,IHAT,FIT,XTDIST)",
+                "declarations": [
+                  {
+                    "path": "src/spaloessf.f",
+                    "line_start": 1609,
+                    "line_end": 1613
+                  },
+                  {
+                    "path": "src/spaloessf.f",
+                    "line_start": 1730,
+                    "line_end": 1734
+                  },
+                  {
+                    "path": "src/spaloessc.c",
+                    "line_start": 235,
+                    "line_end": 263
+                  }
+                ],
+                "path": "src/spaloessf.f",
+                "line_start": 1730,
+                "line_end": 1760,
+                "usage": "external :: lowesd,lowesf\n! Allocate IV(LIV), WV(LV) following the author C LOESS_WORKSPACE formulas.\n! X(N,D), Z(M,D), Y/WEIGHTS(N), FIT(M) are double precision.\n! Choose enough noncoincident observations for a full-rank local polynomial.\ncall lowesd(106,iv,liv,lv,wv,d,n,span,degree,nvmax,.false.)\n! Apply compatible per-coordinate/nonparametric controls as in the C setup.\nihat=0; xtdist=1\ncall lowesf(x,y,weights,iv,liv,lv,wv,m,z,l_dummy,ihat,fit,xtdist)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation Euclidean direct-fit fragment; L_DUMMY must be addressable matching-real storage even with IHAT=0. Link required LINPACK/BLAS and C/R diagnostic helpers; the Fortran file alone is insufficient. No local fit, workspace, singular-neighborhood or spatial-distance case was run."
+              },
+              {
+                "procedure": "ehg127",
+                "role": "implementation-helper",
+                "path": "src/spaloessf.f",
+                "line_start": 233,
+                "line_end": 459
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT package plus retained AT&T permissive source notice",
+          "spdx_expression": null,
+          "revision": "fdf9fe62d3469be1a52439e4771ec912c247606a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The package declares MIT plus LICENSE. The Fortran LOESS source separately retains the Cleveland/Grosse/Shyu AT&T permission-and-disclaimer notice. Both notices must be preserved; this is not a blanket replacement of the inherited source grant with the newer package notice.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/LICENSE",
+              "sha256": "2cb1d5fde9ca1ebab1e23d5f29d2462dcc5532a9cb296cc9ddc8b5d1e3ce9bac"
+            },
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/DESCRIPTION",
+              "sha256": "2f04e9bc122a0d0c20b54da686dd09224bec3da61d934205b6ef804a6b283cef"
+            },
+            {
+              "path": "src/spaloessf.f",
+              "url": "https://github.com/XiaosuTong/Spaloess/blob/fdf9fe62d3469be1a52439e4771ec912c247606a/src/spaloessf.f",
+              "sha256": "0dae4716812db8a8551a23b20d354fb64fb37601f9c3cc7f9227f2f145d8730e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -61240,12 +61945,105 @@
             ],
             "notes": "The pinned DG-Clust readme identifies discrete-gradient clustering and its references. This supports a broad optimization/clustering mapping for the collection, not a review of every bundled algorithm. The document specifies academic teaching/research use; unrestricted reuse and clustering quality are not assumed.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L14a1b",
+            "level": "source-reviewed",
+            "revision": "8dd8c8a7fdb8786afd32895fff412b377612bdd4",
+            "reviewed_on": "2026-11-05",
+            "notes": "The selected DCDB-Clust directory provides incremental minimum-sum-of-squares clustering, with OPTIM dispatching the DC-Clust local nonsmooth optimizer for the configured auxiliary or real clustering objective. For NS=2, CLUSTERFUNC sums each record squared distance to its nearest of NC centers, packed feature-first within each center. The public OPTIM interface takes MAXDIM-sized start/result arrays, with data matrix A, MF, NC, NRECORD and method controls supplied through shared modules. It has no arbitrary objective callback or returned termination code; printed FVALUE is not a global-optimum certificate. Other directory algorithms and the alternative DCD-Bundle method are not inferred from this one path. Review covers the public dispatcher, objective and selected local search structure, not clustering accuracy, initialization quality or every bundled implementation.",
+            "evidence": [
+              {
+                "path": "DCDB-Clust/dcclust_method.f95",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/dcclust_method.f95",
+                "sha256": "0a4e97c6452a75f6942621b2291df3c526e6ef2d9a984e8b39e4a79399d44f52"
+              },
+              {
+                "path": "DCDB-Clust/functionmod.f95",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/functionmod.f95",
+                "sha256": "4afc9754394318c21c1c32d7656c77fad85871166fccc8c92f068444b2a7042c"
+              },
+              {
+                "path": "DCDB-Clust/initclust.f95",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/initclust.f95",
+                "sha256": "f20c97881fc8a89bda7baa17d4a560e3ae993589aca5d189cfd9cce6230c56b9"
+              },
+              {
+                "path": "DCDB-Clust/parameters.f95",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/parameters.f95",
+                "sha256": "d5f8381920791673753a4d9b7ed7432aafa251fac0ea357ed4cfaa4bb90a6078"
+              },
+              {
+                "path": "DCDB-Clust/clusteringmod.f95",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/clusteringmod.f95",
+                "sha256": "187b9577c8aa988edb4a176417ae48f47b3de11d1e1c5e67bbb8ec80a614bb05"
+              },
+              {
+                "path": "DCDB-Clust/read_me.txt",
+                "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/read_me.txt",
+                "sha256": "41c724a7b332a5e639395ecaaab7cd37555d85d936da7b74ae5eb287139579be"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "optim",
+                "role": "public-entry-point",
+                "summary": "Public module local clustering optimizer requiring initialized shared dataset/control modules.",
+                "signature": "CALL optim(X0,X,FVALUE)",
+                "declarations": [
+                  {
+                    "path": "DCDB-Clust/dcclust_method.f95",
+                    "line_start": 39,
+                    "line_end": 59
+                  }
+                ],
+                "path": "DCDB-Clust/dcclust_method.f95",
+                "line_start": 39,
+                "line_end": 91,
+                "module": "dcclust_method",
+                "usage": "use r_precision, only: prec\nuse initclust, only: maxdim,ns,nc,mf\nuse dcclust_method, only: optim\nreal(prec) :: start(maxdim),centers(maxdim),objective\n! Populate INITCLUST data matrix A/NRECORD and all solver controls as in the driver.\n! Set NC/MF consistently, with NC*MF<=MAXDIM; initialize the active center entries.\nns=2\ncall optim(start,centers,objective)\n! Active centers occupy CENTERS(1:NC*MF); independently check assignments/objective.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-setup fragment for the DC-Clust branch only. This does not allocate/read a dataset or initialize every shared solver parameter. No clustering solution, local stationarity or incremental-center selection was run."
+              },
+              {
+                "procedure": "clusterfunc",
+                "role": "implementation-helper",
+                "path": "DCDB-Clust/functionmod.f95",
+                "line_start": 85,
+                "line_end": 134
+              },
+              {
+                "procedure": "qsm",
+                "role": "implementation-helper",
+                "path": "DCDB-Clust/dcclust_method.f95",
+                "line_start": 129,
+                "line_end": 172
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Academic teaching/research permission for reviewed DCDB subset",
+          "spdx_expression": null,
+          "revision": "8dd8c8a7fdb8786afd32895fff412b377612bdd4",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected directory readme says the software is free for academic teaching/research and requests the listed citations. No general commercial/redistribution grant or single license covering every other repository directory is inferred.",
+          "evidence": [
+            {
+              "path": "DCDB-Clust/read_me.txt",
+              "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/read_me.txt",
+              "sha256": "41c724a7b332a5e639395ecaaab7cd37555d85d936da7b74ae5eb287139579be"
+            },
+            {
+              "path": "DCDB-Clust/dcclust_method.f95",
+              "url": "https://github.com/SnTa2019/Clustering-via-Nonsmooth-Optimization/blob/8dd8c8a7fdb8786afd32895fff412b377612bdd4/DCDB-Clust/dcclust_method.f95",
+              "sha256": "0a4e97c6452a75f6942621b2291df3c526e6ef2d9a984e8b39e4a79399d44f52"
+            }
+          ]
         }
       },
       "imports": {}
@@ -62308,12 +63106,77 @@
             ],
             "notes": "The broad mapping uses the README together with documented predict/update interfaces in forapollo_estimate.f90. Other advertised guidance/orbit capabilities need individual review before further classes are assigned. The README identifies a proprietary license; public source availability does not imply unrestricted reuse or safety validation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L10a2e",
+            "level": "source-reviewed",
+            "revision": "95abadba7c3e774ca58dc2fe1e7d6a572b7cb031",
+            "reviewed_on": "2026-11-05",
+            "notes": "FA_KF_PREDICT applies x=F*x and P=F*P*F-transpose+Q. FA_KF_UPDATE computes innovations, gates individual measurements by squared innovation over diagonal innovation variance, extracts the retained full covariance submatrix, solves the SPD innovation system, and applies a Joseph-form covariance update. All C-boundary matrices are flat row-major, not ordinary Fortran column-major arrays. VALIDITY is output: +1 fused, 0 skipped above 9, -1 rejected above 16 (or degenerate diagonal); if no values are fused, state/covariance remain at prediction with INFO=0. Cholesky solve failure maps to INFO=4; invalid dimensions to 3. Covariance consistency/finite values are not comprehensively checked. Some helper calls alias input/output arrays despite differing INTENTs and need compiler/alias-contract review. The sketch uses a scalar model to avoid layout ambiguity. Review covers the linear KF path and matrix-solve helper, not every EKF/UKF/particle-filter variant.",
+            "evidence": [
+              {
+                "path": "src/fortran/forapollo_estimate.f90",
+                "url": "https://github.com/forKernels/forApollo/blob/95abadba7c3e774ca58dc2fe1e7d6a572b7cb031/src/fortran/forapollo_estimate.f90",
+                "sha256": "ba74eb5332359d695bd4bc97b24b46ae1d99473b241755cf0c2f6315429216a1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fa_kf_predict",
+                "role": "public-entry-point",
+                "summary": "External BIND(C) linear prediction; N is passed by value and covariance storage is flat row-major.",
+                "signature": "CALL fa_kf_predict(N,X,P,F,Q,INFO)\nCALL fa_kf_update(N,M,X,P,Z,H,R,VALIDITY,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/forapollo_estimate.f90",
+                    "line_start": 50,
+                    "line_end": 59
+                  },
+                  {
+                    "path": "src/fortran/forapollo_estimate.f90",
+                    "line_start": 99,
+                    "line_end": 110
+                  }
+                ],
+                "path": "src/fortran/forapollo_estimate.f90",
+                "line_start": 50,
+                "line_end": 87,
+                "usage": "use iso_c_binding, only: c_int,c_double\ninterface\n subroutine fa_kf_predict(n,x,p,f,q,info) bind(C)\n  import c_int,c_double\n  integer(c_int),value :: n\n  real(c_double) :: x(n),p(n*n),f(n*n),q(n*n)\n  integer(c_int) :: info\n end subroutine\n subroutine fa_kf_update(n,m,x,p,z,h,r,validity,info) bind(C)\n  import c_int,c_double\n  integer(c_int),value :: n,m\n  real(c_double) :: x(n),p(n*n),z(m),h(m*n),r(m*m)\n  integer(c_int) :: validity(m),info\n end subroutine\nend interface\nreal(c_double) :: x(1),p(1),f(1),q(1),z(1),h(1),r(1)\ninteger(c_int) :: validity(1),info\nx=0d0; p=1d0; f=1d0; q=0.1d0; z=0.2d0; h=1d0; r=0.25d0\ncall fa_kf_predict(1_c_int,x,p,f,q,info)\nif(info/=0) error stop \"KF predict failed\"\ncall fa_kf_update(1_c_int,1_c_int,x,p,z,h,r,validity,info)\nif(info/=0) error stop \"KF update failed\"\n! Inspect VALIDITY too: success alone does not mean a measurement was fused.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Resolve helper aliasing and whole-object external linkage before relying on this scalar interface example; other routines in the same object reference propagation/observation dependencies. Use explicit C-compatible interfaces and preserve row-major ordering for larger systems. No filtering, gating threshold or covariance result was tested."
+              },
+              {
+                "procedure": "mat_solve_symm",
+                "role": "implementation-helper",
+                "path": "src/fortran/forapollo_estimate.f90",
+                "line_start": 666,
+                "line_end": 727
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "Proprietary designation; no standalone permission grant identified",
+          "spdx_expression": null,
+          "revision": "95abadba7c3e774ca58dc2fe1e7d6a572b7cb031",
+          "reviewed_on": "2026-11-05",
+          "notes": "README displays a Proprietary license badge and the source retains a copyright notice. No standalone LICENSE/COPYING file or redistribution permission was identified in the reviewed tree/files. Source access does not imply an open-source grant.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/forKernels/forApollo/blob/95abadba7c3e774ca58dc2fe1e7d6a572b7cb031/README.md",
+              "sha256": "4445a7fe313844b46a21043fb7d5041ab79dcae1482f9afe046e378376b83236"
+            },
+            {
+              "path": "src/fortran/forapollo_estimate.f90",
+              "url": "https://github.com/forKernels/forApollo/blob/95abadba7c3e774ca58dc2fe1e7d6a572b7cb031/src/fortran/forapollo_estimate.f90",
+              "sha256": "ba74eb5332359d695bd4bc97b24b46ae1d99473b241755cf0c2f6315429216a1"
+            }
+          ]
         }
       },
       "imports": {}

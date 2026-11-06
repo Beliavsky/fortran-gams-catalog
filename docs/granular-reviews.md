@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 340 repositories now have 452 source-reviewed
+Reviewed on 2026-11-05. 348 repositories now have 464 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-329 repository cards now identify public routines and link their usage lines
+337 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Eleven further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV and TiktakGlobalSearch) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 340 independently source-reviewed repositories now have an
+separately. All 348 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -364,6 +364,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Fortran shape functions | `shapefuncs::shapefunc%eval` | MIT |
 | Neural-network tangent and adjoint tests | `NOGWDNN_MOD::NN_TL`, `NOGWDNN_MOD::NN_AD` | MIT |
 | Fortran Neural Network library | `fnn_network_sequential::SequentialNeuralNetwork%apply_tangent_linear`, `fnn_network_sequential::SequentialNeuralNetwork%apply_adjoint` | MIT |
+| PolyChordLite | `interfaces_module::run_polychord` | Custom PolyChord noncommercial academic/research license |
+| Stripy | `TRMESH`, `INTRC0` | LGPL-3.0 text plus retained Renka source notices |
+| JKogb | `dtransf::DHSVD2` | MIT with named inherited components |
+| FORCES | `mo_moment::mean`, `mo_moment::variance`, `mo_moment::covariance` | Conflicting Apache/GPL/LGPL notices; selected module says LGPLv3+ |
+| TSSS | `UNICORF`, `CRSCORF` | GPL-2.0-or-later |
+| Spaloess | `lowesf` | MIT package plus retained AT&T permissive source notice |
+| Clustering via Nonsmooth Optimization | `dcclust_method::optim` | Academic teaching/research permission for reviewed DCDB subset |
+| forApollo | `fa_kf_predict` | Proprietary designation; no standalone permission grant identified |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -723,6 +731,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Fortran shape functions](https://github.com/willklausler/fortran_shapefuncs) | E1b; H1 | Finite-line polynomial interpolation and analytic shape derivatives | Reference coordinates and node ordering; cubature dependency and physical derivative transformations. |
 | [Neural-network tangent and adjoint tests](https://github.com/samhatfield/nn_tl_ad) | H1 | Fixed-network input tangent-linear and adjoint operators | Global weights/batch biases and BLAS kinds; derivatives concern inputs rather than training parameters. |
 | [Fortran Neural Network library](https://github.com/cerea-daml/fnn) | H1 | Sequential-network state/parameter tangent and adjoint operators | Stored per-member forward trajectory and parameter packing; adjoint may overwrite output seeds. |
+| [PolyChordLite](https://github.com/polychord/polychordlite) | L | Bayesian nested sampling and likelihood-constrained slice replacement | Likelihood/prior/dumper callback contracts; estimated stopping, outputs and noncommercial license. |
+| [Stripy](https://github.com/underworldcode/stripy) | P; E2b | Planar Delaunay triangulation and scattered linear interpolation | Use matching included fixed-form REAL variants; distinguish interpolation/constraint/exterior results. |
+| [JKogb](https://github.com/venovako/jkogb) | D | Two-by-two real signature-metric singular-value transformations | Overwritten matrix; signature validation, positive status bits and exceptional off-diagonals. |
+| [FORCES](https://github.com/mhm-ufz/forces) | L1a1a; L1a1b; L1b | Masked mean, sample variance and bivariate covariance | Empty selections, n versus n-1 normalization and inconsistent license notices are explicit. |
+| [TSSS](https://github.com/cran/tsss) | L10a2a1; L10b2a | Univariate and two-channel lagged covariance/correlation summaries | Exclusive observation bounds, total-count normalization and unguarded empty/constant selections. |
+| [Spaloess](https://github.com/xiaosutong/spaloess) | K5 | Direct local polynomial smoothing | Versioned packed workspace, explicit Euclidean distance selector and C/R numerical diagnostics. |
+| [Clustering via Nonsmooth Optimization](https://github.com/snta2019/clustering-via-nonsmooth-optimization) | L14a1b | DC-Clust minimum-sum-of-squares nonhierarchical clustering | Shared data/control modules and packed centers; selected DCDB-directory academic terms. |
+| [forApollo](https://github.com/forkernels/forapollo) | L10a2e | Linear Kalman prediction and gated Joseph-form updates | Flat row-major C boundary, output gating flags, helper aliasing and proprietary designation. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1325,3 +1341,11 @@ coordinates, raw MAD and scaled dispersion, and reusable kernels versus
 grid-driven demonstrations. Censoring-tail conventions, filter boundaries,
 normalization differences, and legacy workspace/dependency/status limits
 remain explicit.
+
+FORCES, ForApollo, PolyChordLite, the DC-Clust subset of Clustering-via-
+Nonsmooth-Optimization, JKogb, Stripy, TSSS and Spaloess now have pinned
+source interfaces and calling sketches. These sketches were not compiled
+or run. Review distinguishes matrix layouts, signature-metric versus ordinary
+decomposition, covariance normalization, gating outputs, boundary extrapolation
+and estimated sampler convergence. Conflicting/proprietary/academic-use notices
+are retained rather than assigning an unsupported blanket permissive license.
