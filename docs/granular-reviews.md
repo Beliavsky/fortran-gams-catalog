@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 723 source-reviewed
+Reviewed on 2026-11-06. 453 repositories now have 724 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -119,7 +119,7 @@ complete public-API audit. Individual local driver checks are identified separat
 | Fortran_Davidson | `davidson_dense::generalized_eigensolver_dense` (ordinary DPR path) | Apache-2.0 |
 | qrupdate-ng | External `DQR1UP` (real rank-one QR update) | GPL-3.0-or-later |
 | PROPACK | External `DLANSVD` (nonrestarted real truncated SVD) | No grant identified in reviewed material |
-| minila | `linsys::linsol` (vector binding) | GPL v3 text; version choice unresolved |
+| minila | `linsys::linsol` (vector binding), `prim::diag_sub`, `::fwd_sub`, `::bck_sub` | GPL v3 text; version choice unresolved |
 | Bolander linear algebra library | External `cholesky_factor` | No license identified in reviewed material |
 | fortsparse | `fortsparse_csr::csr_matvec` (real64 service) | MIT core; backend licenses separate |
 | Fortran_CSR | `csrmodule::CSRcomplex%matmul` (native fallback) | MIT |
@@ -966,6 +966,7 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [FMM collection: adaptive quadrature](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | H2a1a1 | Closed eight-panel Newton-Cotes with adaptive subdivision | 55 analytic integrals, including reversed/zero intervals; persistent limit state and estimated-error scope documented. |
 | [FMM collection: real SVD](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | D6 | Householder/QR rectangular singular-value decomposition | 48 square/tall matrices; reconstruction, orthogonality, energy and selected known spectra; both vector flags true. |
 | [FMM collection: RKF45](https://github.com/Beliavsky/Computer-Methods-for-Mathematical-Computations) | I1a1a | Adaptive explicit nonstiff initial-value integration | 211 analytic-state comparisons at GNU -O0; preserved helper state has an INTENT(OUT) portability issue. |
+| [minila: direct triangular solves](https://github.com/ghbrown/minila) | D2a3 | Default-REAL diagonal, forward and backward substitution | 108 known-solution/scaled-residual checks; 32-bit REAL, correct structure and nonzero pivots required. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1902,3 +1903,16 @@ recorded passing run is not portable or optimized continuation verification.
 SVD flags/shapes outside the stated contract, extreme scales, other recovery
 paths and other compilers remain unverified. Existing source/license findings
 are unchanged and the numerical source is not bundled.
+
+Minila now has a [complete locally checked triangular-system driver](../drivers/minila-triangular/README.md)
+for D2a3, with public `prim::diag_sub`, `::fwd_sub` and `::bck_sub` interfaces.
+All 108 diagonal/lower/upper systems passed known-solution and independent
+scaled-residual checks, covering N=1..12 and scales 1e-8, 1 and 1e8. GNU
+Fortran 17.0.0 20260510 (experimental), Windows, used 32-bit default REAL,
+full bounds checks and invalid/zero/overflow traps. Maximum relative solution
+error was 1.726479e-7 and maximum scaled residual 8.948365e-8, below 5e-6.
+These low-level routines do not validate triangularity or zero pivots, and
+nonsquare error paths leave results undefined. The checked usage therefore
+requires finite, correctly structured square systems with nonzero diagonals;
+no error-bound, conditioning, invalid-input, dispatch-wrapper, LU/inverse/SOR
+or double-precision claim is added. Existing source/license findings remain.

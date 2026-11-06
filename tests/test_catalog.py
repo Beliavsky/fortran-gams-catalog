@@ -302,6 +302,13 @@ class CatalogTests(unittest.TestCase):
                 self.assertIn('ForsytheMalcolmMoler::'+procedure, class_page)
             self.assertIn('continuation helper INTENT(OUT)', fmm)
             self.assertTrue((destination/'drivers/fmm-svd-ode/results.json').is_file())
+            minila = (destination/'projects/ghbrown/minila/index.html').read_text(encoding='utf-8')
+            self.assertIn('drivers/minila-triangular/triangular.f90', minila)
+            for procedure in ('diag_sub', 'fwd_sub', 'bck_sub'):
+                class_page = (destination/'classes/D2a3/index.html').read_text(encoding='utf-8')
+                self.assertIn('prim::'+procedure, class_page)
+            self.assertTrue((destination/'drivers/minila-triangular/triangular.f90').is_file())
+            self.assertTrue((destination/'drivers/minila-triangular/results.json').is_file())
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)

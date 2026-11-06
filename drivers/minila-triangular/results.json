@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-11-06T21:37:01.040435+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings",
+  "checks": [
+    {
+      "name": "triangular",
+      "gams_code": "D2a3",
+      "source": {
+        "path": "src/prim.f90",
+        "revision": "9f20969c68ce5b174d4a21cfc610c5ff276d183c",
+        "sha256": "064aa96e4627b8386a3f62a2a071daab7ca2b5ec7b024a138404b4bb1f8f6850"
+      },
+      "dependencies": [],
+      "driver": "triangular.f90",
+      "driver_sha256": "e6fcb68d77b2cb8bd46970462e300ec25b78d5bf3df98265ba9eb0749474ffe6",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "source_flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-ffree-line-length-none",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\prim.f90:82:25:\n\n   82 |        else if (sum_upper+sum_lower == 0.0) then\n      |                         1\nWarning: Equality comparison for REAL(4) at (1) [-Wcompare-reals]\n<temporary>\\prim.f90:295:16:\n\n  295 |     integer :: i\n      |                1\nWarning: Unused variable 'i' declared at (1) [-Wunused-variable]\n<temporary>\\prim.f90:219:16:\n\n  219 |     integer :: i\n      |                1\nWarning: Unused variable 'i' declared at (1) [-Wunused-variable]\nC:\\python\\fortran-gams-catalog\\drivers\\minila-triangular\\triangular.f90:38:11:\n\n   38 |     if(any(a/=original)) error stop 'input matrix was modified'\n      |           1\nWarning: Inequality comparison for REAL(4) at (1) [-Wcompare-reals]\n",
+      "stdout": "Default REAL storage bits: 32\nChecked triangular systems: 108\nMaximum relative solution error:   1.726479E-07\nMaximum scaled residual:   8.948365E-08\nPASS triangular\n",
+      "stderr": ""
+    }
+  ]
+}

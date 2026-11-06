@@ -35,3 +35,4 @@ separate check.
 | [FFTPack signal operations](fftpack-signals/README.md) | J2; J4; J1a1 | 175 direct convolution, analytic-signal and direct-DFT comparisons; documented legacy ABI/bounds limits |
 | [FMM splines and quadrature](fmm-interpolation-quadrature/README.md) | E1a; E3a2; H2a1a1 | 499 spline values, 499 derivative vectors and 55 analytic integrals; full bounds instrumentation |
 | [FMM SVD and ODE](fmm-svd-ode/README.md) | D6; I1a1a | 48 matrix-invariant cases and 211 analytic ODE states; documented continuation INTENT portability issue |
+| [Minila triangular systems](minila-triangular/README.md) | D2a3 | 108 diagonal/lower/upper systems with known solutions and scaled residuals; default REAL is 32-bit |
