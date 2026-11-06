@@ -942,6 +942,12 @@
       "parent": "D4b",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "I2a2": {
+      "label": "Hyperbolic",
+      "parent": "I2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-06"
     }
   }
 }

@@ -1,0 +1,56 @@
+{
+  "checked_at": "2026-11-06T14:49:07.747569+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "compiler": "GNU Fortran (GCC) 17.0.0 20260510 (experimental)",
+  "checks": [
+    {
+      "name": "advection",
+      "gams_code": "I2a2",
+      "source": {
+        "path": "src/rp1_advection_ptwise.f90",
+        "sha256": "80b314b5f00f5186154b4de536efdc72d0d470e07469a8f296c6da896a922d65",
+        "revision": "008d4921ea46878a97a96c8b8daa399a2e7b9078"
+      },
+      "driver": "advection.f90",
+      "driver_sha256": "62581a17237b4d0047f63c1a175d81af60ec3be6e2cf674dcdfbbcdf415b61f9",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\advection_upstream.f90:5:62:\n\n    5 | subroutine rp1_ptwise(num_eqn, num_aux, num_waves, q_l, q_r, aux_l, aux_r,    &\n      |                                                              1~~~~\nWarning: Unused dummy argument 'aux_l' at (1) [-Wunused-dummy-argument]\n<temporary>\\advection_upstream.f90:5:69:\n\n    5 | subroutine rp1_ptwise(num_eqn, num_aux, num_waves, q_l, q_r, aux_l, aux_r,    &\n      |                                                                     1~~~~\nWarning: Unused dummy argument 'aux_r' at (1) [-Wunused-dummy-argument]\n",
+      "stdout": "Maximum absolute error:   0.0000E+00\nPASS advection: 9 positive/negative/zero-speed and state cases\n",
+      "stderr": ""
+    },
+    {
+      "name": "burgers",
+      "gams_code": "I2a2",
+      "source": {
+        "path": "src/rp1_burgers_ptwise.f90",
+        "sha256": "91ea080bb93c8b0c3eff3baefc08a0fdf676e0765db9496d657943d751648072",
+        "revision": "008d4921ea46878a97a96c8b8daa399a2e7b9078"
+      },
+      "driver": "burgers.f90",
+      "driver_sha256": "283744a95a254ccf73ad39d43395ce3f0607ad1ecd71feb9f42e752fc8d976e8",
+      "flags": [
+        "-O0",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-fcheck=all",
+        "-ffpe-trap=invalid,zero,overflow"
+      ],
+      "build_returncode": 0,
+      "run_returncode": 0,
+      "build_stderr": "<temporary>\\burgers_upstream.f90:2:62:\n\n    2 | subroutine rp1_ptwise(num_eqn, num_aux, num_waves, q_l, q_r, aux_l, aux_r,    &\n      |                                                              1~~~~\nWarning: Unused dummy argument 'aux_l' at (1) [-Wunused-dummy-argument]\n<temporary>\\burgers_upstream.f90:2:69:\n\n    2 | subroutine rp1_ptwise(num_eqn, num_aux, num_waves, q_l, q_r, aux_l, aux_r,    &\n      |                                                                     1~~~~\nWarning: Unused dummy argument 'aux_r' at (1) [-Wunused-dummy-argument]\n",
+      "stdout": "Maximum absolute error:   0.0000E+00\nPASS Burgers: 8 shock, rarefaction, transonic and constant-state cases\n",
+      "stderr": ""
+    }
+  ],
+  "hash_convention": "SHA-256 of UTF-8 text normalized to LF line endings"
+}

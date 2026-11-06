@@ -67,6 +67,19 @@ def build(destination, root=ROOT):
     destination.mkdir(parents=True, exist_ok=True)
     for asset in ('catalog.css', 'search.js'):
         shutil.copy2(root/'assets'/asset, destination/asset)
+    copied = set()
+    for project in projects:
+        for claim in project['local'].get('classifications', []):
+            for procedure in claim.get('procedures', []):
+                driver = procedure.get('local_driver')
+                if driver:
+                    for field in ('path', 'runner', 'report', 'readme'):
+                        artifact = driver[field]
+                        if artifact not in copied:
+                            target = destination/artifact
+                            target.parent.mkdir(parents=True, exist_ok=True)
+                            shutil.copy2(root/artifact, target)
+                            copied.add(artifact)
     (destination/'.nojekyll').touch()
     (destination/'catalog.json').write_text(json.dumps(merged, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'taxonomy.json').write_text(json.dumps(tree, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
@@ -240,7 +253,13 @@ def build(destination, root=ROOT):
                             body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',
                                               'Argument declarations: '+declaration['path']+':'+str(declaration['line_start']))+'</p>'
                     if procedure.get('usage'):
-                        body += '<p>Calling sketch (not a checked driver):</p><pre><code>'+e(procedure['usage'])+'</code></pre>'
+                        driver = procedure.get('local_driver')
+                        label = 'Locally checked main program' if driver else 'Calling sketch (not a checked driver)'
+                        body += '<p>'+label+':</p><pre><code>'+e(procedure['usage'])+'</code></pre>'
+                        if driver:
+                            body += '<p>'+' ? '.join(link(prefix+driver[field], title) for field, title in (
+                                ('path', 'Download main program'), ('report', 'Saved numerical results'),
+                                ('readme', 'Build instructions and scope'), ('runner', 'Pinned-source check runner')))+'</p>'
                         body += '<p>'+e(procedure['usage_notes'])+'</p>'
                     for example in procedure.get('examples', []):
                         source = next(v for v in claim['evidence'] if v['path'] == example['path'])

@@ -1,7 +1,7 @@
 # Standalone numerical drivers
 
-This directory is reserved for problem-specific drivers for independently reviewed
-repositories. Imported playground drivers remain in their original repository;
+This directory contains problem-specific drivers for independently reviewed
+repositories. See the [locally checked Riemann examples](riemann/README.md). Imported playground drivers remain in their original repository;
 the catalog retains their source hashes, licenses, validation reports and links.
 
 For each new driver, provide:
@@ -16,5 +16,9 @@ For each new driver, provide:
 5. License and attribution for borrowed code, including author examples.
 
 A source-reviewed procedure mapping may precede a driver. Do not describe an
-unrun driver as verified. Add support in the local metadata validator and site
-renderer when the first local driver is ready.
+unrun driver as verified. The optional `local_driver` record on a reviewed procedure binds its full
+main-program text, runner and saved report to normalized SHA-256 hashes. The
+validator checks the upstream source pin/hash, GAMS class and successful named
+result. Generated pages label and link these artifacts separately from unchecked
+calling sketches. Catalog builds remain offline; compilation is an explicit
+separate check.

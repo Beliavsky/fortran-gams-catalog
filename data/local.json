@@ -35432,12 +35432,128 @@
             ],
             "notes": "The README describes a repository of solver components and normal/transverse interfaces. These components are not full time-dependent PDE applications by themselves.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2a2",
+            "level": "source-reviewed",
+            "revision": "008d4921ea46878a97a96c8b8daa399a2e7b9078",
+            "reviewed_on": "2026-11-06",
+            "notes": "The selected pointwise routines solve scalar interface Riemann problems used in wave-propagation finite-volume methods for one-dimensional hyperbolic conservation laws. rp1_advection_ptwise uses constant velocity from REAL(KIND=8) COMMON /cparam/ u, returns the state jump, speed and signed flux fluctuations. rp1_burgers_ptwise uses the Roe average speed for flux q**2/2 and applies an always-enabled entropy fix to transonic rarefactions. Require NUM_EQN=1 and NUM_WAVES=1; the checked drivers use NUM_AUX=1 with unused auxiliary arrays. All numerical arrays are REAL(KIND=8), integers use the matching default ABI, and the pointwise declarations are INOUT even for quantities only read by these implementations. There is no status/dimension validation; larger arbitrary systems are not implied by dimension arguments. The two files export the same external symbol and are alternative link selections. Source review covers the full selected small kernels. Two complete catalog-owned main programs were compiled and run with bounds/FPE checks: nine advection cases and eight Burgers cases verify exact interface fluxes, fluctuation conservation, jumps and reported speeds. The results establish those cases, not a complete Clawpack time integrator, boundary treatment, convergence order or all solvers in the repository.",
+            "evidence": [
+              {
+                "path": "src/rp1_advection_ptwise.f90",
+                "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/src/rp1_advection_ptwise.f90",
+                "sha256": "80b314b5f00f5186154b4de536efdc72d0d470e07469a8f296c6da896a922d65"
+              },
+              {
+                "path": "src/rp1_burgers_ptwise.f90",
+                "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/src/rp1_burgers_ptwise.f90",
+                "sha256": "91ea080bb93c8b0c3eff3baefc08a0fdf676e0765db9496d657943d751648072"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rp1_ptwise",
+                "role": "public-entry-point",
+                "summary": "Pointwise scalar advection Riemann-solver component; link this source variant separately.",
+                "signature": "CALL rp1_ptwise(NUM_EQN,NUM_AUX,NUM_WAVES,Q_L,Q_R, &\n AUX_L,AUX_R,WAVE,S,AMDQ,APDQ)",
+                "declarations": [
+                  {
+                    "path": "src/rp1_advection_ptwise.f90",
+                    "line_start": 5,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "src/rp1_advection_ptwise.f90",
+                    "line_start": 11,
+                    "line_end": 23
+                  }
+                ],
+                "path": "src/rp1_advection_ptwise.f90",
+                "line_start": 5,
+                "line_end": 31,
+                "usage": "! GAMS I2a2; scalar advection interface checks.\n! Upstream pin: 008d4921ea46878a97a96c8b8daa399a2e7b9078\nprogram check_advection\n  implicit none\n  interface\n    subroutine rp1_ptwise(ne,na,nw,ql,qr,al,ar,w,s,am,ap)\n      integer, intent(in) :: ne,na,nw\n      real(kind=8), intent(inout) :: ql(ne),qr(ne),al(na),ar(na)\n      real(kind=8), intent(inout) :: w(ne,nw),s(nw),am(ne),ap(ne)\n    end subroutine\n  end interface\n  real(kind=8) :: u\n  common /cparam/ u\n  real(kind=8) :: ql(1),qr(1),al(1),ar(1),w(1,1),s(1),am(1),ap(1)\n  real(kind=8), parameter :: speeds(3)=[-2d0,0d0,3d0]\n  real(kind=8), parameter :: left(3)=[1d0,-1d0,2d0],right(3)=[4d0,2d0,2d0]\n  real(kind=8) :: flux,err,maxerr,tol\n  integer :: i,j\n  maxerr=0d0; al=0d0; ar=0d0\n  do i=1,size(speeds)\n    u=speeds(i)\n    do j=1,size(left)\n      ql=left(j); qr=right(j); w=0d0; s=0d0; am=0d0; ap=0d0\n      call rp1_ptwise(1,1,1,ql,qr,al,ar,w,s,am,ap)\n      if(u>=0d0)then\n        flux=u*left(j)\n      else\n        flux=u*right(j)\n      endif\n      err=max(abs(u*left(j)+am(1)-flux),abs(u*right(j)-ap(1)-flux), &\n              abs(am(1)+ap(1)-u*(right(j)-left(j))), &\n              abs(w(1,1)-(right(j)-left(j))),abs(s(1)-u))\n      tol=2d-13*max(1d0,abs(flux),abs(u*left(j)),abs(u*right(j)))\n      if(.not.(err<=tol))error stop 'advection flux/speed/jump check failed'\n      maxerr=max(maxerr,err)\n    enddo\n  enddo\n  print '(a,es12.4)','Maximum absolute error: ',maxerr\n  print '(a)','PASS advection: 9 positive/negative/zero-speed and state cases'\nend program check_advection",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Flags: -O0 -g -Wall -Wextra -fcheck=all -ffpe-trap=invalid,zero,overflow. Saved main program: drivers/riemann/advection.f90; reproducible pinned-source runner: drivers/riemann/run.py; compiler, source/driver hashes and output: drivers/riemann/results.json. Nine cases check positive/negative/zero velocities, jump/speed and upwind Godunov flux from both sides. Maximum absolute discrepancy was zero for these finite test cases. Both source variants export the same rp1_ptwise symbol and must be compiled separately; this is not a whole-package or full time-evolution verification.",
+                "local_driver": {
+                  "path": "drivers/riemann/advection.f90",
+                  "sha256": "62581a17237b4d0047f63c1a175d81af60ec3be6e2cf674dcdfbbcdf415b61f9",
+                  "runner": "drivers/riemann/run.py",
+                  "runner_sha256": "722f395974c8a716bf81a2c1f4ce795454e86859debd8adc1e5b1cac147cbc67",
+                  "report": "drivers/riemann/results.json",
+                  "report_sha256": "22551a88288896b51803fd252631fa528ad560119877167ed3965d8d77749fd6",
+                  "readme": "drivers/riemann/README.md",
+                  "check_name": "advection"
+                }
+              },
+              {
+                "procedure": "rp1_ptwise",
+                "role": "public-entry-point",
+                "summary": "Pointwise scalar burgers Riemann-solver component; link this source variant separately.",
+                "signature": "CALL rp1_ptwise(NUM_EQN,NUM_AUX,NUM_WAVES,Q_L,Q_R, &\n AUX_L,AUX_R,WAVE,S,AMDQ,APDQ)",
+                "declarations": [
+                  {
+                    "path": "src/rp1_burgers_ptwise.f90",
+                    "line_start": 2,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "src/rp1_burgers_ptwise.f90",
+                    "line_start": 19,
+                    "line_end": 26
+                  }
+                ],
+                "path": "src/rp1_burgers_ptwise.f90",
+                "line_start": 2,
+                "line_end": 46,
+                "usage": "! GAMS I2a2; scalar burgers interface checks.\n! Upstream pin: 008d4921ea46878a97a96c8b8daa399a2e7b9078\nprogram check_burgers\n  implicit none\n  interface\n    subroutine rp1_ptwise(ne,na,nw,ql,qr,al,ar,w,s,am,ap)\n      integer, intent(in) :: ne,na,nw\n      real(kind=8), intent(inout) :: ql(ne),qr(ne),al(na),ar(na)\n      real(kind=8), intent(inout) :: w(ne,nw),s(nw),am(ne),ap(ne)\n    end subroutine\n  end interface\n  real(kind=8) :: ql(1),qr(1),al(1),ar(1),w(1,1),s(1),am(1),ap(1)\n  real(kind=8), parameter :: left(8) =[1d0,-3d0,-2d0,1d0,2d0,1d0,2d0,0d0]\n  real(kind=8), parameter :: right(8)=[3d0,-1d0,1d0,-1d0,-1d0,-2d0,2d0,0d0]\n  real(kind=8) :: fl,fr,flux,err,maxerr,tol\n  integer :: i\n  maxerr=0d0; al=0d0; ar=0d0\n  do i=1,size(left)\n    ql=left(i); qr=right(i); w=0d0; s=0d0; am=0d0; ap=0d0\n    call rp1_ptwise(1,1,1,ql,qr,al,ar,w,s,am,ap)\n    fl=0.5d0*left(i)**2; fr=0.5d0*right(i)**2\n    ! Independent exact Godunov flux from the scalar Riemann solution.\n    if(left(i)>right(i))then\n      flux=max(fl,fr)\n    elseif(left(i)>=0d0)then\n      flux=fl\n    elseif(right(i)<=0d0)then\n      flux=fr\n    else\n      flux=0d0\n    endif\n    err=max(abs(fl+am(1)-flux),abs(fr-ap(1)-flux), &\n            abs(am(1)+ap(1)-(fr-fl)), &\n            abs(w(1,1)-(right(i)-left(i))), &\n            abs(s(1)-0.5d0*(left(i)+right(i))))\n    tol=2d-13*max(1d0,abs(fl),abs(fr),abs(flux))\n    if(.not.(err<=tol))error stop 'Burgers Godunov flux/entropy check failed'\n    maxerr=max(maxerr,err)\n  enddo\n  print '(a,es12.4)','Maximum absolute error: ',maxerr\n  print '(a)','PASS Burgers: 8 shock, rarefaction, transonic and constant-state cases'\nend program check_burgers",
+                "usage_notes": "Complete main program compiled and run locally on Windows with GNU Fortran 17.0.0 20260510 (experimental), 2026-11-06. Flags: -O0 -g -Wall -Wextra -fcheck=all -ffpe-trap=invalid,zero,overflow. Saved main program: drivers/riemann/burgers.f90; reproducible pinned-source runner: drivers/riemann/run.py; compiler, source/driver hashes and output: drivers/riemann/results.json. Eight cases check shock/rarefaction/constant states, including a transonic rarefaction and stationary/moving shocks, against the exact Godunov interface flux. Maximum absolute discrepancy was zero for these finite test cases. Both source variants export the same rp1_ptwise symbol and must be compiled separately; this is not a whole-package or full time-evolution verification.",
+                "local_driver": {
+                  "path": "drivers/riemann/burgers.f90",
+                  "sha256": "283744a95a254ccf73ad39d43395ce3f0607ad1ecd71feb9f42e752fc8d976e8",
+                  "runner": "drivers/riemann/run.py",
+                  "runner_sha256": "722f395974c8a716bf81a2c1f4ce795454e86859debd8adc1e5b1cac147cbc67",
+                  "report": "drivers/riemann/results.json",
+                  "report_sha256": "22551a88288896b51803fd252631fa528ad560119877167ed3965d8d77749fd6",
+                  "readme": "drivers/riemann/README.md",
+                  "check_name": "burgers"
+                }
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "The selected pointwise advection and Burgers routines have source-reviewed interfaces and complete local driver checks with saved results. Other solver variants and full PDE time evolution retain their separate, unverified scope. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause Clawpack Riemann solver notice",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "008d4921ea46878a97a96c8b8daa399a2e7b9078",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned BSD three-clause license credits Clawpack Developers. This records the selected Fortran routines and root notice; Python wrappers, other contributed solvers and broader Clawpack dependencies were not subjected to a complete license audit. Catalog-owned checking programs are stored separately from downloaded upstream source.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/LICENSE",
+              "sha256": "668317944192d8217d63c0fd0730f889bd07f759b69ed6b657e1fb9902145ebe"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/README.md",
+              "sha256": "56aea3bccd6c6a236661e309e671f874a8606f23deefdc7512281a6921d58865"
+            },
+            {
+              "path": "src/rp1_advection_ptwise.f90",
+              "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/src/rp1_advection_ptwise.f90",
+              "sha256": "80b314b5f00f5186154b4de536efdc72d0d470e07469a8f296c6da896a922d65"
+            },
+            {
+              "path": "src/rp1_burgers_ptwise.f90",
+              "url": "https://github.com/clawpack/riemann/blob/008d4921ea46878a97a96c8b8daa399a2e7b9078/src/rp1_burgers_ptwise.f90",
+              "sha256": "91ea080bb93c8b0c3eff3baefc08a0fdf676e0765db9496d657943d751648072"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45220,12 +45336,126 @@
             ],
             "notes": "The README requires a level-restricted tree and tensor-product Chebyshev samples. It explicitly warns that more complicated periodic and boundary-condition options in legacy poisson8.f are not thoroughly tested in the wrapped environment; timing/accuracy claims were not reproduced.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I2b1a1",
+            "level": "source-reviewed",
+            "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+            "reviewed_on": "2026-11-06",
+            "notes": "LBFMM2D wraps the legacy eighth-order adaptive box-code volume-potential solver for a two-dimensional free-space Poisson problem. This is a volume-potential tool with the library kernel normalization, not an arbitrary prescribed-boundary-value interface; the mapping stays at the Poisson/Laplace class without selecting a rectangular Dirichlet/Neumann subclass. Input is a level-restricted quadtree and density values on each leaf box 8-by-8 Chebyshev grid; the active wrapper loops over ND density components and dispatches FMMSTART8_WRAP. The latter hardcodes IPERIOD=0 and allocates/maps legacy FMM tables/workspace. Require NORDER=8, NPBOX=64, IPERIOD=0, positive box counts and a valid tree. The wrapper does not enforce its apparent NORDER/IPERIOD parameters, and TIMEINFO is never assigned; do not infer timing/status outputs from its dummy list. Source-declared IPTR(8) is default INTEGER despite the header calling it INTEGER(8); the converter also contains explicit INTEGER*4 data, so use the compatible default-four-byte integer build rather than blindly promoting all integers. FVALS/POT actually have rank three (ND,NPBOX,NBOXES), unlike the rank-two prose summary. Centers/sizes are normalized by BOXSize(0) without a visible final physical potential rescaling: the selected fragment requires a unit-side root and leaves general physical scaling to separate verification. Only leaf potential entries are within the documented output scope. Review covers wrapper shapes, tree conversion and core dispatch; the author legacy core test is linked as usage context but has not been compiled or run for this catalog, nor has the modern wrapper, near-field behavior or all FMM kernels. The legacy core wrapper reserves 64000*NBOXES entries in each real and integer workspace; check memory capacity and default-integer size arithmetic before using large trees.",
+            "evidence": [
+              {
+                "path": "src/lbfmm2d.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/lbfmm2d.f",
+                "sha256": "a2a98393b046fe4e34e14e423d9116de256402ad842abecc7da88ba1c27cbd99"
+              },
+              {
+                "path": "src/poisson8.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/poisson8.f",
+                "sha256": "203b6930b5bacfde5ab3ee71a376a156300816366b00344cdd31049db3bbbf30"
+              },
+              {
+                "path": "src/tree_routs4.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/tree_routs4.f",
+                "sha256": "1f806d1d8ed9567c64536a684432ffd154551f58fc91b1dbc3b812e0d0bf8a43"
+              },
+              {
+                "path": "test/test_poisson8.f",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/test/test_poisson8.f",
+                "sha256": "8c810683644fcee90e61d526d21edece66922a8a71ba894d02edb79b80313609"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/README.md",
+                "sha256": "12725dad114a53a71bc2f78d105ee5213ff3e0f7166dc5657297167cd3f6683d"
+              },
+              {
+                "path": "makefile",
+                "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/makefile",
+                "sha256": "b5f0d8f8d038f03486b5f44f7b0899874e3b1310cdb0d23a6a1ae16fa4ebdd20"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lbfmm2d",
+                "role": "public-entry-point",
+                "summary": "External adaptive free-space 2-D Poisson volume-potential wrapper with fixed eight-point order.",
+                "signature": "CALL lbfmm2d(ND,EPS,IPERIOD,NBOXES,NLEVELS,LTREE,ITREE,IPTR, &\n NORDER,NPBOX,FVALS,CENTERS,BOXSIZE,IFNEAR,POT,TIMEINFO)",
+                "declarations": [
+                  {
+                    "path": "src/lbfmm2d.f",
+                    "line_start": 2,
+                    "line_end": 3
+                  },
+                  {
+                    "path": "src/lbfmm2d.f",
+                    "line_start": 52,
+                    "line_end": 67
+                  },
+                  {
+                    "path": "src/tree_routs4.f",
+                    "line_start": 1184,
+                    "line_end": 1193
+                  }
+                ],
+                "path": "src/lbfmm2d.f",
+                "line_start": 2,
+                "line_end": 131,
+                "examples": [
+                  {
+                    "path": "test/test_poisson8.f",
+                    "line_start": 1,
+                    "line_end": 32
+                  }
+                ],
+                "usage": "! After constructing a valid level-restricted quadtree with unit root side:\n! INTEGER ITREE(LTREE), IPTR(8); compatible default-four-byte integer build.\n! REAL*8 FVALS(ND,64,NBOXES), POT(ND,64,NBOXES), CENTERS(2,NBOXES),\n! BOXSIZE(0:NLEVELS), TIMEINFO(6); fill leaf density samples.\n! Require BOXSIZE(0)=1, NORDER=8, NPBOX=64, IPERIOD=0.\ncall lbfmm2d(nd,1d-9,0,nboxes,nlevels,ltree,itree,iptr, &\n             8,64,fvals,centers,boxsize,1,pot,timeinfo)\n! Read documented leaf outputs only; TIMEINFO is not assigned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-tree-setup unit-root wrapper contract. The linked author program exercises a legacy core path and is not evidence of a checked modern wrapper. No potential, kernel normalization, scaling, timing or requested precision was verified."
+              },
+              {
+                "procedure": "free-space legacy core dispatch and workspace allocation",
+                "role": "implementation-helper",
+                "path": "src/poisson8.f",
+                "line_start": 4,
+                "line_end": 43
+              },
+              {
+                "procedure": "new-tree to legacy-tree translation",
+                "role": "implementation-helper",
+                "path": "src/tree_routs4.f",
+                "line_start": 1137,
+                "line_end": 1292
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No license grant identified in reviewed root and wrapper files",
+          "spdx_expression": null,
+          "revision": "68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28",
+          "reviewed_on": "2026-11-06",
+          "notes": "The pinned repository tree has no separately named LICENSE/COPYING file, and the inspected README, wrapper and legacy Poisson file do not establish a redistribution grant. This is a scoped absence finding, not a conclusion about all historical upstream distributions. Keep links/hashes and review notes; no upstream source is bundled into the catalog.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/README.md",
+              "sha256": "12725dad114a53a71bc2f78d105ee5213ff3e0f7166dc5657297167cd3f6683d"
+            },
+            {
+              "path": "src/lbfmm2d.f",
+              "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/lbfmm2d.f",
+              "sha256": "a2a98393b046fe4e34e14e423d9116de256402ad842abecc7da88ba1c27cbd99"
+            },
+            {
+              "path": "src/poisson8.f",
+              "url": "https://github.com/mrachh/boxcode2d-legacy/blob/68ba21fe3f5acac0ed59947b2bdbd90e0deb0f28/src/poisson8.f",
+              "sha256": "203b6930b5bacfde5ab3ee71a376a156300816366b00344cdd31049db3bbbf30"
+            }
+          ]
         }
       },
       "imports": {}

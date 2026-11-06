@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 450 repositories now have 706 source-reviewed
+Reviewed on 2026-11-06. 452 repositories now have 708 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,14 +13,14 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-436 repository cards now identify public routines and link their usage lines
+438 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 450 independently source-reviewed repositories now have an
-entry-point annotation and a scoped license finding. These are source-inspected
-interfaces, not new compilation or numerical checks or complete public-API audits.
+separately. All 452 independently source-reviewed repositories now have an
+entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
+complete public-API audit. Individual local driver checks are identified separately.
 
 | Repository | Entry points | Recorded license |
 | --- | --- | --- |
@@ -475,6 +475,8 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | fastSHT | `get_plm_recursive`, `map2fft`, `fft2map`, `t2alm`, `alm2t` | GPL-3.0 license text; HEALPix-derived recurrence provenance |
 | FLAPWxHZ | `HIF_HZ::ZHZL1SA` | MIT FLAPWxHZ with retained contributor attribution |
 | ecTrans | `DIR_TRANS`, `INV_TRANS`, `EDIR_TRANS`, `EINV_TRANS` | Apache-2.0 ecTrans notices with ECMWF privileges/immunities statement |
+| Clawpack Riemann solvers | `rp1_ptwise` | BSD-3-Clause Clawpack Riemann solver notice |
+| Boxcode2D legacy wrapper | `lbfmm2d` | No license grant identified in reviewed root and wrapper files |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -946,6 +948,8 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Dataplot: distributions and beta functions](https://github.com/usnistgov/dataplot) | L5a1b; L5a2b; L5a1c; L5a2c; L5a1t; L5a2t; L5a1f; L5a2f; L5a1g; L5a2g; L5a1w; L5a2w; C7b; C7f | Beta, chi-square, Student t, F, gamma and Weibull probability/quantile functions; complete log-beta and normalized incomplete-beta functions | Promoted-real ABI, integer versus real degrees, common initialization, fixed tolerances, clipping, boundary conventions and branch findings. |
 | [FLAPWxHZ](https://github.com/venovako/flapwxhz) | D6; D4b3 | Complex generalized factor-pair SVD and factorized Hermitian-definite generalized eigenproblems | Aligned storage, signature/regularity assumptions, scheduling and thread capacity, promoted integers and sweep-count status. |
 | [ecTrans](https://github.com/ecmwf-ifs/ectrans) | J; J1b | CPU spherical-harmonic and limited-area bifourier analysis/synthesis | Explicit generated interfaces, initialized geometry/distribution, packed storage, field-set ownership and abort behavior. |
+| [Clawpack Riemann solvers](https://github.com/clawpack/riemann) | I2a2 | Scalar hyperbolic advection/Burgers interface solvers | Two complete local main programs: 17 flux/entropy/conservation cases; separate same-symbol source variants; no full PDE evolution check. |
+| [Boxcode2D legacy wrapper](https://github.com/mrachh/boxcode2d-legacy) | I2b1a1 | Adaptive eighth-order free-space two-dimensional Poisson volume potential | Unit-root wrapper contract, rank-three data, default/four-byte integer compatibility, ignored selectors, unassigned timing and large workspaces; uncompiled. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1778,3 +1782,18 @@ example, alignment and OpenMP capacity requirements, and the non-LAPACK
 INFO convention: a positive sweep count may represent normal completion.
 No transform round trip, decomposition residual or kernel accuracy was
 verified; the existing documentation reviews remain available.
+
+Clawpack Riemann solvers and boxcode2d-legacy add two targeted PDE
+mappings. Two [complete Riemann main programs](../drivers/riemann/README.md)
+were compiled and run locally with GNU Fortran 17.0.0 20260510 (experimental)
+on Windows, using bounds checks and floating-point traps. All 17 finite
+Godunov-flux, jump/speed and conservation checks passed with zero maximum
+discrepancy; [saved results](../drivers/riemann/results.json) retain compiler,
+flags and normalized source/driver hashes. These checks apply only to the
+two selected pointwise kernels, not a whole PDE time integrator. Their pages
+distinguish locally checked main programs from uncompiled calling sketches
+and provide downloadable source, runner and reports. The Poisson wrapper
+remains uncompiled; review notes document unit-root scaling assumptions,
+ignored selectors, default/four-byte integer compatibility, large workspaces
+and unassigned TIMEINFO. No redistribution grant was found in its inspected
+root/wrapper files, and its source is linked rather than bundled.

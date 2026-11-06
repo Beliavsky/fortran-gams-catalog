@@ -92,7 +92,9 @@ vendored module is unused; builds do not depend on the playground's other tools.
 ## Add or review software
 
 See [review policy](docs/review-policy.md), [independent reviews](docs/local-reviews.md)
-and [driver requirements](drivers/README.md). Each new classification needs pinned
+and [driver requirements](drivers/README.md).
+The [local Riemann checks](drivers/riemann/README.md) provide complete main
+programs, a pinned-source build runner and saved numerical results. Each new classification needs pinned
 evidence and scope notes. Build systems can be Make, CMake, custom scripts or
 unreviewed; FPM compatibility is not an inclusion criterion.
 

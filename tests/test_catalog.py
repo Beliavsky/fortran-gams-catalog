@@ -137,6 +137,40 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(procedure_label({'module': 'mod_splines', 'derived_type': 'spline', 'procedure': 'value'}),
                          'mod_splines::spline%value')
 
+    def test_local_checks_bind_sources_results_and_safe_artifacts(self):
+        original = next(p for p in self.local['projects'] if p['id'] == 'github:clawpack/riemann')
+        validate_local({'schema_version': 1, 'projects': [original]}, self.tree)
+        for change in ('unsafe-path', 'changed-driver', 'changed-runner', 'changed-report', 'missing-case', 'changed-source', 'changed-main'):
+            record = copy.deepcopy(original)
+            claim = next(c for c in record['local']['classifications'] if c['level'] == 'source-reviewed')
+            procedure = claim['procedures'][0]
+            driver = procedure['local_driver']
+            if change == 'unsafe-path': driver['path'] = 'drivers/../../README.md'
+            elif change == 'changed-driver': driver['sha256'] = '0'*64
+            elif change == 'changed-runner': driver['runner_sha256'] = '0'*64
+            elif change == 'changed-report': driver['report_sha256'] = '0'*64
+            elif change == 'missing-case': driver['check_name'] = 'not-run'
+            elif change == 'changed-source': claim['evidence'][0]['sha256'] = '0'*64
+            else: procedure['usage'] += '\nerror stop "unverified edit"'
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_local({'schema_version': 1, 'projects': [record]}, self.tree)
+        # Even a freshly rehashed report cannot turn a failing run into a checked driver.
+        with tempfile.TemporaryDirectory() as folder:
+            temporary = Path(folder)
+            shutil.copytree(ROOT/'drivers', temporary/'drivers')
+            record = copy.deepcopy(original)
+            claim = next(c for c in record['local']['classifications'] if c['level'] == 'source-reviewed')
+            report_path = temporary/'drivers/riemann/results.json'
+            report = read(report_path)
+            report['checks'][0]['run_returncode'] = 1
+            report_path.write_text(json.dumps(report), encoding='utf-8')
+            import hashlib
+            digest = hashlib.sha256(report_path.read_text(encoding='utf-8').encode()).hexdigest()
+            for procedure in claim['procedures']:
+                procedure['local_driver']['report_sha256'] = digest
+            with self.assertRaises(ValueError):
+                validate_local({'schema_version': 1, 'projects': [record]}, self.tree, temporary)
+
     def test_licenses_distinguish_reviewed_imported_and_unknown_terms(self):
         acrs = next(p for p in self.projects if p['id'] == 'github:derivativefreelibrary/acrs')
         self.assertEqual(acrs['license']['spdx_expression'], 'GPL-3.0-or-later')
@@ -207,6 +241,12 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('documentation reviewed', expokit)
             self.assertIn('Not built or run', expokit)
             self.assertNotIn('<h2>Checked hosted drivers</h2>', expokit)
+            riemann = (destination/'projects/clawpack/riemann/index.html').read_text(encoding='utf-8')
+            self.assertEqual(riemann.count('Locally checked main program:'), 2)
+            self.assertNotIn('Calling sketch (not a checked driver)', riemann)
+            for name in ('advection.f90', 'burgers.f90', 'run.py', 'results.json', 'README.md'):
+                self.assertEqual((destination/'drivers/riemann'/name).read_bytes(), (ROOT/'drivers/riemann'/name).read_bytes())
+            self.assertIn('Saved numerical results', riemann)
             acrs = (destination/'projects/derivativefreelibrary/acrs/index.html').read_text(encoding='utf-8')
             self.assertIn('PRICE_BASE_ITERATION', acrs)
             self.assertIn('#L424-L660', acrs)

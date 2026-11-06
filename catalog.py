@@ -1,5 +1,6 @@
 """Offline catalog assembly. Imported and catalog-owned metadata stay separate."""
 import copy
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -55,7 +56,49 @@ def extend_taxonomy(tree, extension):
     return result
 
 
-def validate_local(local, tree):
+def validate_local_driver(driver, procedure, claim, root):
+    """Bind a local verification claim to shipped files and a successful report."""
+    if not isinstance(driver, dict):
+        raise ValueError('Local driver metadata must be an object.')
+    paths = {}
+    for field in ('path', 'runner', 'report', 'readme'):
+        value = driver.get(field, '')
+        if not isinstance(value, str):
+            raise ValueError('Invalid local driver path.')
+        relative = Path(value)
+        if (not value.startswith('drivers/') or '\\' in value
+                or relative.is_absolute() or '..' in relative.parts):
+            raise ValueError('Local driver files must stay under drivers/.')
+        target = (Path(root)/relative).resolve()
+        if not target.is_relative_to((Path(root)/'drivers').resolve()) or not target.is_file():
+            raise ValueError('Missing or unsafe local driver artifact.')
+        paths[field] = target
+        if field != 'readme':
+            key = 'sha256' if field == 'path' else field+'_sha256'
+            digest = hashlib.sha256(target.read_text(encoding='utf-8').encode()).hexdigest()
+            if driver.get(key) != digest:
+                raise ValueError('Local driver artifact hash mismatch: '+field)
+    report = read(paths['report'])
+    if not all(isinstance(report.get(k), str) and report[k].strip()
+               for k in ('compiler', 'platform', 'checked_at')):
+        raise ValueError('Local checks need compiler, platform and date.')
+    checks = [c for c in report.get('checks', []) if c.get('name') == driver.get('check_name')]
+    if len(checks) != 1:
+        raise ValueError('Local driver needs one named result.')
+    check = checks[0]
+    evidence = next(e for e in claim['evidence'] if e['path'] == procedure['path'])
+    if (check.get('gams_code') != claim['code']
+            or type(check.get('build_returncode')) is not int or check['build_returncode'] != 0
+            or type(check.get('run_returncode')) is not int or check['run_returncode'] != 0
+            or not check.get('flags') or 'PASS' not in check.get('stdout', '')
+            or check.get('driver') != paths['path'].name
+            or check.get('driver_sha256') != driver['sha256']
+            or check.get('source') != {'path': procedure['path'], 'revision': claim['revision'], 'sha256': evidence['sha256']}
+            or procedure.get('usage', '').rstrip() != paths['path'].read_text(encoding='utf-8').rstrip()):
+        raise ValueError('Local check must match its source, main program and successful result.')
+
+
+def validate_local(local, tree, root=ROOT):
     if local.get('schema_version') != 1 or not isinstance(local.get('projects'), list):
         raise ValueError('Expected a version 1 local catalog.')
     seen = set()
@@ -130,6 +173,8 @@ def validate_local(local, tree):
                             raise ValueError('Procedure links need pinned evidence and valid ranges: ' + identity)
                     if 'signature' in procedure and not procedure.get('declarations'):
                         raise ValueError('Usage signatures need pinned argument declarations: ' + identity)
+                    if 'local_driver' in procedure:
+                        validate_local_driver(procedure['local_driver'], procedure, claim, root)
     return local
 
 
@@ -140,7 +185,7 @@ def assemble(root=ROOT):
     extensions = root/'data/gams-extensions.json'
     if extensions.exists():
         tree = extend_taxonomy(tree, read(extensions))
-    local = validate_local(read(root/'data/local.json'), tree)
+    local = validate_local(read(root/'data/local.json'), tree, root)
     merged = merge_catalog(local, feed)
     projects = []
     owners = feed.get('owners', {})
