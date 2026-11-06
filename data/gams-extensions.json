@@ -702,6 +702,30 @@
       "parent": "L8c",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L10a2a2": {
+      "label": "Partial autocorrelations",
+      "parent": "L10a2a",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D4c1": {
+      "label": "Transform problem",
+      "parent": "D4c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D4c1b": {
+      "label": "Reduce to compact form",
+      "parent": "D4c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D4c1b2": {
+      "label": "Hessenberg",
+      "parent": "D4c1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }

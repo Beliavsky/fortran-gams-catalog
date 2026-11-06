@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 380 repositories now have 505 source-reviewed
+Reviewed on 2026-11-05. 388 repositories now have 517 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-368 repository cards now identify public routines and link their usage lines
+376 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 380 independently source-reviewed repositories now have an
+separately. All 388 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -404,6 +404,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | rrcov | `rlds` | GPL-3.0-or-later |
 | SmoothHazard | `survWeib` | GPL-2.0-or-later |
 | Robust Gauss Newton | `rgnMod::rgn` | MIT |
+| Fortress | `filter::kalman_filter` | CC0-1.0 for project code; separate component notices |
+| Timeslab | `arcv`, `arprt` | No explicit license grant identified |
+| Parallel Structured Matrix Multiplication research code | `PSMMA_TOEPLITZ` | No explicit license grant identified |
+| PSBLAS | `psb_linsolve_mod::psb_krylov` | BSD-3-Clause |
+| PyGSLIB | `gamv` | MIT modifications with retained GSLIB notice |
+| Implicit QR demonstration | `eigenvalues::eig`, `eigenvalues::eig_hessenberg_matrix` | No explicit license grant identified |
+| Inference for physical sciences | `DCUHRE`, `ninfol` | BSD-3-Clause root notice; historical cubature terms need separate confirmation |
+| glmnet MATLAB builds | `elnet`, `lognet` | GPL-3.0 license file; no later-version election identified |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -803,6 +811,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [rrcov](https://github.com/valentint/rrcov) | L4c1b | Projection-based robust multivariate location/scatter | Nonparametric scope, bounded random versus exhaustive subsets, squared-weight scatter and degenerate-weight checks. |
 | [SmoothHazard](https://github.com/tagteam/smoothhazard) | L15 | Censored Weibull proportional-hazards fitting | R-hosted saved state, optimizer success code one, inverse-scale convention and optional confidence bands. |
 | [Robust Gauss Newton](https://github.com/eachonly/robust-gauss-newton-algorithm) | K1b2 | Bounded nonlinear least squares | Consistent residual/objective callback, module kinds, finite-difference bounds and stopping-code interpretation. |
+| [Fortress](https://github.com/eph/fortress) | L10a2e | Linear Gaussian state-space likelihood by Kalman filtering | Stationary non-SLICOT covariance initialization, likelihood-only output and unpropagated numerical statuses. |
+| [Timeslab](https://github.com/beliavsky/timeslab) | L10a2a1; L10a2a2 | Theoretical AR autocovariances and model-implied partial autocorrelations | Default-real legacy kernels, overwritten coefficients, stationarity checks and caller-established sign convention. |
+| [Parallel Structured Matrix Multiplication research code](https://github.com/shengguolsg/psmma_git) | D1b6 | Distributed dense-by-Toeplitz matrix multiplication | Replicated full generators, restricted block-cyclic layouts, RRQR compression and no public error/tolerance query. |
+| [PSBLAS](https://github.com/sfilippone/psblas3) | D2b4 | Distributed preconditioned conjugate-gradient sparse solves | Explicit CG dispatch, SPD assumptions, PSBLAS vector layouts, collective setup and residual validation. |
+| [PyGSLIB](https://github.com/opengeostat/pygslib) | L4c | Directional spatial lag-covariance analysis | Pair-count masking, flattened lag layout, broad spatial-statistics mapping and cloud-output limitations. |
+| [Implicit QR demonstration](https://github.com/keksipurkki/keksipurkki-demos-qr) | D4a2; D4c1b2 | Real nonsymmetric eigenvalues and Householder Hessenberg reduction | Complex-output overload, callback failures, experimental QR limitations and no accumulated similarity matrix. |
+| [Inference for physical sciences](https://github.com/tloredo/inference) | H2b1a1; H1 | Adaptive vector cubature and mode-specific information matrices | Hyperrectangular callback/workspace controls, numerical error estimates and positive-curvature mode assumptions. |
+| [glmnet MATLAB builds](https://github.com/lachioma/glmnet_matlab) | L8c; L8 | Gaussian and binomial elastic-net regression paths | Default-real ABI, compressed coefficients, mutable inputs, weighted response rows and partial-path statuses. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1451,3 +1467,13 @@ from a complete MM workflow, and convex from indefinite quadratic programs.
 R-hosted dependencies, random-subset limits, Weibull inverse-scale and
 success conventions, EQP constraint signs and solver termination diagnostics
 are recorded with the public interfaces.
+
+The QR demo, Timeslab, fortress, PSBLAS, PSMMA, PyGSLIB, inference and
+GLMnet MATLAB distribution have twelve additional pinned mappings and
+calling sketches, which were not compiled or run. Reviews document
+complex versus real eigenvalue output, Hessenberg reduction, AR coefficient
+and partial-correlation signs, stationary Kalman likelihood initialization,
+distributed CG and structured products, spatial lag covariance, adaptive
+vector cubature, numerical information matrices and penalized regression
+paths. Missing statuses, inherited source notices, overwritten inputs,
+compressed coefficients and scoped algorithm restrictions remain explicit.

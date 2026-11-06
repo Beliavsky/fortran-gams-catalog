@@ -12698,12 +12698,85 @@
             ],
             "notes": "The README describes Fortran-library and Python workflows with optional MPI/OpenMP. Specific posterior samplers and model families await procedure-level review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2e",
+            "level": "source-reviewed",
+            "revision": "7fffbcfb037163295f12071d318455fa5651a2a1",
+            "reviewed_on": "2026-11-05",
+            "notes": "KALMAN_FILTER evaluates per-observation Gaussian log-likelihood contributions for a linear state-space model. It initializes zero state mean and a stationary covariance using DLYAP, then forms innovations/covariances, performs the Kalman prediction update and accumulates contributions only for t>T0. The selected one-observation-channel use fits the univariate state-space class; the implementation also accepts multivariate observations, but this map does not infer a smoother or returned state trajectory from a likelihood-only function. Require stable transition dynamics and positive-definite innovation covariances. The basic path does not handle missing observations; separate missing-data functions exist. DLYAP and Cholesky/inversion status values are not propagated by this API, so finite likelihood output alone is not a convergence or factorization certificate. The reviewed non-SLICOT DLYAP branch uses covariance doubling; the SLICOT conditional branch has its solver call commented out and must not be assumed equivalent. Review covers the basic filter and initializer, not every alternate recursion or particle-filter method.",
+            "evidence": [
+              {
+                "path": "src/fortran/filter.f90",
+                "url": "https://github.com/eph/fortress/blob/7fffbcfb037163295f12071d318455fa5651a2a1/src/fortran/filter.f90",
+                "sha256": "136028000d280a87a043fc85915b812ef58a285cbf33726e6fce7e91855e3a13"
+              },
+              {
+                "path": "src/fortran/fortress_linalg.f90",
+                "url": "https://github.com/eph/fortress/blob/7fffbcfb037163295f12071d318455fa5651a2a1/src/fortran/fortress_linalg.f90",
+                "sha256": "2b03737641050f22e89a26e5b95d9414bbbcd181d513f2bb2602ba252c7f2067"
+              },
+              {
+                "path": "src/fortran/fortress_constants.f90",
+                "url": "https://github.com/eph/fortress/blob/7fffbcfb037163295f12071d318455fa5651a2a1/src/fortran/fortress_constants.f90",
+                "sha256": "8dfe3ba5ef4fbae042b03f42e2e11348349a8db5080bd32fb15d0dbc69b2794f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "kalman_filter",
+                "role": "public-entry-point",
+                "summary": "Public module function returning a vector of Gaussian state-space likelihood contributions.",
+                "signature": "LOGLH = kalman_filter(Y,TT,RR,QQ,DD,ZZ,HH,NY,NOBS,NEPS,NS,T0)",
+                "declarations": [
+                  {
+                    "path": "src/fortran/filter.f90",
+                    "line_start": 60,
+                    "line_end": 74
+                  }
+                ],
+                "path": "src/fortran/filter.f90",
+                "line_start": 60,
+                "line_end": 74,
+                "module": "filter",
+                "usage": "use iso_fortran_env, only: real64\nuse filter, only: kalman_filter\nreal(real64) :: y(1,5),tt(1,1),rr(1,1),qq(1,1),dd(1),zz(1,1),hh(1,1),ll(5)\ny(1,:)=[0.1_real64,0.2_real64,0._real64,-0.1_real64,0.1_real64]\ntt=0.5_real64; rr=1._real64; qq=0.2_real64\ndd=0._real64; zz=1._real64; hh=0.1_real64\nll=kalman_filter(y,tt,rr,qq,dd,zz,hh,1,5,1,1,0)\nprint *,sum(ll)\n! Validate the model and numerical factors independently; no status is returned.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the complete generated/preprocessed fortress build, compatible BLAS/LAPACK and the reviewed non-SLICOT covariance-initialization branch. This is a stationary scalar-state likelihood example with finite observations, not a diffuse or missing-data example. No likelihood or state estimate was tested."
+              },
+              {
+                "procedure": "kalman_filter prediction and likelihood",
+                "role": "implementation-helper",
+                "path": "src/fortran/filter.f90",
+                "line_start": 76,
+                "line_end": 138
+              },
+              {
+                "procedure": "DLYAP non-SLICOT branch",
+                "role": "implementation-helper",
+                "path": "src/fortran/fortress_linalg.f90",
+                "line_start": 233,
+                "line_end": 351
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "CC0-1.0 for project code; separate component notices",
+          "spdx_expression": "CC0-1.0",
+          "revision": "7fffbcfb037163295f12071d318455fa5651a2a1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root notice declares CC0 1.0 for project code and separately lists third-party components. The selected filter is project code; this scoped finding does not replace embedded RANDLIB, JSON, command-line or system numerical-library notices.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/eph/fortress/blob/7fffbcfb037163295f12071d318455fa5651a2a1/LICENSE",
+              "sha256": "59973a558a34941769740e849245b94a5ed4765a898db05d4ff7f35f6e3d6c1e"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37650,12 +37723,138 @@
             ],
             "notes": "The brief README identifies the author, book and extracted original distribution. Individual estimators, build requirements and modern compiler compatibility need further review; no specific model coverage is inferred solely from the title.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "d77a2424d04be719fe1afa92abdd9b7023d2d478",
+            "reviewed_on": "2026-11-05",
+            "notes": "ARCV computes the theoretical autocovariance sequence of a stationary autoregressive model from its coefficients and innovation variance. It converts coefficients to partials to determine lag-zero variance, then rebuilds lower-order coefficient/covariance relations and extends the sequence recursively. These are model-implied covariances, not empirical estimates from observations or a fitted AR model. Timeslab uses X(t)+sum(ALPHA(j)*X(t-j))=innovation; consequently an AR(1) coefficient phi=0.5 is supplied as ALPHA=-0.5. ALPHA is overwritten by the intermediate conversion/reconstruction and should be copied if needed later. IER is nonzero when the partial-recursion stationarity check fails; unit-modulus partials are rejected in code as well as values beyond one. Require positive model order, nonnegative requested lag count, positive innovation variance and adequate output storage. Review covers the covariance recursion and its stationarity helper, not every interactive Timeslab command.",
+            "evidence": [
+              {
+                "path": "ar.F",
+                "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/ar.F",
+                "sha256": "6ae8fbae6b74f549e07799e96262a072090fe972e495c54a37075c162431aaf4"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/README.md",
+                "sha256": "438293ab9513ad0cd077bc96326a4b2019ce5bd05c55e0215205933879d34a3b"
+              },
+              {
+                "path": "readme",
+                "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/readme",
+                "sha256": "80a1bad6e5142463de6465a0486b4e2595b3482597508479a8da2df10774d1ab"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "arcv",
+                "role": "public-entry-point",
+                "summary": "External default-real theoretical AR autocovariance calculation with overwritten coefficient workspace.",
+                "signature": "CALL ARCV(ALPHA,NORD,RVAR,NCOV,R,R0,IER)",
+                "declarations": [
+                  {
+                    "path": "ar.F",
+                    "line_start": 53,
+                    "line_end": 67
+                  },
+                  {
+                    "path": "ar.F",
+                    "line_start": 337,
+                    "line_end": 345
+                  }
+                ],
+                "path": "ar.F",
+                "line_start": 53,
+                "line_end": 106,
+                "usage": "external :: arcv\nreal :: alpha(1),covariances(5),variance\ninteger :: ier\n! Model x(t)=0.5*x(t-1)+innovation, innovation variance one.\nalpha=[-0.5]\ncall arcv(alpha,1,1.0,5,covariances,variance,ier)\nif(ier/=0) error stop \"stationarity recursion failed\"\nprint *,variance,covariances",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the pinned default-REAL legacy ABI, not DOUBLE PRECISION arguments. ARCV calls ARPRT; linking the entire interactive ar.F object can also require unrelated Timeslab support symbols, so isolate the reviewed kernels or link the complete package. No covariance sequence, stationarity or accuracy case was run."
+              },
+              {
+                "procedure": "arprt",
+                "role": "implementation-helper",
+                "path": "ar.F",
+                "line_start": 337,
+                "line_end": 373
+              }
+            ]
+          },
+          {
+            "code": "L10a2a2",
+            "level": "source-reviewed",
+            "revision": "d77a2424d04be719fe1afa92abdd9b7023d2d478",
+            "reviewed_on": "2026-11-05",
+            "notes": "ARPRT implements the backward recursion converting stationary AR coefficients to signed reflection/partial-autocorrelation coefficients. It overwrites ALPHA and checks abs(c)>=1 at each stage before division by 1-c*c. The raw kernel returns Timeslab-signed partials; the public ARPART command negates its output before labeling it partial autocorrelations. The calling sketch includes that same negation and preserves no original coefficients. This computes partials implied by a supplied model, not sample PACF estimation or model-order selection. Near-unit partials can make the recursion ill-conditioned even without a nonzero IER, and invalid model orders are not checked in this kernel. Review covers the transformation and the caller-established sign convention.",
+            "evidence": [
+              {
+                "path": "ar.F",
+                "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/ar.F",
+                "sha256": "6ae8fbae6b74f549e07799e96262a072090fe972e495c54a37075c162431aaf4"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "arprt",
+                "role": "public-entry-point",
+                "summary": "External in-place AR-to-partial recursion; negate the returned array to follow the package display convention.",
+                "signature": "CALL ARPRT(ALPHA,NORD,IER)\nPACF = -ALPHA",
+                "declarations": [
+                  {
+                    "path": "ar.F",
+                    "line_start": 337,
+                    "line_end": 345
+                  },
+                  {
+                    "path": "ar.F",
+                    "line_start": 317,
+                    "line_end": 330
+                  }
+                ],
+                "path": "ar.F",
+                "line_start": 337,
+                "line_end": 373,
+                "usage": "external :: arprt\nreal :: alpha(2),pacf(2)\ninteger :: ier\n! x(t)=0.4*x(t-1)+0.2*x(t-2)+innovation.\nalpha=[-0.4,-0.2]\ncall arprt(alpha,2,ier)\nif(ier/=0) error stop \"AR partial recursion failed\"\npacf=-alpha\nprint *,pacf",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default-REAL legacy fragment using the sign conversion visible in ARPART. Preserve ALPHA separately if the original AR coefficients are needed. Match package linkage or extract both inspected routines appropriately; no PACF, stationarity or near-unit-root case was tested."
+              },
+              {
+                "procedure": "arpart display convention",
+                "role": "implementation-helper",
+                "path": "ar.F",
+                "line_start": 317,
+                "line_end": 330
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "d77a2424d04be719fe1afa92abdd9b7023d2d478",
+          "reviewed_on": "2026-11-05",
+          "notes": "The repository identifies H. Joseph Newton and the Timeslab book/distribution. No explicit permission grant was identified in these reviewed files or a standalone root LICENSE/COPYING. Authorship and public availability do not establish redistribution terms.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/README.md",
+              "sha256": "438293ab9513ad0cd077bc96326a4b2019ce5bd05c55e0215205933879d34a3b"
+            },
+            {
+              "path": "readme",
+              "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/readme",
+              "sha256": "80a1bad6e5142463de6465a0486b4e2595b3482597508479a8da2df10774d1ab"
+            },
+            {
+              "path": "ar.F",
+              "url": "https://github.com/Beliavsky/Timeslab/blob/d77a2424d04be719fe1afa92abdd9b7023d2d478/ar.F",
+              "sha256": "6ae8fbae6b74f549e07799e96262a072090fe972e495c54a37075c162431aaf4"
+            }
+          ]
         }
       },
       "imports": {}
@@ -43503,12 +43702,106 @@
             ],
             "notes": "The release README and development notes identify structured multiplication and process-grid restrictions. The notes also contain abandoned approaches and to-do items; those are not treated as implemented low-rank or 2.5D algorithms.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "87e84e00fd32300eb9945b429f5d794c30abd236",
+            "reviewed_on": "2026-11-05",
+            "notes": "PSMMA_TOEPLITZ computes a distributed dense-by-Toeplitz product Q=alpha*A*H+beta*Q from replicated Toeplitz generators and block-cyclic matrix data. The native core circulates local panels with BLACS, constructs needed Toeplitz blocks and uses dense products or RRQR-compressed block products. Despite an older wrapper comment saying low-rank work is not implemented, the inspected core does call ConstToeplitzlowrank and Compress_RRQR. This can therefore be an approximate product, not an exact-structure FFT convolution or an eigensolver. The sketch restricts N=K, full generators LDB=2*K-1, equal descriptor row/column block sizes, origin submatrices and REDIST=false. These avoid extrapolating from unverified symmetric-short-generator, submatrix-offset or redistribution layouts. No INFO is returned; allocation/backend failures can print and return, and internal compression tolerance is not a user-requested product error bound. Review covers wrapper, panel multiplication and low-rank construction/compression dispatch, not parallel scaling or all descriptor combinations.",
+            "evidence": [
+              {
+                "path": "SRC/psmma_toeplitz.f90",
+                "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/SRC/psmma_toeplitz.f90",
+                "sha256": "1cddeffca595e2b7ea7f5b8d4984f5d47362b7b7bf7ba845537214583e433004"
+              },
+              {
+                "path": "SRC/pstoeplitz_compute.f90",
+                "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/SRC/pstoeplitz_compute.f90",
+                "sha256": "76bb40a093856b12350b7751290c66ede013d755529c39e0e5c6916c93a51075"
+              },
+              {
+                "path": "SRC/Auxil_2p5D.f90",
+                "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/SRC/Auxil_2p5D.f90",
+                "sha256": "184f98640f3dfe627ef0a79c0e2717a4f3af4ca94f7a993e0e679a712211fdbe"
+              },
+              {
+                "path": "Test/psmma_testtoeplitz.f90",
+                "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/Test/psmma_testtoeplitz.f90",
+                "sha256": "8e2017213232fc03519850933a55965f30363e69470fd061e45c62b93d991e87"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PSMMA_TOEPLITZ",
+                "role": "public-entry-point",
+                "summary": "External MPI/BLACS block-cyclic matrix product with a replicated Toeplitz generator.",
+                "signature": "CALL PSMMA_TOEPLITZ(N,K,ALPHA,A,IA,JA,DESCA,B,LDB,BETA,Q,IQ,JQ,DESCQ,WORK,REDIST)",
+                "declarations": [
+                  {
+                    "path": "SRC/psmma_toeplitz.f90",
+                    "line_start": 2,
+                    "line_end": 21
+                  },
+                  {
+                    "path": "SRC/psmma_toeplitz.f90",
+                    "line_start": 27,
+                    "line_end": 44
+                  }
+                ],
+                "path": "SRC/psmma_toeplitz.f90",
+                "line_start": 2,
+                "line_end": 21,
+                "usage": "external :: psmma_toeplitz\n! After MPI/BLACS setup: square N-by-N distributed A and Q, compatible\n! DESCA/DESCQ with equal row/column blocks and source process (0,0).\n! B(1:2*N-1) is replicated; H(i,j)=B(N+j-i).\n! WORK is DOUBLE PRECISION and sized for the local-panel algorithm;\n! follow the author driver for the actual grid, block sizes and local extents.\ncall psmma_toeplitz(n,n,1d0,a,1,1,desca,b,2*n-1, &\n 0d0,q,1,1,descq,work,.false.)\n! No status is returned; compare with an independently formed A*H.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Restricted post-allocation collective fragment, requiring the complete package and MPI/BLACS/ScaLAPACK/BLAS/RRQR dependencies. Retain full generators even for a symmetric Toeplitz matrix. The author local workspace allocation is an example, not a universal size query. No product, compression tolerance or distributed run was tested."
+              },
+              {
+                "procedure": "PSTOEPLITZ_COMPUTE",
+                "role": "implementation-helper",
+                "path": "SRC/pstoeplitz_compute.f90",
+                "line_start": 245,
+                "line_end": 295
+              },
+              {
+                "procedure": "ConstToeplitzlowrank",
+                "role": "implementation-helper",
+                "path": "SRC/Auxil_2p5D.f90",
+                "line_start": 968,
+                "line_end": 1059
+              },
+              {
+                "procedure": "Compress_RRQR",
+                "role": "implementation-helper",
+                "path": "SRC/Auxil_2p5D.f90",
+                "line_start": 1063,
+                "line_end": 1189
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "87e84e00fd32300eb9945b429f5d794c30abd236",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and wrapper identify the research implementation and authors but no explicit permission grant was identified. The pinned tree has no root LICENSE/COPYING; linked BLAS/ScaLAPACK terms do not establish a license for the native structured-product code.",
+          "evidence": [
+            {
+              "path": "README.txt",
+              "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/README.txt",
+              "sha256": "82c6839ed17628b3cb64a0aa2d70c48057475f40d1eae39b04258d929316325e"
+            },
+            {
+              "path": "SRC/psmma_toeplitz.f90",
+              "url": "https://github.com/shengguolsg/PSMMA_Git/blob/87e84e00fd32300eb9945b429f5d794c30abd236/SRC/psmma_toeplitz.f90",
+              "sha256": "1cddeffca595e2b7ea7f5b8d4984f5d47362b7b7bf7ba845537214583e433004"
+            }
+          ]
         }
       },
       "imports": {}
@@ -43802,12 +44095,97 @@
             ],
             "notes": "The README distinguishes sparse matrix/dense operations, triangular block solves and solver infrastructure from optional external preconditioner packages. It documents integer-size choices and a CUDA incompatibility with 8-byte local indices; not every configuration is interchangeable.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "68ae08adf2f71c9db80b58569ec140b948f626bf",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public PSB_KRYLOV generic dispatches its distributed real-double CG selection to a native preconditioned conjugate-gradient iteration. The implementation forms b-A*x, applies the supplied preconditioner, computes global dot products and updates search directions, solution and recursive residual. This selection requires an SPD system and compatible fixed SPD preconditioning, not an arbitrary nonsymmetric matrix. The caller must initialize a PSBLAS/MPI context, assemble the distributed sparse matrix/vectors/descriptor and build the preconditioner. ISTOP=2 selects relative residual scaling and iteration/error outputs are explicit; zero denominators and breakdown exits have internal conventions, so INFO plus a fresh independently computed residual should be checked. Unknown method strings otherwise fall back to BiCGStab, making the exact CG selector significant. Review covers public dispatch, CG recurrence and convergence cleanup, not every backend/precision or Krylov variant.",
+            "evidence": [
+              {
+                "path": "linsolve/psb_linsolve_mod.f90",
+                "url": "https://github.com/sfilippone/psblas3/blob/68ae08adf2f71c9db80b58569ec140b948f626bf/linsolve/psb_linsolve_mod.f90",
+                "sha256": "c7ba56dc0e82f4edc3e29797878b754c7b33754f47facfb52f8013675954706e"
+              },
+              {
+                "path": "linsolve/impl/psb_dkrylov.f90",
+                "url": "https://github.com/sfilippone/psblas3/blob/68ae08adf2f71c9db80b58569ec140b948f626bf/linsolve/impl/psb_dkrylov.f90",
+                "sha256": "2632348791334050308b8df3297bdac1bba40504602fb1d8b75248b468fac5d8"
+              },
+              {
+                "path": "linsolve/impl/psb_dcg.F90",
+                "url": "https://github.com/sfilippone/psblas3/blob/68ae08adf2f71c9db80b58569ec140b948f626bf/linsolve/impl/psb_dcg.F90",
+                "sha256": "d765397b316ca7a7226c01eba060c358cde9c5bc37312841b96019a0ff0a8af8"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "psb_krylov",
+                "role": "public-entry-point",
+                "summary": "Public distributed Krylov generic, using its real-double vector overload with METHOD=\"CG\".",
+                "signature": "CALL psb_krylov(\"CG\",A,PREC,B,X,EPS,DESC_A,INFO, &\n ITMAX=ITMAX,ITER=ITER,ERR=ERR,ISTOP=2)",
+                "declarations": [
+                  {
+                    "path": "linsolve/psb_linsolve_mod.f90",
+                    "line_start": 85,
+                    "line_end": 104
+                  },
+                  {
+                    "path": "linsolve/impl/psb_dkrylov.f90",
+                    "line_start": 82,
+                    "line_end": 99
+                  }
+                ],
+                "path": "linsolve/psb_linsolve_mod.f90",
+                "line_start": 41,
+                "line_end": 44,
+                "module": "psb_linsolve_mod",
+                "usage": "use psb_base_mod\nuse psb_linsolve_mod, only: psb_krylov\ninteger(psb_ipk_) :: info,iterations\nreal(psb_dpk_) :: residual_estimate\n! After MPI/PSBLAS setup and assembly of A, B, X, DESC_A and PREC:\n! A is SPD; PREC is an appropriate fixed SPD preconditioner.\ncall psb_krylov(\"CG\",a,prec,b,x,1e-8_psb_dpk_,desc_a,info, &\n itmax=500_psb_ipk_,iter=iterations,err=residual_estimate,istop=2_psb_ipk_)\nif(info/=0) error stop \"inspect PSBLAS solver diagnostics\"\n! Recompute a residual with the original distributed A and B.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-assembly collective fragment using PSBLAS vector objects, not raw real arrays. Match context, descriptor, distributed layouts and integer kinds across MPI ranks. INFO and an internal residual estimate do not establish forward error. No sparse solve, preconditioner or MPI run was tested."
+              },
+              {
+                "procedure": "psb_dkrylov_vect",
+                "role": "implementation-helper",
+                "path": "linsolve/impl/psb_dkrylov.f90",
+                "line_start": 180,
+                "line_end": 214
+              },
+              {
+                "procedure": "psb_dcg_vect",
+                "role": "implementation-helper",
+                "path": "linsolve/impl/psb_dcg.F90",
+                "line_start": 239,
+                "line_end": 314
+              },
+              {
+                "procedure": "psb_dcg_vect convergence cleanup",
+                "role": "implementation-helper",
+                "path": "linsolve/impl/psb_dcg.F90",
+                "line_start": 338,
+                "line_end": 354
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "68ae08adf2f71c9db80b58569ec140b948f626bf",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root notice has the three-clause redistribution/endorsement grant and named PSBLAS contributor notices. MPI, accelerator backends and separately linked numerical libraries retain their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sfilippone/psblas3/blob/68ae08adf2f71c9db80b58569ec140b948f626bf/LICENSE",
+              "sha256": "9eff4d206a45948fca55664ce8e4099ab9d5a519b061fcc7c6708f572029a198"
+            }
+          ]
         }
       },
       "imports": {}
@@ -45573,12 +45951,86 @@
             ],
             "notes": "The README distinguishes the Fortran-backed gslib component from Python/VTK drillhole, block-model and geometry utilities. It marks nonlinear geostatistics as experimental and the development source as unstable; those components are not all classified as mature Fortran methods.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L4c",
+            "level": "source-reviewed",
+            "revision": "c26c3bff20c7cc16583c94fb850e17600b9a610d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external GAMV kernel computes directional lag-binned spatial continuity statistics from irregular multidimensional coordinates and observed variables. It enumerates accepted data pairs, filters lag/direction/bandwidth and trimming conditions, accumulates products/differences and normalizes per-bin means. The selected IVTYPE=3 branch returns lag covariance after subtracting the head/tail means. The adopted GAMS tree has no dedicated spatial-variogram leaf, so this spatial statistical analysis remains in multidimensional elementary data analysis L4c rather than being called temporal autocovariance or kriging interpolation. NP reports floating-point pair counts; empty bins remain zero and need masking. The semivariogram cloud branch has an off-by-one capacity guard and stores cumulative bin values rather than a clearly isolated pair statistic; the sketch selects covariance, for which that cloud branch writes no points. No general success status is returned. Review covers covariance accumulation/normalization and related public declarations, not every variogram type or the separate kriging solver.",
+            "evidence": [
+              {
+                "path": "for_code/variograms.f90",
+                "url": "https://github.com/opengeostat/pygslib/blob/c26c3bff20c7cc16583c94fb850e17600b9a610d/for_code/variograms.f90",
+                "sha256": "a8573aeb905ad46b939a3fd9774ef278f0dbf627738808d30258d79ad8c472d9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "gamv",
+                "role": "public-entry-point",
+                "summary": "External directional spatial covariance/variogram analysis with flattened per-lag output arrays.",
+                "signature": "CALL GAMV(ND,X,Y,Z,BHID,NV,VR,TMIN,TMAX,NLAG,XLAG,XLTOL, &\n NDIR,AZM,ATOL,BANDWH,DIP,DTOL,BANDWD,ISILL,SILLS,NVARG,IVTAIL,IVHEAD,IVTYPE, &\n NP,DIS,GAM,HM,TM,HV,TV,CLDI,CLDJ,CLDG,CLDH,L,MAXCLP)",
+                "declarations": [
+                  {
+                    "path": "for_code/variograms.f90",
+                    "line_start": 248,
+                    "line_end": 266
+                  }
+                ],
+                "path": "for_code/variograms.f90",
+                "line_start": 128,
+                "line_end": 133,
+                "usage": "external :: gamv\ninteger,parameter :: nd=4,nlag=3,nbin=nlag+2\ninteger :: bhid(nd),ci(1),cj(1),cloud_count\ndouble precision :: x(nd),y(nd),z(nd),vr(nd,1),sills(1)\ndouble precision :: pairs(nbin),distance(nbin),cov(nbin),hm(nbin),tm(nbin),hv(nbin),tv(nbin)\ndouble precision :: cloud_value(1),cloud_distance(1)\nx=[0d0,1d0,2d0,3d0]; y=0d0; z=0d0; bhid=1\nvr(:,1)=[1d0,2d0,1d0,3d0]; sills=1d0\ncall gamv(nd,x,y,z,bhid,1,vr,-1d20,1d20,nlag,1d0,0.5d0, &\n 1,[90d0],[90d0],[1d20],[0d0],[90d0],[1d20],0,sills,1,[1],[1],[3], &\n pairs,distance,cov,hm,tm,hv,tv,ci,cj,cloud_value,cloud_distance,cloud_count,1)\n! Interpret only bins with PAIRS>0; the covariance branch has no cloud output.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The legacy external interface uses REAL*8 data and default INTEGER metadata. This is lag-covariance estimation from spatial samples, not fitting a covariance model or predicting at new points. Use IVTYPE=3 as shown; do not reuse this tiny cloud allocation for semivariogram types. No covariance bin or cloud case was run."
+              },
+              {
+                "procedure": "gamv covariance accumulation",
+                "role": "implementation-helper",
+                "path": "for_code/variograms.f90",
+                "line_start": 498,
+                "line_end": 520
+              },
+              {
+                "procedure": "gamv normalization",
+                "role": "implementation-helper",
+                "path": "for_code/variograms.f90",
+                "line_start": 659,
+                "line_end": 708
+              },
+              {
+                "procedure": "gamv cloud limitations",
+                "role": "implementation-helper",
+                "path": "for_code/variograms.f90",
+                "line_start": 629,
+                "line_end": 650
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT modifications with retained GSLIB notice",
+          "spdx_expression": null,
+          "revision": "c26c3bff20c7cc16583c94fb850e17600b9a610d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and modification header use MIT. The selected file also retains Stanford/GSLIB copyright and an explicit permission to copy, modify and redistribute provided its notice remains intact. Preserve both notices; no single SPDX expression is assigned to this combined scoped finding.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/opengeostat/pygslib/blob/c26c3bff20c7cc16583c94fb850e17600b9a610d/LICENSE.txt",
+              "sha256": "b9da95136fb1cc1a5349a57947226678ad322dd19cf50a61c8236257c8d479d8"
+            },
+            {
+              "path": "for_code/variograms.f90",
+              "url": "https://github.com/opengeostat/pygslib/blob/c26c3bff20c7cc16583c94fb850e17600b9a610d/for_code/variograms.f90",
+              "sha256": "a8573aeb905ad46b939a3fd9774ef278f0dbf627738808d30258d79ad8c472d9"
+            }
+          ]
         }
       },
       "imports": {}
@@ -53351,12 +53803,159 @@
             ],
             "notes": "The README identifies an experimental demonstration and shows example errors against reference eigenvalues. Those outputs were not reproduced and do not establish a production eigensolver for arbitrary matrix classes.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D4a2",
+            "level": "source-reviewed",
+            "revision": "247c3d8cad2892fab419854c71ee04c2b2e715c6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public EIG generic computes ordinary eigenvalues of a real nonsymmetric square matrix by Householder Hessenberg reduction followed by implicit double-shift QR steps and recursive deflation. Its complex-output overload preserves complex-conjugate pairs; the real-output overload explicitly discards imaginary parts, so it is not a reliable representation of a general nonsymmetric spectrum. Error reporting is through an optional callback, whose default silently ignores both rectangular-input and nonconvergence events. The calling sketch installs a callback and uses complex output. This is an experimental eigenvalue-only implementation, not a complete Schur/eigenvector interface. Exceptional shifts are marked TODO, exact subdiagonal-zero splitting follows a numerical truncation heuristic and exhausted iterations can leave initialized placeholder results. Review covers the native reduction/QR/deflation paths and callback contract, not the separate bundled LAPACK comparison routine or numerical convergence guarantees.",
+            "evidence": [
+              {
+                "path": "eigenvalues.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/eigenvalues.F",
+                "sha256": "7ae12393c7df53c7c03a239b0a867f56ea291b97d5bfcf9678d8d16bdd0b6358"
+              },
+              {
+                "path": "utils.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/utils.F",
+                "sha256": "1e4da277a6e56f6888bdb3781ca1892fed4daac8dfba2f3e120f28ddb58de6f3"
+              },
+              {
+                "path": "eigenvalues.test.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/eigenvalues.test.F",
+                "sha256": "d0d6b5ddfd135c2d40ccc614a43bc657ce564aa24d30f2b54aad85e3b9e5debe"
+              },
+              {
+                "path": "Makefile",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/Makefile",
+                "sha256": "dbf6153bcdcdd741b5de40e9e3191bf01e21abe11800110b91a259034bcc5fc3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eig",
+                "role": "public-entry-point",
+                "summary": "Public real-input eigenvalue generic; use complex output and an error callback for nonsymmetric matrices.",
+                "signature": "CALL eig(A,L,ITERMAX,CALLBACK)",
+                "declarations": [
+                  {
+                    "path": "eigenvalues.F",
+                    "line_start": 30,
+                    "line_end": 46
+                  },
+                  {
+                    "path": "eigenvalues.F",
+                    "line_start": 20,
+                    "line_end": 26
+                  }
+                ],
+                "path": "eigenvalues.F",
+                "line_start": 16,
+                "line_end": 18,
+                "module": "eigenvalues",
+                "usage": "program qr_sketch\nuse iso_fortran_env, only: real64\nuse eigenvalues, only: eig\nimplicit none\nreal(real64) :: a(3,3)\ncomplex(real64),allocatable :: values(:)\na=reshape([0._real64,1._real64,0._real64, &\n -1._real64,0._real64,0._real64,0._real64,0._real64,2._real64],[3,3])\ncall eig(a,values,itermax=1000,callback=inspect)\nprint *,values\ncontains\nsubroutine inspect(err,h)\n integer,intent(in) :: err\n real(real64),intent(in) :: h(:,:)\n if(err/=0) error stop \"QR routine reported failure\"\nend subroutine\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the free-form preprocessed .F modules with the matching display/utils dependencies and compiler intrinsics. This deliberately uses complex output; the real overload discards imaginary parts. Check results independently even if the callback reports no error. No spectrum, iteration-limit or residual case was tested."
+              },
+              {
+                "procedure": "eig_hessenberg",
+                "role": "implementation-helper",
+                "path": "eigenvalues.F",
+                "line_start": 48,
+                "line_end": 139
+              },
+              {
+                "procedure": "eig_shifted_double_step",
+                "role": "implementation-helper",
+                "path": "eigenvalues.F",
+                "line_start": 296,
+                "line_end": 340
+              }
+            ]
+          },
+          {
+            "code": "D4c1b2",
+            "level": "source-reviewed",
+            "revision": "247c3d8cad2892fab419854c71ee04c2b2e715c6",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public EIG_HESSENBERG_MATRIX function reduces a real square matrix to upper Hessenberg form using two-sided Householder similarity transformations. EIG_REFLECT forms the reflector from each active column and applies it from the left and right; the driver zeros entries below the first subdiagonal after reduction. This is the associated Hessenberg-reduction operation rather than an eigensolve or an orthogonal-factor-returning API. The function returns H only, not the accumulated similarity matrix Q. It assumes square nonempty input and does not expose a numerical status; unlike the eigenvalue callback path, it has no explicit rectangular-input check. The sketch therefore supplies a small finite square matrix. Review covers the actual reflector construction/application rather than inferring a reduction from a wrapper name.",
+            "evidence": [
+              {
+                "path": "eigenvalues.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/eigenvalues.F",
+                "sha256": "7ae12393c7df53c7c03a239b0a867f56ea291b97d5bfcf9678d8d16bdd0b6358"
+              },
+              {
+                "path": "utils.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/utils.F",
+                "sha256": "1e4da277a6e56f6888bdb3781ca1892fed4daac8dfba2f3e120f28ddb58de6f3"
+              },
+              {
+                "path": "eigenvalues.test.F",
+                "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/eigenvalues.test.F",
+                "sha256": "d0d6b5ddfd135c2d40ccc614a43bc657ce564aa24d30f2b54aad85e3b9e5debe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eig_hessenberg_matrix",
+                "role": "public-entry-point",
+                "summary": "Public Householder reduction returning an allocated upper Hessenberg matrix.",
+                "signature": "H = eig_hessenberg_matrix(A)",
+                "declarations": [
+                  {
+                    "path": "eigenvalues.F",
+                    "line_start": 443,
+                    "line_end": 449
+                  }
+                ],
+                "path": "eigenvalues.F",
+                "line_start": 443,
+                "line_end": 460,
+                "module": "eigenvalues",
+                "usage": "use iso_fortran_env, only: real64\nuse eigenvalues, only: eig_hessenberg_matrix\nreal(real64) :: a(3,3)\nreal(real64),allocatable :: h(:,:)\na=reshape([1._real64,2._real64,3._real64,4._real64, &\n 5._real64,6._real64,7._real64,8._real64,10._real64],[3,3])\nh=eig_hessenberg_matrix(a)\n! H is returned; the routine does not return the accumulated Q.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Square-input fragment with the pinned preprocessed module dependencies. Structural zeros alone do not prove a correct similarity transformation. The API provides neither Q nor a status code; no Hessenberg reduction, similarity residual or orthogonality check was run."
+              },
+              {
+                "procedure": "eig_reflector",
+                "role": "implementation-helper",
+                "path": "eigenvalues.F",
+                "line_start": 275,
+                "line_end": 294
+              },
+              {
+                "procedure": "eig_reflect",
+                "role": "implementation-helper",
+                "path": "eigenvalues.F",
+                "line_start": 342,
+                "line_end": 371
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "247c3d8cad2892fab419854c71ee04c2b2e715c6",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README and native eigenvalue module identify an experimental numerical demo but no explicit license grant. The pinned tree has no LICENSE/COPYING. Licensing of bundled comparison/display code must be considered separately; public repository access is not a blanket grant.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/README.md",
+              "sha256": "1d0ed0a91c5201b231ca4093330c79b4decffd2b68f82df1fa463c3266e5557c"
+            },
+            {
+              "path": "eigenvalues.F",
+              "url": "https://github.com/keksipurkki/keksipurkki-demos-qr/blob/247c3d8cad2892fab419854c71ee04c2b2e715c6/eigenvalues.F",
+              "sha256": "7ae12393c7df53c7c03a239b0a867f56ea291b97d5bfcf9678d8d16bdd0b6358"
+            }
+          ]
         }
       },
       "imports": {}
@@ -55774,12 +56373,161 @@
             ],
             "notes": "The README describes focused inference tools and a parametric inference engine, explicitly calling the current migration from Python 2 alpha quality. Fortran source remains present, but not every model or API is implemented in Fortran or ported to the current Python generation.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "H2b1a1",
+            "level": "source-reviewed",
+            "revision": "fedde4bfd3bb9882640d303238188dbb73016598",
+            "reviewed_on": "2026-11-05",
+            "notes": "The redistributed DCUHRE driver automatically integrates a vector of user-provided functions over a hyperrectangle. It validates dimension/rule/workspace controls, then DADHRE repeatedly bisects a region with greatest estimated error, evaluates embedded cubature rules and maintains a heap of regions until componentwise absolute/relative criteria or the evaluation budget is reached. The selected default two-dimensional rule has 65 samples per region and the driver supports dimensions 2..15, not a general one-dimensional quadrature entry. IFAIL=0 means the internal estimated-error criterion; IFAIL=1 returns an approximation after budget exhaustion and larger codes report invalid controls. Estimated error is not a rigorous bound. Restart requires preserved compatible workspace and controls; the sketch starts fresh. Review covers driver validation, subdivision/error aggregation and termination paths, not every cubature weight generator or high-dimensional reliability claim.",
+            "evidence": [
+              {
+                "path": "src/inference/integrate/dcuhre_py.f",
+                "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/integrate/dcuhre_py.f",
+                "sha256": "d8561f165580107b29b7b78d22ecbd8db76899f2fed1b95729a489ef559bebd6"
+              },
+              {
+                "path": "src/inference/integrate/dadhre.f",
+                "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/integrate/dadhre.f",
+                "sha256": "0f42cdcbd520ab4ca2c4dbb34243eac1b0d89a0f061a0c7960873b6145605f51"
+              },
+              {
+                "path": "src/inference/integrate/dchhre.f",
+                "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/integrate/dchhre.f",
+                "sha256": "05385dcf4b541bc450d8fd9fb5fdadab9e3adfbd42e777b2e998976e30aac9da"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DCUHRE",
+                "role": "public-entry-point",
+                "summary": "External vector-valued globally adaptive hyperrectangular cubature driver.",
+                "signature": "CALL DCUHRE(NDIM,NUMFUN,A,B,MINPTS,MAXPTS,FUNSUB,EPSABS,EPSREL,KEY,NW, &\n RESTAR,RESULT,ABSERR,NEVAL,IFAIL,WORK)",
+                "declarations": [
+                  {
+                    "path": "src/inference/integrate/dcuhre_py.f",
+                    "line_start": 328,
+                    "line_end": 332
+                  },
+                  {
+                    "path": "src/inference/integrate/dcuhre_py.f",
+                    "line_start": 112,
+                    "line_end": 123
+                  }
+                ],
+                "path": "src/inference/integrate/dcuhre_py.f",
+                "line_start": 1,
+                "line_end": 3,
+                "usage": "program cubature_sketch\nimplicit none\nexternal :: dcuhre,integrand\ninteger :: neval,ifail\ndouble precision :: lower(2),upper(2),value(1),abserr(1),work(5000)\nlower=0d0; upper=1d0\ncall dcuhre(2,1,lower,upper,0,10000,integrand,1d-8,1d-8,0,5000, &\n 0,value,abserr,neval,ifail,work)\nif(ifail/=0) error stop \"inspect cubature diagnostics\"\nprint *,value,abserr,neval\nend program\nsubroutine integrand(ndim,x,numfun,values)\ninteger :: ndim,numfun\ndouble precision :: x(ndim),values(numfun)\nvalues(1)=x(1)**2+x(2)**2\nend subroutine",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link the complete compatible DCUHRE helper/rule family from this distribution. The workspace and budget are chosen for this two-dimensional one-component sketch only. Independently compare with the analytic integral 2/3; no integral, error estimate or restart was tested."
+              },
+              {
+                "procedure": "DCHHRE validation",
+                "role": "implementation-helper",
+                "path": "src/inference/integrate/dchhre.f",
+                "line_start": 130,
+                "line_end": 153
+              },
+              {
+                "procedure": "DADHRE subdivision",
+                "role": "implementation-helper",
+                "path": "src/inference/integrate/dadhre.f",
+                "line_start": 279,
+                "line_end": 324
+              },
+              {
+                "procedure": "DADHRE termination",
+                "role": "implementation-helper",
+                "path": "src/inference/integrate/dadhre.f",
+                "line_start": 408,
+                "line_end": 420
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "source-reviewed",
+            "revision": "fedde4bfd3bb9882640d303238188dbb73016598",
+            "reviewed_on": "2026-11-05",
+            "notes": "NINFOL estimates an observed-information matrix, namely minus the Hessian of a user log-density/log-likelihood at a supplied mode. It evaluates central second differences with successively smaller steps, extrapolates using RID_EX and uses estimated diagonal curvature to scale mixed differences. It does not exponentiate the log function or divide the final log-Hessian by its exponential, despite ambiguous prose in the historical comments. MU must be a genuine stationary maximum with positive diagonal information; otherwise square-root scaling can be invalid. DP must contain nonzero meaningful steps and ITER must be positive. IERR is a real matrix of extrapolation-error estimates, not an integer success flag; ITER=1 sets these estimates to zero without estimating error. MU is temporarily perturbed and restored on normal paths. Review covers diagonal/mixed differencing and extrapolation dispatch, not a general-purpose Hessian routine valid at arbitrary points or a covariance/inference guarantee.",
+            "evidence": [
+              {
+                "path": "src/inference/deriv/_obsinfo.f",
+                "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/deriv/_obsinfo.f",
+                "sha256": "0ebc3596b45f48cc35399ba642fd286f9949833cfd4ad27eae4f8506b4e0bda0"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "ninfol",
+                "role": "public-entry-point",
+                "summary": "External mode-specific negative log-Hessian estimation with real-valued error estimates.",
+                "signature": "CALL NINFOL(LF,N,MU,LFMAX,DP,ITER,INFO,IERR,H,D2F,A)",
+                "declarations": [
+                  {
+                    "path": "src/inference/deriv/_obsinfo.f",
+                    "line_start": 191,
+                    "line_end": 196
+                  }
+                ],
+                "path": "src/inference/deriv/_obsinfo.f",
+                "line_start": 121,
+                "line_end": 122,
+                "usage": "program information_sketch\nimplicit none\ndouble precision,external :: log_density\nexternal :: ninfol\ndouble precision :: mode(2),steps(2),information(2,2),errors(2,2),h(4),d2(4),table(4,4)\nmode=0d0; steps=0.1d0\ncall ninfol(log_density,2,mode,0d0,steps,4,information,errors,h,d2,table)\nprint *,information,errors\n! ERRORS is an estimated-error matrix, not a status return.\nend program\ndouble precision function log_density(n,x)\ninteger :: n\ndouble precision :: x(n)\nlog_density=-0.5d0*(x(1)**2+2d0*x(2)**2)\nend function",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The supplied zero mode is stationary with positive diagonal information for this Gaussian log density. Match REAL*8/default INTEGER interfaces and link RID_EX. Compare against diag(1,2) independently; no Hessian, extrapolation or information-matrix result was tested."
+              },
+              {
+                "procedure": "ninfol diagonal differences",
+                "role": "implementation-helper",
+                "path": "src/inference/deriv/_obsinfo.f",
+                "line_start": 209,
+                "line_end": 234
+              },
+              {
+                "procedure": "ninfol mixed differences",
+                "role": "implementation-helper",
+                "path": "src/inference/deriv/_obsinfo.f",
+                "line_start": 236,
+                "line_end": 277
+              },
+              {
+                "procedure": "rid_ex",
+                "role": "implementation-helper",
+                "path": "src/inference/deriv/_obsinfo.f",
+                "line_start": 281,
+                "line_end": 324
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause root notice; historical cubature terms need separate confirmation",
+          "spdx_expression": null,
+          "revision": "fedde4bfd3bb9882640d303238188dbb73016598",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root declares BSD-3-Clause for the project. The selected cubature source retains Berntsen/Espelid/Genz authorship and historical algorithm text without an explicit component permission grant in that file. Do not infer that the root notice settles every historical third-party redistribution term; no single SPDX expression is assigned for this mixed scope.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/LICENSE",
+              "sha256": "3adf694472e1ec5ef7a2b2bafff8efd6b31fe6c7f93f7f0148e57c314d698bf4"
+            },
+            {
+              "path": "src/inference/integrate/dcuhre_py.f",
+              "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/integrate/dcuhre_py.f",
+              "sha256": "d8561f165580107b29b7b78d22ecbd8db76899f2fed1b95729a489ef559bebd6"
+            },
+            {
+              "path": "src/inference/deriv/_obsinfo.f",
+              "url": "https://github.com/tloredo/inference/blob/fedde4bfd3bb9882640d303238188dbb73016598/src/inference/deriv/_obsinfo.f",
+              "sha256": "0ebc3596b45f48cc35399ba642fd286f9949833cfd4ad27eae4f8506b4e0bda0"
+            }
+          ]
         }
       },
       "imports": {}
@@ -61076,12 +61824,159 @@
             ],
             "notes": "The README identifies rebuilt GLMnet Fortran/MEX components and Windows/MATLAB-specific compatibility reports. Prebuilt binaries and speed comparisons are upstream reports; this does not independently verify every model family or MATLAB release.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external ELNET entry computes an elastic-net penalized Gaussian multiple-linear-regression path. PARM interpolates ridge and lasso penalties; the covariance-update path standardizes data and uses coordinate updates with soft thresholding and coefficient bounds, then rescales compressed coefficients/intercepts to the original predictor scale. This is penalized regression, not ordinary least squares or robust-loss estimation. X, Y, W and CL may be overwritten. FLMIN>=1 selects the user-supplied lambda sequence; LMU, IA and NIN describe the returned compressed paths and should be used rather than treating CA as a full coefficient matrix. Positive JERR denotes fatal error and negative JERR can retain earlier partial solutions. The source declares default REAL, so standalone callers must match that kind or a deliberately promoted whole build; MATLAB double arrays do not change the raw Fortran declarations. Review covers the dense covariance-update path and penalty iteration, not sparse/multivariate families or cross-validation selection.",
+            "evidence": [
+              {
+                "path": "GLMnet.f",
+                "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/GLMnet.f",
+                "sha256": "6f59bd53ab3ce291ed86646c4cd7ea086def492b0a4a798dcd8d00d0bd0db7e6"
+              },
+              {
+                "path": "elnet.m",
+                "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/elnet.m",
+                "sha256": "f5d588005cf72b271238a1efff7fa768b9b9fadf2a060396034939aa377e40e2"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/README.md",
+                "sha256": "dfd8a9a5bd5f07aa53dc5c96f39329cd30cca69d1e7531bd3f9524730fb16bb3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "elnet",
+                "role": "public-entry-point",
+                "summary": "External dense Gaussian elastic-net path driver returning compressed coefficients.",
+                "signature": "CALL ELNET(KA,PARM,NO,NI,X,Y,W,JD,VP,CL,NE,NX,NLAM,FLMIN,ULAM,THR, &\n ISD,INTR,MAXIT,LMU,A0,CA,IA,NIN,RSQ,ALM,NLP,JERR)",
+                "declarations": [
+                  {
+                    "path": "GLMnet.f",
+                    "line_start": 715,
+                    "line_end": 719
+                  },
+                  {
+                    "path": "GLMnet.f",
+                    "line_start": 67,
+                    "line_end": 88
+                  }
+                ],
+                "path": "GLMnet.f",
+                "line_start": 715,
+                "line_end": 719,
+                "usage": "external :: elnet\ninteger,parameter :: n=6,p=2,nlam=3\ninteger :: jd(1),ia(p),nin(nlam),lmu,nlp,jerr\nreal :: x(n,p),y(n),weights(n),vp(p),cl(2,p),lambda(nlam)\nreal :: intercept(nlam),coef(p,nlam),rsq(nlam),used_lambda(nlam)\nx(:,1)=[0.,1.,2.,3.,4.,5.]; x(:,2)=[0.,1.,0.,1.,0.,1.]\ny=[1.,3.,4.,6.,7.,9.]; weights=1.; vp=1.; jd=0\ncl(1,:)=-100.; cl(2,:)=100.; lambda=[1.,0.1,0.01]\ncall elnet(1,0.5,n,p,x,y,weights,jd,vp,cl,p,p,nlam,1.,lambda,1e-5, &\n 1,1,100000,lmu,intercept,coef,ia,nin,rsq,used_lambda,nlp,jerr)\nif(jerr/=0) error stop \"inspect regression path status\"\n! For each k<=LMU, COEF(1:NIN(k),k) belongs to predictors IA(1:NIN(k)).",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default-REAL dense Fortran fragment; preserve copies of overwritten inputs and match any real-promotion flags across all objects/callers. No lambda selection, coefficients, fit accuracy or MATLAB wrapper execution was tested."
+              },
+              {
+                "procedure": "elnet1",
+                "role": "implementation-helper",
+                "path": "GLMnet.f",
+                "line_start": 861,
+                "line_end": 881
+              },
+              {
+                "procedure": "elnet1 coordinate update",
+                "role": "implementation-helper",
+                "path": "GLMnet.f",
+                "line_start": 970,
+                "line_end": 982
+              }
+            ]
+          },
+          {
+            "code": "L8",
+            "level": "source-reviewed",
+            "revision": "86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external LOGNET NC=1 path computes elastic-net penalized binomial logistic regression by iterated weighted/quadratic approximation and coordinate-descent updates. Y has two nonnegative count/weight columns even for NC=1, with column one defining the modeled event probability; rows are normalized internally and their totals become observation weights. G supplies offsets and is mutable working/output state. The routine dispatches the native LOGNET2N branch and rescales compressed coefficients after fitting. Positive row totals and both outcome classes are required; degenerate class probabilities, allocation, iteration and active-set limits have JERR conventions. The adopted GAMS regression tree has no dedicated penalized logistic/GLM leaf, so broad L8 is retained rather than labeling this nonlinear least squares or Gaussian regression. Review covers the dense binomial selection, normalization and penalized update paths, not multinomial/Cox/Poisson families, inferential coverage or predictive validation.",
+            "evidence": [
+              {
+                "path": "GLMnet.f",
+                "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/GLMnet.f",
+                "sha256": "6f59bd53ab3ce291ed86646c4cd7ea086def492b0a4a798dcd8d00d0bd0db7e6"
+              },
+              {
+                "path": "lognet.m",
+                "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/lognet.m",
+                "sha256": "435deea77631b14331071c4a160a0659841a8a47004faae88ba551b5b94804ee"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lognet",
+                "role": "public-entry-point",
+                "summary": "External dense binomial elastic-net path entry with two response columns and one coefficient channel.",
+                "signature": "CALL LOGNET(PARM,NO,NI,NC,X,Y,G,JD,VP,CL,NE,NX,NLAM,FLMIN,ULAM,THR, &\n ISD,INTR,MAXIT,KOPT,LMU,A0,CA,IA,NIN,DEV0,DEV,ALM,NLP,JERR)",
+                "declarations": [
+                  {
+                    "path": "GLMnet.f",
+                    "line_start": 2031,
+                    "line_end": 2036
+                  },
+                  {
+                    "path": "lognet.m",
+                    "line_start": 8,
+                    "line_end": 35
+                  }
+                ],
+                "path": "GLMnet.f",
+                "line_start": 2031,
+                "line_end": 2036,
+                "usage": "external :: lognet\ninteger,parameter :: n=6,p=2,nlam=3\ninteger :: jd(1),ia(p),nin(nlam),lmu,nlp,jerr\nreal :: x(n,p),y(n,2),offset(n,1),vp(p),cl(2,p),lambda(nlam)\nreal :: intercept(1,nlam),coef(p,1,nlam),dev0,dev(nlam),used_lambda(nlam)\nx(:,1)=[-2.,-1.,0.,1.,2.,3.]; x(:,2)=[0.,1.,0.,1.,0.,1.]\ny(:,1)=[0.,0.,1.,0.,1.,1.]; y(:,2)=1.-y(:,1)\noffset=0.; vp=1.; jd=0; cl(1,:)=-100.; cl(2,:)=100.; lambda=[1.,0.1,0.01]\ncall lognet(0.5,n,p,1,x,y,offset,jd,vp,cl,p,p,nlam,1.,lambda,1e-5, &\n 1,1,100000,0,lmu,intercept,coef,ia,nin,dev0,dev,used_lambda,nlp,jerr)\nif(jerr/=0) error stop \"inspect logistic path status\"\n! Use LMU/NIN/IA to decode COEF; the event is response column one.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default-REAL dense binomial fragment with positive row totals and both classes. Y, X, offsets and coefficient bounds may be overwritten. Match the compiled real ABI; no logistic fit, probability, convergence or wrapper result was tested."
+              },
+              {
+                "procedure": "lognet normalization and dispatch",
+                "role": "implementation-helper",
+                "path": "GLMnet.f",
+                "line_start": 2064,
+                "line_end": 2084
+              },
+              {
+                "procedure": "lognet2n",
+                "role": "implementation-helper",
+                "path": "GLMnet.f",
+                "line_start": 2197,
+                "line_end": 2214
+              },
+              {
+                "procedure": "lognet2n penalized update",
+                "role": "implementation-helper",
+                "path": "GLMnet.f",
+                "line_start": 2334,
+                "line_end": 2380
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies the GNU GPL version 3 text. No version-or-later election was identified in the selected README/kernel. Retain upstream GLMnet author attribution and inspect separately linked MATLAB/runtime terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/lachioma/glmnet_matlab/blob/86c1b0366cbe040b996c2ab5151a5ac9e5aab6ed/README.md",
+              "sha256": "dfd8a9a5bd5f07aa53dc5c96f39329cd30cca69d1e7531bd3f9524730fb16bb3"
+            }
+          ]
         }
       },
       "imports": {}
