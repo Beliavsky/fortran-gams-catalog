@@ -18990,12 +18990,147 @@
             ],
             "notes": "The README documents geometric-scale detection and Python-driven examples requiring gfortran. It is a diagnostic workflow, not a general-purpose standalone Fortran interpolation API.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "P",
+            "level": "source-reviewed",
+            "revision": "0a8bb52060e722291116a64b17318c23575deb4b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The bundled DELAUNAYSPARSES routine locates Delaunay simplices containing specified query points and returns vertex indices and barycentric weights. Its native serial path constructs a starting simplex, performs a budgeted visibility walk, and optionally projects out-of-hull queries. It does not construct/export an entire triangulation or certify arbitrary geometric predicates. PTS and Q are shifted/rescaled in place; shapes are D by N and D by M, with D+1 vertex/weight rows per query. Per-query IERR=0 means interpolation, 1 means permitted projected extrapolation, and larger codes report invalid data, degeneracy, budget or dependency failures. EXACT controls diameter/duplicate-check strategy, not exact arithmetic. This source review selects the bundled Fortran geometry, not the Python Delaunay-density diagnostic or an execution check of high-dimensional conditioning.",
+            "evidence": [
+              {
+                "path": "delsparse_src/delsparse.f90",
+                "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/delsparse_src/delsparse.f90",
+                "sha256": "61af927e1586708e0e8c047f885a61c44a6c9893fcad62c3bd9f2d539c812900"
+              },
+              {
+                "path": "delsparse_src/real_precision.f90",
+                "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/delsparse_src/real_precision.f90",
+                "sha256": "901d3bc6a788aa50374e20b4532de0739651735f3d26a9a0ba97fb5b517ebf18"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DELAUNAYSPARSES",
+                "role": "public-entry-point",
+                "summary": "External serial Delaunay simplex-location entry with explicit module interface and per-query status.",
+                "signature": "CALL DELAUNAYSPARSES(D,N,PTS,M,Q,SIMPS,WEIGHTS,IERR, &\n [INTERP_IN,INTERP_OUT,EPS,EXTRAP,RNORM,IBUDGET,CHAIN,EXACT])",
+                "declarations": [
+                  {
+                    "path": "delsparse_src/delsparse.f90",
+                    "line_start": 15,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "delsparse_src/delsparse.f90",
+                    "line_start": 294,
+                    "line_end": 313
+                  }
+                ],
+                "path": "delsparse_src/delsparse.f90",
+                "line_start": 85,
+                "line_end": 86,
+                "module": "DELSPARSE_MOD",
+                "usage": "use DELSPARSE_MOD, only: DELAUNAYSPARSES,R8\nreal(R8) :: pts(2,3),q(2,1),weights(3,1)\ninteger :: simps(3,1),ierr(1)\npts(:,1)=[0._R8,0._R8]; pts(:,2)=[1._R8,0._R8]\npts(:,3)=[0._R8,1._R8]; q(:,1)=[0.2_R8,0.3_R8]\ncall DELAUNAYSPARSES(2,3,pts,1,q,simps,weights,ierr,EXTRAP=0._R8)\nif(any(ierr/=0)) error stop \"inspect per-query simplex-location diagnostics\"\n! PTS/Q have changed scale; validate the indices and barycentric weights.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Import the supplied explicit interface for assumed-shape/optional arguments and link the complete matching BLAS/LAPACK/BQPD support. Preserve original coordinates for independent checks. No simplex, predicate, extrapolation or weight was tested."
+              },
+              {
+                "procedure": "serial visibility walk",
+                "role": "implementation-helper",
+                "path": "delsparse_src/delsparse.f90",
+                "line_start": 492,
+                "line_end": 535
+              },
+              {
+                "procedure": "serial query termination/status",
+                "role": "implementation-helper",
+                "path": "delsparse_src/delsparse.f90",
+                "line_start": 675,
+                "line_end": 688
+              }
+            ]
+          },
+          {
+            "code": "E2b",
+            "level": "source-reviewed",
+            "revision": "0a8bb52060e722291116a64b17318c23575deb4b",
+            "reviewed_on": "2026-11-05",
+            "notes": "With INTERP_IN/INTERP_OUT supplied, the bundled serial DELAUNAYSPARSES routine evaluates multivariate scattered-data piecewise-linear interpolation by summing response values at the located Delaunay-simplex vertices with their barycentric weights. Multiple response components use rows of INTERP_IN/OUT; both optional arrays must be present together. The native path only accumulates response values for per-query statuses 0 or 1. This is scattered-data interpolation E2b, not a smooth spline, gridded interpolator or a statistical density estimate. Default extrapolation projects onto the convex hull and interpolates at the projection rather than extending an affine function beyond the hull; EXTRAP=0 rejects outside queries. Coordinates are modified by normalization, and degeneracy/budget failures must be inspected per query before consuming outputs.",
+            "evidence": [
+              {
+                "path": "delsparse_src/delsparse.f90",
+                "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/delsparse_src/delsparse.f90",
+                "sha256": "61af927e1586708e0e8c047f885a61c44a6c9893fcad62c3bd9f2d539c812900"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "DELAUNAYSPARSES",
+                "role": "public-entry-point",
+                "summary": "Public explicit-interface serial scattered-data interpolation using optional response arrays.",
+                "signature": "CALL DELAUNAYSPARSES(D,N,PTS,M,Q,SIMPS,WEIGHTS,IERR, &\n INTERP_IN=VALUES,INTERP_OUT=ESTIMATE,EXTRAP=0)",
+                "declarations": [
+                  {
+                    "path": "delsparse_src/delsparse.f90",
+                    "line_start": 15,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "delsparse_src/delsparse.f90",
+                    "line_start": 204,
+                    "line_end": 221
+                  }
+                ],
+                "path": "delsparse_src/delsparse.f90",
+                "line_start": 85,
+                "line_end": 86,
+                "module": "DELSPARSE_MOD",
+                "usage": "use DELSPARSE_MOD, only: DELAUNAYSPARSES,R8\nreal(R8) :: pts(2,3),q(2,1),weights(3,1),values(1,3),estimate(1,1)\ninteger :: simps(3,1),ierr(1)\npts(:,1)=[0._R8,0._R8]; pts(:,2)=[1._R8,0._R8]\npts(:,3)=[0._R8,1._R8]; q(:,1)=[0.2_R8,0.3_R8]\nvalues(1,:)=[0._R8,2._R8,3._R8]\ncall DELAUNAYSPARSES(2,3,pts,1,q,simps,weights,ierr, &\n INTERP_IN=values,INTERP_OUT=estimate,EXTRAP=0._R8)\nif(any(ierr/=0)) error stop \"inspect interpolation diagnostics\"\nprint *,estimate",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The fragment rejects extrapolation and supplies one response component. Preserve original coordinates and compare with a known affine function independently; a zero flag is not an accuracy proof. No interpolated value or conditioning test was run."
+              },
+              {
+                "procedure": "serial barycentric response accumulation",
+                "role": "implementation-helper",
+                "path": "delsparse_src/delsparse.f90",
+                "line_start": 690,
+                "line_end": 703
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice; bundled BQPD has research-distribution terms",
+          "spdx_expression": null,
+          "revision": "0a8bb52060e722291116a64b17318c23575deb4b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The project root carries MIT/LLNL notices, while the bundled BQPD license grants distribution for research purposes only and requests permission for other distribution. The reviewed Delaunay source identifies BQPD and other numerical dependencies. Preserve their separate scope rather than treating the complete bundled numerical stack as uniformly MIT; no full component provenance audit was performed.",
+          "evidence": [
+            {
+              "path": "LICENSE.md",
+              "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/LICENSE.md",
+              "sha256": "77708e18c217f9216c8e81a537ecfcbe472f7098c541aa2c0e5a0c2893cdb841"
+            },
+            {
+              "path": "NOTICE.md",
+              "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/NOTICE.md",
+              "sha256": "f4247dde07952a5ff866b24e45b5cdd1fce410cdb2e038255a1635867f59c10c"
+            },
+            {
+              "path": "delsparse_src/bqpd_min/LICENSE",
+              "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/delsparse_src/bqpd_min/LICENSE",
+              "sha256": "64ed39eec804bd875ccf23c1512c93ae46bf9591cdddf6a3313bae9f4ca89f72"
+            },
+            {
+              "path": "delsparse_src/delsparse.f90",
+              "url": "https://github.com/LLNL/ddd/blob/0a8bb52060e722291116a64b17318c23575deb4b/delsparse_src/delsparse.f90",
+              "sha256": "61af927e1586708e0e8c047f885a61c44a6c9893fcad62c3bd9f2d539c812900"
+            }
+          ]
         }
       },
       "imports": {}
@@ -29762,12 +29897,89 @@
             ],
             "notes": "The README documents frequency/duration search arguments and a direct eebls interface. Box least squares here is not a general box-constrained least-squares optimizer; statistical detection significance is not established by this review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a3a2",
+            "level": "source-reviewed",
+            "revision": "f066acfbd9ab1dd238ec3b592db32c93fa183500",
+            "reviewed_on": "2026-11-05",
+            "notes": "EEBLS scans a supplied frequency grid, folds mean-centered observations into phase bins, searches contiguous box windows including wrapped windows, and records the strongest box-least-squares statistic, period, depth, duty fraction and bin endpoints. This supports periodogram analysis for box-shaped periodic signals, not a Fourier power-spectral density estimate, sinusoidal Lomb-Scargle fit or false-alarm probability. The native arrays Y/IBI have length 2000: checking NB<=2000 alone is insufficient because wrapping writes through NB+FLOOR(QMA*NB)+1. Validate the extended bound, positive time span/frequencies and sorted finite times. Every considered window must avoid all-sample/empty denominators, and at least one eligible window must exist; otherwise best-window scalars can remain undefined. Invalid NB/frequency controls can STOP the process. There is no explicit returned convergence/error flag, weighting or missing-data handling. Review covers the actual frequency/phase/window loop and output extraction, not detection significance.",
+            "evidence": [
+              {
+                "path": "bls/eebls.f",
+                "url": "https://github.com/dfm/python-bls/blob/f066acfbd9ab1dd238ec3b592db32c93fa183500/bls/eebls.f",
+                "sha256": "376c607e5f5873a0ff7b0b572a2723be3fe1ee8d99242cf3fa39efc44f1f00fb"
+              },
+              {
+                "path": "bls/bls.pyf",
+                "url": "https://github.com/dfm/python-bls/blob/f066acfbd9ab1dd238ec3b592db32c93fa183500/bls/bls.pyf",
+                "sha256": "ae890686076e4ebb86e9bdd6b7a51738dccb22616532d30fc2ad4ddda0544702"
+              },
+              {
+                "path": "README.rst",
+                "url": "https://github.com/dfm/python-bls/blob/f066acfbd9ab1dd238ec3b592db32c93fa183500/README.rst",
+                "sha256": "766a2d7c37f5e6cff0fbcde34ed8db7186d9547b4b11dcd21ea5402dff738c62"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "eebls",
+                "role": "public-entry-point",
+                "summary": "External double-precision edge-wrapped box-least-squares period search.",
+                "signature": "CALL eebls(N,T,X,U,V,NF,FMIN,DF,NB,QMI,QMA,P,BPER,BPOW,DEPTH,QTRAN,IN1,IN2)",
+                "declarations": [
+                  {
+                    "path": "bls/eebls.f",
+                    "line_start": 72,
+                    "line_end": 85
+                  }
+                ],
+                "path": "bls/eebls.f",
+                "line_start": 3,
+                "line_end": 4,
+                "usage": "integer,parameter :: n=200,nf=100,nb=40\ninteger :: i,in1,in2\ndouble precision :: t(n),x(n),u(n),v(n),p(nf),period,power,depth,qtran\nt=[(0.1d0*(i-1),i=1,n)]; x=0d0\nwhere(modulo(t,2d0)<0.2d0) x=-1d0\ncall eebls(n,t,x,u,v,nf,0.2d0,0.01d0,nb,0.05d0,0.15d0, &\n p,period,power,depth,qtran,in1,in2)\nprint *,period,power,depth,qtran\n! Inspect valid-window coverage and compare against the constructed signal.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Synthetic-input calling sketch with small phase-bin storage. Validate all native preconditions before direct use; the Python wrapper is not required to call the numerical subroutine. No period recovery, window scan, significance or runtime STOP path was tested."
+              },
+              {
+                "procedure": "frequency folding and wrapped bins",
+                "role": "implementation-helper",
+                "path": "bls/eebls.f",
+                "line_start": 130,
+                "line_end": 159
+              },
+              {
+                "procedure": "box statistic and best-window outputs",
+                "role": "implementation-helper",
+                "path": "bls/eebls.f",
+                "line_start": 166,
+                "line_end": 205
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice",
+          "spdx_expression": "MIT",
+          "revision": "f066acfbd9ab1dd238ec3b592db32c93fa183500",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root carries an MIT permission notice for the wrapper distribution. The Fortran source retains the original BLS algorithm and edge-effect contributor attribution; preserve these notices without claiming a complete upstream provenance or component-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/dfm/python-bls/blob/f066acfbd9ab1dd238ec3b592db32c93fa183500/LICENSE",
+              "sha256": "cebdbadfed97a09dcdc7e223fe91a7de76e7f5f24f0f7a0ee7d71d43e0fe2b9d"
+            },
+            {
+              "path": "bls/eebls.f",
+              "url": "https://github.com/dfm/python-bls/blob/f066acfbd9ab1dd238ec3b592db32c93fa183500/bls/eebls.f",
+              "sha256": "376c607e5f5873a0ff7b0b572a2723be3fe1ee8d99242cf3fa39efc44f1f00fb"
+            }
+          ]
         }
       },
       "imports": {}
@@ -33219,12 +33431,240 @@
             ],
             "notes": "The author Poisson example documents a unit-square manufactured solution, mesh inputs and GMRES assembly/solve. It has not been run here; source-interface inspection does not verify its reported convergence or sign conventions.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "69df663d2c25f070097f9167fc949bd7426f43d1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public CONJUGATE_GRADIENT%SOLVE binding implements unpreconditioned CG for an attached real linear operator, including the sparse stencil operators used by this finite-volume framework. The native recurrence updates residual, search direction and the iterate using inherited matrix actions and scalar products. The operator must be symmetric positive definite in the actual pairing; the code does not verify symmetry/positivity, and its tiny-PAP guard checks magnitude rather than positive curvature. The stopping threshold is TOLERANCE*(1+NORM(RHS)); ACHIEVED reports a residual norm, but return can also follow a tiny denominator or exhausted iteration budget. There is no separate reason/status output. Affine constants from an attached operation must be moved to the RHS consistently. This mapping records sparse symmetric solver usage, not a sparse storage-format API or a guarantee for nonsymmetric/indefinite systems.",
+            "evidence": [
+              {
+                "path": "src/operation_conjugate_gradient.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_conjugate_gradient.f90",
+                "sha256": "33f5acda6ceaba03d9c7be94d2b499e6a9fca4b7cf913bdabf411abd55538842"
+              },
+              {
+                "path": "src/operation_minimization.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_minimization.f90",
+                "sha256": "54ab06a88711421bc243d34bf928b0f1dcd201701a617157a4b0d5441246c381"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public operator-attached CG binding with residual-norm output and no separate convergence code.",
+                "signature": "CALL SOLVER%solve(RHS,X,ACHIEVED)",
+                "declarations": [
+                  {
+                    "path": "src/operation_conjugate_gradient.f90",
+                    "line_start": 30,
+                    "line_end": 39
+                  },
+                  {
+                    "path": "src/operation_conjugate_gradient.f90",
+                    "line_start": 55,
+                    "line_end": 64
+                  },
+                  {
+                    "path": "src/operation_minimization.f90",
+                    "line_start": 122,
+                    "line_end": 143
+                  }
+                ],
+                "path": "src/operation_conjugate_gradient.f90",
+                "line_start": 55,
+                "line_end": 96,
+                "module": "operation_conjugate_gradient",
+                "derived_type": "conjugate_gradient",
+                "usage": "use iso_fortran_env, only: real64\nuse operation_conjugate_gradient, only: conjugate_gradient\ntype(conjugate_gradient) :: solver\nreal(real64) :: achieved\n! After constructing/attaching a symmetric-positive sparse linear action and\n! consistent execution/unknown domains: RHS and initial X have matching sizes.\nsolver%tolerance=1.e-10_real64; solver%max_iterations=1000\ncall solver%solve(rhs,x,achieved)\n! Independently form RHS-A*X and distinguish a tolerance exit from breakdown.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-attach context fragment requiring the complete field/graph/operator framework. CG assumes the chosen attached linear system has the needed symmetry/definiteness. No stencil solve, residual or breakdown was run."
+              },
+              {
+                "procedure": "minimizer scalar product and norm",
+                "role": "implementation-helper",
+                "path": "src/operation_minimization.f90",
+                "line_start": 319,
+                "line_end": 361
+              }
+            ]
+          },
+          {
+            "code": "D2a4",
+            "level": "source-reviewed",
+            "revision": "69df663d2c25f070097f9167fc949bd7426f43d1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public GMRES%SOLVE binding implements restarted real GMRES for attached general linear actions, including sparse finite-volume stencils. It uses native Arnoldi orthogonalization, Givens rotations, triangular back substitution and correction updates. RESTART is the Krylov dimension, while MAX_ITERATIONS bounds outer restart cycles rather than the total number of matrix actions. On an estimated-tolerance exit the true residual norm is recomputed before returning, but an exhausted final cycle can leave an estimate as ACHIEVED. Zero MAX_ITERATIONS can leave that output undefined. The radius/breakdown branch can still reach division by a zero triangular diagonal; return has no dedicated failure/status code. Require positive tolerances, sensible dimensions, initialized attachment and explicit affine-RHS handling. This is a general sparse/operator solver mapping, not a rank-deficient least-squares solver or automatically preconditioned algorithm.",
+            "evidence": [
+              {
+                "path": "src/operation_gmres.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_gmres.f90",
+                "sha256": "087e0c11b632c7b1ae3c5ce9cf005f065b0587c17064e73a09b72f6f669046ae"
+              },
+              {
+                "path": "src/operation_minimization.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_minimization.f90",
+                "sha256": "54ab06a88711421bc243d34bf928b0f1dcd201701a617157a4b0d5441246c381"
+              },
+              {
+                "path": "maths/demo/poisson.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/maths/demo/poisson.f90",
+                "sha256": "32cab32601973f3f6dbbecf61a489fbdb013f720dd9e957f480e07008ae641ff"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "solve",
+                "role": "public-entry-point",
+                "summary": "Public restarted GMRES operator binding; restart cycles and residual-output limitations are explicit.",
+                "signature": "CALL SOLVER%solve(RHS,X,ACHIEVED)",
+                "declarations": [
+                  {
+                    "path": "src/operation_gmres.f90",
+                    "line_start": 30,
+                    "line_end": 41
+                  },
+                  {
+                    "path": "src/operation_gmres.f90",
+                    "line_start": 57,
+                    "line_end": 72
+                  }
+                ],
+                "path": "src/operation_gmres.f90",
+                "line_start": 57,
+                "line_end": 158,
+                "module": "operation_gmres",
+                "derived_type": "gmres",
+                "usage": "use iso_fortran_env, only: real64\nuse operation_gmres, only: gmres\ntype(gmres) :: solver\nreal(real64) :: achieved\n! Attach the initialized linear action/domain and prepare RHS/initial X first.\nsolver%restart=30; solver%max_iterations=100; solver%tolerance=1.e-10_real64\ncall solver%solve(rhs,x,achieved)\n! Compute the actual residual and inspect breakdown/iteration-budget behavior.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-attach fragment. MAX_ITERATIONS counts restarted cycles in this implementation and ACHIEVED is not an independent success flag. No Arnoldi step, breakdown, restart or final residual was tested."
+              },
+              {
+                "procedure": "GMRES rotations and stopping",
+                "role": "implementation-helper",
+                "path": "src/operation_gmres.f90",
+                "line_start": 109,
+                "line_end": 154
+              },
+              {
+                "procedure": "minimizer matrix action",
+                "role": "implementation-helper",
+                "path": "src/operation_minimization.f90",
+                "line_start": 308,
+                "line_end": 317
+              }
+            ]
+          },
+          {
+            "code": "I2b1a1a",
+            "level": "source-reviewed",
+            "revision": "69df663d2c25f070097f9167fc949bd7426f43d1",
+            "reviewed_on": "2026-11-05",
+            "notes": "DIFFUSION_STENCIL translates conductivity, tagged Robin/Dirichlet boundary relations and a chosen/default polynomial form into a compiled fitted-balance operator. The supplied POISSON program uses this factory for a unit-square Dirichlet Poisson problem with a manufactured sine solution, volume-scaled RHS, native GMRES and reported L2/max errors across supplied mesh sizes. The rectangular-domain leaf is supported by that concrete workflow; arbitrary domain/BC accuracy is not inferred. The native factory obtains face conductivities/areas, assembles boundary value/weight arrays and delegates to fitted-balance neighborhood fitting. The driver determines the assembled sign from its manufactured solution rather than enforcing a universal Laplacian sign convention, so copying its RHS to a new problem requires care. Mesh files and expected boundary labels are prerequisites. Review follows source assembly/dispatch and the supplied driver, not observed convergence or a checked PDE solution.",
+            "evidence": [
+              {
+                "path": "src/operation_diffusion.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_diffusion.f90",
+                "sha256": "922c18e12334362c5bd2173cde46a074d64874c809f4b5f3c43dcb445014aaa2"
+              },
+              {
+                "path": "src/operation_fitted_balance.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_fitted_balance.f90",
+                "sha256": "7815676ab9e4362e70ed917857155add5ea173bacd635ca1ff73078d34f5d9f5"
+              },
+              {
+                "path": "maths/demo/poisson.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/maths/demo/poisson.f90",
+                "sha256": "32cab32601973f3f6dbbecf61a489fbdb013f720dd9e957f480e07008ae641ff"
+              },
+              {
+                "path": "src/operation_gmres.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_gmres.f90",
+                "sha256": "087e0c11b632c7b1ae3c5ce9cf005f065b0587c17064e73a09b72f6f669046ae"
+              },
+              {
+                "path": "src/operation_conduction.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_conduction.f90",
+                "sha256": "f5cf6d1f71d611743cb11161c7d4d6ed046a22fe1304c6233d3c6c67268d86ae"
+              },
+              {
+                "path": "src/operation_robin_condition.f90",
+                "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_robin_condition.f90",
+                "sha256": "6f496b1c847240175a376fa8a61f3014944c55957780895f76462928ac1125e6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "diffusion_stencil",
+                "role": "public-entry-point",
+                "summary": "Public diffusion operator factory used by the supplied rectangular Poisson workflow.",
+                "signature": "OP = diffusion_stencil(M,LAW,CONDITIONS[,SHAPE])",
+                "declarations": [
+                  {
+                    "path": "src/operation_diffusion.f90",
+                    "line_start": 49,
+                    "line_end": 56
+                  }
+                ],
+                "path": "src/operation_diffusion.f90",
+                "line_start": 49,
+                "line_end": 111,
+                "module": "operation_diffusion",
+                "examples": [
+                  {
+                    "path": "maths/demo/poisson.f90",
+                    "line_start": 42,
+                    "line_end": 71
+                  }
+                ],
+                "usage": "use iso_fortran_env, only: real64\nuse operation_diffusion, only: diffusion_stencil\nuse operation_conduction, only: conduction\n! M is an initialized mesh and WALLS contains boundary conditions with matching labels.\n! OP is a stencil; construct it before attaching a compatible solver.\nop=diffusion_stencil(m,conduction(1._real64),walls)\n! Account for its affine boundary contribution, sign and cell-volume RHS scaling.\n! The supplied maths/demo/poisson.f90 shows the complete manufactured-square setup.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Factory/setup fragment requiring the supplied mesh/field/boundary infrastructure. The author driver supplies examples, not execution evidence for this catalog. No mesh loading, PDE solve, error norm or convergence order was run."
+              },
+              {
+                "procedure": "fitted-balance face fitting",
+                "role": "implementation-helper",
+                "path": "src/operation_fitted_balance.f90",
+                "line_start": 126,
+                "line_end": 148
+              },
+              {
+                "procedure": "Poisson RHS/sign/solve workflow",
+                "role": "implementation-helper",
+                "path": "maths/demo/poisson.f90",
+                "line_start": 50,
+                "line_end": 75
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "69df663d2c25f070097f9167fc949bd7426f43d1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root supplies GNU GPL version 3. The selected native modules retain author attribution; no separate or-later election was identified in these reviewed files. This is not a complete toolchain or dependency-license audit.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "src/operation_conjugate_gradient.f90",
+              "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_conjugate_gradient.f90",
+              "sha256": "33f5acda6ceaba03d9c7be94d2b499e6a9fca4b7cf913bdabf411abd55538842"
+            },
+            {
+              "path": "src/operation_diffusion.f90",
+              "url": "https://github.com/komahanb/unstructured-finite-volume/blob/69df663d2c25f070097f9167fc949bd7426f43d1/src/operation_diffusion.f90",
+              "sha256": "922c18e12334362c5bd2173cde46a074d64874c809f4b5f3c43dcb445014aaa2"
+            }
+          ]
         }
       },
       "imports": {}
@@ -43003,12 +43443,145 @@
             ],
             "notes": "The short README is supplemented by Runge-Kutta interface comments describing caller-supplied right-hand sides and time stepping. Detailed assimilation algorithms, order claims and numerical results have not been independently verified.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "I1a1a",
+            "level": "source-reviewed",
+            "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public RK4 routine implements one classical explicit four-stage Runge-Kutta step for a vector initial-value problem. It calls RHS at the standard starting, midpoint and endpoint stages and forms the weighted increment in a separate output vector. The actual callback signature is RHS(N,T,X,DXDT), including N, despite comments omitting that leading argument. DP is KIND(0D0) from TYPES. The caller owns the time loop, step choice, output scheduling and stability/error assessment; no adaptive control, embedded estimate, rejection, event location or convergence status is provided. This review selects the RK4 implementation rather than endorsing all other order-named routines or a particular dynamical-system model.",
+            "evidence": [
+              {
+                "path": "src/lib/runge_kutta.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/runge_kutta.f90",
+                "sha256": "db4696094979914003e280a9d141cf26db9c97d711dcffa5bc2d97ece38cf3b9"
+              },
+              {
+                "path": "src/lib/types.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/types.f90",
+                "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rk4",
+                "role": "public-entry-point",
+                "summary": "Public fixed-step vector classical RK4 update with an external RHS callback.",
+                "signature": "CALL rk4(N,X,T,H,XN,RHS)",
+                "declarations": [
+                  {
+                    "path": "src/lib/runge_kutta.f90",
+                    "line_start": 125,
+                    "line_end": 133
+                  },
+                  {
+                    "path": "src/lib/types.f90",
+                    "line_start": 7,
+                    "line_end": 15
+                  }
+                ],
+                "path": "src/lib/runge_kutta.f90",
+                "line_start": 116,
+                "line_end": 150,
+                "module": "runge_kutta",
+                "usage": "use types, only: dp\nuse runge_kutta, only: rk4\nexternal :: rhs\nreal(dp) :: x(2),xn(2)\nx=[1._dp,0._dp]\n! Supply RHS(N,T,X,DXDT) with default INTEGER N and REAL(DP) T/X/DXDT.\ncall rk4(2,x,0._dp,0.01_dp,xn,rhs)\n! Advance time explicitly and assess error/stability before repeating.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Callback contract fragment; the linked RHS must implement the chosen two-variable IVP and accept the leading N argument. Preserve distinct input/output actual arrays. No step, convergence order or dynamical trajectory was run."
+              }
+            ]
+          },
+          {
+            "code": "E1a",
+            "level": "source-reviewed",
+            "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public AKIMA generic computes regularized Akima slopes and evaluates piecewise cubic Hermite interpolation for scalar or vector queries. EVLAK locates an interval and evaluates the native Hermite formula; outside the data interval it continues the nearest interval polynomial. Supply matching arrays with at least three distinct strictly increasing abscissae: DAKIMA reads the third sample before its later N=2 return, so two-point input is unsafe. The slope rule includes an epsilon proportional to the abscissa span; it is not an unconditional monotonicity/shape-preserving guarantee. EVLAK saves its interval index between calls and clamps it to N rather than N-1, which can leave an invalid last interval when changing datasets/lengths. Concurrent calls and reuse with varying grids need review. This is univariate piecewise-polynomial interpolation, not a global polynomial fit or quadrature.",
+            "evidence": [
+              {
+                "path": "src/lib/math.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/math.f90",
+                "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+              },
+              {
+                "path": "src/lib/types.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/types.f90",
+                "sha256": "b2c1b68c8a458049de699c1df6d7981aa4b795b296995469fb3e96eafa6be293"
+              },
+              {
+                "path": "src/interpolation/interpolation.f90",
+                "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/interpolation/interpolation.f90",
+                "sha256": "94ce624e6f1787ec9802d0ab124585a86acd523e5c92dadcdd738ca5e3b16905"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "akima",
+                "role": "public-entry-point",
+                "summary": "Public scalar/vector cubic-Hermite interpolation generic with native Akima-style slopes.",
+                "signature": "VALUE = akima(X,F,QUERY)",
+                "declarations": [
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 37,
+                    "line_end": 45
+                  },
+                  {
+                    "path": "src/lib/math.f90",
+                    "line_start": 54,
+                    "line_end": 63
+                  }
+                ],
+                "path": "src/lib/math.f90",
+                "line_start": 21,
+                "line_end": 23,
+                "module": "math",
+                "usage": "use types, only: dp\nuse math, only: akima\nreal(dp) :: x(5),f(5),value\nx=[0._dp,1._dp,2._dp,3._dp,4._dp]; f=sin(x)\nvalue=akima(x,f,1.5_dp)\nprint *,value\n! Use a fixed valid grid and review saved interval state before dataset changes.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete matching module graph or isolate selected routines with their dependencies/notices. Use at least three sorted distinct samples and compatible finite values. No interpolation, endpoint/extrapolation path or slope accuracy was tested."
+              },
+              {
+                "procedure": "evlak saved interval and Hermite evaluation",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 77,
+                "line_end": 131
+              },
+              {
+                "procedure": "dakima slopes and endpoint handling",
+                "role": "implementation-helper",
+                "path": "src/lib/math.f90",
+                "line_start": 135,
+                "line_end": 187
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT root notice; selected original routines reviewed",
+          "spdx_expression": "MIT",
+          "revision": "366339d9f6fea2e4242f8a73b700f8ea0af07797",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains an MIT grant. The review selects the named RK4 and Akima interfaces; other sections of the large mathematics module explicitly reference Numerical Recipes and were not audited here. Do not infer that this scoped finding resolves all historical component provenance.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/LICENSE",
+              "sha256": "e46bee6b6d912bac251fe2eaf251a060bc4500e3e284962f3bd326df53b4a57d"
+            },
+            {
+              "path": "src/lib/runge_kutta.f90",
+              "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/runge_kutta.f90",
+              "sha256": "db4696094979914003e280a9d141cf26db9c97d711dcffa5bc2d97ece38cf3b9"
+            },
+            {
+              "path": "src/lib/math.f90",
+              "url": "https://github.com/quimbp/system_dynamics/blob/366339d9f6fea2e4242f8a73b700f8ea0af07797/src/lib/math.f90",
+              "sha256": "a0d29b680fbd1a248c7b6f2296d359c7baab6ca576aa19e5c275c1e51ae728bc"
+            }
+          ]
         }
       },
       "imports": {}
@@ -60790,12 +61363,152 @@
             ],
             "notes": "The README identifies the PyMC 2 series and directs new users to a successor project. That historical advice is retained as evidence of superseded status, not a current version recommendation; legacy interfaces/dependencies and sampling results remain untested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L5a1n",
+            "level": "source-reviewed",
+            "revision": "6b1b51ddea1a74c50d9a027741252b30810b29e0",
+            "reviewed_on": "2026-11-05",
+            "notes": "NORMCDF overwrites a double-precision vector with standard-normal cumulative probabilities using one half times (1+DERF(x/sqrt(2))). This is a direct statistical function-evaluation kernel from historical PyMC2, not a current PyMC interface or a Bayesian sampler. It is a CDF, not a density or a normal random-number generator. The left-tail formula can lose relative accuracy by cancellation; there is no complementary-tail/log-CDF branch, finite-input check or returned status. A direct Fortran call includes NX, although f2py hides the length in Python. Review covers the complete short routine and its actual in-place behavior, not numerical tail accuracy or compiler support for the legacy DERF spelling.",
+            "evidence": [
+              {
+                "path": "pymc/flib.f",
+                "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/pymc/flib.f",
+                "sha256": "034c6cdace6f9bf7722663a87e61757196d25f5d7cef02ca60a2efa150985650"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "normcdf",
+                "role": "public-entry-point",
+                "summary": "External vector standard-normal CDF that replaces its input values.",
+                "signature": "CALL normcdf(X,NX)",
+                "declarations": [
+                  {
+                    "path": "pymc/flib.f",
+                    "line_start": 291,
+                    "line_end": 300
+                  }
+                ],
+                "path": "pymc/flib.f",
+                "line_start": 291,
+                "line_end": 303,
+                "usage": "double precision :: x(3)\nx=[-1d0,0d0,1d0]\ncall normcdf(x,3)\nprint *,x\n! X now contains probabilities; retain a copy if original arguments are needed.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use a matching native-kernel build or extract the selected routine with its notices. The complete FLIB object has additional dependencies; this is not a promise that the whole historical Python package builds on current toolchains. No probability or extreme tail was evaluated."
+              }
+            ]
+          },
+          {
+            "code": "L5a1p",
+            "level": "source-reviewed",
+            "revision": "6b1b51ddea1a74c50d9a027741252b30810b29e0",
+            "reviewed_on": "2026-11-05",
+            "notes": "The external POISSON kernel sums log Poisson mass terms across independent integer counts, with either one shared rate or a rate per count. A call with N=1 evaluates one log probability mass; larger N returns the joint log likelihood rather than a vector of individual masses. It uses the native FACTLN/GAMMLN support for log factorials and returns a large finite negative sentinel for negative counts/rates. Require NMU=1 or N: the Fortran implementation does not validate every length accepted by its broadcast-like convention. The pair count=0/rate=0 is special-cased, but positive counts with zero rate reach LOG(0), which can trigger floating-point traps. No returned status or gradient is part of this entry. FACTLN has a lazily populated saved table, so concurrent-call safety is not established.",
+            "evidence": [
+              {
+                "path": "pymc/flib.f",
+                "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/pymc/flib.f",
+                "sha256": "034c6cdace6f9bf7722663a87e61757196d25f5d7cef02ca60a2efa150985650"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poisson",
+                "role": "public-entry-point",
+                "summary": "External Poisson joint log-mass/likelihood kernel with scalar or per-count rate arrays.",
+                "signature": "CALL poisson(X,MU,N,NMU,LIKE)",
+                "declarations": [
+                  {
+                    "path": "pymc/flib.f",
+                    "line_start": 1117,
+                    "line_end": 1135
+                  }
+                ],
+                "path": "pymc/flib.f",
+                "line_start": 1117,
+                "line_end": 1167,
+                "usage": "integer :: count(1)\ndouble precision :: mu(1),log_mass\ncount=3; mu=2d0\ncall poisson(count,mu,1,1,log_mass)\nprint *,log_mass\n! This is log probability mass, not a CDF or a generated count.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Link matching FACTLN/GAMMLN support and default-integer/double-precision ABI. Validate lengths/counts and use positive rates for this fragment; inspect finite sentinels and IEEE behavior separately. No log mass, factorial approximation or thread behavior was run."
+              },
+              {
+                "procedure": "factln saved cache",
+                "role": "implementation-helper",
+                "path": "pymc/flib.f",
+                "line_start": 257,
+                "line_end": 284
+              },
+              {
+                "procedure": "gammln",
+                "role": "implementation-helper",
+                "path": "pymc/flib.f",
+                "line_start": 174,
+                "line_end": 200
+              }
+            ]
+          },
+          {
+            "code": "L5a2w",
+            "level": "source-reviewed",
+            "revision": "6b1b51ddea1a74c50d9a027741252b30810b29e0",
+            "reviewed_on": "2026-11-05",
+            "notes": "EXPONWEIB_PPF computes exponentiated-Weibull quantiles directly from probability q and positive shape parameters a,c, with each parameter supplied as a singleton or length-N array. For a=1 this specializes to the ordinary Weibull inverse CDF, supporting the GAMS Weibull inverse-distribution leaf. The native formula uses ordinary power and LOG(1-q**(1/a)), not stabilized LOG1P/exponential-difference kernels, so endpoint and extreme-parameter accuracy is not established. Require 0<q<1, positive finite shapes and valid broadcast lengths. Invalid shape-array lengths return before assigning outputs, while invalid probabilities/shapes have no explicit validation or status. This is deterministic quantile evaluation, not a random sampler.",
+            "evidence": [
+              {
+                "path": "pymc/flib.f",
+                "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/pymc/flib.f",
+                "sha256": "034c6cdace6f9bf7722663a87e61757196d25f5d7cef02ca60a2efa150985650"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "exponweib_ppf",
+                "role": "public-entry-point",
+                "summary": "External exponentiated-Weibull inverse-CDF kernel; a=1 gives ordinary Weibull quantiles.",
+                "signature": "CALL exponweib_ppf(Q,A,C,N,NA,NC,PPF)",
+                "declarations": [
+                  {
+                    "path": "pymc/flib.f",
+                    "line_start": 1043,
+                    "line_end": 1054
+                  }
+                ],
+                "path": "pymc/flib.f",
+                "line_start": 1025,
+                "line_end": 1065,
+                "usage": "double precision :: q(3),a(1),c(1),quantile(3)\nq=[0.25d0,0.5d0,0.75d0]; a=1d0; c=2d0\ncall exponweib_ppf(q,a,c,3,1,1,quantile)\nprint *,quantile\n! Unit-scale Weibull specialization; validate tail behavior independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Supply the explicit Fortran dimensions even though f2py hides them in Python. Invalid length returns leave PPF undefined; this moderate-probability sketch avoids endpoints but provides no accuracy guarantee. No quantile or shape limit was tested."
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "AFL-3.0 root notice; bundled components have separate terms",
+          "spdx_expression": null,
+          "revision": "6b1b51ddea1a74c50d9a027741252b30810b29e0",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root identifies Academic Free License version 3.0 for historical PyMC2 and separately mentions Cephes BSD terms. Record the distribution notice with selected native FLIB evidence, without applying it to every numerical dependency or claiming a complete provenance/license audit of the monolithic kernel file.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/LICENSE",
+              "sha256": "cf71b5350b83cbb3a1c50858ea3c174c3246dddf262b4b5eff34cca9dc4ab02b"
+            },
+            {
+              "path": "README.rst",
+              "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/README.rst",
+              "sha256": "85e62f02845f7f7fe9903afecf48abb4b6b34baa11107e9afe06b0104bb1985d"
+            },
+            {
+              "path": "pymc/flib.f",
+              "url": "https://github.com/pymc-devs/pymc2/blob/6b1b51ddea1a74c50d9a027741252b30810b29e0/pymc/flib.f",
+              "sha256": "034c6cdace6f9bf7722663a87e61757196d25f5d7cef02ca60a2efa150985650"
+            }
+          ]
         }
       },
       "imports": {}
@@ -61893,12 +62606,104 @@
             ],
             "notes": "The brief README identifies the decomposition algorithm and points to a PDF and source for complete arguments, with no compilation support promised by the author. Supported wavelet families, noise models and reconstruction accuracy need deeper review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "J2",
+            "level": "source-reviewed",
+            "revision": "92a2d45b0566452666f69277e470b03209e90286",
+            "reviewed_on": "2026-11-05",
+            "notes": "ATROUSWV forms adjacent smoothed image levels using separable dilated five-tap B-spline convolutions, with coefficients proportional to [1,4,6,4,1] and endpoint replication. The native Fortran control code dispatches the C ATRousstep_02 kernel along rows/columns. With CJ1MODE false it copies the original image and computes both smoothing levels; their difference supplies the associated detail image. The returned CJ1/CJ arrays themselves are smooth levels, not automatically thresholded wavelet coefficients. This concrete convolution component supports J2; it is not a claim of orthogonal/downsampled wavelet normalization or reconstruction correctness. The scratch pencils have fixed bounds -8191:24576, so dimensions, dilation and all padded indices must fit; use positive compatible scale/dimensions. The C bridge expects default Fortran REAL/INTEGER compatible with C float/int and matching symbol naming. Full image-detection/FITS/classification application paths are outside this review.",
+            "evidence": [
+              {
+                "path": "atrouswv.f",
+                "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/atrouswv.f",
+                "sha256": "19087ea43cc5dca790a4b87f0aac3b4225df07bdc15d785b74d4bf770926a0e2"
+              },
+              {
+                "path": "atrousstep0.c",
+                "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/atrousstep0.c",
+                "sha256": "8b3c2ba4a393be8591d009b5c880c73ba99a4ceba45a529cb67cea4330e96cb9"
+              },
+              {
+                "path": "smallutil.f",
+                "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/smallutil.f",
+                "sha256": "a64b3a5936ee15f238b365e31fae0b0c0562440deb9ae156b42a3bff4c10f29c"
+              },
+              {
+                "path": "conv_wavelet.f",
+                "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/conv_wavelet.f",
+                "sha256": "ecc3b8e12c3fd75ee1b8c9c07bf9083128f78b22bcd6b0c386db3eae60de1080"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "atrouswv",
+                "role": "public-entry-point",
+                "summary": "External separable multiscale smoothing entry returning adjacent image levels.",
+                "signature": "CALL atrouswv(IMG,CJ1,CJ,NX,NY,JSCALE,CJ1MODE)",
+                "declarations": [
+                  {
+                    "path": "atrouswv.f",
+                    "line_start": 1,
+                    "line_end": 6
+                  },
+                  {
+                    "path": "atrouswv.f",
+                    "line_start": 21,
+                    "line_end": 28
+                  }
+                ],
+                "path": "atrouswv.f",
+                "line_start": 1,
+                "line_end": 19,
+                "usage": "real :: image(32,32),previous(32,32),smooth(32,32),detail(32,32)\nimage=0.; image(16,16)=1.\ncall atrouswv(image,previous,smooth,32,32,1,.false.)\ndetail=previous-smooth\n! Inspect edge treatment and smoothing/detail conventions independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use distinct arrays for this non-aliasing path and link the C kernel plus copy helpers with the matching ABI. The small scale-one shape fits the static workspace, but no impulse response, edge sum, detail image or reconstruction was run."
+              },
+              {
+                "procedure": "atrouswv_range separable dispatch",
+                "role": "implementation-helper",
+                "path": "atrouswv.f",
+                "line_start": 21,
+                "line_end": 56
+              },
+              {
+                "procedure": "C dilated convolution and replicated padding",
+                "role": "implementation-helper",
+                "path": "atrousstep0.c",
+                "line_start": 4,
+                "line_end": 51
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LPPL notice; version not specified",
+          "spdx_expression": null,
+          "revision": "92a2d45b0566452666f69277e470b03209e90286",
+          "reviewed_on": "2026-11-05",
+          "notes": "The short root notice names the LaTeX Project Public License without pinning a version and asks modified files to be renamed and the author email removed. Preserve that text as supplied rather than inventing an SPDX version or substituting a conventional numerical-library license. External image/I/O dependencies were not audited.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/LICENSE",
+              "sha256": "388bf995495cb7e339786da59c0d335490437dd1f3b7adb9fcc361e571006d9e"
+            },
+            {
+              "path": "README",
+              "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/README",
+              "sha256": "18336833b63291716908e14f3b2cb8e60a937e6f4fbc2a43684f287d315e31ba"
+            },
+            {
+              "path": "atrouswv.f",
+              "url": "https://github.com/avikhlinin/wvdecomp/blob/92a2d45b0566452666f69277e470b03209e90286/atrouswv.f",
+              "sha256": "19087ea43cc5dca790a4b87f0aac3b4225df07bdc15d785b74d4bf770926a0e2"
+            }
+          ]
         }
       },
       "imports": {}

@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 416 repositories now have 564 source-reviewed
+Reviewed on 2026-11-05. 422 repositories now have 576 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-402 repository cards now identify public routines and link their usage lines
+408 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 416 independently source-reviewed repositories now have an
+separately. All 422 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -440,6 +440,12 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | forSISL | `Curve_Interrogation::s1850` | Custom forSISL license plus separately licensed SISL |
 | Powell optimization archive | `BOBYQA`, `COBYLA`, `LINCOA`, `NEWUOA`, `GETMIN` | LGPL-2.1-or-later for the five reviewed solver folders |
 | ARPACK PARPACK modernization | `znaupd`, `zneupd` | No explicit license grant identified for the adaptation |
+| Delaunay Density Diagnostic | `DELSPARSE_MOD::DELAUNAYSPARSES` | MIT root notice; bundled BQPD has research-distribution terms |
+| Python BLS | `eebls` | MIT root notice |
+| Unstructured finite volume | `operation_conjugate_gradient::conjugate_gradient%solve`, `operation_gmres::gmres%solve`, `operation_diffusion::diffusion_stencil` | GPL-3.0 license file; no later-version election identified |
+| System Dynamics | `runge_kutta::rk4`, `math::akima` | MIT root notice; selected original routines reviewed |
+| PyMC 2 historical implementation | `normcdf`, `poisson`, `exponweib_ppf` | AFL-3.0 root notice; bundled components have separate terms |
+| wvdecomp | `atrouswv` | LPPL notice; version not specified |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -875,6 +881,12 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [forSISL](https://github.com/rweed/forsisl) | P | Spline-curve line/plane intersection binding | External SISL implementation, unresolved pointer/overlap-copy defects, stale outputs and scoped custom notices. |
 | [Powell optimization archive](https://github.com/ralna/mjdp_software) | G2h1a1; G2h3b1a; G2h2a1; G1b1a; G2h2a2 | Original BOBYQA, COBYLA, LINCOA, NEWUOA and TOLMIN optimization entries | Local search scope, callback/workspace contracts, COBYLA default precision, internal LINCOA relaxation and TOLMIN status meanings. |
 | [ARPACK PARPACK modernization](https://github.com/kingjgod/arpack_parpack) | D4a4 | Adapted complex implicitly restarted Arnoldi reverse communication | Persistent-state INTENT attributes need review, exact kind/workspace contract and separate extraction. |
+| [Delaunay Density Diagnostic](https://github.com/llnl/ddd) | P; E2b | Bundled Delaunay simplex location and scattered-data interpolation | In-place coordinate normalization, per-query errors, projected extrapolation, native component scope and BQPD terms. |
+| [Python BLS](https://github.com/dfm/python-bls) | L10a3a2 | Edge-wrapped box-least-squares periodogram | Extended phase-bin storage, eligible-window/denominator requirements, STOP paths and no significance estimate. |
+| [Unstructured finite volume](https://github.com/komahanb/unstructured-finite-volume) | D2b4; D2a4; I2b1a1a | Sparse operator CG/GMRES and rectangular Poisson factory/workflow | Attachment, affine RHS, positivity assumptions, restart budgets, breakdown/status and supplied mesh labels. |
+| [System Dynamics](https://github.com/quimbp/system_dynamics) | I1a1a; E1a | Classical RK4 stepping and cubic Akima interpolation | Actual RHS includes N, fixed time step, minimum sample count, saved interval state and component provenance. |
+| [PyMC 2 historical implementation](https://github.com/pymc-devs/pymc2) | L5a1n; L5a1p; L5a2w | Historical native normal CDF, Poisson log mass and Weibull-family quantiles | Explicit Fortran lengths, in-place CDF, tails, broadcast/zero-rate limits and saved factorial cache. |
+| [wvdecomp](https://github.com/avikhlinin/wvdecomp) | J2 | Separable dilated image convolution for adjacent smooth levels | Details require subtraction, fixed padded workspace, C float/int ABI and unversioned LPPL notice. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1574,3 +1586,14 @@ persistence concerns and forSISL pointer/overlap-copy defects remain explicit.
 The tanh-sinh review records mixed-precision bounds/callbacks and the fact that
 a returned approximation with zero shared error status need not meet its target.
 Folder-specific and custom license notices remain scoped to the reviewed code.
+
+Historical PyMC2, system_dynamics, unstructured-finite-volume, DDD, wvdecomp
+and python-bls have twelve additional pinned source-reviewed mappings.
+Calling sketches were not compiled or run. Reviews distinguish probability
+function evaluation from sampling/fitting, local Delaunay queries from a complete
+triangulation, adjacent smooth levels from wavelet detail coefficients, and box
+periodogram statistics from significance estimates. Saved interpolation state,
+minimum sample counts, explicit RHS callback shape, solver attachment/status,
+phase-bin wrapping limits and in-place coordinate normalization remain explicit.
+The DDD root MIT notice is not substituted for the bundled BQPD terms; historical
+component provenance and the unversioned wavelet license notice remain scoped.

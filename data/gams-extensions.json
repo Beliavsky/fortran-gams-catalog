@@ -792,6 +792,12 @@
       "parent": "G2h2a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "L5a2w": {
+      "label": "Weibull",
+      "parent": "L5a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
