@@ -12650,12 +12650,124 @@
             ],
             "notes": "The README distinguishes assimilation algorithms, model coupling, observation handling and ensemble infrastructure. Particular model integrations and MPI/OpenMP configurations remain unverified for this catalog.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10c",
+            "level": "source-reviewed",
+            "revision": "a52d8bcb6b417cf29983125bedb1a38668ff2a1d",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public PDAF_ASSIMILATE_ETKF entry schedules ensemble-transform Kalman analysis within an initialized multivariate state-space forecast workflow. It invokes forecast operations at each call, passes collected state/observation/error callbacks through PUT_STATE_ETKF when the forecast interval ends and redistributes the next ensemble forecast. The reviewed SUBTYPE=1 analysis path forms ensemble-space observation-error-weighted covariance/information, combines distributed contributions with MPI and uses symmetric eigendecomposition to construct weights and an ensemble transform. An ensemble larger than one, consistent MPI/decomposition state, valid error covariance application and matching callback precision are required. Different filter subtypes select other analysis variants not reviewed here. OUTFLAG=0 can mean an ordinary forecast step with no analysis due, not proof that every call assimilated data; nonzero status must be handled. This is multivariate time-series/state-space analysis L10c, not a physical-domain PDE mapping or an independently validated forecast system. Review covers public scheduling/dispatch and selected native ETKF algebra, not the complete model/callback ecosystem.",
+            "evidence": [
+              {
+                "path": "src/PDAF_assimilate_etkf.F90",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF_assimilate_etkf.F90",
+                "sha256": "4ec4b1fe6b52c90679e67d6920aa32a1003b3998a97e0623e8e7223465299a92"
+              },
+              {
+                "path": "src/PDAF_etkf_analysis.F90",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF_etkf_analysis.F90",
+                "sha256": "968091016fe3bafda4213f241864d980c7847cb584e68ba70b8e03e9307a5dca"
+              },
+              {
+                "path": "src/PDAF_etkf_update.F90",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF_etkf_update.F90",
+                "sha256": "fa209cad2d68632d68c8ecd5ed089c644dbab55769b740b36bce1b0aec2dfade"
+              },
+              {
+                "path": "src/PDAF_put_state_etkf.F90",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF_put_state_etkf.F90",
+                "sha256": "d0271fa2eabd81fc5c41f1994c83cd715456324fb36a9b5c4d045f6058b0c53e"
+              },
+              {
+                "path": "src/PDAF.F90",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF.F90",
+                "sha256": "8e0761b6035aab4caeaa937a1a63beb4417ebc6a824977b505113053e2513296"
+              },
+              {
+                "path": "src/typedefs.h",
+                "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/typedefs.h",
+                "sha256": "1f79be61f841a78d2c240ca4f80145f526b574a1ebdbbd439024ce03d5c54dae"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDAF_assimilate_etkf",
+                "role": "public-entry-point",
+                "summary": "Public framework assimilation entry with model/observation callbacks and initialized ETKF state.",
+                "signature": "CALL PDAF_assimilate_etkf(U_COLLECT_STATE,U_DISTRIBUTE_STATE,U_INIT_DIM_OBS, &\n U_OBS_OP,U_INIT_OBS,U_PREPOSTSTEP,U_PRODRINVA,U_INIT_OBSVAR,U_NEXT_OBSERVATION,OUTFLAG)",
+                "declarations": [
+                  {
+                    "path": "src/PDAF_assimilate_etkf.F90",
+                    "line_start": 55,
+                    "line_end": 84
+                  },
+                  {
+                    "path": "src/PDAF.F90",
+                    "line_start": 87,
+                    "line_end": 95
+                  }
+                ],
+                "path": "src/PDAF_assimilate_etkf.F90",
+                "line_start": 55,
+                "line_end": 84,
+                "module": "PDAF",
+                "usage": "use PDAF, only: PDAF_assimilate_etkf\ninteger :: outflag\nexternal :: collect_state,distribute_state,init_dim_obs,obs_op,init_obs\nexternal :: prepoststep,prodRinvA,init_obsvar,next_observation\n! After MPI/PDAF initialization with ETKF SUBTYPE=1 and ensemble setup:\n! Each external callback must implement the matching PDAF callback interface.\ncall PDAF_assimilate_etkf(collect_state,distribute_state,init_dim_obs, &\n obs_op,init_obs,prepoststep,prodRinvA,init_obsvar,next_observation,outflag)\nif(outflag/=0) error stop \"inspect PDAF assimilation diagnostics\"\n! A zero status does not imply that an analysis was scheduled on this step.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Framework-coupling fragment, not standalone data assimilation. Supply real callback implementations and match the build precision flags with MPI and BLAS/LAPACK typedefs; the header changes backend names but does not itself change every REAL declaration. Configure ETKF SUBTYPE=1 for the reviewed algebra and follow package lifecycle/callback templates. No assimilation, covariance, forecast accuracy or MPI case was run."
+              },
+              {
+                "procedure": "PDAF_assimilate_etkf schedule",
+                "role": "implementation-helper",
+                "path": "src/PDAF_assimilate_etkf.F90",
+                "line_start": 96,
+                "line_end": 139
+              },
+              {
+                "procedure": "PDAF_etkf_ana ensemble information",
+                "role": "implementation-helper",
+                "path": "src/PDAF_etkf_analysis.F90",
+                "line_start": 179,
+                "line_end": 213
+              },
+              {
+                "procedure": "PDAF_etkf_ana eigendecomposition/status",
+                "role": "implementation-helper",
+                "path": "src/PDAF_etkf_analysis.F90",
+                "line_start": 277,
+                "line_end": 317
+              },
+              {
+                "procedure": "PDAFetkf_update subtype dispatch",
+                "role": "implementation-helper",
+                "path": "src/PDAF_etkf_update.F90",
+                "line_start": 230,
+                "line_end": 246
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "LGPL-3.0-or-later",
+          "spdx_expression": "LGPL-3.0-or-later",
+          "revision": "a52d8bcb6b417cf29983125bedb1a38668ff2a1d",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected core explicitly elects LGPL version 3 or later and retains Lars Nerger/PDAF notices. External optimization, MPI and BLAS/LAPACK components have separate terms.",
+          "evidence": [
+            {
+              "path": "LICENSE.txt",
+              "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/LICENSE.txt",
+              "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+            },
+            {
+              "path": "src/PDAF_etkf_analysis.F90",
+              "url": "https://github.com/PDAF/PDAF/blob/a52d8bcb6b417cf29983125bedb1a38668ff2a1d/src/PDAF_etkf_analysis.F90",
+              "sha256": "968091016fe3bafda4213f241864d980c7847cb584e68ba70b8e03e9307a5dca"
+            }
+          ]
         }
       },
       "imports": {}
@@ -32567,12 +32679,150 @@
             ],
             "notes": "The original distribution README identifies the nonlinear time-series project and installation workflow. Individual estimators, dependencies and current compiler/platform compatibility need separate review.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "e5bc1db740b29faf3977a46a453e33c19653d394",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied AUTOCOR executable estimates a univariate autocorrelation sequence using the squared Fourier amplitudes and an inverse transform. Its default path demeans/normalizes nonconstant data, zero-pads and divides lag values by the decreasing overlap count before normalizing lag zero. The -v path requests unnormalized autocovariance and bypasses the normalizing helper, so callers needing centered covariance should center input explicitly. The -p/-P periodic paths have different continuation/length conventions. The CLI reads files/columns and writes lag/value pairs; it is not a reusable Fortran module function. Constant-series normalization stops and the helper uses fixed one-million-point work arrays; default padding can make the helper limit smaller than the advertised input length. Review covers the command driver and Fourier-power/backtransform helper, not every file parser or a bias/uncertainty guarantee.",
+            "evidence": [
+              {
+                "path": "source_f/autocor.f",
+                "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/autocor.f",
+                "sha256": "e78d1d2ff0b5bc4ba0404386eedaf3854998b9fae83e04bf4ec8e3cb39049eee"
+              },
+              {
+                "path": "source_f/store_spec.f",
+                "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/store_spec.f",
+                "sha256": "84039a6e87f88641a280a0e23d2f52b4998294b1d03b73624098c25a73351168"
+              },
+              {
+                "path": "source_f/normal.f",
+                "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/normal.f",
+                "sha256": "f53337debfb619748c69480dab72c06ca5d0e1b785fc60d954b83e28d73baa9c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "autocor",
+                "role": "program-entry-point",
+                "summary": "Supplied command-line FFT autocorrelation program with file/column controls.",
+                "signature": "autocor -c1 series.dat",
+                "declarations": [
+                  {
+                    "path": "source_f/autocor.f",
+                    "line_start": 27,
+                    "line_end": 40
+                  },
+                  {
+                    "path": "source_f/autocor.f",
+                    "line_start": 79,
+                    "line_end": 92
+                  }
+                ],
+                "path": "source_f/autocor.f",
+                "line_start": 27,
+                "line_end": 77,
+                "usage": "! After building TISEAN, create a finite nonconstant single-column series.dat.\n! Shell command, writing lag/value pairs to standard output:\n!   autocor -c1 series.dat\n! Default behavior uses nonperiodic continuation and normalized autocorrelation.\n! Keep input and padded FFT lengths within the STORE_SPEC work-array limit.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This is the supplied executable, not a callable module API or a newly validated driver. Build the complete matching CLI/FFTPACK support. Input centering and periodic flags change the statistic; no autocorrelation, boundary correction or command execution was tested."
+              },
+              {
+                "procedure": "store_spec",
+                "role": "implementation-helper",
+                "path": "source_f/store_spec.f",
+                "line_start": 26,
+                "line_end": 49
+              },
+              {
+                "procedure": "normal",
+                "role": "implementation-helper",
+                "path": "source_f/normal.f",
+                "line_start": 39,
+                "line_end": 46
+              }
+            ]
+          },
+          {
+            "code": "L10a3a2",
+            "level": "source-reviewed",
+            "revision": "e5bc1db740b29faf3977a46a453e33c19653d394",
+            "reviewed_on": "2026-11-05",
+            "notes": "The supplied SPECTRUM executable forms a Fourier periodogram of a univariate sample sequence and prints frequency/power pairs. STORE_SPEC scales the real FFT, stores squared amplitudes and optional phase slots; the driver emits powers and can sum neighboring frequency bins when -w requests coarser resolution. It does not automatically remove the sample mean, taper the sequence or supply confidence intervals, and summed bins are not an automatic spectral-density normalization. NLENGTH may be reduced to a supported transform length; the driver reports this truncation. The selected unsmoothed CLI use belongs to periodogram analysis L10a3a2, not an autoregressive spectrum or an arbitrary continuous Fourier transform. Review covers driver frequency/bin layout and the shared periodogram helper. Finite positive sampling rate, sufficiently long finite samples and interpretation of DC/Nyquist units remain caller responsibilities.",
+            "evidence": [
+              {
+                "path": "source_f/spectrum.f",
+                "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/spectrum.f",
+                "sha256": "178801da8031785b53e23dab9d953e91c7a1e8686c5666633eae19f441693f8a"
+              },
+              {
+                "path": "source_f/store_spec.f",
+                "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/store_spec.f",
+                "sha256": "84039a6e87f88641a280a0e23d2f52b4998294b1d03b73624098c25a73351168"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "spectrum",
+                "role": "program-entry-point",
+                "summary": "Supplied command-line Fourier periodogram program with sampling-rate and bin-width controls.",
+                "signature": "spectrum -f1 -c1 series.dat",
+                "declarations": [
+                  {
+                    "path": "source_f/spectrum.f",
+                    "line_start": 26,
+                    "line_end": 38
+                  },
+                  {
+                    "path": "source_f/spectrum.f",
+                    "line_start": 66,
+                    "line_end": 78
+                  }
+                ],
+                "path": "source_f/spectrum.f",
+                "line_start": 26,
+                "line_end": 64,
+                "usage": "! After building TISEAN, prepare finite samples in column one of series.dat.\n! Shell command, using a sampling rate of one sample per time unit:\n!   spectrum -f1 -c1 series.dat\n! Center/taper the input beforehand if needed; retain any length-truncation notice.\n! Output is frequency/power data, not a checked spectral-density estimate.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use the supplied CLI and complete FFT/file support, within its fixed-array limits. Frequency units follow the sampling-rate option. No periodogram, normalization, binning or command run was tested."
+              },
+              {
+                "procedure": "store_spec",
+                "role": "implementation-helper",
+                "path": "source_f/store_spec.f",
+                "line_start": 26,
+                "line_end": 49
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "e5bc1db740b29faf3977a46a453e33c19653d394",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected executable sources explicitly elect GPL version 2 or later and retain TISEAN author notices. The GPL text is in COPYING; embedded transform and other support components retain their notices.",
+          "evidence": [
+            {
+              "path": "COPYING",
+              "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/COPYING",
+              "sha256": "ab15fd526bd8dd18a9e77ebc139656bf4d33e97fc7238cd11bf60e2b9b8666c6"
+            },
+            {
+              "path": "source_f/autocor.f",
+              "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/autocor.f",
+              "sha256": "e78d1d2ff0b5bc4ba0404386eedaf3854998b9fae83e04bf4ec8e3cb39049eee"
+            },
+            {
+              "path": "source_f/spectrum.f",
+              "url": "https://github.com/gazeek/Tisean/blob/e5bc1db740b29faf3977a46a453e33c19653d394/source_f/spectrum.f",
+              "sha256": "178801da8031785b53e23dab9d953e91c7a1e8686c5666633eae19f441693f8a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44406,12 +44656,117 @@
             ],
             "notes": "The README restricts the solver to symmetric positive-definite systems. It documents a sequential default and selectable OpenMP, StarPU or PaRSEC runtimes, with SPRAL/METIS analysis dependencies; indefinite-system support is not inferred.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D2b4",
+            "level": "source-reviewed",
+            "revision": "08a181d9088daf4bf9b72856e705e0b0263bfe3b",
+            "reviewed_on": "2026-11-05",
+            "notes": "SpLLT provides sparse real-SPD Cholesky factorization and triangular solves through analysis/factor/solve phases. The native factor wrapper selects task-based STF/PTG work; local diagonal kernels use Cholesky and block triangular updates, while solves traverse forward/backward work. Symbolic analysis uses SPRAL and requires the lower-triangular CSC pattern, consistent values and permutation storage. The selected usage is an initialized OpenMP/STF configuration after successful analysis. SOLVE JOB=0 or omission means both phases, JOB=1 forward and JOB=2 backward in the actual worker, despite a conflicting earlier prologue description. Task completion is explicit through SPLLT_WAIT where required. INFO%FLAG reports framework diagnostics, but the reviewed local diagonal kernel returns on nonzero DPOTRF status without exposing that status as a public argument; do not treat the wrapper flag as sufficient numerical certification. Review covers public phase dispatch, selected factor kernel and solve-job dispatch, not all runtimes, GPUs or indefinite systems.",
+            "evidence": [
+              {
+                "path": "src/spllt_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_mod.F90",
+                "sha256": "eb22642c9199a50c707dd6b819b9bf4c42d5b1459ce63b47e5894e4a41e60c1f"
+              },
+              {
+                "path": "src/spllt_solve_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_solve_mod.F90",
+                "sha256": "66f440ce05a92d788b7eb3ebd4a795eb1296fd7cec2c842f4b8a345aa1945ac1"
+              },
+              {
+                "path": "src/spllt_kernels_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_kernels_mod.F90",
+                "sha256": "3785e47efee246153d674cffac848b08ccf170629a0c37ed3f68ee7423d5bc57"
+              },
+              {
+                "path": "src/spllt_analyse_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_analyse_mod.F90",
+                "sha256": "d1384acb5ffb2e71a8ca0e9bf68a189682af63687cdf802f1f3f394293a5f45a"
+              },
+              {
+                "path": "src/spllt_stf_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_stf_mod.F90",
+                "sha256": "e52d237af3ad2c47fa2ac7ea53affb2f1602474881a34e45c075d77e9fd6e6c5"
+              },
+              {
+                "path": "src/spllt_data_mod.F90",
+                "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/src/spllt_data_mod.F90",
+                "sha256": "4d4efeb6c8b747a800f23f255e2a995c56edf57a438d461d7e0d4fff3db20aed"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "spllt_factor",
+                "role": "public-entry-point",
+                "summary": "Public sparse SPD task-based factorization phase, followed by a complete solve through SPLLT_SOLVE.",
+                "signature": "CALL spllt_factor(AKEEP,FKEEP,OPTIONS,VAL,INFO)\nCALL spllt_solve(FKEEP,OPTIONS,X,INFO=INFO)",
+                "declarations": [
+                  {
+                    "path": "src/spllt_mod.F90",
+                    "line_start": 141,
+                    "line_end": 153
+                  },
+                  {
+                    "path": "src/spllt_solve_mod.F90",
+                    "line_start": 32,
+                    "line_end": 52
+                  },
+                  {
+                    "path": "src/spllt_analyse_mod.F90",
+                    "line_start": 23,
+                    "line_end": 40
+                  }
+                ],
+                "path": "src/spllt_mod.F90",
+                "line_start": 141,
+                "line_end": 168,
+                "module": "spllt_mod",
+                "usage": "use spllt_mod\nuse spllt_solve_mod, only: spllt_solve\n! After SPLLT_INIT and successful SPLLT_ANALYSE of an SPD lower-triangle CSC matrix:\n! AKEEP/FKEEP/OPTIONS/INFO are matching SpLLT objects; VAL follows the analysed pattern.\n! X is REAL(WP), length FKEEP%N, initialized to the original-order right-hand side.\n! This fragment assumes the configured OpenMP/STF runtime.\ncall spllt_factor(akeep,fkeep,options,val,info)\ncall spllt_wait()\nif(info%flag/=0) error stop \"inspect SpLLT factorization diagnostics\"\ncall spllt_solve(fkeep,options,x,info=info)\nif(info%flag/=0) error stop \"inspect SpLLT solve diagnostics\"\n! Independently validate the residual, then release matrix data and finalize the runtime.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-analysis fragment with compatible SPRAL/BLAS/LAPACK and the selected task runtime. The concrete analysis interface requires ORDER even though a nearby comment calls it optional. Omitting JOB selects a full solve; use the worker semantics rather than the conflicting summary comment. No factor, residual, task completion or runtime configuration was tested."
+              },
+              {
+                "procedure": "spllt_factor_diag_block",
+                "role": "implementation-helper",
+                "path": "src/spllt_kernels_mod.F90",
+                "line_start": 1168,
+                "line_end": 1189
+              },
+              {
+                "procedure": "spllt_solve_mult_double_worker",
+                "role": "implementation-helper",
+                "path": "src/spllt_solve_mod.F90",
+                "line_start": 203,
+                "line_end": 224
+              },
+              {
+                "procedure": "spllt_stf_factorize",
+                "role": "implementation-helper",
+                "path": "src/spllt_stf_mod.F90",
+                "line_start": 18,
+                "line_end": 37
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "08a181d9088daf4bf9b72856e705e0b0263bfe3b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root gives the BSD three-clause grant and STFC attribution. SPRAL, runtime systems and optional GPU/numerical dependencies have separate notices and are not licensed solely by this root file.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/NLAFET/SpLLT/blob/08a181d9088daf4bf9b72856e705e0b0263bfe3b/LICENSE",
+              "sha256": "2bfe4d978068fbf71222218f7a2d348c5be815a990a7cf21656502f4013dfd44"
+            }
+          ]
         }
       },
       "imports": {}
@@ -54190,12 +54545,120 @@
             ],
             "notes": "The README describes exact decomposition of a matrix into families and an approximate product of exponentials, using Misra-Gries edge coloring. Exactness of the split does not mean a finite-step product equals the full matrix exponential; timing and order claims remain untested.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D1b6",
+            "level": "source-reviewed",
+            "revision": "f8bced83bac281e80751c125b72253274a982a3a",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public FULLEXP%LMULT binding applies a checkerboard splitting approximation of a Hermitian matrix exponential to a dense complex matrix. Graph conversion and Misra-van-Gries edge coloring partition off-diagonal couplings; the factory distributes diagonal terms and builds stage exponentials. The selected METHOD=2 constructs paired half-weight stages, and LMULT applies reversed/forward factor order through LMULT_T/LMULT for the Strang-style composition. This is an approximate exponential matrix action under matrix multiplication D1b6, not a matrix polynomial, exact dense exponential or arbitrary non-Hermitian routine. MAT2VERTS requires an exactly Hermitian zero-diagonal off-diagonal matrix; the diagonal is passed separately as a real allocatable vector. Method selectors outside the implemented set and invalid graph/data shapes are not certified, and several failures use STOP rather than a status return. Review covers the matrix-action path and factory/stage dispatch; the different vector-action loop is not inferred to have identical composition order.",
+            "evidence": [
+              {
+                "path": "Exponentials.F90",
+                "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/Exponentials.F90",
+                "sha256": "89c17c792657d6aaa642e42bef93b13cde0a994d12a23c5269d46ac2822a4a15"
+              },
+              {
+                "path": "graphdata.F90",
+                "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/graphdata.F90",
+                "sha256": "9b2584b7da8d12f816a11d5d2da40fa8915f295822eb136b759968acdc8b2009"
+              },
+              {
+                "path": "MvG_decomp.F90",
+                "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/MvG_decomp.F90",
+                "sha256": "245d118b17e25c8cd1e6e9208931d86ccea2dc60d66aae2d83a2974d9a9ed862"
+              },
+              {
+                "path": "GeneralSingleColExp.F90",
+                "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/GeneralSingleColExp.F90",
+                "sha256": "985679c248e5b649acba7a991d6974d8417fec2f06b1df062222e3cca44562de"
+              },
+              {
+                "path": "testsuite/6-FullExponential.F90",
+                "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/testsuite/6-FullExponential.F90",
+                "sha256": "863b17e6a74e3fd05ba6e4fd3a27c2aae4228e5f2ca39fe5276e03ead25c8690"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lmult",
+                "role": "public-entry-point",
+                "summary": "Public type-bound left multiplication by a checkerboard exponential splitting approximation.",
+                "signature": "FE = createFullExponentialfromGraphData(GD,DIAGONALS,2)\nCALL FE%LMULT(MAT)",
+                "declarations": [
+                  {
+                    "path": "Exponentials.F90",
+                    "line_start": 215,
+                    "line_end": 223
+                  },
+                  {
+                    "path": "graphdata.F90",
+                    "line_start": 381,
+                    "line_end": 403
+                  }
+                ],
+                "path": "Exponentials.F90",
+                "line_start": 84,
+                "line_end": 99,
+                "module": "Exponentials_mod",
+                "derived_type": "FullExp",
+                "usage": "use Exponentials_mod, only: FullExp\nuse graphdata_mod, only: GraphData,mat2verts,determine_used_colors_of_graph, &\n createFullExponentialfromGraphData,dealloc_graphdata\nuse MvG_mod, only: MvG_decomp\ninteger,parameter :: wp=kind(1d0),n=3\ninteger :: i\ncomplex(wp) :: offdiag(n,n),mat(n,n)\nreal(wp),allocatable :: diagonal(:)\ntype(GraphData) :: gd\ntype(FullExp) :: fe\noffdiag=cmplx(0d0,0d0,wp)\noffdiag(1,2)=0.1d0; offdiag(2,1)=0.1d0\noffdiag(2,3)=0.1d0; offdiag(3,2)=0.1d0\nallocate(diagonal(n)); diagonal=0d0\ngd=mat2verts(offdiag)\ncall MvG_decomp(gd%verts)\ncall determine_used_colors_of_graph(gd)\nfe=createFullExponentialfromGraphData(gd,diagonal,2)\nmat=cmplx(0d0,0d0,wp)\ndo i=1,n\n mat(i,i)=cmplx(1d0,0d0,wp)\nend do\ncall fe%lmult(mat)\n! MAT is a splitting approximation to the exponential, not a checked exact result.\ncall fe%dealloc()\ncall dealloc_graphdata(gd)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete preprocessed graph/single-column exponential module set and numerical dependencies. Use the reviewed matrix-action path with valid Hermitian graph data and METHOD=2; no error estimate is returned. Compare independently against a trusted exponential and refine the splitting step if needed. No matrix exponential, coloring or inverse/composition test was run."
+              },
+              {
+                "procedure": "FullExp_init Strang stages",
+                "role": "implementation-helper",
+                "path": "Exponentials.F90",
+                "line_start": 103,
+                "line_end": 122
+              },
+              {
+                "procedure": "FullExp_lmult",
+                "role": "implementation-helper",
+                "path": "Exponentials.F90",
+                "line_start": 215,
+                "line_end": 223
+              },
+              {
+                "procedure": "mat2verts validation",
+                "role": "implementation-helper",
+                "path": "graphdata.F90",
+                "line_start": 104,
+                "line_end": 127
+              },
+              {
+                "procedure": "createFullExponentialfromGraphData",
+                "role": "implementation-helper",
+                "path": "graphdata.F90",
+                "line_start": 381,
+                "line_end": 405
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "f8bced83bac281e80751c125b72253274a982a3a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root and selected source provide the MIT grant and Florian Goth attribution. Separately linked numerical libraries retain their own notices; the source grant does not certify a splitting order or approximation error.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/LICENSE",
+              "sha256": "cf248748bd8c15383e8a619a8f3314404a1292c2c326a2e41521bd22f9f90e15"
+            },
+            {
+              "path": "Exponentials.F90",
+              "url": "https://github.com/CaptainSifff/mscbdecomp/blob/f8bced83bac281e80751c125b72253274a982a3a/Exponentials.F90",
+              "sha256": "89c17c792657d6aaa642e42bef93b13cde0a994d12a23c5269d46ac2822a4a15"
+            }
+          ]
         }
       },
       "imports": {}
@@ -58318,12 +58781,97 @@
             ],
             "notes": "The README gives sparse-regression scope, and the source tree includes private Fortran GLM/least-squares/penalty routines. Individual penalty families, optimization guarantees and MATLAB interoperability need more detailed procedure-level review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a",
+            "reviewed_on": "2026-11-05",
+            "notes": "PENALIZED_L2_REGRESSION in the public Fortran SPARSEREG module performs cyclic coordinate updates for weighted multiple-linear regression with selected separable penalties. The reviewed ENET branch uses rho*((eta-1)*beta**2/2+(2-eta)*abs(beta)), with eta in [1,2], a different parameter convention from GLMnet PARM. SUM_X_SQUARES must be precomputed as sum(WT*X(:,i)**2); unpenalized columns use a direct coordinate minimizer and all required coordinate curvatures must be positive. ESTIMATE is updated in place and MAXITERS can be reset from a nonpositive value, but no actual iteration count or success code is returned. Shape mismatch, objective increase, convergence and exhaustion can all end without distinct diagnostics. Some invalid threshold inputs leave the function result unassigned, so validate sizes, weights and tuning values first. Although the file is under MATLAB private/, its module procedures are public by default and do not require a MEX entry for this direct call. Review covers the native weighted ENET path, not every nonconvex penalty, GLM family or MATLAB wrapper.",
+            "evidence": [
+              {
+                "path": "private/sparsereg.F90",
+                "url": "https://github.com/Hua-Zhou/SparseReg/blob/59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a/private/sparsereg.F90",
+                "sha256": "cb760f57514180db20b0b725c443298665cca0c7c03471af5091f6d332c1b30a"
+              },
+              {
+                "path": "private/lsqsparse.F90",
+                "url": "https://github.com/Hua-Zhou/SparseReg/blob/59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a/private/lsqsparse.F90",
+                "sha256": "edb5cd72120c50312c0fb771a1521a6bc51115e56f5988649b249cfb27ff9384"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/Hua-Zhou/SparseReg/blob/59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a/README.md",
+                "sha256": "7610fffc37e139c25de25ca0bbb98e87a00dad691354099e9f78720a9bae0ca9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PENALIZED_L2_REGRESSION",
+                "role": "public-entry-point",
+                "summary": "Public module weighted penalized least-squares coordinate-descent kernel.",
+                "signature": "CALL PENALIZED_L2_REGRESSION(ESTIMATE,X,Y,WT,LAMBDA,SUM_X_SQUARES, &\n PENIDX,MAXITERS,PENTYPE,PENPARAM)",
+                "declarations": [
+                  {
+                    "path": "private/sparsereg.F90",
+                    "line_start": 769,
+                    "line_end": 784
+                  }
+                ],
+                "path": "private/sparsereg.F90",
+                "line_start": 769,
+                "line_end": 784,
+                "module": "SPARSEREG",
+                "usage": "use SPARSEREG, only: DBLE_PREC,PENALIZED_L2_REGRESSION\ninteger,parameter :: n=6,p=2\ninteger :: maxiters,j\nreal(DBLE_PREC) :: x(n,p),y(n),weights(n),beta(p),curvature(p)\nlogical :: penalized(p)\nx(:,1)=1._DBLE_PREC; x(:,2)=[0._DBLE_PREC,1._DBLE_PREC,2._DBLE_PREC, &\n 3._DBLE_PREC,4._DBLE_PREC,5._DBLE_PREC]\ny=1._DBLE_PREC+2._DBLE_PREC*x(:,2); weights=1._DBLE_PREC; beta=0._DBLE_PREC\ndo j=1,p\n curvature(j)=sum(weights*x(:,j)**2)\nend do\npenalized=[.false.,.true.]; maxiters=1000\ncall PENALIZED_L2_REGRESSION(beta,x,y,weights,0.1_DBLE_PREC,curvature, &\n penalized,maxiters,\"ENET\",[1.5_DBLE_PREC])\nprint *,beta\n! No success flag is returned; check objective/residuals and convergence independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Direct module call with a nonzero-curvature intercept/slope design and positive weights. ENET ETA=1.5 is the package convention; it is not GLMnet alpha. Compile the Fortran module with matching kinds, without treating MATLAB MEX wrappers as necessary. No regression, objective descent or convergence result was run."
+              },
+              {
+                "procedure": "PENALTY_FUN ENET definition",
+                "role": "implementation-helper",
+                "path": "private/sparsereg.F90",
+                "line_start": 46,
+                "line_end": 87
+              },
+              {
+                "procedure": "LSQ_THRESHOLDING ENET",
+                "role": "implementation-helper",
+                "path": "private/sparsereg.F90",
+                "line_start": 224,
+                "line_end": 278
+              },
+              {
+                "procedure": "PENALIZED_L2_REGRESSION updates and termination",
+                "role": "implementation-helper",
+                "path": "private/sparsereg.F90",
+                "line_start": 825,
+                "line_end": 880
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected README describes the SparseReg toolbox and the native module exposes algorithms, but neither supplies an explicit permission grant. No root LICENSE/COPYING was present in the pinned tree. Public module visibility and public repository access do not establish a redistribution license.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "url": "https://github.com/Hua-Zhou/SparseReg/blob/59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a/README.md",
+              "sha256": "7610fffc37e139c25de25ca0bbb98e87a00dad691354099e9f78720a9bae0ca9"
+            },
+            {
+              "path": "private/sparsereg.F90",
+              "url": "https://github.com/Hua-Zhou/SparseReg/blob/59a6de001f95f6a59a0f7fb54e0c48fe00b90e3a/private/sparsereg.F90",
+              "sha256": "cb760f57514180db20b0b725c443298665cca0c7c03471af5091f6d332c1b30a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -62560,12 +63108,127 @@
             ],
             "notes": "The README describes state-space extension and pure functions but its dependency URL is a placeholder. Fitting/prediction examples, zero-overhead claims and the shared-library build workflow were not tested here.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "M",
+            "level": "source-reviewed",
+            "revision": "38371cf44c5a221b53cbd5023be9fae2c4040f78",
+            "reviewed_on": "2026-11-05",
+            "notes": "PREDICT_K_STEPS propagates an initial probability row vector through a finite-state transition matrix by repeated vector-matrix products. PREDICT_NEXT_STEP applies MATMUL(state_vector,transition_matrix), establishing the row-stochastic orientation. This is exact finite-step probability propagation up to floating-point arithmetic, not random path simulation or a continuous-time Markov solver. Broad stochastic-modeling class M is retained because the adopted taxonomy has no explicit finite-state discrete-time probability-propagation leaf; M1b is not inferred from the word Markov alone. The routines do not validate dimensions, nonnegativity, row sums, state-vector normalization or step counts. Negative K_STEPS simply leaves the original state under the loop semantics, so the sketch restricts K>=0. Review covers these pure first-order routines, not ergodicity, stationary distributions or the separate greedy higher-order trajectory routine.",
+            "evidence": [
+              {
+                "path": "src/markov_core.f90",
+                "url": "https://github.com/barisbarisgithub/markov_fortran-/blob/38371cf44c5a221b53cbd5023be9fae2c4040f78/src/markov_core.f90",
+                "sha256": "4a453b90335b4c592960784ce3a7d033b912b70f8909478ceb606fda0c98b9a5"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/barisbarisgithub/markov_fortran-/blob/38371cf44c5a221b53cbd5023be9fae2c4040f78/README.md",
+                "sha256": "c11885dd033ac02347fce9be191dd86fea8a9d83683d330202172f325e9b8f55"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "predict_k_steps",
+                "role": "public-entry-point",
+                "summary": "Public pure finite-step probability propagation using a row-stochastic transition matrix.",
+                "signature": "FUTURE = predict_k_steps(INITIAL_STATE,TRANSITION_MATRIX,K_STEPS)",
+                "declarations": [
+                  {
+                    "path": "src/markov_core.f90",
+                    "line_start": 28,
+                    "line_end": 32
+                  },
+                  {
+                    "path": "src/markov_core.f90",
+                    "line_start": 18,
+                    "line_end": 24
+                  }
+                ],
+                "path": "src/markov_core.f90",
+                "line_start": 28,
+                "line_end": 41,
+                "module": "markov_core",
+                "usage": "use iso_c_binding, only: c_double,c_int\nuse markov_core, only: predict_k_steps\nreal(c_double) :: transition(2,2),initial(2),future(2)\ntransition(1,:)=[0.8_c_double,0.2_c_double]\ntransition(2,:)=[0.3_c_double,0.7_c_double]\ninitial=[1._c_double,0._c_double]\nfuture=predict_k_steps(initial,transition,3_c_int)\nprint *,future,sum(future)",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Use normalized nonnegative row probabilities and a conforming square matrix. The pure Fortran module API uses C interoperable kinds but is not itself a BIND(C) interface. No distribution, normalization drift or stochastic trajectory was tested."
+              },
+              {
+                "procedure": "predict_next_step",
+                "role": "implementation-helper",
+                "path": "src/markov_core.f90",
+                "line_start": 18,
+                "line_end": 25
+              }
+            ]
+          },
+          {
+            "code": "L10a2",
+            "level": "source-reviewed",
+            "revision": "38371cf44c5a221b53cbd5023be9fae2c4040f78",
+            "reviewed_on": "2026-11-05",
+            "notes": "FIT_TRANSITION_MATRIX estimates a higher-order categorical transition table from an ordered state sequence. It encodes each length-ORDER history in base N_STATES, counts the following state and normalizes each observed-history row. An entirely unseen history receives a uniform row; this is a fallback, not Laplace smoothing of all observed counts. The result has N_STATES**ORDER rows and N_STATES columns, so storage and integer exponent/index overflow grow rapidly with order. Require state labels in 1..N_STATES, positive state count/order and enough sequence entries. There is no input-validation or statistical-status output. This is categorical time-domain model estimation, not linear autoregression, and broad L10a2 is kept rather than forcing an AR estimation leaf. The separate higher-order k-step routine chooses successive MAXLOC states and is not a full probability forecast; that routine is not used by this sketch.",
+            "evidence": [
+              {
+                "path": "src/markov_higher_order.f90",
+                "url": "https://github.com/barisbarisgithub/markov_fortran-/blob/38371cf44c5a221b53cbd5023be9fae2c4040f78/src/markov_higher_order.f90",
+                "sha256": "03124d8ef43c5935e04f9437863afacb33cd32c49e407f7c733e2a5b79bcb414"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fit_transition_matrix",
+                "role": "public-entry-point",
+                "summary": "Public pure history-count estimator for a finite higher-order categorical transition table.",
+                "signature": "TRANSITION = fit_transition_matrix(DATA_SERIES,N_STATES,ORDER)",
+                "declarations": [
+                  {
+                    "path": "src/markov_higher_order.f90",
+                    "line_start": 112,
+                    "line_end": 121
+                  }
+                ],
+                "path": "src/markov_higher_order.f90",
+                "line_start": 112,
+                "line_end": 145,
+                "module": "markov_higher_order",
+                "usage": "use iso_c_binding, only: c_double,c_int\nuse markov_higher_order, only: fit_transition_matrix,predict_higher_order_next\ninteger(c_int) :: observations(8)\nreal(c_double) :: transition(4,2),next_probability(2)\nobservations=[1_c_int,1_c_int,2_c_int,1_c_int,2_c_int,2_c_int,1_c_int,1_c_int]\ntransition=fit_transition_matrix(observations,2_c_int,2_c_int)\nnext_probability=predict_higher_order_next([1_c_int,2_c_int],2_c_int,transition)\nprint *,next_probability",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Small two-state order-two table; validate encoded states and exponential table size before calling. The final call extracts a one-step conditional probability row, not a multi-step distribution. No fitted table, unseen-history fallback or forecast was tested."
+              },
+              {
+                "procedure": "encode_composite_state",
+                "role": "implementation-helper",
+                "path": "src/markov_higher_order.f90",
+                "line_start": 40,
+                "line_end": 53
+              },
+              {
+                "procedure": "predict_higher_order_next",
+                "role": "implementation-helper",
+                "path": "src/markov_higher_order.f90",
+                "line_start": 59,
+                "line_end": 69
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT-style permission notice (incomplete standard text)",
+          "spdx_expression": null,
+          "revision": "38371cf44c5a221b53cbd5023be9fae2c4040f78",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned licence file is headed MIT License and includes the permission grant and notice-retention condition, but omits the usual warranty/liability paragraph. Record the visible grant without assigning the SPDX MIT identifier to the incomplete text; numerical and statistical validity are not established by this notice.",
+          "evidence": [
+            {
+              "path": "licence",
+              "url": "https://github.com/barisbarisgithub/markov_fortran-/blob/38371cf44c5a221b53cbd5023be9fae2c4040f78/licence",
+              "sha256": "d172ce6bb2de85dc76bf9e7742cc4cf271a83444422ea5697fcb69bf2a833552"
+            }
+          ]
         }
       },
       "imports": {}
@@ -71890,12 +72553,162 @@
             ],
             "notes": "The root README is supplemented by documented toolbox interfaces for matrix algebra, roots, optimization, integration, distributions, interpolation, sorting and plotting. It includes inherited routines and a GNUPlot interface; the entire textbook syllabus is not used as proof of implemented coverage. No toolbox procedures or exercises were built or numerically checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "F1b",
+            "level": "source-reviewed",
+            "revision": "dd70a86a02e45b6b5f9576216f280475c1b3b40b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The scalar FZERO overload dispatches to NEWTON_INTERPOL, which uses two nearby initial function values and secant interpolation to solve a scalar equation without a supplied derivative. It is not a bracketing Brent solver despite other optimization routines in the toolbox. The selected cosine-minus-x example is a nonpolynomial equation and supports F1b. X is overwritten; the optional CHECK_RETURN is false on a residual-based return and true on stagnation or exhausted iterations. Shared module tolerance/iteration settings affect calls. The iteration has no interval or domain safeguard and can encounter a vanishing secant denominator; callers must supply a valid initial neighborhood and independently check the final residual. Review covers the scalar generic/implementation, not the distinct vector Broyden overload or global root isolation.",
+            "evidence": [
+              {
+                "path": "installation/toolbox/toolbox.f90",
+                "url": "https://github.com/fabiankindermann/ce-fortran/blob/dd70a86a02e45b6b5f9576216f280475c1b3b40b/installation/toolbox/toolbox.f90",
+                "sha256": "3465adb229596f7aa61e189f7f0e46b9b58bd96410e60c9c317d61fa9970dd7a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fzero",
+                "role": "public-entry-point",
+                "summary": "Public scalar secant-style root solver selected through the FZERO generic.",
+                "signature": "CALL fzero(X,FUNCV,CHECK_RETURN)",
+                "declarations": [
+                  {
+                    "path": "installation/toolbox/toolbox.f90",
+                    "line_start": 6740,
+                    "line_end": 6752
+                  },
+                  {
+                    "path": "installation/toolbox/toolbox.f90",
+                    "line_start": 6767,
+                    "line_end": 6773
+                  }
+                ],
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 303,
+                "line_end": 307,
+                "module": "toolbox",
+                "usage": "program scalar_root_sketch\nuse toolbox, only: fzero\nimplicit none\nreal(kind=kind(1d0)) :: x\nlogical :: failed\nx=0.5d0\ncall fzero(x,residual,failed)\nif(failed) error stop \"root iteration stagnated or reached its limit\"\nprint *,x,residual(x)\ncontains\nfunction residual(x) result(value)\n real(kind=kind(1d0)),intent(in) :: x\n real(kind=kind(1d0)) :: value\n value=cos(x)-x\nend function\nend program",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the pinned toolbox and match its REAL*8 interface. The scalar overload does not bracket a root or prove uniqueness; inspect the residual even after CHECK_RETURN is false. No root, stagnation or domain-error case was run."
+              },
+              {
+                "procedure": "newton_interpol",
+                "role": "implementation-helper",
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 6778,
+                "line_end": 6854
+              }
+            ]
+          },
+          {
+            "code": "E1b",
+            "level": "source-reviewed",
+            "revision": "dd70a86a02e45b6b5f9576216f280475c1b3b40b",
+            "reviewed_on": "2026-11-05",
+            "notes": "The scalar POLY_INTERPOL generic evaluates the global Lagrange interpolating polynomial through supplied univariate nodes. The implementation builds each product basis directly and sums YI times the bases; it is not piecewise interpolation, a spline or a barycentric implementation. Equal node/value counts are asserted, but duplicate nodes are not rejected before division. Distinct well-scaled nodes and modest degree are appropriate for the calling sketch; polynomial interpolation does not imply stable extrapolation or freedom from Runge oscillation. The node/value dummy arrays have lower bound zero, which is reflected in the usage fragment. Review covers scalar evaluation and generic visibility, not the separate vector-query implementation or fitted-error guarantees.",
+            "evidence": [
+              {
+                "path": "installation/toolbox/toolbox.f90",
+                "url": "https://github.com/fabiankindermann/ce-fortran/blob/dd70a86a02e45b6b5f9576216f280475c1b3b40b/installation/toolbox/toolbox.f90",
+                "sha256": "3465adb229596f7aa61e189f7f0e46b9b58bd96410e60c9c317d61fa9970dd7a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "poly_interpol",
+                "role": "public-entry-point",
+                "summary": "Public scalar global Lagrange polynomial interpolation through arbitrary distinct nodes.",
+                "signature": "VALUE = poly_interpol(X,XI,YI)",
+                "declarations": [
+                  {
+                    "path": "installation/toolbox/toolbox.f90",
+                    "line_start": 5408,
+                    "line_end": 5423
+                  }
+                ],
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 279,
+                "line_end": 283,
+                "module": "toolbox",
+                "usage": "use toolbox, only: poly_interpol\nreal(kind=kind(1d0)) :: nodes(0:2),values(0:2),value\nnodes=[-1d0,0d0,1d0]; values=nodes**2\nvalue=poly_interpol(0.5d0,nodes,values)\nprint *,value\n! Distinct nodes are required; the routine does not guard duplicate abscissas.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. This fragment uses three nodes for a quadratic and matches the toolbox REAL*8 arrays. It illustrates interpolation rather than a checked accuracy result. No value, high-degree stability or extrapolation case was tested."
+              },
+              {
+                "procedure": "poly_interpol_1 Lagrange basis",
+                "role": "implementation-helper",
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 5433,
+                "line_end": 5450
+              }
+            ]
+          },
+          {
+            "code": "H2c",
+            "level": "source-reviewed",
+            "revision": "dd70a86a02e45b6b5f9576216f280475c1b3b40b",
+            "reviewed_on": "2026-11-05",
+            "notes": "LEGENDRE generates Gauss-Legendre abscissas and weights on a finite interval, selecting order from the output-array size. It uses symmetric initial root guesses, recurrence evaluation of Legendre polynomials/derivatives, Newton corrections and symmetric mapping of roots/weights to the target interval. The concrete mapping is quadrature service routine H2c: this API does not itself accept or integrate a user function, and the sketch performs the fixed-order weighted sum separately. Array-size mismatch or exhausted root iterations invokes the toolbox error handler; no numerical status is returned. The source caps root iteration at ten steps. A positive order and increasing finite endpoints are assumed by the sketch. The source explicitly identifies Numerical Recipes adaptation, which is retained as a licensing/provenance qualification rather than silently treating every component as original GPL code.",
+            "evidence": [
+              {
+                "path": "installation/toolbox/toolbox.f90",
+                "url": "https://github.com/fabiankindermann/ce-fortran/blob/dd70a86a02e45b6b5f9576216f280475c1b3b40b/installation/toolbox/toolbox.f90",
+                "sha256": "3465adb229596f7aa61e189f7f0e46b9b58bd96410e60c9c317d61fa9970dd7a"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "legendre",
+                "role": "public-entry-point",
+                "summary": "Public fixed-order Gauss-Legendre node/weight generator on a caller-supplied interval.",
+                "signature": "CALL legendre(X1,X2,X,W)",
+                "declarations": [
+                  {
+                    "path": "installation/toolbox/toolbox.f90",
+                    "line_start": 9779,
+                    "line_end": 9796
+                  }
+                ],
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 9779,
+                "line_end": 9796,
+                "module": "toolbox",
+                "usage": "use toolbox, only: legendre\nreal(kind=kind(1d0)) :: nodes(4),weights(4),integral\ncall legendre(0d0,1d0,nodes,weights)\nintegral=sum(weights*nodes**2)\nprint *,integral\n! This weighted sum is caller-side quadrature; LEGENDRE returns nodes/weights.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Four-point fixed-order example, not automatic adaptive integration or an error estimate. Build the matching toolbox and consider retained component notices. Compare independently with 1/3; no nodes, weights or integral were tested."
+              },
+              {
+                "procedure": "legendre root iteration and weights",
+                "role": "implementation-helper",
+                "path": "installation/toolbox/toolbox.f90",
+                "line_start": 9812,
+                "line_end": 9893
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 notice; Numerical Recipes adaptations need separate review",
+          "spdx_expression": null,
+          "revision": "dd70a86a02e45b6b5f9576216f280475c1b3b40b",
+          "reviewed_on": "2026-11-05",
+          "notes": "The toolbox header states GPL v3 and the root includes GPL version 3. The selected LEGENDRE implementation explicitly says portions were copied/adapted from Numerical Recipes; the root notice alone does not establish permission for every inherited component. Preserve provenance and confirm component terms before redistribution; no single SPDX expression is assigned for this mixed scope.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/fabiankindermann/ce-fortran/blob/dd70a86a02e45b6b5f9576216f280475c1b3b40b/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "installation/toolbox/toolbox.f90",
+              "url": "https://github.com/fabiankindermann/ce-fortran/blob/dd70a86a02e45b6b5f9576216f280475c1b3b40b/installation/toolbox/toolbox.f90",
+              "sha256": "3465adb229596f7aa61e189f7f0e46b9b58bd96410e60c9c317d61fa9970dd7a"
+            }
+          ]
         }
       },
       "imports": {}
@@ -72357,12 +73170,108 @@
             ],
             "notes": "The README documents the F08 library and FPM build/test workflow with map-training parameters. It is retained separately from the F03 repository without assuming numerical equivalence or that all described SOM variants are equally mature. Training convergence and neighborhood preservation were not checked.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L14a1b",
+            "level": "source-reviewed",
+            "revision": "c4acb25f6ea33d9b415da8fd032f29df01dd6a28",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public SELF_ORGANIZING_MAP%TRAIN binding fits a fixed-grid Kohonen prototype map through online best-match selection and neighborhood-weighted prototype updates. The reviewed normal_som path uses a decreasing learning rate/radius and Gaussian or bubble neighborhoods, then assigns patterns to final best-matching nodes. This is non-nested prototype clustering, not hierarchical clustering or a supervised predictor. Training needs a created map, compatible initialized KOHONEN_PATTERN objects and validated layer parameters; create randomizes prototype values using the configured generator. The implementation visits patterns in supplied order, has radius/learning-rate floors and writes progress/distortion information. The OpenMP best-match loop updates a shared argmin without a visible reduction/protection; use a serial build or one OpenMP thread for this scoped sketch. Empty/invalid dimensions, unsuitable scaling and all nonfinite distances are not certified. Review covers the public binding and normal_som best-match/update paths, not all ViSOM or two-level variants.",
+            "evidence": [
+              {
+                "path": "src/library/self_organizing_map_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF08/blob/c4acb25f6ea33d9b415da8fd032f29df01dd6a28/src/library/self_organizing_map_utilities.f90",
+                "sha256": "0b68078021c8e3cabb1cc5c4eb23aa5ac26d1e4571190e9bcaf9e2b5c8f9aa30"
+              },
+              {
+                "path": "src/library/som_train_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF08/blob/c4acb25f6ea33d9b415da8fd032f29df01dd6a28/src/library/som_train_utilities.f90",
+                "sha256": "f01a99b1adbe24ca52a1d6217bc2931cc136fbf0dcdb819dee71dd54ce71ab0d"
+              },
+              {
+                "path": "src/library/kohonen_layer_parameters_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF08/blob/c4acb25f6ea33d9b415da8fd032f29df01dd6a28/src/library/kohonen_layer_parameters_utilities.f90",
+                "sha256": "0cc2756acaedd39272761ac830c9a27625de21fde290f28b7025979f62b4b832"
+              },
+              {
+                "path": "src/library/precision_utilities.f90",
+                "url": "https://github.com/khaors/KohonenF08/blob/c4acb25f6ea33d9b415da8fd032f29df01dd6a28/src/library/precision_utilities.f90",
+                "sha256": "d76c2ee74fb7ffaf60875e80be23b3c834109c46d0d8b862f6e7360cd1e06c0d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "train",
+                "role": "public-entry-point",
+                "summary": "Public type-bound online training of a created fixed-grid self-organizing map.",
+                "signature": "CALL MAP%CREATE(TRAINING_PARAMETERS)\nCALL MAP%TRAIN(INPUT_DATA)",
+                "declarations": [
+                  {
+                    "path": "src/library/self_organizing_map_utilities.f90",
+                    "line_start": 73,
+                    "line_end": 76
+                  },
+                  {
+                    "path": "src/library/self_organizing_map_utilities.f90",
+                    "line_start": 170,
+                    "line_end": 177
+                  },
+                  {
+                    "path": "src/library/som_train_utilities.f90",
+                    "line_start": 7,
+                    "line_end": 23
+                  }
+                ],
+                "path": "src/library/self_organizing_map_utilities.f90",
+                "line_start": 40,
+                "line_end": 45,
+                "module": "self_organizing_map_utilities",
+                "derived_type": "self_organizing_map",
+                "usage": "use self_organizing_map_utilities, only: self_organizing_map\nuse kohonen_layer_parameters_utilities, only: kohonen_layer_parameters\nuse kohonen_pattern_utilities, only: kohonen_pattern\ntype(self_organizing_map) :: map\ntype(kohonen_layer_parameters) :: parameters(1)\ntype(kohonen_pattern),allocatable :: patterns(:)\n! Before these calls: load/validate all layer parameters and initialize PATTERNS.\n! Set SOM_TYPE=\"normal_som\" and a supported distance/neighborhood.\n! NUMBER_PATTERNS and the variable dimensions must match PATTERNS.\n! Use a serial build or one OpenMP thread for this fragment.\ncall map%create(parameters)\ncall map%train(patterns)\n! Query/print the trained prototypes and assignments before cleanup.\ncall map%destroy()",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-configuration fragment, not a complete input-file loader. Build the matching parent module/submodule and dependencies. Supply valid output-unit configuration and inspect data scaling, random seed and serial best-match behavior. No clustering, topology, convergence or parallel result was tested."
+              },
+              {
+                "procedure": "train_som_data",
+                "role": "implementation-helper",
+                "path": "src/library/som_train_utilities.f90",
+                "line_start": 41,
+                "line_end": 94
+              },
+              {
+                "procedure": "find_best_match_unit",
+                "role": "implementation-helper",
+                "path": "src/library/som_train_utilities.f90",
+                "line_start": 146,
+                "line_end": 196
+              },
+              {
+                "procedure": "update_weights normal_som",
+                "role": "implementation-helper",
+                "path": "src/library/som_train_utilities.f90",
+                "line_start": 220,
+                "line_end": 261
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "c4acb25f6ea33d9b415da8fd032f29df01dd6a28",
+          "reviewed_on": "2026-11-05",
+          "notes": "The pinned root gives the MIT grant with contributor attribution. Random-number and other embedded/dependency notices remain applicable; this review does not audit every component license.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/khaors/KohonenF08/blob/c4acb25f6ea33d9b415da8fd032f29df01dd6a28/LICENSE",
+              "sha256": "e0cab9325342a53ac01a805289968dbcafdadffda769b2e58ada560282d732d9"
+            }
+          ]
         }
       },
       "imports": {}

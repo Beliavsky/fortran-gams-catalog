@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-05. 388 repositories now have 517 source-reviewed
+Reviewed on 2026-11-05. 396 repositories now have 529 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-376 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Twelve further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
-PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch and Sparse Fortran examples) identify supplied program entry points and keep their internal/benchmark
+383 repository cards now identify public routines and link their usage lines
+to pinned argument declarations. Thirteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples and TISEAN) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 388 independently source-reviewed repositories now have an
+separately. All 396 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. These are source-inspected
 interfaces, not new compilation or numerical checks or complete public-API audits.
 
@@ -412,6 +412,14 @@ interfaces, not new compilation or numerical checks or complete public-API audit
 | Implicit QR demonstration | `eigenvalues::eig`, `eigenvalues::eig_hessenberg_matrix` | No explicit license grant identified |
 | Inference for physical sciences | `DCUHRE`, `ninfol` | BSD-3-Clause root notice; historical cubature terms need separate confirmation |
 | glmnet MATLAB builds | `elnet`, `lognet` | GPL-3.0 license file; no later-version election identified |
+| PDAF | `PDAF::PDAF_assimilate_etkf` | LGPL-3.0-or-later |
+| TISEAN | `autocor`, `spectrum` | GPL-2.0-or-later |
+| SpLLT | `spllt_mod::spllt_factor` | BSD-3-Clause |
+| Minimum Split Checkerboard Decomposition | `Exponentials_mod::FullExp%lmult` | MIT |
+| SparseReg MATLAB toolbox | `SPARSEREG::PENALIZED_L2_REGRESSION` | No explicit license grant identified |
+| Higher Order Markov Fortran | `markov_core::predict_k_steps`, `markov_higher_order::fit_transition_matrix` | MIT-style permission notice (incomplete standard text) |
+| Computational Economics Fortran examples | `toolbox::fzero`, `toolbox::poly_interpol`, `toolbox::legendre` | GPL-3.0 notice; Numerical Recipes adaptations need separate review |
+| KohonenF08 | `self_organizing_map_utilities::self_organizing_map%train` | MIT |
 
 Pinned license evidence, declaration ranges, author examples and calling sketches
 are retained in [the review ledger](local-reviews.md). A generic's private
@@ -819,6 +827,14 @@ model's shared arrays, module ordering and adapted absolute include paths.
 | [Implicit QR demonstration](https://github.com/keksipurkki/keksipurkki-demos-qr) | D4a2; D4c1b2 | Real nonsymmetric eigenvalues and Householder Hessenberg reduction | Complex-output overload, callback failures, experimental QR limitations and no accumulated similarity matrix. |
 | [Inference for physical sciences](https://github.com/tloredo/inference) | H2b1a1; H1 | Adaptive vector cubature and mode-specific information matrices | Hyperrectangular callback/workspace controls, numerical error estimates and positive-curvature mode assumptions. |
 | [glmnet MATLAB builds](https://github.com/lachioma/glmnet_matlab) | L8c; L8 | Gaussian and binomial elastic-net regression paths | Default-real ABI, compressed coefficients, mutable inputs, weighted response rows and partial-path statuses. |
+| [PDAF](https://github.com/pdaf/pdaf) | L10c | Ensemble-transform Kalman multivariate state-space assimilation | Public callback scheduling, reviewed SUBTYPE=1 algebra, MPI/precision consistency and analysis-step status interpretation. |
+| [TISEAN](https://github.com/gazeek/tisean) | L10a2a1; L10a3a2 | FFT autocorrelation and Fourier periodogram command-line programs | Supplied executable entries, centering/periodicity conventions, fixed transform arrays and no callable module claim. |
+| [SpLLT](https://github.com/nlafet/spllt) | D2b4 | Task-based sparse real-SPD Cholesky factorization and solves | Analysis/factor/solve phases, actual solve-job semantics, task completion and local-factorization status limitations. |
+| [Minimum Split Checkerboard Decomposition](https://github.com/captainsifff/mscbdecomp) | D1b6 | Checkerboard exponential splitting applied to dense matrices | Hermitian graph conversion, edge coloring, paired matrix-action stages, supported methods and approximation scope. |
+| [SparseReg MATLAB toolbox](https://github.com/hua-zhou/sparsereg) | L8c | Weighted penalized linear-regression coordinate descent | Native Fortran module, ENET parameter convention, precomputed curvatures and absent convergence/status output. |
+| [Higher Order Markov Fortran](https://github.com/barisbarisgithub/markov_fortran-) | M; L10a2 | Finite-state probability propagation and categorical history-transition estimation | Row-stochastic orientation, uniform unseen-history fallback, exponential table size and distinction from greedy trajectories. |
+| [Computational Economics Fortran examples](https://github.com/fabiankindermann/ce-fortran) | F1b; E1b; H2c | Scalar secant roots, global polynomial interpolation and Gauss-Legendre nodes/weights | Public overloads, duplicate-node/domain limits, quadrature service scope and retained Numerical Recipes provenance. |
+| [KohonenF08](https://github.com/khaors/kohonenf08) | L14a1b | Online fixed-grid self-organizing-map prototype clustering | Initialized pattern/parameter objects, serial best-match restriction, neighborhood updates and output configuration. |
 
 The spherical-Bessel mapping uses the half-integer cylindrical-Bessel relation
 in [NIST DLMF 10.47.3](https://dlmf.nist.gov/10.47.E3). Its integer spherical
@@ -1477,3 +1493,13 @@ distributed CG and structured products, spatial lag covariance, adaptive
 vector cubature, numerical information matrices and penalized regression
 paths. Missing statuses, inherited source notices, overwritten inputs,
 compressed coefficients and scoped algorithm restrictions remain explicit.
+
+CE-Fortran, the Markov modules, TISEAN, KohonenF08, SparseReg, SpLLT, PDAF
+and mscbdecomp have twelve additional pinned source-reviewed mappings.
+Their calling sketches were not compiled or run. TISEAN is annotated as
+supplied command-line programs rather than a callable library. Reviews
+record scalar versus vector overloads, quadrature-node generation,
+finite-state probability versus greedy paths, ETKF subtype selection,
+SOM serial/OpenMP restrictions, regression convergence limitations,
+SpLLT solve-job semantics and matrix-exponential splitting order.
+Historical component provenance and license scope remain explicit.
