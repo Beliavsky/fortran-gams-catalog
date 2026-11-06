@@ -19186,12 +19186,166 @@
             ],
             "notes": "The driver documentation describes generalized eigenvalues and optional Schur reductions of the input pair. This is a QZ-stage implementation, not an asserted end-to-end solver for every arbitrary matrix-pair representation.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D4b2",
+            "level": "source-reviewed",
+            "revision": "00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde",
+            "reviewed_on": "2026-11-05",
+            "notes": "PDHGEQZ computes generalized eigenvalue pairs of a distributed real nonsymmetric Hessenberg/upper-triangular pencil, optionally overwriting it with generalized real Schur form and accumulating left/right orthogonal Schur factors. The native driver dispatches small/large QZ kernels, with shift/deflation work in the distributed implementation. This entry assumes H already upper Hessenberg and T upper triangular; it is not a complete arbitrary dense-pencil reduction in one call. Eigenvalues are represented by (ALPHAR+i*ALPHAI,BETA); retain that representation for zero/tiny BETA instead of blindly dividing. Schur vectors are not individual generalized eigenvectors. MPI/BLACS context, block-cyclic descriptors and local storage must match on all ranks. Query both real and integer workspace after setup; nonzero INFO can mean invalid input or algorithmic failure and no residual/conditioning guarantee follows from zero alone. Review covers public dispatch, workspace contract and selected QZ/deflation paths, not every tuning variant or backend.",
+            "evidence": [
+              {
+                "path": "src/pdhgeqz/PDHGEQZ.f",
+                "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/pdhgeqz/PDHGEQZ.f",
+                "sha256": "999a6bc4e5bb006c17911f8407e9dfc9a538cfdb57746dcfdec4ad87159e2794"
+              },
+              {
+                "path": "src/pdhgeqz/PDHGEQZ0.f",
+                "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/pdhgeqz/PDHGEQZ0.f",
+                "sha256": "ba9666d65c301392ff2039baed9c8ae64cfb22eb7f8414bf90382ee3b7b48c45"
+              },
+              {
+                "path": "src/pdhgeqz/PDHGEQZ1.f",
+                "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/pdhgeqz/PDHGEQZ1.f",
+                "sha256": "f7262e95aece2f9b560015b38b52ba1e395e21434532095c262ecb1694ea882d"
+              },
+              {
+                "path": "examples/EXRAND1.f",
+                "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/examples/EXRAND1.f",
+                "sha256": "c9acd5b74d1926e0487419cf6b6705c14843e804de5beb64cb75a8611b5e105f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDHGEQZ",
+                "role": "public-entry-point",
+                "summary": "External distributed generalized real QZ driver for a prepared Hessenberg-triangular pencil.",
+                "signature": "CALL PDHGEQZ(JOB,COMPQ,COMPZ,N,ILO,IHI,H,DESCH,T,DESCT, &\n ALPHAR,ALPHAI,BETA,Q,DESCQ,Z,DESCZ,DWORK,LDWORK,IWORK,LIWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/pdhgeqz/PDHGEQZ.f",
+                    "line_start": 15,
+                    "line_end": 31
+                  }
+                ],
+                "path": "src/pdhgeqz/PDHGEQZ.f",
+                "line_start": 15,
+                "line_end": 31,
+                "usage": "external :: pdhgeqz\ninteger :: info,ldwork,liwork,integer_query(1)\ninteger,allocatable :: iwork(:)\ndouble precision :: real_query(1)\ndouble precision,allocatable :: dwork(:)\n! After MPI/BLACS setup: H Hessenberg, T triangular, matching descriptors,\n! allocated Q/Z storage and replicated ALPHAR/ALPHAI/BETA vectors of length N.\ncall pdhgeqz(\"S\",\"I\",\"I\",n,1,n,h,desch,t,desct,alphar,alphai,beta, &\n q,descq,z,descz,real_query,-1,integer_query,-1,info)\nif(info/=0) error stop \"QZ workspace query failed\"\nldwork=max(1,ceiling(real_query(1))); liwork=max(1,integer_query(1))\nallocate(dwork(ldwork),iwork(liwork))\ncall pdhgeqz(\"S\",\"I\",\"I\",n,1,n,h,desch,t,desct,alphar,alphai,beta, &\n q,descq,z,descz,dwork,ldwork,iwork,liwork,info)\nif(info/=0) error stop \"inspect QZ diagnostics\"\n! Preserve homogeneous eigenvalue pairs when BETA is zero or tiny.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-reduction collective fragment; link the complete package plus compatible ScaLAPACK/BLACS/MPI and numerical libraries. Q/Z are orthogonal Schur factors, not eigenvector arrays. A full residual check needs original matrices and the accumulated transforms. No generalized eigenvalue, workspace or distributed run was tested."
+              },
+              {
+                "procedure": "PDHGEQZ dispatch",
+                "role": "implementation-helper",
+                "path": "src/pdhgeqz/PDHGEQZ.f",
+                "line_start": 404,
+                "line_end": 429
+              },
+              {
+                "procedure": "PDHGEQZ execution dispatch",
+                "role": "implementation-helper",
+                "path": "src/pdhgeqz/PDHGEQZ.f",
+                "line_start": 473,
+                "line_end": 499
+              },
+              {
+                "procedure": "PDHGEQZ0 QZ/deflation dispatch",
+                "role": "implementation-helper",
+                "path": "src/pdhgeqz/PDHGEQZ0.f",
+                "line_start": 932,
+                "line_end": 951
+              }
+            ]
+          },
+          {
+            "code": "D4c1b2",
+            "level": "source-reviewed",
+            "revision": "00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde",
+            "reviewed_on": "2026-11-05",
+            "notes": "PDGGHRD reduces a distributed real matrix pair with general A and already upper-triangular B to Hessenberg-triangular form using accumulated left/right Givens rotations and blocked sliver updates. The associated Hessenberg-reduction leaf D4c1b2 records this concrete compact-form operation; it is not a generalized eigensolve or the preceding QR triangularization of arbitrary B. A and B are overwritten and optional Q/Z accumulate equivalence transformations. The workspace-query branch returns a debugging workspace size before assigning INFO, so the sketch does not interpret INFO from that query as validation. The actual reduction initializes/checks INFO later. Internal panel/rotation allocations and process/grid configuration must fit the matching distribution; inherited source/backend statuses are not all independently certified. Review covers public declarations, Givens/blocked update dispatch and query behavior.",
+            "evidence": [
+              {
+                "path": "src/ab2ht/PDGGHRD.f",
+                "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/ab2ht/PDGGHRD.f",
+                "sha256": "16d50157564a94bae45e5373ae710020f899d2e2e66edcb1de89b02fbfec4279"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGGHRD",
+                "role": "public-entry-point",
+                "summary": "External distributed Hessenberg-triangular reduction for a pencil whose second matrix is triangular.",
+                "signature": "CALL PDGGHRD(COMPQ,COMPZ,N,ILO,IHI,A,DESCA,B,DESCB,Q,DESCQ,Z,DESCZ,WORK,LWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/ab2ht/PDGGHRD.f",
+                    "line_start": 147,
+                    "line_end": 154
+                  },
+                  {
+                    "path": "src/ab2ht/PDGGHRD.f",
+                    "line_start": 22,
+                    "line_end": 34
+                  }
+                ],
+                "path": "src/ab2ht/PDGGHRD.f",
+                "line_start": 13,
+                "line_end": 14,
+                "usage": "external :: pdgghrd\ninteger :: info,lwork\ndouble precision :: query(1)\ndouble precision,allocatable :: work(:)\n! After BLACS setup and allocation: A general real, B already upper triangular;\n! descriptors/local storage and Q/Z buffers are initialized and compatible.\ncall pdgghrd(\"I\",\"I\",n,1,n,a,desca,b,descb,q,descq,z,descz,query,-1,info)\n! This query returns before assigning INFO; use QUERY(1) only.\nlwork=max(1,ceiling(query(1))); allocate(work(lwork))\ncall pdgghrd(\"I\",\"I\",n,1,n,a,desca,b,descb,q,descq,z,descz,work,lwork,info)\nif(info/=0) error stop \"inspect Hessenberg-triangular reduction diagnostics\"",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-triangularization collective fragment. Supplying a general B directly does not meet this entry contract. Query INFO is not assigned in the reviewed early branch; check the actual reduction and verify equivalence residuals independently. No reduction or orthogonality result was run."
+              },
+              {
+                "procedure": "PDGGHRD workspace query",
+                "role": "implementation-helper",
+                "path": "src/ab2ht/PDGGHRD.f",
+                "line_start": 254,
+                "line_end": 265
+              },
+              {
+                "procedure": "PDGGHRD triangular fill removal",
+                "role": "implementation-helper",
+                "path": "src/ab2ht/PDGGHRD.f",
+                "line_start": 419,
+                "line_end": 443
+              },
+              {
+                "procedure": "PDGGHRD blocked rotation application",
+                "role": "implementation-helper",
+                "path": "src/ab2ht/PDGGHRD.f",
+                "line_start": 516,
+                "line_end": 538
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README/drivers retain contributor and institutional attribution but no explicit permission grant was identified, and the pinned tree has no root LICENSE/COPYING. Public source availability and separately linked ScaLAPACK terms do not establish a license for this distribution.",
+          "evidence": [
+            {
+              "path": "README",
+              "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/README",
+              "sha256": "a8cb86ac51836f05baacd7519cd6e1b0d8202961fd1330b2f58a8f9971bdfeb6"
+            },
+            {
+              "path": "src/pdhgeqz/PDHGEQZ.f",
+              "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/pdhgeqz/PDHGEQZ.f",
+              "sha256": "999a6bc4e5bb006c17911f8407e9dfc9a538cfdb57746dcfdec4ad87159e2794"
+            },
+            {
+              "path": "src/ab2ht/PDGGHRD.f",
+              "url": "https://github.com/NLAFET/GEVP-PDHGEQZ/blob/00d1d78ed00ba6f4bf2eb3bf8eadfcf3aed34cde/src/ab2ht/PDGGHRD.f",
+              "sha256": "16d50157564a94bae45e5373ae710020f899d2e2e66edcb1de89b02fbfec4279"
+            }
+          ]
         }
       },
       "imports": {}
@@ -24353,12 +24507,129 @@
             ],
             "notes": "The README separates generators/checkers from an initial vectorized SVD implementation and points to successors for several components. Test-data generation alone is not treated as a verified eigensolver or decomposition algorithm; GNU compiler restrictions are documented upstream.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "D6",
+            "level": "source-reviewed",
+            "revision": "3a90fbb1724fefbf43590774a1cb5bcce78619e1",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public JACV0_EXECUTE generic performs the one-sided Jacobi column-orthogonalization core of an SVD through a Fortran interface to AVX2/FMA or AVX-512 native kernels. It initializes V to identity, applies column rotations/swaps to G and V and returns packed transformation/sweep counters. It does not itself return a normalized U and singular-value vector, so a complete validated SVD needs postprocessing and residual/orthogonality checks. The inspected parameter/preparation predicates require M=N and vector-multiple dimensions; they must not be generalized to arbitrary rectangular matrices. Matrices and integer strategy workspace require matching alignment, prepared pivot offsets and supported CPU instructions. The reviewed C bridge expects 64-bit pointer-offset workspace and packed integer storage, so select a matching 64-bit-integer build rather than assuming default INTEGER works. QUERY/PREPARE use positive strategy counts on successful paths and EXECUTE INFO holds counters, not an INFO=0 success convention. Review covers the concrete Fortran bridge and AVX2 rotation/sweep paths, not the unrelated full LAPACK comparison executables or all platforms.",
+            "evidence": [
+              {
+                "path": "src/L0_IFACES_IMPL.F90",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/L0_IFACES_IMPL.F90",
+                "sha256": "1fb9e1aa875f7806892d2e6984988553296dc2941a3fd381ccabf454c6134d90"
+              },
+              {
+                "path": "src/L0_IFACES.F90",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/L0_IFACES.F90",
+                "sha256": "9620a47ffee4969af348186292ad1ddd72f311bff00568d195415d41f21c7cfc"
+              },
+              {
+                "path": "src/JACSVD.F90",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/JACSVD.F90",
+                "sha256": "9a83b819cd4219f1ee25d6807f20fbd8ae765183e9f62b90e53f810084bfb1fc"
+              },
+              {
+                "path": "src/AVX2_FMA_DJACV.c",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/AVX2_FMA_DJACV.c",
+                "sha256": "aa1d9cb3052b93c1e0a4ac650922b146d8eb6dd5d210f68ed16e5112c7a831d6"
+              },
+              {
+                "path": "gnu.mk",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/gnu.mk",
+                "sha256": "6c0ccda3e83dc6ef2c747a440c5fd32cd36940a068b2746adb8a97149d71fb72"
+              },
+              {
+                "path": "src/VEC_PARAMS.F90",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/VEC_PARAMS.F90",
+                "sha256": "dcc4ed26d27e05a4624fb83f7fc0e2fc0ee87c3909ed3d3ed81fdf03e1a6fb36"
+              },
+              {
+                "path": "src/KIND_PARAMS.F90",
+                "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/KIND_PARAMS.F90",
+                "sha256": "3b7cb154745b2b3f635a3a398303a7b559c32b963f3164f4ca9e937c3b8d7c81"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "JACV0_EXECUTE",
+                "role": "public-entry-point",
+                "summary": "Public SIMD one-sided Jacobi SVD core with prepared aligned storage and counter outputs.",
+                "signature": "CALL JACV0_EXECUTE(LDA,M,N,G,V,TOL,SWP,STEPS,IWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "src/L0_IFACES_IMPL.F90",
+                    "line_start": 118,
+                    "line_end": 148
+                  },
+                  {
+                    "path": "src/KIND_PARAMS.F90",
+                    "line_start": 7,
+                    "line_end": 23
+                  }
+                ],
+                "path": "src/L0_IFACES.F90",
+                "line_start": 9,
+                "line_end": 11,
+                "module": "JACSVD",
+                "usage": "use JACSVD, only: JACV0_EXECUTE\n! Advanced post-allocation fragment for the matching 64-bit-INTEGER build:\n! AVX2/FMA CPU, aligned real-double G/V and pointer-sized IWORK; M=N,\n! N a multiple of 2*D_VEC_LEN, LDA compatible with column alignment.\n! Prepare the pivot strategy/offset workspace through JACV0_PARAMQ/PREPARE.\n! Their success outputs include positive counts; do not assume zero means success.\ncall JACV0_EXECUTE(lda,m,n,g,v,tol,sweep_limit,steps,iwork,info)\n! INFO contains packed counters. Inspect sweeps/transformations and independently\n! validate column orthogonality; normalization/SVA extraction is separate.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Not a portable drop-in SVD call. Use the pinned compiler/CPU/alignment and integer ABI contract, complete C/JSTRAT/BLAS dependencies and valid prepared offsets. The helper validation restricts this version to square/vector-multiple shapes. No rotations, SVD, normalization, hardware path or packed status was tested."
+              },
+              {
+                "procedure": "DJACV0_PARAMQ_F",
+                "role": "implementation-helper",
+                "path": "src/L0_IFACES_IMPL.F90",
+                "line_start": 1,
+                "line_end": 47
+              },
+              {
+                "procedure": "DJACV0_PREPARE_F",
+                "role": "implementation-helper",
+                "path": "src/L0_IFACES_IMPL.F90",
+                "line_start": 65,
+                "line_end": 116
+              },
+              {
+                "procedure": "avx2_fma_djacv",
+                "role": "implementation-helper",
+                "path": "src/AVX2_FMA_DJACV.c",
+                "line_start": 127,
+                "line_end": 194
+              },
+              {
+                "procedure": "avx2_fma_djacv0_execute",
+                "role": "implementation-helper",
+                "path": "src/AVX2_FMA_DJACV.c",
+                "line_start": 197,
+                "line_end": 223
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MIT for selected Jacobi implementation",
+          "spdx_expression": "MIT",
+          "revision": "3a90fbb1724fefbf43590774a1cb5bcce78619e1",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root MIT grant applies unless otherwise stated and explicitly distinguishes modified Netlib qxblas components. This review selects the native Jacobi interface/kernel, not a blanket MIT claim over every imported BLAS/LAPACK file or dependency.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/LICENSE",
+              "sha256": "ae0964d003d1d1bffd444fb91567c6d9ed757841b5ef143015fe3dce71d5c326"
+            },
+            {
+              "path": "src/AVX2_FMA_DJACV.c",
+              "url": "https://github.com/venovako/JACSD/blob/3a90fbb1724fefbf43590774a1cb5bcce78619e1/src/AVX2_FMA_DJACV.c",
+              "sha256": "aa1d9cb3052b93c1e0a4ac650922b146d8eb6dd5d210f68ed16e5112c7a831d6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -33667,12 +33938,96 @@
             ],
             "notes": "The README distinguishes SLARAC, QRBS, LASAR and SELVAR. Competition rankings and causal interpretations are author results, not proof of correct causal recovery for arbitrary observational data.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L10c",
+            "level": "source-reviewed",
+            "revision": "30c5421cf3ce0cc5700dc64aa9d4154e588957b7",
+            "reviewed_on": "2026-11-05",
+            "notes": "SLVAR performs selective multivariate autoregressive structure/lag search: each directed variable pair has one selected lag or no edge, candidate changes are scored in contiguous data batches and a greedy hill-climb retains improving changes. The final B matrix is batch-averaged absolute coefficients, not the full signed VAR lag tensor; A stores selected lags. BS, ML and MXITR can be rewritten, and MXITR=0 skips search so it requires an already initialized graph. The PRESS-like score helper calls DORGQR using workspace left by DGELS, which does not expose a reflector-TAU output contract; the validity of these leverage corrections is therefore not established and needs validation/repair. Too-small batches, singular designs and leverage denominators near zero also need checks. INFO is reused through candidate fits/final coefficient calculations and does not certify the global optimum or every intermediate fit. Review covers the native selection/control flow and concrete returned quantities, not a causal-identification guarantee or a validated scoring implementation.",
+            "evidence": [
+              {
+                "path": "tidybench/selvarF.f",
+                "url": "https://github.com/sweichwald/tidybench/blob/30c5421cf3ce0cc5700dc64aa9d4154e588957b7/tidybench/selvarF.f",
+                "sha256": "904970a45168819c7b79ac4e340516832a73a2fbe6cd6211199c51ccd7361fec"
+              },
+              {
+                "path": "tidybench/selvar.py",
+                "url": "https://github.com/sweichwald/tidybench/blob/30c5421cf3ce0cc5700dc64aa9d4154e588957b7/tidybench/selvar.py",
+                "sha256": "3f515090a58ffff9b9ca2650c76454d91284091d87b9a8daecfa9b867f77e33d"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "SLVAR",
+                "role": "public-entry-point",
+                "summary": "External selective VAR lag-graph search returning selected lags and absolute coefficient scores.",
+                "signature": "CALL SLVAR(T,N,X,BS,ML,MXITR,B,A,INFO,TRC)",
+                "declarations": [
+                  {
+                    "path": "tidybench/selvarF.f",
+                    "line_start": 5,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "tidybench/selvarF.f",
+                    "line_start": 47,
+                    "line_end": 53
+                  }
+                ],
+                "path": "tidybench/selvarF.f",
+                "line_start": 5,
+                "line_end": 20,
+                "usage": "external :: slvar\ninteger :: batch_size,max_lag,max_iterations,info\n! X(T,N) is a finite DOUBLE PRECISION multivariate series.\n! Allocate DOUBLE PRECISION B(N,N) and default-INTEGER A(N,N).\n! Choose T sufficiently larger than N+maximum lag, and full-rank batches.\nbatch_size=t-2; max_lag=2; max_iterations=20\ncall slvar(t,n,x,batch_size,max_lag,max_iterations,b,a,info,0)\n! A(i,j) is a selected lag; B(i,j) is an average ABSOLUTE coefficient.\n! Validate/repair the PRESS QR-workspace handoff before relying on the scores.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation native-kernel fragment with compatible LAPACK/BLAS. The scoring implementation has a concrete QR-workspace concern, so this is not a checked causal/VAR driver. A returned INFO=0 does not resolve it. No lag selection, predictive score or causal result was tested."
+              },
+              {
+                "procedure": "SLVAR hill-climb",
+                "role": "implementation-helper",
+                "path": "tidybench/selvarF.f",
+                "line_start": 87,
+                "line_end": 134
+              },
+              {
+                "procedure": "GTPRSS QR/PRESS handoff",
+                "role": "implementation-helper",
+                "path": "tidybench/selvarF.f",
+                "line_start": 173,
+                "line_end": 213
+              },
+              {
+                "procedure": "GTCOEF absolute score aggregation",
+                "role": "implementation-helper",
+                "path": "tidybench/selvarF.f",
+                "line_start": 267,
+                "line_end": 310
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "MPL-2.0",
+          "spdx_expression": "MPL-2.0",
+          "revision": "30c5421cf3ce0cc5700dc64aa9d4154e588957b7",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides Mozilla Public License version 2.0 and the selected source retains original SELVAR attribution. Separately linked LAPACK/BLAS and Python dependencies retain their own terms; source licensing does not certify causal conclusions.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sweichwald/tidybench/blob/30c5421cf3ce0cc5700dc64aa9d4154e588957b7/LICENSE",
+              "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+            },
+            {
+              "path": "tidybench/selvarF.f",
+              "url": "https://github.com/sweichwald/tidybench/blob/30c5421cf3ce0cc5700dc64aa9d4154e588957b7/tidybench/selvarF.f",
+              "sha256": "904970a45168819c7b79ac4e340516832a73a2fbe6cd6211199c51ccd7361fec"
+            }
+          ]
         }
       },
       "imports": {}
@@ -34227,12 +34582,96 @@
             ],
             "notes": "DESCRIPTION restricts the documented tests to linear and factor-augmented sparse regressions. Tuning-free wording does not establish universally valid inference outside the model assumptions.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "4166f981c84b3dc70730fc3fbc57b98aac64179e",
+            "reviewed_on": "2026-11-05",
+            "notes": "FITNOISEF fits a lasso regression path and evaluates multiplier-bootstrap effective-noise quantiles/tuning thresholds along that path. The native loop multiplies fitted residuals by caller-supplied ESIM draws, computes 2*abs(X-transpose*residual_draw)/NOBS and the maximum over predictors, then obtains type-7 empirical quantiles. Random multipliers are generated by the R wrapper, not inside this Fortran kernel. This is a tuning/inference component of penalized multiple-linear regression, not ordinary-least-squares inference or an end-to-end factor-estimation routine. X/PF/ULAM and work/output arrays can be changed; initialize JERR=0 because allocation statuses are accumulated onto its incoming value. Require valid quantile levels, positive bootstrap count, adequate nonconstant design/path sizes and compatible multipliers. HATLAM=-1 can remain when no threshold crossing is found; negative path statuses and NALAM limit usable outputs. Review covers native path/bootstrap/quantile logic, not the asymptotic validity of the test or every R wrapper.",
+            "evidence": [
+              {
+                "path": "src/fitnoiseF.f90",
+                "url": "https://github.com/jstriaukas/FAS/blob/4166f981c84b3dc70730fc3fbc57b98aac64179e/src/fitnoiseF.f90",
+                "sha256": "1835111953564ef5ddce49886ea981b34dc8390613542a41fd8066fc779bb8a4"
+              },
+              {
+                "path": "src/auxiliary.f90",
+                "url": "https://github.com/jstriaukas/FAS/blob/4166f981c84b3dc70730fc3fbc57b98aac64179e/src/auxiliary.f90",
+                "sha256": "21b0cf1672ccb2e2749af0f79ea0f2bc372c0c34197a8f40c0a685f8285e0834"
+              },
+              {
+                "path": "src/maxlambda.f90",
+                "url": "https://github.com/jstriaukas/FAS/blob/4166f981c84b3dc70730fc3fbc57b98aac64179e/src/maxlambda.f90",
+                "sha256": "9ee603899240069cd7af96a8173acf0100437752cee58917167356f15b46dd85"
+              },
+              {
+                "path": "R/fitboot.R",
+                "url": "https://github.com/jstriaukas/FAS/blob/4166f981c84b3dc70730fc3fbc57b98aac64179e/R/fitboot.R",
+                "sha256": "26cccc9abd2b4dc031737a2fb792c9fe8d3ce05ca92e3049510fa56d7b20dec9"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "fitnoiseF",
+                "role": "public-entry-point",
+                "summary": "External lasso effective-noise bootstrap/tuning kernel with externally supplied multipliers.",
+                "signature": "CALL fitnoiseF(QLEV,NQUANT,ESIM,NUMBOOT,NOBS,NVARS,X,Y,PF,DFMAX,PMAX, &\n NLAM,FLMIN,ULAM,EPS,ISD,INTR,MAXIT,NALAM,B0,BETA,IBETA,NBETA, &\n ALAM,NPASS,JERR,QUANT,HATLAM)",
+                "declarations": [
+                  {
+                    "path": "src/fitnoiseF.f90",
+                    "line_start": 4,
+                    "line_end": 20
+                  }
+                ],
+                "path": "src/fitnoiseF.f90",
+                "line_start": 4,
+                "line_end": 20,
+                "usage": "external :: fitnoiseF\ninteger :: jerr\n! After allocating inputs/outputs with the linked declarations:\n! QLEV in [0,1], NUMBOOT>0, NLAM>=2, valid design, and ESIM(NOBS,NUMBOOT)\n! containing independently generated bootstrap multipliers of the required law.\n! Set a valid descending ULAM path or the documented automatic-path sentinel.\njerr=0\ncall fitnoiseF(qlev,nquant,esim,numboot,nobs,nvars,x,y,pf,dfmax,pmax, &\n nlam,flmin,ulam,eps,isd,intr,maxit,nalam,b0,beta,ibeta,nbeta, &\n alam,npass,jerr,quant,hatlam)\nif(jerr/=0) error stop \"inspect bootstrap regression path diagnostics\"\n! Use only populated path entries; HATLAM=-1 means no crossing was selected.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-allocation component fragment; the native bootstrap uses supplied multipliers and does not create them or estimate latent factors. Preserve original inputs if needed and respect compressed path metadata. No bootstrap quantile, tuning selection, coverage or R run was tested."
+              },
+              {
+                "procedure": "fitnoiseF status/standardization",
+                "role": "implementation-helper",
+                "path": "src/fitnoiseF.f90",
+                "line_start": 26,
+                "line_end": 58
+              },
+              {
+                "procedure": "lassofitpathqF bootstrap maxima",
+                "role": "implementation-helper",
+                "path": "src/fitnoiseF.f90",
+                "line_start": 236,
+                "line_end": 274
+              },
+              {
+                "procedure": "QUANTILE",
+                "role": "implementation-helper",
+                "path": "src/fitnoiseF.f90",
+                "line_start": 286,
+                "line_end": 318
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0-or-later",
+          "spdx_expression": "GPL-2.0-or-later",
+          "revision": "4166f981c84b3dc70730fc3fbc57b98aac64179e",
+          "reviewed_on": "2026-11-05",
+          "notes": "The package DESCRIPTION specifies GPL (>=2). The selected bootstrap/path code is one component of the R package, and R/package dependencies retain separate terms.",
+          "evidence": [
+            {
+              "path": "DESCRIPTION",
+              "url": "https://github.com/jstriaukas/FAS/blob/4166f981c84b3dc70730fc3fbc57b98aac64179e/DESCRIPTION",
+              "sha256": "2624eeccfbac16182163019bfaaebb09ca53f58c2a411021724d9a33934a76ab"
+            }
+          ]
         }
       },
       "imports": {}
@@ -37673,12 +38112,96 @@
             ],
             "notes": "The README identifies MIDAS regression and Fortran kernels copied from sparsegl as of November 2023. The Python model/interface and underlying Fortran estimation components are distinguished; predictive performance is not independently benchmarked.",
             "reviewed_on": "2026-11-03"
+          },
+          {
+            "code": "L8c",
+            "level": "source-reviewed",
+            "revision": "d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099",
+            "reviewed_on": "2026-11-05",
+            "notes": "SPARSE_FOUR implements a dense Gaussian sparse-group-lasso path using block updates, separate group/L1 penalties, strong-rule screening and subsequent KKT rechecks. Groups are contiguous intervals described by BS/IX/IY; GAM supplies positive group curvature/step controls and LB/UB bound group coefficients. ALSPARSE splits lambda into L1 and group parts. Unlike a compressed scalar-coefficient path, BETA is dimensioned NVARS by NLAM but only active-group blocks are assigned, so inactive entries must not be interpreted as defined zeros. The native interface also declares JERR INTENT(OUT) and assigns it only on error paths, leaving the success status undefined; initializing a caller variable does not repair that contract. This needs a source fix before trustworthy success-status handling. NALAM/NBETA/ACTIVEGROUP delimit populated path blocks, and nonzero iteration/active-size errors can leave partial results. Review covers the concrete Gaussian update/screening implementation, not logistic/mixed-frequency preprocessing, inference or an assertion that the current native entry is production-ready.",
+            "evidence": [
+              {
+                "path": "midasmlpy/src/sparseglf90/sparsegl.f90",
+                "url": "https://github.com/jstriaukas/midasmlpy/blob/d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099/midasmlpy/src/sparseglf90/sparsegl.f90",
+                "sha256": "8f235281df4d0c463c39f641f490c9f8787b6ab0b745affd98ececabcf3d1382"
+              },
+              {
+                "path": "midasmlpy/src/sparseglf90/sgl_subfuns.f90",
+                "url": "https://github.com/jstriaukas/midasmlpy/blob/d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099/midasmlpy/src/sparseglf90/sgl_subfuns.f90",
+                "sha256": "2e5be63b401e2a0b46df50a4b2d98cf4fe6432995b2144af32685d49e81b74fa"
+              },
+              {
+                "path": "midasmlpy/src/sparseglf90/README.md",
+                "url": "https://github.com/jstriaukas/midasmlpy/blob/d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099/midasmlpy/src/sparseglf90/README.md",
+                "sha256": "7f2849912d18637694b6664ff64e739bdbfd5a2664df4fb9e65491714de6a3da"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "sparse_four",
+                "role": "public-entry-point",
+                "summary": "External dense sparse-group Gaussian regression path with contiguous groups and source-level status/output limitations.",
+                "signature": "CALL sparse_four(BN,BS,IX,IY,GAM,NOBS,NVARS,X,Y,PF,PFL1,DFMAX,PMAX,NLAM, &\n FLMIN,ULAM,EPS,MAXIT,INTR,NALAM,B0,BETA,ACTIVEGROUP,NBETA,ALAM,NPASS,JERR,MSE,ALSPARSE,LB,UB)",
+                "declarations": [
+                  {
+                    "path": "midasmlpy/src/sparseglf90/sparsegl.f90",
+                    "line_start": 4,
+                    "line_end": 33
+                  }
+                ],
+                "path": "midasmlpy/src/sparseglf90/sparsegl.f90",
+                "line_start": 4,
+                "line_end": 33,
+                "usage": "external :: sparse_four\n! After validating/allocating contiguous group metadata, design/response,\n! positive GAM, penalty weights and coefficient bounds with the declared shapes:\n! choose FLMIN>=1 and a positive descending ULAM sequence for a supplied path.\ncall sparse_four(bn,bs,ix,iy,gam,nobs,nvars,x,y,pf,pfl1,dfmax,pmax,nlam, &\n flmin,ulam,eps,maxit,intr,nalam,b0,beta,activeGroup,nbeta,alam,npass,jerr,mse,alsparse,lb,ub)\n! IMPORTANT: the implementation must initialize its INTENT(OUT) JERR on success\n! before this can be treated as a normal status-returning API.\n! Decode only populated active-group blocks; inactive BETA entries are not defined.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Interface sketch identifying an algorithm and a needed status fix, not a working checked driver. Caller-side JERR initialization does not define an unassigned INTENT(OUT) result. Build the full Fortran support modules with matching kinds and repair/validate output initialization before using results. No path, KKT check or fit was run."
+              },
+              {
+                "procedure": "sparse_four penalty/update dispatch",
+                "role": "implementation-helper",
+                "path": "midasmlpy/src/sparseglf90/sparsegl.f90",
+                "line_start": 118,
+                "line_end": 164
+              },
+              {
+                "procedure": "sparse_four KKT checks and output blocks",
+                "role": "implementation-helper",
+                "path": "midasmlpy/src/sparseglf90/sparsegl.f90",
+                "line_start": 173,
+                "line_end": 229
+              },
+              {
+                "procedure": "kkt_check",
+                "role": "implementation-helper",
+                "path": "midasmlpy/src/sparseglf90/sgl_subfuns.f90",
+                "line_start": 26,
+                "line_end": 59
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-2.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-2.0-only",
+          "revision": "d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root contains GNU GPL version 2 text and the selected README identifies this native source build. No or-later election was identified in those reviewed files. Preserve inherited sparse-group implementation and dependency notices; no blanket grant for binary artifacts is inferred.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jstriaukas/midasmlpy/blob/d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099/LICENSE",
+              "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+            },
+            {
+              "path": "midasmlpy/src/sparseglf90/README.md",
+              "url": "https://github.com/jstriaukas/midasmlpy/blob/d705b51b7b29e4c736357ef3f6f8e7bf5b4b7099/midasmlpy/src/sparseglf90/README.md",
+              "sha256": "7f2849912d18637694b6664ff64e739bdbfd5a2664df4fb9e65491714de6a3da"
+            }
+          ]
         }
       },
       "imports": {}
@@ -44296,12 +44819,154 @@
             ],
             "notes": "The README restricts current coverage to double-precision real matrices and identifies complex support as planned. The principal operation is a real Schur form of an upper Hessenberg matrix, with MPI/BLAS/LAPACK/ScaLAPACK dependencies.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "D4c2b",
+            "level": "source-reviewed",
+            "revision": "4ba142120491204d1bab4f26d0ce802f7147d41a",
+            "reviewed_on": "2026-11-05",
+            "notes": "PDHSEQR computes the ordinary eigenvalues of a distributed real upper Hessenberg matrix and optionally its real Schur form/factors. The native multishift QR path invokes aggressive early deflation and bulge-chasing kernels, with alternative/recovery paths for small or unconverged blocks. This is specifically the compact Hessenberg eigenvalue leaf D4c2b; a general dense matrix must first be reduced, and Schur vectors must not be labeled individual eigenvectors. WR/WI contain replicated real/imaginary eigenvalue components. The query requires valid distributed descriptors and returns real/integer workspace sizes; H is overwritten on computation. Nonzero INFO needs interpretation for invalid controls or incomplete convergence, and balancing/reduction transforms must be retained if original-matrix factors are desired. Review covers public driver, workspace/dispatch and selected AED/multishift calls, not every tuning/kernel or numerical accuracy claim.",
+            "evidence": [
+              {
+                "path": "Src/pdhseqr.f",
+                "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Src/pdhseqr.f",
+                "sha256": "da30767c838e59bd2f7c3d077b9d447543d4db41a5ff3aef0fc452173a45f26e"
+              },
+              {
+                "path": "Src/pdlaqr0.f",
+                "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Src/pdlaqr0.f",
+                "sha256": "38291965ec305fcc8a8e06c9196c8604f473ac7fe95ec7aeb4fd087869322f8e"
+              },
+              {
+                "path": "Examples/example1.F",
+                "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Examples/example1.F",
+                "sha256": "8747e57d46f05360a49aba3c8942f6f87677f6d13cd5ffdd838dc267eee88a72"
+              },
+              {
+                "path": "README",
+                "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/README",
+                "sha256": "067fd983a44a42362d111d4b42517e67c96e515b0c9ced38babf5d331afa4734"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDHSEQR",
+                "role": "public-entry-point",
+                "summary": "External real distributed Hessenberg QR/Schur driver with replicated complex-pair components.",
+                "signature": "CALL PDHSEQR(JOB,COMPZ,N,ILO,IHI,H,DESCH,WR,WI,Z,DESCZ,WORK,LWORK,IWORK,LIWORK,INFO)",
+                "declarations": [
+                  {
+                    "path": "Src/pdhseqr.f",
+                    "line_start": 15,
+                    "line_end": 25
+                  }
+                ],
+                "path": "Src/pdhseqr.f",
+                "line_start": 15,
+                "line_end": 25,
+                "usage": "external :: pdhseqr\ninteger :: info,lwork,liwork,integer_query(1)\ninteger,allocatable :: iwork(:)\ndouble precision :: real_query(1)\ndouble precision,allocatable :: work(:)\n! After BLACS setup: H upper Hessenberg, valid DESCH/DESCZ and local Z storage;\n! WR/WI are replicated length-N arrays.\ncall pdhseqr(\"S\",\"I\",n,1,n,h,desch,wr,wi,z,descz, &\n real_query,-1,integer_query,-1,info)\nif(info/=0) error stop \"Hessenberg QR workspace query failed\"\nlwork=max(1,ceiling(real_query(1))); liwork=max(1,integer_query(1))\nallocate(work(lwork),iwork(liwork))\ncall pdhseqr(\"S\",\"I\",n,1,n,h,desch,wr,wi,z,descz, &\n work,lwork,iwork,liwork,info)\nif(info/=0) error stop \"inspect Hessenberg QR diagnostics\"\n! Columns of Z are Schur vectors; eigenvalues are WR+i*WI.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-Hessenberg-reduction collective fragment with the complete matching distributed QR/BLACS/ScaLAPACK build. Preserve transformations/input data for independent residuals. No spectrum, Schur relation, workspace query or MPI run was tested."
+              },
+              {
+                "procedure": "PDHSEQR workspace contract",
+                "role": "implementation-helper",
+                "path": "Src/pdhseqr.f",
+                "line_start": 332,
+                "line_end": 371
+              },
+              {
+                "procedure": "PDLAQR0 aggressive early deflation",
+                "role": "implementation-helper",
+                "path": "Src/pdlaqr0.f",
+                "line_start": 599,
+                "line_end": 612
+              },
+              {
+                "procedure": "PDLAQR0 multishift sweep",
+                "role": "implementation-helper",
+                "path": "Src/pdlaqr0.f",
+                "line_start": 899,
+                "line_end": 915
+              }
+            ]
+          },
+          {
+            "code": "D4c1a",
+            "level": "source-reviewed",
+            "revision": "4ba142120491204d1bab4f26d0ce802f7147d41a",
+            "reviewed_on": "2026-11-05",
+            "notes": "PDGEBAL balances a distributed general real matrix by optional permutation and diagonal similarity scaling. It isolates rows/columns, communicates norms and applies power-of-two scaling with underflow/overflow guards. JOB=B performs both stages; JOB=P or S selects one, and SCALE combines permutation records outside the active interval with scale factors inside it. This is an associated eigenproblem transformation, not an eigenvalue computation or a promise that balancing improves every problem. A is overwritten and ILO/IHI identify the remaining active block. The caller must retain SCALE/permutation information and apply matching backtransformation conventions when using original-matrix vectors. NaN/invalid inputs can invoke PXERBLA. Review covers the native distributed permutation/scaling path and public contract, not the original LAPACK implementation or arbitrary exceptional floating-point behavior.",
+            "evidence": [
+              {
+                "path": "Src/pdgebal.f",
+                "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Src/pdgebal.f",
+                "sha256": "6efc177a1482e8031272f1b66c18e45810782c1cd878a3de850bca6a767f6e76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "PDGEBAL",
+                "role": "public-entry-point",
+                "summary": "External distributed permutation/scaling balance before a nonsymmetric eigenproblem.",
+                "signature": "CALL PDGEBAL(JOB,N,A,DESCA,ILO,IHI,SCALE,INFO)",
+                "declarations": [
+                  {
+                    "path": "Src/pdgebal.f",
+                    "line_start": 15,
+                    "line_end": 24
+                  }
+                ],
+                "path": "Src/pdgebal.f",
+                "line_start": 15,
+                "line_end": 24,
+                "usage": "external :: pdgebal\ninteger :: ilo,ihi,info\n! After BLACS setup/allocation: A is a general real distributed N-by-N matrix,\n! DESCA is valid, SCALE is a replicated DOUBLE PRECISION length-N array.\ncall pdgebal(\"B\",n,a,desca,ilo,ihi,scale,info)\nif(info/=0) error stop \"inspect distributed balancing diagnostics\"\n! Retain SCALE, ILO/IHI and any later Hessenberg/Schur transforms.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Post-distribution fragment; this transforms A without returning eigenvectors. Use compatible backend integer kinds and correct backtransformation of later vectors. No norm reduction, eigenvalue accuracy or balancing case was run."
+              },
+              {
+                "procedure": "PDGEBAL row/column permutation",
+                "role": "implementation-helper",
+                "path": "Src/pdgebal.f",
+                "line_start": 250,
+                "line_end": 284
+              },
+              {
+                "procedure": "PDGEBAL diagonal scaling",
+                "role": "implementation-helper",
+                "path": "Src/pdgebal.f",
+                "line_start": 349,
+                "line_end": 429
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "No explicit license grant identified",
+          "spdx_expression": null,
+          "revision": "4ba142120491204d1bab4f26d0ce802f7147d41a",
+          "reviewed_on": "2026-11-05",
+          "notes": "The reviewed README/drivers identify authors and TOMS/ScaLAPACK-style provenance but no explicit grant was identified in these files or a standalone root LICENSE/COPYING. A CALGO reference is not treated as a blanket redistribution license; linked libraries retain separate terms.",
+          "evidence": [
+            {
+              "path": "README",
+              "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/README",
+              "sha256": "067fd983a44a42362d111d4b42517e67c96e515b0c9ced38babf5d331afa4734"
+            },
+            {
+              "path": "Src/pdhseqr.f",
+              "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Src/pdhseqr.f",
+              "sha256": "da30767c838e59bd2f7c3d077b9d447543d4db41a5ff3aef0fc452173a45f26e"
+            },
+            {
+              "path": "Src/pdgebal.f",
+              "url": "https://github.com/NLAFET/SEVP-PDHSEQR-Alg953/blob/4ba142120491204d1bab4f26d0ce802f7147d41a/Src/pdgebal.f",
+              "sha256": "6efc177a1482e8031272f1b66c18e45810782c1cd878a3de850bca6a767f6e76"
+            }
+          ]
         }
       },
       "imports": {}
@@ -58212,12 +58877,96 @@
             ],
             "notes": "The README explicitly suspends development as of September 2021 and labels the implementation experimental. It documents modified f2py Fortran and translated R code; completeness relative to R quantreg and current Python compatibility are not established.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L8c3",
+            "level": "source-reviewed",
+            "revision": "b0d3cc26f11e68f080c466a916b76d4e64188ec2",
+            "reviewed_on": "2026-11-05",
+            "notes": "RQFNB solves the bounded linear-program form used for multiple quantile regression with a Frisch-Newton primal-dual interior-point iteration and weighted normal-equation solves. The selected TAU=0.5 case is multiple median/L1 regression and supports L8c3; other quantiles use asymmetric check loss rather than an ordinary Lp norm. The caller supplies A=X-transpose, cost=-response, RHS=(1-tau)*sum(X,rows), unit upper bounds and initial WN(:,1)=1-tau, as the Python wrapper establishes. Regression coefficients are minus WP(:,1), not the raw primal/dual vector in WN. Iterations are hard-capped at fifty; INFO primarily reports normal-equation factorization and may remain zero on iteration exhaustion, so NIT and independent optimality/residual checks are needed. Inputs/workspaces are overwritten and boundary quantiles or singular designs are not supported by this sketch. Review covers initialization, predictor/corrector loop, solve dispatch and wrapper sign conventions, not censored/constrained variants or statistical inference.",
+            "evidence": [
+              {
+                "path": "quantregpy/_fortran/rqfnb.f",
+                "url": "https://github.com/quantregpy/quantregpy/blob/b0d3cc26f11e68f080c466a916b76d4e64188ec2/quantregpy/_fortran/rqfnb.f",
+                "sha256": "31ce77d5a140001457b556b847efe1e5cb0d5eb3def6a4b080ceb1f83464f3e6"
+              },
+              {
+                "path": "quantregpy/quantreg.py",
+                "url": "https://github.com/quantregpy/quantregpy/blob/b0d3cc26f11e68f080c466a916b76d4e64188ec2/quantregpy/quantreg.py",
+                "sha256": "52f1bee85c95000e88e26c6587ff40e6c752a3014a06fe32377150677382351c"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "rqfnb",
+                "role": "public-entry-point",
+                "summary": "External dense Frisch-Newton quantile-regression LP kernel, selected here for median regression.",
+                "signature": "CALL RQFNB(N,P,A,COST,RHS,D,U,BETA,EPS,WN,WP,NIT,INFO)",
+                "declarations": [
+                  {
+                    "path": "quantregpy/_fortran/rqfnb.f",
+                    "line_start": 2,
+                    "line_end": 5
+                  },
+                  {
+                    "path": "quantregpy/quantreg.py",
+                    "line_start": 338,
+                    "line_end": 355
+                  }
+                ],
+                "path": "quantregpy/_fortran/rqfnb.f",
+                "line_start": 2,
+                "line_end": 13,
+                "usage": "external :: rqfnb\ninteger,parameter :: n=6,p=2\ninteger :: nit(3),info\ndouble precision :: x(n,p),response(n),a(p,n),cost(n),rhs(p),d(n),u(n),wn(n,9),wp(p,p+3),coef(p)\nx(:,1)=1d0; x(:,2)=[0d0,1d0,2d0,3d0,4d0,5d0]\nresponse=[1d0,3d0,5d0,7d0,9d0,20d0]\na=transpose(x); cost=-response; rhs=0.5d0*sum(x,dim=1)\nd=1d0; u=1d0; wn=0d0; wn(:,1)=0.5d0; wp=0d0\ncall rqfnb(n,p,a,cost,rhs,d,u,0.99995d0,1d-6,wn,wp,nit,info)\nif(info/=0.or.nit(1)>=50) error stop \"inspect LP factorization/iteration diagnostics\"\ncoef=-wp(:,1)\nprint *,coef\n! Check median-regression optimality independently; INFO alone is insufficient.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Default INTEGER/DOUBLE PRECISION fragment with transposed design, explicit dual initialization and compatible BLAS/LAPACK. The cap check conservatively requests inspection even if a fiftieth step met tolerance. No quantile fit, LP gap, singular case or Python wrapper was tested."
+              },
+              {
+                "procedure": "lpfnb initialization and iteration cap",
+                "role": "implementation-helper",
+                "path": "quantregpy/_fortran/rqfnb.f",
+                "line_start": 14,
+                "line_end": 58
+              },
+              {
+                "procedure": "lpfnb corrector and updates",
+                "role": "implementation-helper",
+                "path": "quantregpy/_fortran/rqfnb.f",
+                "line_start": 95,
+                "line_end": 147
+              },
+              {
+                "procedure": "stepy",
+                "role": "implementation-helper",
+                "path": "quantregpy/_fortran/rqfnb.f",
+                "line_start": 149,
+                "line_end": 167
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "GPL-3.0 license file; no later-version election identified",
+          "spdx_expression": "GPL-3.0-only",
+          "revision": "b0d3cc26f11e68f080c466a916b76d4e64188ec2",
+          "reviewed_on": "2026-11-05",
+          "notes": "The root provides GPL version 3 text. The Ratfor-output header identifies a translator and is not treated as a public-domain grant over the regression algorithm. Retain upstream quantreg and embedded numerical-source notices; separately linked libraries have their own terms.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/quantregpy/quantregpy/blob/b0d3cc26f11e68f080c466a916b76d4e64188ec2/LICENSE",
+              "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+            },
+            {
+              "path": "quantregpy/_fortran/rqfnb.f",
+              "url": "https://github.com/quantregpy/quantregpy/blob/b0d3cc26f11e68f080c466a916b76d4e64188ec2/quantregpy/_fortran/rqfnb.f",
+              "sha256": "31ce77d5a140001457b556b847efe1e5cb0d5eb3def6a4b080ceb1f83464f3e6"
+            }
+          ]
         }
       },
       "imports": {}
@@ -65306,12 +66055,221 @@
             ],
             "notes": "The README documents modeling examples and shared numerical infrastructure. Translation/adaptation status does not establish numerical equivalence with each R package; reusable inherited routines are distinguished from independent implementations. Broad time-series statistics is recorded before method-by-method review.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "L10a2a1",
+            "level": "source-reviewed",
+            "revision": "6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public ARMA_ACVF function forms theoretical autocovariances for a supplied causal ARMA model using a state transition/loading representation and fixed-point iteration of the stationary state covariance. It then propagates lag vectors to extract covariance at lags zero through MAX_LAG. These are model-implied covariances, not estimates from a sample. The sketch uses a stable AR(1), positive innovation variance and explicitly allocated empty MA coefficients. Invalid lag/variance returns an empty array; covariance iteration is capped and a failure returns HUGE-valued entries rather than a general status. A finite-value test alone does not reject that finite sentinel, and this routine does not independently prove model stability. Review covers state representation, iterative covariance and lag extraction, not the many unrelated translated time-series packages in the repository.",
+            "evidence": [
+              {
+                "path": "itsmr.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/itsmr.f90",
+                "sha256": "fbf9a951f439487f40021539d5808eab211eb48d0e285c50af39a90676c0fd76"
+              },
+              {
+                "path": "kind.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/kind.f90",
+                "sha256": "5d1b6dc57d64745faf9a9a15f5a87a8868aba4ccd93b96f8d5a5023a9e01f7b3"
+              },
+              {
+                "path": "test_itsmr.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/test_itsmr.f90",
+                "sha256": "86f9017befecdf6af59ac1e3fd39bae7deefd57932997f9f863ca4aa80e406c6"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "arma_acvf",
+                "role": "public-entry-point",
+                "summary": "Public theoretical ARMA autocovariance calculation returning an allocated zero-based lag array.",
+                "signature": "COVARIANCE = arma_acvf(MODEL,MAX_LAG)",
+                "declarations": [
+                  {
+                    "path": "itsmr.f90",
+                    "line_start": 133,
+                    "line_end": 140
+                  },
+                  {
+                    "path": "itsmr.f90",
+                    "line_start": 26,
+                    "line_end": 34
+                  }
+                ],
+                "path": "itsmr.f90",
+                "line_start": 133,
+                "line_end": 181,
+                "module": "itsmr_mod",
+                "usage": "use kind_mod, only: dp\nuse itsmr_mod, only: itsmr_arma_model_t,arma_acvf\ntype(itsmr_arma_model_t) :: model\nreal(dp),allocatable :: covariance(:)\nallocate(model%ar(1),model%ma(0)); model%ar=[0.5_dp]\nmodel%innovation_variance=1._dp\ncovariance=arma_acvf(model,4)\nif(size(covariance)/=5) error stop \"invalid covariance result shape\"\nif(any(abs(covariance)>=huge(1._dp))) error stop \"covariance iteration failed\"\nprint *,covariance\n! Returned normal-path bounds are 0:4; validate against the supplied model.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Build the complete matching module dependency graph; the selected source has its own BSD-2-Clause identifier. The model is supplied, not fitted. Check stability, finiteness and the HUGE sentinel separately; no covariance sequence or iteration was tested."
+              },
+              {
+                "procedure": "arma_acvf stationary covariance iteration",
+                "role": "implementation-helper",
+                "path": "itsmr.f90",
+                "line_start": 150,
+                "line_end": 180
+              }
+            ]
+          },
+          {
+            "code": "L10a2d3",
+            "level": "source-reviewed",
+            "revision": "6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f",
+            "reviewed_on": "2026-11-05",
+            "notes": "ARMA_FORECAST uses a supplied ARMA model, theoretical covariance and the innovations recursion to recover sample innovations and extend the centered AR/MA recurrence. It adds the sample mean back and builds normal prediction intervals from accumulated squared infinite-MA weights times innovation variance. This is ARMA forecasting L10a2d3, not model selection, parameter fitting or a parameter-uncertainty interval. Even for a supplied model, centering uses the current sample mean rather than a stored model intercept. Require allocated AR and MA arrays, stable valid parameters, positive variance/horizon and a confidence level strictly inside (0,1). The returned INFO distinguishes input/innovation errors, but the covariance helper finite-HUGE sentinel warrants additional model/diagnostic validation. Review covers forecast recursion, innovations dispatch and interval construction, not empirical coverage or all transformed/nonlinear variants.",
+            "evidence": [
+              {
+                "path": "itsmr.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/itsmr.f90",
+                "sha256": "fbf9a951f439487f40021539d5808eab211eb48d0e285c50af39a90676c0fd76"
+              },
+              {
+                "path": "kind.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/kind.f90",
+                "sha256": "5d1b6dc57d64745faf9a9a15f5a87a8868aba4ccd93b96f8d5a5023a9e01f7b3"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "arma_forecast",
+                "role": "public-entry-point",
+                "summary": "Public supplied-model ARMA mean forecast and Gaussian prediction-interval function.",
+                "signature": "OUT = arma_forecast(SERIES,MODEL,HORIZON,CONFIDENCE_LEVEL)",
+                "declarations": [
+                  {
+                    "path": "itsmr.f90",
+                    "line_start": 613,
+                    "line_end": 623
+                  },
+                  {
+                    "path": "itsmr.f90",
+                    "line_start": 42,
+                    "line_end": 48
+                  }
+                ],
+                "path": "itsmr.f90",
+                "line_start": 613,
+                "line_end": 678,
+                "module": "itsmr_mod",
+                "usage": "use kind_mod, only: dp\nuse itsmr_mod, only: itsmr_arma_model_t,itsmr_forecast_t,arma_forecast\ntype(itsmr_arma_model_t) :: model\ntype(itsmr_forecast_t) :: forecast\nreal(dp) :: series(8)\nseries=[0.1_dp,0.3_dp,-0.2_dp,0.4_dp,0.2_dp,-0.1_dp,0.1_dp,0.2_dp]\nallocate(model%ar(1),model%ma(0)); model%ar=[0.5_dp]\nmodel%innovation_variance=0.1_dp\nforecast=arma_forecast(series,model,3,0.95_dp)\nif(forecast%info/=0) error stop \"inspect forecast diagnostics\"\nprint *,forecast%mean,forecast%standard_error\n! Normal intervals condition on this supplied model and omit parameter uncertainty.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The fragment supplies a stable AR model rather than estimating it. Follow the sample-mean convention, module dependencies and covariance-sentinel caveat. No forecast, innovation recovery or interval coverage was run."
+              },
+              {
+                "procedure": "innovations_algorithm",
+                "role": "implementation-helper",
+                "path": "itsmr.f90",
+                "line_start": 183,
+                "line_end": 233
+              },
+              {
+                "procedure": "arma_forecast recurrence and intervals",
+                "role": "implementation-helper",
+                "path": "itsmr.f90",
+                "line_start": 642,
+                "line_end": 678
+              }
+            ]
+          },
+          {
+            "code": "L10a2c2",
+            "level": "source-reviewed",
+            "revision": "6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f",
+            "reviewed_on": "2026-11-05",
+            "notes": "The public BURG_FIT helper estimates univariate autoregressive coefficients by forward/backward prediction-error recursion. It demeans the series, computes reflection coefficients from paired errors, updates AR coefficients and innovation variance, then forms an approximate covariance matrix using an empirical Toeplitz matrix inverse. This supports AR parameter estimation, not automatic order selection or a global likelihood optimum. Input order must be positive and smaller than sample size; zero variance, degenerate error denominators, vanished innovation variance and failed covariance inversion have INFO returns. Reflections are clipped to [-1,1], and equality at a boundary can drive the variance failure path, so the header stable claim is not used as an unconditional guarantee. Review covers the native shared Burg implementation rather than only the ITSMR wrapper; covariance outputs are approximations, not verified inferential coverage.",
+            "evidence": [
+              {
+                "path": "time_series_stats.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/time_series_stats.f90",
+                "sha256": "8dfee190ee8b4420149f05574edc709bc07082696dc8c30c7651aafd19c4b05c"
+              },
+              {
+                "path": "kind.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/kind.f90",
+                "sha256": "5d1b6dc57d64745faf9a9a15f5a87a8868aba4ccd93b96f8d5a5023a9e01f7b3"
+              },
+              {
+                "path": "itsmr.f90",
+                "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/itsmr.f90",
+                "sha256": "fbf9a951f439487f40021539d5808eab211eb48d0e285c50af39a90676c0fd76"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "burg_fit",
+                "role": "public-entry-point",
+                "summary": "Public pure Burg AR estimator returning coefficients, reflections, variance, approximate covariance and status.",
+                "signature": "FIT = burg_fit(SERIES,ORDER)",
+                "declarations": [
+                  {
+                    "path": "time_series_stats.f90",
+                    "line_start": 179,
+                    "line_end": 187
+                  },
+                  {
+                    "path": "time_series_stats.f90",
+                    "line_start": 19,
+                    "line_end": 24
+                  }
+                ],
+                "path": "time_series_stats.f90",
+                "line_start": 179,
+                "line_end": 246,
+                "module": "time_series_stats_mod",
+                "usage": "use kind_mod, only: dp\nuse time_series_stats_mod, only: burg_result_t,burg_fit\ntype(burg_result_t) :: fit\nreal(dp) :: series(12)\nseries=[0.2_dp,0.5_dp,-0.1_dp,0.3_dp,0.7_dp,0.1_dp, &\n -0.4_dp,0.2_dp,0.4_dp,-0.2_dp,0.1_dp,0.6_dp]\nfit=burg_fit(series,2)\nif(fit%info/=0) error stop \"inspect Burg/covariance diagnostics\"\nprint *,fit%coefficients,fit%variance\n! Assess order choice, residuals and stability independently.",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. The selected original infrastructure source identifies MIT, while the ITSMR translation has a separate BSD-2-Clause identifier. Link the matching kind/statistics/linear-algebra modules. No coefficients, stability, covariance or fitted residuals were tested."
+              },
+              {
+                "procedure": "burg_fit forward/backward recursion",
+                "role": "implementation-helper",
+                "path": "time_series_stats.f90",
+                "line_start": 194,
+                "line_end": 230
+              },
+              {
+                "procedure": "burg_fit covariance approximation",
+                "role": "implementation-helper",
+                "path": "time_series_stats.f90",
+                "line_start": 231,
+                "line_end": 246
+              }
+            ]
           }
         ],
-        "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
+        "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
         "discovery": {
           "url": "https://github.com/Beliavsky/Fortran-code-on-GitHub/blob/f5ab25294a12ed004d5a8934200ca8e26ac2e825/README.md",
           "commit": "f5ab25294a12ed004d5a8934200ca8e26ac2e825"
+        },
+        "license": {
+          "label": "BSD-2-Clause and MIT identifiers in reviewed sources; other package terms vary",
+          "spdx_expression": null,
+          "revision": "6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f",
+          "reviewed_on": "2026-11-05",
+          "notes": "The selected ITSMR translation explicitly identifies BSD-2-Clause; the reviewed original statistics/kind infrastructure identifies MIT. The README also warns that other translated packages have GPL terms. Record this scoped source evidence without assigning a blanket expression to the full repository or its unreviewed dependency graph.",
+          "evidence": [
+            {
+              "path": "itsmr.f90",
+              "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/itsmr.f90",
+              "sha256": "fbf9a951f439487f40021539d5808eab211eb48d0e285c50af39a90676c0fd76"
+            },
+            {
+              "path": "time_series_stats.f90",
+              "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/time_series_stats.f90",
+              "sha256": "8dfee190ee8b4420149f05574edc709bc07082696dc8c30c7651aafd19c4b05c"
+            },
+            {
+              "path": "kind.f90",
+              "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/kind.f90",
+              "sha256": "5d1b6dc57d64745faf9a9a15f5a87a8868aba4ccd93b96f8d5a5023a9e01f7b3"
+            },
+            {
+              "path": "README.md",
+              "url": "https://github.com/Beliavsky/time-series/blob/6b4e3ae984dc148c9b1fd26fb24a07f4c3b9775f/README.md",
+              "sha256": "e2055ccecf11bda381c17f7fd264be7ba71e41c2d170dbcbb39f859d63fdce95"
+            }
+          ]
         }
       },
       "imports": {}

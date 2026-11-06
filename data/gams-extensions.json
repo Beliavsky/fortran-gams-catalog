@@ -726,6 +726,54 @@
       "parent": "D4c1b",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-05"
+    },
+    "D4c2": {
+      "label": "Compute eigenvalues of matrix in compact form",
+      "parent": "D4c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D4c2b": {
+      "label": "Hessenberg",
+      "parent": "D4c2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "D4c1a": {
+      "label": "Balance matrix",
+      "parent": "D4c1",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L8c3": {
+      "label": "L_p for p different from 2",
+      "parent": "L8c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2d": {
+      "label": "ARMA and ARIMA models (including Box-Jenkins methods)",
+      "parent": "L10a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2d3": {
+      "label": "Forecasting",
+      "parent": "L10a2d",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2c": {
+      "label": "Autoregressive models",
+      "parent": "L10a2",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
+    },
+    "L10a2c2": {
+      "label": "Parameter estimation",
+      "parent": "L10a2c",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-05"
     }
   }
 }
