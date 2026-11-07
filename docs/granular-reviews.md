@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 498 repositories now have 791 source-reviewed
+Reviewed on 2026-11-07. 508 repositories now have 804 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-484 repository cards now identify public routines and link their usage lines
+494 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 498 independently source-reviewed repositories now have an
+separately. All 508 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2060,3 +2060,24 @@ declaration, while integrate_fortran's placeholder license is not promoted to a
 resolved SPDX license. The 45 overlapping playground imports keep the catalog at
 1,000 distinct repositories. These are interface/source reviews; no new main
 programs were compiled or run, and numerical checked-driver scope remains separate.
+
+
+A further public-interface review adds **25 calling sequences across ten selected
+FPM packages**: finterp, mersenne-twister-fortran, fortran_function_parser,
+orderpack, regridpack, splpak, pikaia, nlesolver-fortran, daglib and rklib.
+The 13 scoped GAMS reviews include initialization/evaluation workflows for
+linear and rectangular interpolation, MT19937-64 seeding and uniform draws,
+expression parsing and error queries, ranking and partial sorting, least-squares
+splines, genetic fitness maximization, dense nonlinear solving, dependency-graph
+ordering and fixed-step classic RK4 integration. Bound calls use the public
+binding and concrete type; signatures omit the implicit passed object and link
+to argument, kind, callback and inherited-binding declarations.
+
+The review records short-output ranking semantics, caller-validated partial-sort
+bounds, extrapolation policies, object-status conventions and the pinned SPLPAK
+evaluator's incorrect COEF INTENT(OUT) declaration. That defect is documented
+rather than represented as a portable interface guarantee. No new numerical
+drivers were compiled or run, and no package pin or hosted verification claim
+was changed. Independent reviews now overlap 55 playground imports; the catalog
+still contains 1,000 distinct repositories. Scoped license findings preserve
+original and modernized component notices.
