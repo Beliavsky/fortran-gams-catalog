@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 548 repositories now have 850 source-reviewed
+Reviewed on 2026-11-07. 558 repositories now have 862 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-534 repository cards now identify public routines and link their usage lines
+544 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 548 independently source-reviewed repositories now have an
+separately. All 558 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2176,3 +2176,23 @@ License notes preserve alternative licenses and explicitly identify absent
 license evidence. No new driver was compiled or run, and no hosted package pin
 or verification scope changed. Independent reviews now overlap 95 playground
 imports; the catalog remains at 1,000 distinct repositories.
+
+
+A utility interface batch adds **25 calling sequences across ten more selected
+FPM packages**: test-drive, fortran_test_helper, ferror, fortime, argv-fortran,
+popen-fortran, m_sort, m_list, m_color and flist. Twelve scoped GAMS reviews
+cover test registration and execution, numerical assertions, error handling,
+wall-clock timing, argument retrieval, process-output capture, sorting,
+allocatable storage, key searches and color conversion.
+
+The notes specify callback lifetimes and failure-count initialization, scalar
+versus array tolerance boundaries, fatal-by-default error reporting, timing
+state and loop averaging, absent process-status channels, in-place versus
+permutation sorting, descending-order search/insertion conventions, color
+ranges and status codes, and polymorphic list ownership. Component license
+notices remain explicit, including the compact quicksort attribution. Every
+sequence links its pinned implementation and argument declarations; public
+generics and type-bound calls use their actual exposed names. No new driver
+was compiled or run and hosted package pins and verification scope did not
+change. Independent reviews now overlap 105 playground imports; the catalog
+remains at 1,000 distinct repositories.
