@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 508 repositories now have 804 source-reviewed
+Reviewed on 2026-11-07. 518 repositories now have 816 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-494 repository cards now identify public routines and link their usage lines
+504 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 508 independently source-reviewed repositories now have an
+separately. All 518 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2081,3 +2081,28 @@ drivers were compiled or run, and no package pin or hosted verification claim
 was changed. Independent reviews now overlap 55 playground imports; the catalog
 still contains 1,000 distinct repositories. Scoped license findings preserve
 original and modernized component notices.
+
+
+A numerical-utilities interface batch adds **25 calling sequences across ten
+more selected FPM packages**: peaks, specialmatrices, fastconv, forpca,
+rng-fortran, lookup-table-fortran, fordiff, fortran-search-and-sort, stringsort
+and codata. The 12 scoped GAMS reviews cover signal-extremum searching,
+structured tridiagonal construction/conversion/solving, valid convolution,
+PCA, seeded uniform/normal/Poisson draws, linear lookup, numerical derivatives,
+array searching/sorting, lexical/natural string sorting and physical-constant
+lookup. Each signature links to exact pinned argument declarations, with
+supporting links for generic overloads, bound objects, callback interfaces and
+included/submodule implementations.
+
+The notes distinguish confirmed signal extrema from endpoint candidates,
+valid convolution from full convolution, uniform endpoint conventions,
+normal-cache behavior on reseeding, lookup-table clamping and the caller's
+column-index validation responsibility. PCA notes identify the pinned default
+SVD variance convention, partially filled score outputs, reconstruction and
+object-reuse limitations; the tridiagonal solver notes its lack of propagated
+public error status. Derivative method strings, exact-match search semantics,
+natural-sort integer limits and CODATA absent-entry behavior are explicit.
+These are source/interface reviews, with no new numerical execution claims or
+changes to hosted package pins. License findings retain incomplete root grants
+and component notices where applicable. Independent reviews now overlap 65
+playground imports; the catalog remains at 1,000 distinct repositories.
