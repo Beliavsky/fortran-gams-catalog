@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 458 repositories now have 738 source-reviewed
+Reviewed on 2026-11-07. 468 repositories now have 750 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-444 repository cards now identify public routines and link their usage lines
+454 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 458 independently source-reviewed repositories now have an
+separately. All 468 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -1990,3 +1990,20 @@ separate; no new main programs were compiled or run. Four existing imported
 repositories gain catalog-owned reviews, so the number of distinct repositories
 remains 1,000. These interfaces feed the package catalog automatically after
 refresh; each matching checked example is linked alongside its calling sequence.
+
+
+A further selected-FPM interface review adds **23 calling sequences across ten
+packages**: PCHIP (construction, evaluation and integration), FFTPACK (complex
+forward/inverse transforms), specfun (Bernoulli numbers), specfunc-fullerton
+(gamma, reciprocal gamma and digamma), Carlson elliptic integrals (RC/RD/RF/RJ),
+fortran-bessels (I0/I1/K0/K1), polyroots-fortran (real Jenkins-Traub and real/complex
+companion matrices), LSMR, MINRES and KISS conjugate gradients. The twelve
+source-reviewed class claims use the exact selected package revisions. Links
+identify argument declarations, callback contracts, public precision kinds and
+reexports. The review records FFTPACK's unnormalized inverse, Fullerton's default
+REAL interfaces, specfun's unwritten odd Bernoulli entries, and LSMR's executable
+stopping codes where old comments disagree. MINRES's original CPL component is
+kept separate from its MIT additions. These ten existing imported repositories
+receive independent reviews; the catalog still has 1,000 distinct repositories.
+No new main programs were compiled or run, and existing hosted driver claims
+remain separate from the source/interface reviews.
