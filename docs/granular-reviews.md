@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-06. 453 repositories now have 729 source-reviewed
+Reviewed on 2026-11-07. 454 repositories now have 730 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-439 repository cards now identify public routines and link their usage lines
+440 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 453 independently source-reviewed repositories now have an
+separately. All 454 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -1963,3 +1963,16 @@ was modified. The extended review includes explicit Numerical Recipes notices
 in AVEVAR/TRED2/TQLI/PYTHAG, so the license record now flags unresolved component
 terms alongside the root MIT notice. No upstream numerical code is bundled.
 Existing RK4/Akima source evidence remains unchanged and was not newly executed.
+
+PowellOpt now has an independently maintained G2h1a1 interface review at the
+same commit selected by the FPM playground. The public
+`bobyqa_module::bobyqa` call has ten arguments, with the objective callback last
+and workspace allocated internally. Links identify the complete argument list,
+assumed-shape callback declarations and REAL64 precision selection. X is updated;
+there is no returned F, status or evaluation count. The illustrative calling
+program was not compiled or run for this review, and the pre-existing checked
+playground quadratic driver remains separate. LICENSE.md records the BSD
+three-clause modifications and the original Powell unrestricted-use notices;
+the README's LICENSE link is outdated. The reverse metadata feed now has its
+first selected-package match. This adds a local review of an already imported
+repository rather than another distinct repository.

@@ -8,17 +8,18 @@ helpers and execution-verification records are excluded. The FPM playground's
 exact pinned revisions and preserving local overrides. This permits shared
 review maintenance without a circular playground-import/export loop.
 Uncompiled usage sketches remain explicitly unchecked; a local numerical test
-does not become a hosted playground check. Existing independent reviews have
-no repository overlap with the currently selected playground packages, so the
-first reverse refresh legitimately has no matches. A selected package can gain
-a local review here using the same evidence format as any other repository.
+does not become a hosted playground check. PowellOpt's BOBYQA interface is the
+first independent review shared back with a selected playground package. Further
+selected packages can gain local reviews here using the same evidence format as
+any other repository.
 
 A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
 The saved catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, alongside **702 independent
-repository reviews**. Counts describe the saved snapshot and change on refresh.
+procedure evidence and checked driver links, alongside **703 catalog-owned
+repository reviews**. One review overlaps a playground import, giving 1,000
+distinct repositories. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
 
