@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 488 repositories now have 774 source-reviewed
+Reviewed on 2026-11-07. 498 repositories now have 791 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-474 repository cards now identify public routines and link their usage lines
+484 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 488 independently source-reviewed repositories now have an
+separately. All 498 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2042,3 +2042,21 @@ All reviews use the selected upstream pins; existing driver execution records
 remain separate and no new main programs were compiled or run. The catalog still
 contains 1,000 distinct repositories, with 35 playground imports now also having
 independent local reviews.
+
+
+A transforms/quadrature/interpolation batch adds **25 calling sequences across
+ten more selected FPM packages**: Spectrum, fortran-primes, geodesic-fortran,
+pointsets, GaussJacobiQuad, integrate_fortran, fortranlib, fortran-utils,
+interpolation and fastmath. Seventeen source-reviewed claims distinguish full
+and centered convolution, half-spectrum length/normalization, prime-value cutoffs,
+degree-valued geodesic angles and required masked outputs, normalized random
+spacings, allocatable-character quadrature selectors, nested integration bounds,
+scalar/vector interpolation, trapezoid sums, limited real quadratic roots,
+consistent-boundary splines, interval-versus-point mesh sizes and approximate
+floating-point functions. Source comments referring to CC-BY-NC-4.0 components
+in fortran-primes are retained alongside its root MIT notice; no MIT-only grant
+is inferred for the complete library. pointsets retains its manifest MIT
+declaration, while integrate_fortran's placeholder license is not promoted to a
+resolved SPDX license. The 45 overlapping playground imports keep the catalog at
+1,000 distinct repositories. These are interface/source reviews; no new main
+programs were compiled or run, and numerical checked-driver scope remains separate.
