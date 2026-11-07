@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 538 repositories now have 838 source-reviewed
+Reviewed on 2026-11-07. 548 repositories now have 850 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-524 repository cards now identify public routines and link their usage lines
+534 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 538 independently source-reviewed repositories now have an
+separately. All 548 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2154,3 +2154,25 @@ generic bindings and supporting types. Scoped license findings preserve
 original/component notices. No new numerical driver was compiled or run and
 no hosted package pin or verification scope changed. Independent reviews now
 overlap 85 playground imports; the catalog remains at 1,000 distinct repositories.
+
+
+A data-handling interface batch adds **25 calling sequences across ten more
+selected FPM packages**: csv-fortran, json-fortran, toml-f, datetime-fortran,
+m_sets, functional-fortran, fortran-fast-float, fortran-string-to-real,
+fortran-shlex and forgex. Twelve scoped GAMS reviews cover tabular input,
+document parsing and serialization, date construction and formatting, set
+operations, functional array transformations, numeric parsing, command-line
+tokenization and regular-expression matching.
+
+Notes distinguish required status outputs from optional error channels,
+allocatable results from caller-sized messages, missing values from parse
+failures, and next-position parsing indices from counts of consumed characters.
+They also record TOML default insertion, fixed date offsets and omitted timezone
+suffixes, integer membership flags, pure callback contracts, restricted numeric
+input grammars, tokenization without command execution, and regex validation
+without a match guarantee. Every signature has pinned source and argument
+declaration links; optional markers are checked against the declarations.
+License notes preserve alternative licenses and explicitly identify absent
+license evidence. No new driver was compiled or run, and no hosted package pin
+or verification scope changed. Independent reviews now overlap 95 playground
+imports; the catalog remains at 1,000 distinct repositories.
