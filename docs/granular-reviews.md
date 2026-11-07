@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 558 repositories now have 862 source-reviewed
+Reviewed on 2026-11-07. 568 repositories now have 873 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-544 repository cards now identify public routines and link their usage lines
+554 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 558 independently source-reviewed repositories now have an
+separately. All 568 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2196,3 +2196,25 @@ generics and type-bound calls use their actual exposed names. No new driver
 was compiled or run and hosted package pins and verification scope did not
 change. Independent reviews now overlap 105 playground imports; the catalog
 remains at 1,000 distinct repositories.
+
+
+A text/input interface batch adds **25 calling sequences across ten more
+selected FPM packages**: m_strings, m_io, m_time, m_cli2, m_attr, jonquil,
+strff, iso_varying_string, utf8-f and ryu_fortran. Eleven scoped GAMS reviews
+cover tokenization, wildcard matching, file/table/record input, calendar
+conversion, command-option parsing, terminal markup, JSON parsing/serialization,
+varying strings, Unicode byte validation and numeric-to-text formatting.
+
+Notes distinguish delimiter sets from substrings, padded token arrays from
+varying strings, record completion from raw IOSTAT, local offsets from UTC,
+optional parser diagnostics from stopping paths, terminal escapes from HTML,
+polymorphic JSON roots from object-only assumptions, and code points from
+graphemes or display columns. Limitations of the pinned implementations remain
+explicit: unimplemented Unicode escape decoding, incomplete calendar validation,
+malformed numeric table rows, bounded formatting buffers, subnormal-to-zero
+formatting and incomplete serializer error reporting. License evidence records
+root/manifest discrepancies and absent project grants. Each sequence links its
+pinned source and argument declarations; no new numerical driver was compiled
+or run, and hosted pins and verification scope were not changed. Independent
+reviews now overlap 115 playground imports; the catalog remains at 1,000 distinct
+repositories.
