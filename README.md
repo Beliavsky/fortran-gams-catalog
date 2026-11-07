@@ -1,5 +1,18 @@
 # Fortran software by GAMS classification
 
+Every site build also publishes `reviewed-metadata.json`, a deterministic feed
+of independently authored license and source-procedure reviews. Only the local
+review layer is exported; saved playground imports, private implementation
+helpers and execution-verification records are excluded. The FPM playground's
+`xcatalog_reviews.py` can consume this feed, matching repository identities and
+exact pinned revisions and preserving local overrides. This permits shared
+review maintenance without a circular playground-import/export loop.
+Uncompiled usage sketches remain explicitly unchecked; a local numerical test
+does not become a hosted playground check. Existing independent reviews have
+no repository overlap with the currently selected playground packages, so the
+first reverse refresh legitimately has no matches. A selected package can gain
+a local review here using the same evidence format as any other repository.
+
 A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 

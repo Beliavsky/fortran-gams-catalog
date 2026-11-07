@@ -7,6 +7,7 @@ from legacy_gams import load as load_legacy, listing_records
 from pathlib import Path
 import shutil
 from urllib.parse import quote
+from review_export import publish_review_feed
 
 from catalog import ROOT, assemble, belongs, lineage, matching_drivers, procedure_label, PROCEDURE_ROLES
 
@@ -106,6 +107,7 @@ def build(destination, root=ROOT):
                             shutil.copy2(root/artifact, target)
                             copied.add(artifact)
     (destination/'.nojekyll').touch()
+    publish_review_feed(destination, projects)
     (destination/'catalog.json').write_text(json.dumps(merged, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'taxonomy.json').write_text(json.dumps(tree, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'legacy-gams.json').write_text(json.dumps(legacy, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
