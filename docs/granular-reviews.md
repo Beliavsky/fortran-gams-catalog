@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 478 repositories now have 762 source-reviewed
+Reviewed on 2026-11-07. 488 repositories now have 774 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-464 repository cards now identify public routines and link their usage lines
+474 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 478 independently source-reviewed repositories now have an
+separately. All 488 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2025,3 +2025,20 @@ reuse license, so neither is assigned a standard SPDX grant by inference.
 These are independent reviews of existing imported packages, keeping 1,000
 distinct repositories. Existing checked drivers remain separate; no new main
 programs were compiled or run for this interface batch.
+
+
+An object-interface batch adds **25 calling sequences across ten more selected
+FPM packages**: roots-fortran (Brent), quadrature-fortran (1D/2D), bspline-fortran
+(1D/2D auto-knot interpolation), DOP853, DDEABM, SLSQP, simulated-annealing, NumDiff,
+LSQR and qdldl-fortran. Twelve source-reviewed claims describe initialization,
+callback registration and numerical operations as object-bound calls. Public
+module/type/binding names are recorded separately from implementation routine
+names. Calls omit the implicit passed object; declaration links retain it and
+identify callback parent classes and precision kinds. The notes distinguish
+required outputs after optional controls, rank-one tolerance arrays, spline order
+versus degree, LSQR stopping codes, and nonpivoted QDLDL's quasi-definite scope.
+Error estimates and solver statuses are not promoted into correctness guarantees.
+All reviews use the selected upstream pins; existing driver execution records
+remain separate and no new main programs were compiled or run. The catalog still
+contains 1,000 distinct repositories, with 35 playground imports now also having
+independent local reviews.
