@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 568 repositories now have 873 source-reviewed
+Reviewed on 2026-11-07. 578 repositories now have 884 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-554 repository cards now identify public routines and link their usage lines
+564 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 568 independently source-reviewed repositories now have an
+separately. All 578 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2218,3 +2218,25 @@ pinned source and argument declarations; no new numerical driver was compiled
 or run, and hosted pins and verification scope were not changed. Independent
 reviews now overlap 115 playground imports; the catalog remains at 1,000 distinct
 repositories.
+
+
+A numerical/container interface batch adds **25 calling sequences across ten
+more selected FPM packages**: fhash, kissfft-f, maptran3d, m_la,
+fortran-simplify, forwarddiff, dnaoad-fpm, fglm, fortran_vector and rearrayfx.
+Eleven scoped GAMS reviews cover hash-table storage/search, FFT planning and
+execution, coordinate transformations, special matrices and row reduction,
+polyline reduction, forward automatic differentiation, graphics transforms
+and capacity-backed array containers.
+
+Notes record key construction and getter type/status contracts, C-plan
+initialization/finalization and precision, default-real geographic units and
+optional height outputs, split-complex leading dimensions, row-oriented curve
+points and stopping preconditions, dual-number callbacks and compile-time
+derivative orders, graphics matrix layout/composition, and logical lengths
+versus backing capacity. Ownership notes distinguish copied data, borrowed
+pointers and invalidated views. Licenses preserve embedded/component notices,
+the explicit BSD patent grant and absent licensing evidence. Public module
+interfaces link their declarations and the implementing submodule evidence.
+No new driver was compiled or run and no hosted package pin or execution scope
+changed. Independent reviews now overlap 125 playground imports; the catalog
+remains at 1,000 distinct repositories.
