@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 454 repositories now have 730 source-reviewed
+Reviewed on 2026-11-07. 458 repositories now have 738 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-440 repository cards now identify public routines and link their usage lines
+444 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 454 independently source-reviewed repositories now have an
+separately. All 458 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -1976,3 +1976,17 @@ three-clause modifications and the original Powell unrestricted-use notices;
 the README's LICENSE link is outdated. The reverse metadata feed now has its
 first selected-package match. This adds a local review of an already imported
 repository rather than another distinct repository.
+
+A selected-FPM interface batch adds 13 calling sequences across lbfgsb, fmin,
+minpack and quadpack, with eight source-reviewed classifications. MINPACK covers
+LMDIF1/LMDER1 least squares and HYBRD1/HYBRJ1 nonlinear systems. QUADPACK covers
+DQAG, DQAGS, DQAGI, DQAGP, DQAWC, DQAWO and DQAWS, including the distinct callback
+meanings and workspace formulas for weighted/singular problems. L-BFGS-B retains
+its reverse-communication state contract and optional iteration-file argument;
+fmin puts its scalar objective first and returns no convergence status. The
+reviews use the exact selected upstream commits and record callback/precision
+declarations and scoped license findings. Existing hosted numerical checks remain
+separate; no new main programs were compiled or run. Four existing imported
+repositories gain catalog-owned reviews, so the number of distinct repositories
+remains 1,000. These interfaces feed the package catalog automatically after
+refresh; each matching checked example is linked alongside its calling sequence.

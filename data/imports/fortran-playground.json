@@ -4339,7 +4339,7 @@
       },
       {
         "path": "fpm_catalog/gams.json",
-        "sha256": "a4b6e4993715516c84adb43e715fe279ef0a69d5272d526d04692467a95b4636"
+        "sha256": "8467b67b1493f4cc655a9802314e2d514f4f5268873c50faa38d4d6ce8c57c0a"
       },
       {
         "path": "fpm_catalog/name-attributions.json",
@@ -42101,8 +42101,8 @@
             "notes": "Search interval brackets a scalar minimizer; this is not a general constraint solver.",
             "evidence": [
               {
-                "path": "src/fmin_module.f90",
-                "line": 94,
+                "path": "src/fmin_module.F90",
+                "line": 85,
                 "sha256": "d63cd59c63c3be05d2f73bdacbf53acef42a70ecef893da770b6a3d087d32182"
               }
             ],
@@ -64072,5 +64072,5 @@
       ]
     }
   },
-  "snapshot_id": "sha256:55932d9b724697c17986c178680c969554379181782af6cb61fa66f12c9ff56f"
+  "snapshot_id": "sha256:181b8b76154be89c245e7203c3f936ccbec719d500bf3fc65c632359956e6795"
 }
