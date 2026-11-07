@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 528 repositories now have 827 source-reviewed
+Reviewed on 2026-11-07. 538 repositories now have 838 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-514 repository cards now identify public routines and link their usage lines
+524 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 528 independently source-reviewed repositories now have an
+separately. All 538 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2130,3 +2130,27 @@ incomplete manifest-only license evidence where applicable. No new numerical
 drivers were compiled or run, package pins were not changed, and hosted
 verification scope was not expanded. Independent reviews now overlap 75
 playground imports; the catalog still contains 1,000 distinct repositories.
+
+
+A solver/interpolation interface batch adds **25 calling sequences across ten
+more selected FPM packages**: dvode, fitpack, nonlin, linalg, kdtree2,
+differentia, stiff3, blas-interface, odrpack95 and nlopt-f. The 11 scoped GAMS
+reviews cover object-aware Adams/BDF integration, spline loading/interpolation/
+evaluation, Brent callback registration and solving, reusable square LU factors,
+full dense SVD, pointer-owned nearest-neighbor trees, dual-number derivatives,
+autonomous stiff integration, assumed-shape BLAS products, orthogonal-distance
+regression and retained-callback local optimization.
+
+Notes specify tolerance-array and continuation-workspace contracts, spline
+degree/status conventions, procedure-pointer versus ordinary callback actuals,
+LU singularity handling, full versus economy SVD storage, column-oriented
+k-d tree data lifetimes and squared distances, allocatable AD error messages,
+STIFF3 autonomous callbacks and half-step conventions, BLAS dimension/ABI
+requirements, ODR model objects and weight ranks, and NLopt callback-wrapper
+lifetimes and termination codes. Optional markers are checked against actual
+OPTIONAL declarations, excluding comments and dimension-expression references.
+Pinned declaration links include the relevant callbacks, kind parameters,
+generic bindings and supporting types. Scoped license findings preserve
+original/component notices. No new numerical driver was compiled or run and
+no hosted package pin or verification scope changed. Independent reviews now
+overlap 85 playground imports; the catalog remains at 1,000 distinct repositories.
