@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 518 repositories now have 816 source-reviewed
+Reviewed on 2026-11-07. 528 repositories now have 827 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-504 repository cards now identify public routines and link their usage lines
+514 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 518 independently source-reviewed repositories now have an
+separately. All 528 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2106,3 +2106,27 @@ These are source/interface reviews, with no new numerical execution claims or
 changes to hosted package pins. License findings retain incomplete root grants
 and component notices where applicable. Independent reviews now overlap 65
 playground imports; the catalog remains at 1,000 distinct repositories.
+
+
+A cubature/geometry/graphics interface batch adds **25 calling sequences across
+ten more selected FPM packages**: fortran_cubatures, dcuhre, rkf45, geompack,
+rndgen-fortran, forcolormap, fsparse, iapws, rational_number and forimage.
+The 11 scoped GAMS reviews cover reference-element integration rules, adaptive
+hyperrectangle integration, retained-workspace ODE integration, planar geometry,
+seeded random draws, palette lookup, dense/coordinate sparse conversion,
+water saturation curves, bounded-integer rational arithmetic and PNM image
+construction/transformation/export. Public generic, bound and external calling
+conventions retain their distinct declaration links; no synthetic module name
+is attached to external DCUHRE.
+
+Notes specify quadrature reference measures and degree conventions, DCUHRE
+callback/workspace/restart rules, RKF45 precision selection and continuation
+flags, GEOMPACK point-order restoration on success, random integer scaling
+limits, zero-based palette levels, sparse conversion initialization and a TINY
+boundary defect, IAPWS MPa/kelvin units, rational denominator/overflow limits,
+and image pixel layout and appended filename extensions. Scoped license
+findings preserve ACM noncommercial terms, component palette notices and
+incomplete manifest-only license evidence where applicable. No new numerical
+drivers were compiled or run, package pins were not changed, and hosted
+verification scope was not expanded. Independent reviews now overlap 75
+playground imports; the catalog still contains 1,000 distinct repositories.
