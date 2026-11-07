@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 468 repositories now have 750 source-reviewed
+Reviewed on 2026-11-07. 478 repositories now have 762 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-454 repository cards now identify public routines and link their usage lines
+464 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 468 independently source-reviewed repositories now have an
+separately. All 478 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2007,3 +2007,21 @@ kept separate from its MIT additions. These ten existing imported repositories
 receive independent reviews; the catalog still has 1,000 distinct repositories.
 No new main programs were compiled or run, and existing hosted driver claims
 remain separate from the source/interface reviews.
+
+
+A statistics and matrix-interface batch adds **23 calling sequences across ten
+more selected FPM packages**: Fstats (eight descriptive-statistics array overloads),
+forinv, foreig, forsvd, fordot, formatmul, FJsample, fortsa, lib_statistics and
+econ-toolchain. Twelve source-reviewed claims document explicit storage, real
+kinds, optional controls and diagnostic limitations at the selected package pins.
+Generic names are retained alongside links to their specific implementations.
+The notes distinguish sample and pooled variance, quantile interpolation, in-place
+trimming, an absolute pseudoinverse cutoff, caller-supplied SVD factor buffers,
+SYEV versus the default nonsymmetric eigensolver, and real jackknife bias scaling.
+The CTSA-backed autocovariance interfaces count lag zero in their output length;
+the Tauchen and stationary-vector routines require opposite matrix orientations.
+The reviewed lib_statistics and econ-toolchain files do not establish a repository
+reuse license, so neither is assigned a standard SPDX grant by inference.
+These are independent reviews of existing imported packages, keeping 1,000
+distinct repositories. Existing checked drivers remain separate; no new main
+programs were compiled or run for this interface batch.
