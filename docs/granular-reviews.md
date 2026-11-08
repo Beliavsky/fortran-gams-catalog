@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 678 repositories now have 996 source-reviewed
+Reviewed on 2026-11-08. 688 repositories now have 1008 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-664 repository cards now identify public routines and link their usage lines
+674 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 678 independently source-reviewed repositories now have an
+separately. All 688 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2444,3 +2444,25 @@ Source hashes, signatures and declaration links were checked at the exact pins.
 No new drivers were compiled or run, and no hosted pin or backend code changed.
 Independent calling-interface reviews now overlap 225 playground imports;
 the catalog remains at 1,000 distinct repositories.
+
+An AD/numerical-utility/testing batch adds **35 calling sequences across ten more
+selected FPM packages**: ciaaw, ecx, forsudoku, rpn-calculator-fortran, ad_dnsvm,
+shunting-yard-fortran, fassert, fortran-error-handler, berkeley-assert and
+m_framework. Twelve scoped reviews separate atomic/isotope table lookups,
+complex circuit-element arithmetic, Sudoku operations, integer GCD/LCM,
+real cube root and sinc, scalar AD derivatives, token parsing, assertions,
+error records and process timing.
+
+Calling notes identify precision sources, explicit derivative-order seeding,
+allocatable gradient/Hessian/tensor results, NOPASS parser registration and
+associated evaluation callbacks. They distinguish partial Sudoku validity
+from occupancy, note the unbounded randomized solve, preserve GCD/LCM input
+and overflow restrictions, and explain absolute assertion tolerances and
+terminating versus status-returning checks. Timer queries read stored samples;
+they do not resample the clock. Native/current license findings retain the
+Berkeley enhancement provision and upstream GPL-or-later grant where applicable.
+Pinned source hashes, argument lists, declaration links and rendered pages
+were checked. No new main programs were compiled or run; hosted pins, existing
+numerical verification and backend behavior are unchanged. Independent reviews
+now overlap 235 playground imports; the catalog remains at 1,000 distinct
+repositories.
