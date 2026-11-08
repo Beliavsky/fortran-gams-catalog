@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 608 repositories now have 921 source-reviewed
+Reviewed on 2026-11-07. 618 repositories now have 934 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-594 repository cards now identify public routines and link their usage lines
+604 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 608 independently source-reviewed repositories now have an
+separately. All 618 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2302,3 +2302,25 @@ argument/result declarations and public exports. No new driver was compiled or
 run, and no hosted pin or execution-verification scope changed. Independent
 reviews now overlap 155 playground imports; the catalog remains at 1,000
 distinct repositories.
+
+
+A numerical-interface batch adds **25 calling sequences across ten more selected
+FPM packages**: scifortran, qdutillib, forlab, nafpack, odepack, friction,
+dynamics, nufft1d, nufft2d and conmin. Thirteen scoped GAMS reviews cover
+sampled integration, orthogonal polynomial bases/operators, array generation,
+variance normalization, Cholesky factors, direct and nonuniform Fourier
+transforms, stateful ODE integration, simulation-model evaluation, structural
+eigenmodes and constrained minimization.
+
+Notes record sample-count restrictions, configured result precision, matrix and
+basis storage, Hermite/Legendre normalization, direct DFT versus planned FFT,
+NUFFT sign/centering and unequal type-1/type-2/type-3 scaling, collapsed-span
+restrictions, ODE callback lifetimes and continuation status, friction sign and
+zero-velocity behavior, angular versus cyclic frequencies and reverse-
+communication workspaces. Fixed-form external routines retain their actual
+non-module names and star-size declarations; public generics link to their
+pinned implementations/declarations. Root license grants, public-domain notices
+and adapted hosted subsets remain explicit. All sequences were checked against
+pinned source; no new driver was compiled or run, and no hosted pin or numerical
+verification scope changed. Independent reviews now overlap 165 playground
+imports; the catalog remains at 1,000 distinct repositories.
