@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 598 repositories now have 910 source-reviewed
+Reviewed on 2026-11-07. 608 repositories now have 921 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-584 repository cards now identify public routines and link their usage lines
+594 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 598 independently source-reviewed repositories now have an
+separately. All 608 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2281,3 +2281,24 @@ All calls and declaration ranges were checked against pinned source files; no
 new numerical driver was compiled or run, and no hosted pin or verification
 scope changed. Independent reviews now overlap 145 playground imports; the
 catalog remains at 1,000 distinct repositories.
+
+
+A containers/text/service interface batch adds **31 calling sequences across ten
+more selected FPM packages**: collections, integer_set, scanner, array_range,
+enclose, errstat, fed, for_fifo_queue, fortran-tokenizer and uint-fortran. Eleven
+scoped GAMS reviews cover owned and borrowed container values, integer-set
+initialization, cursor-based character reading, array-bound metadata, delimiter
+construction, structured errors, edit-descriptor formats, fixed-width FIFO
+allocation, callback tokenization and unsigned numeric conversions.
+
+Notes distinguish copied values from borrowed pointers, constructor requirements
+and explicit cleanup, scanner advance-before-read behavior, bounds-vector order,
+paired-bracket reversal, success-status constants, descriptor constructors
+from numeric intrinsics, token-list index/status limitations and integer-to-real
+rounding. The native FIFO C source establishes ownership transfers and why
+control-block destruction does not release queued payloads; allocator and
+nonstandard LOC restrictions remain explicit. Every sequence links pinned
+argument/result declarations and public exports. No new driver was compiled or
+run, and no hosted pin or execution-verification scope changed. Independent
+reviews now overlap 155 playground imports; the catalog remains at 1,000
+distinct repositories.
