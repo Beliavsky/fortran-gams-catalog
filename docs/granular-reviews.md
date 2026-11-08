@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 658 repositories now have 975 source-reviewed
+Reviewed on 2026-11-08. 668 repositories now have 986 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-654 repository cards now identify public routines and link their usage lines
+664 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 658 independently source-reviewed repositories now have an
+separately. All 668 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2404,3 +2404,23 @@ notices and manifest/root discrepancies. No new driver was compiled or run;
 package pins, hosted verification scopes and backend deployment are unchanged.
 Independent interface reviews now overlap 205 playground imports; the catalog
 remains at 1,000 distinct repositories.
+
+An iterative-numerics/native-interface batch adds **32 calling sequences across
+ten more selected FPM packages**: poisfft, seiscope-optimization, arpack-ng,
+propack, libdogleg-f, fgsl, fortran-lmdb, fortran-curl, fdict and flibcpp.
+Eleven scoped GAMS reviews cover Poisson solves, gradient-based optimization,
+symmetric eigenpairs, partial SVD, nonlinear least squares, adaptive quadrature,
+database handles/transactions, offline URL parsing, dictionaries and both
+sorting and ordered lookup.
+
+The signatures link fixed-form declarations, included precision-specialized
+sources and Fypp templates at exact pins. Notes explain ARPACK's matrix-vector
+request loop and extraction workspace, PROPACK's forward/transpose callback,
+SEISCOPE's integer flags, quadrature callback/data lifetimes, LMDB transactions,
+URL handle cleanup, dictionary-copy ownership and FLIBCPP's one-based index
+results. Native wrapper limitations are explicit, including libdogleg-f's lost
+context handle and gradient-callback ABI declaration, unrepeated FGSL cleanup
+and CURL URL-get error paths. Source inspection does not validate those paths.
+No new driver was compiled or run, and no hosted package pin or backend code
+changed. Independent calling-interface reviews now overlap 215 playground
+imports; the catalog remains at 1,000 distinct repositories.
