@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 638 repositories now have 955 source-reviewed
+Reviewed on 2026-11-07. 648 repositories now have 965 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-624 repository cards now identify public routines and link their usage lines
+644 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 638 independently source-reviewed repositories now have an
+separately. All 648 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2364,3 +2364,21 @@ Source hashes, formal arguments and declaration ranges were checked at exact
 pins. No new driver was compiled or run and no hosted package pin changed.
 Independent reviews now overlap 185 playground imports; the catalog remains at
 1,000 distinct repositories.
+
+An optimization/sparse-algebra/representation batch adds **27 calling sequences
+across ten more selected FPM packages**: conmax, psqp, optgra, y12m, lusol,
+strith, bstrith, list, penf and orbs. Ten scoped reviews document public solves,
+setup/cleanup, sparse matrix norms, diagnostics, decimal and binary arithmetic,
+linked-list sorting, numeric text conversion and bitset operations.
+
+The calls link callback/kind declarations, workspace layouts and exact source
+pins. Notes cover CONMAX's abstract solver and workspace error return, PSQP's
+retained callbacks and advanced workspace entry, OPTGRA's merit slot, Y12M's
+column/row arrays and destructive solve, and LUSOL's intermediate-error handling.
+Utility annotations distinguish fixed capacity from arbitrary precision,
+uninitialized binary-error results, list constructor/copy stubs, PENF sign and
+parse-error behavior and stdlib-backed bit positions. License findings preserve
+upstream notice requirements and choices, including Y12M's unidentified
+library-wide grant. No new driver was compiled or run, no hosted pin changed,
+and no backend redeployment is needed. Independent interface reviews now overlap
+195 playground imports; the catalog remains at 1,000 distinct repositories.
