@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 698 repositories now have 1019 source-reviewed
+Reviewed on 2026-11-08. 708 repositories now have 1030 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-684 repository cards now identify public routines and link their usage lines
+694 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 698 independently source-reviewed repositories now have an
+separately. All 708 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2490,3 +2490,26 @@ calling sequences were checked. No new drivers were compiled or run; package
 pins, existing hosted numerical checks and backend behavior are unchanged.
 Independent interface reviews now overlap 245 playground imports; the catalog
 remains at 1,000 distinct repositories.
+
+A plotting/inference/container batch adds **40 calling sequences across ten more
+selected FPM packages**: dftatom, fortran-lua53, ogpf, easy-plplot, fortrandf,
+neural-fortran, ftorch, fortran-sdl2, fycollections and flook. Eleven scoped
+reviews cover radial shooting and mesh mapping, Lua stack/state execution,
+contour and vector plotting, frame columns, dense-network/TorchScript inference,
+software surfaces and typed list storage/search.
+
+The usage notes retain required kinds, optional arguments, pointer assignments,
+native/runtime dependencies, status conventions and resource ownership. Radial
+meshes use N+1 points and the derivative rejects the uniform-mesh branch. Plot
+notes distinguish Gnuplot script names from PNG paths and PLplot session finish
+from browser display. Data frames expose type-specific retrieval; neural
+prediction mutates training mode. FTorch tensor handles can retain caller CPU
+storage, while SDL image loading needs an explicitly terminated path at this
+pin. Integer-list signatures link author Fypp specialization inputs rather
+than invented generated-file URLs, and search documents the zero sentinel.
+
+Pinned source hashes, formal/optional arguments and declaration ranges were
+checked. No new main programs were compiled or run; hosted pins, existing
+execution checks and backend behavior are unchanged. Independent interface
+reviews now overlap 255 playground imports; the catalog remains at 1,000
+distinct repositories.
