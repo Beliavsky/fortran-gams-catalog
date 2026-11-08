@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 618 repositories now have 934 source-reviewed
+Reviewed on 2026-11-07. 628 repositories now have 945 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-604 repository cards now identify public routines and link their usage lines
+614 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 618 independently source-reviewed repositories now have an
+separately. All 628 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2324,3 +2324,25 @@ and adapted hosted subsets remain explicit. All sequences were checked against
 pinned source; no new driver was compiled or run, and no hosted pin or numerical
 verification scope changed. Independent reviews now overlap 165 playground
 imports; the catalog remains at 1,000 distinct repositories.
+
+
+A plotting/data-handling interface batch adds **30 calling sequences across ten
+more selected FPM packages**: pyplot-fortran, befor64, fortran_stb_image, fmmap,
+fortran-messagepack, h5fortran, nc4fortran, io-fortran-library, fortran_huffman
+and ncio. Eleven scoped GAMS reviews cover script-based plotting, Base64,
+RGB image storage, memory mapping, MessagePack, HDF5/NetCDF datasets, numeric
+text I/O, string conversion and custom Huffman compression.
+
+Notes distinguish plot construction from Python execution, character DPI and
+required line labels/styles, allocated encoded output from fixed-length decoded
+storage, image width/height order and value-returning loads, borrowed mapped
+pointers and unmapping, codec construction and polymorphic payloads, explicit
+file modes/closing, preallocated versus allocatable read destinations, rank-one
+slice arrays, differing read/write header arguments and native stopping errors.
+Huffman notes retain custom-format and fresh-tree restrictions. License evidence
+includes the British-spelled LICENCE, embedded ncio grant, BeFoR64's stated
+multi-licensing choices, fmmap's conflicting root/source notices and the absence
+of an identified Huffman grant. All source hashes, calls and declaration ranges
+were checked at exact pins; no new driver was compiled or run, and no hosted
+pin or numerical verification scope changed. Independent reviews now overlap
+175 playground imports; the catalog remains at 1,000 distinct repositories.
