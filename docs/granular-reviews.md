@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 668 repositories now have 986 source-reviewed
+Reviewed on 2026-11-08. 678 repositories now have 996 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -18,7 +18,7 @@ to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, St
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 668 independently source-reviewed repositories now have an
+separately. All 678 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2424,3 +2424,23 @@ and CURL URL-get error paths. Source inspection does not validate those paths.
 No new driver was compiled or run, and no hosted package pin or backend code
 changed. Independent calling-interface reviews now overlap 215 playground
 imports; the catalog remains at 1,000 distinct repositories.
+
+A differential-equations/scripting/file-interface batch adds **34 calling
+sequences across ten more selected FPM packages**: flint, twopnt, daskr,
+dde_solver, fatode, fortran-lua54, fortran-unix, netcdf-fortran,
+fortran-tcl86 and stdlib-os. Ten scoped GAMS reviews document explicit ODE and
+tangent-linear integration, boundary-value and DAE solves, delay-equation
+interpolation, native interpreters, POSIX directories and classic netCDF output.
+
+Usage annotations retain abstract problem callbacks, required procedure slots,
+tolerance/workspace shapes, initialization and continuation requirements, native
+pointer lifetime, explicit cleanup and status-return conventions. FLINT's
+formally optional tolerance arrays must still be supplied in this implementation;
+DDE_SET's blocked MOVING_AVERAGE argument and pointer cleanup are explicit.
+TWOPNT requires a concrete problem extension; FATODE coverage is restricted to
+the service-selected ERK_TLM module. Native component licenses and incomplete or
+conflicting license text are recorded without broadening their grants.
+Source hashes, signatures and declaration links were checked at the exact pins.
+No new drivers were compiled or run, and no hosted pin or backend code changed.
+Independent calling-interface reviews now overlap 225 playground imports;
+the catalog remains at 1,000 distinct repositories.
