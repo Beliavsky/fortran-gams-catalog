@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 578 repositories now have 884 source-reviewed
+Reviewed on 2026-11-07. 588 repositories now have 896 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-564 repository cards now identify public routines and link their usage lines
+574 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 578 independently source-reviewed repositories now have an
+separately. All 588 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2240,3 +2240,24 @@ interfaces link their declarations and the implementing submodule evidence.
 No new driver was compiled or run and no hosted package pin or execution scope
 changed. Independent reviews now overlap 125 playground imports; the catalog
 remains at 1,000 distinct repositories.
+
+
+A file/configuration/native-binding interface batch adds **25 calling sequences
+across ten more selected FPM packages**: ffilesystem, npy-for-fortran,
+fortran-sqlite3, fortran-zlib, fortran-zstd, fortran-pcre2, fortran-regex,
+m_match, config-fortran and paramcard. Twelve scoped GAMS reviews cover local
+filesystem services, binary array output, database access, compression,
+pattern encoding/search and typed configuration parsing.
+
+Notes specify lexical versus filesystem path operations, native-endian NPY
+assumptions and Fortran array order, SQLite callback and close/error-buffer
+ownership, compression byte capacities versus lengths/status, PCRE2 handle
+cleanup and zero-based code-unit offsets, integer flags versus indices, bounded
+regex grammars, required configuration values and stopping validation summaries.
+Direct C bindings retain their actual interoperable kinds and argument order;
+Fortran wrappers use their exposed optional arguments. Evidence includes pinned
+include files, C compatibility code and the full ISC grants named LICENCE.
+Root/manifest license discrepancies remain explicit. No new driver was compiled
+or run and no hosted pin or execution-verification scope changed. Independent
+reviews now overlap 135 playground imports; the catalog remains at 1,000 distinct
+repositories.
