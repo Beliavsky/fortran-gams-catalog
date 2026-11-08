@@ -202,7 +202,7 @@ def build(destination, root=ROOT):
                 if claim['level'] != 'source-reviewed' or not belongs(tree, claim['code'], code):
                     continue
                 for proc in claim.get('procedures', []):
-                    if proc.get('role') in ('public-entry-point', 'program-entry-point'):
+                    if proc.get('role') in ('public-entry-point', 'program-entry-point', 'public-data', 'public-template', 'public-adapter'):
                         entries.setdefault((procedure_label(proc), proc['path']), (claim, proc))
             entry_html = ''
             for claim, proc in list(entries.values())[:3]:
@@ -214,10 +214,12 @@ def build(destination, root=ROOT):
                     declaration = proc['declarations'][0]
                     source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                     url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
-                    entry_html += '<p>Usage (argument declarations):</p><pre><code>'+link(url, proc['signature'])+'</code></pre>'
+                    label = 'Usage (source declarations)' if proc.get('role') in {'public-data', 'public-template'} else 'Usage (argument declarations)'
+                    entry_html += '<p>'+label+':</p><pre><code>'+link(url, proc['signature'])+'</code></pre>'
                 entry_html += '</li>'
             if entries:
-                entry_html = '<div class="entry-points"><p>Reviewed entry points:</p><ul>'+entry_html+'</ul><p>'+link(
+                entry_label = 'Reviewed public interfaces:' if any(v[1].get('role') in {'public-data', 'public-template', 'public-adapter'} for v in entries.values()) else 'Reviewed entry points:'
+                entry_html = '<div class="entry-points"><p>'+entry_label+'</p><ul>'+entry_html+'</ul><p>'+link(
                     prefix+project_path(p), 'Usage and full procedure evidence')+'</p></div>'
             cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-license="{license_group(p)}" data-license-reviewed="{str(license_reviewed(p)).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
@@ -305,7 +307,7 @@ def build(destination, root=ROOT):
             body += '<p>Reviewed '+e(claim['reviewed_on'])+' at '+link(repo['url']+'/tree/'+claim['revision'], claim['revision'])+'</p><ul>'
             body += ''.join('<li>'+link(v['url'], v['path'])+' · SHA-256 <code>'+e(v['sha256'])+'</code></li>' for v in claim['evidence'])+'</ul>'
             if claim.get('procedures'):
-                body += '<h3>Reviewed procedures and source ranges</h3><ul>'
+                body += '<h3>Reviewed interfaces and source ranges</h3><ul>'
                 for procedure in claim['procedures']:
                     evidence = next(v for v in claim['evidence'] if v['path'] == procedure['path'])
                     start, end = procedure['line_start'], procedure['line_end']
@@ -318,11 +320,12 @@ def build(destination, root=ROOT):
                         declaration = procedure['declarations'][0]
                         source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                         url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
-                        body += '<p>Usage (click for argument declarations):</p><pre><code>'+link(url, procedure['signature'])+'</code></pre>'
+                        label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (click for argument declarations)'
+                        body += '<p>'+label+':</p><pre><code>'+link(url, procedure['signature'])+'</code></pre>'
                         for declaration in procedure['declarations']:
                             source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                             body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',
-                                              'Argument declarations: '+declaration['path']+':'+str(declaration['line_start']))+'</p>'
+                                              ('Source declarations: ' if procedure.get('role') in {'public-data', 'public-template'} else 'Argument declarations: ')+declaration['path']+':'+str(declaration['line_start']))+'</p>'
                     if procedure.get('usage'):
                         driver = procedure.get('local_driver')
                         label = 'Locally checked main program' if driver else 'Calling sketch (not a checked driver)'

@@ -4,6 +4,21 @@ from review_export import build_review_feed, snapshot_id
 
 
 class ReviewExportTests(unittest.TestCase):
+    def test_public_data_templates_and_adapters_keep_their_roles(self):
+        for role in ('public-data', 'public-template', 'public-adapter'):
+            with self.subTest(role=role):
+                interface = {'procedure': 'example', 'role': role, 'path': 'src.f90',
+                             'line_start': 1, 'line_end': 2, 'summary': 'Scoped public interface.',
+                             'signature': 'USE example_module',
+                             'declarations': [{'path': 'src.f90', 'line_start': 1, 'line_end': 2}]}
+                claim = {'code': 'R', 'level': 'source-reviewed', 'revision': 'a'*40,
+                         'reviewed_on': '2026-11-08', 'notes': 'Source review only.',
+                         'evidence': [], 'procedures': [interface]}
+                project = {'id': 'github:example/local', 'repository': {},
+                           'local': {'classifications': [claim]}}
+                exported = build_review_feed([project])['projects'][0]['classifications'][0]['procedures']
+                self.assertEqual(exported, [interface])
+
     def test_only_local_source_reviews_are_exported_and_checks_are_not_promoted(self):
         imported = {'id': 'github:example/imported', 'local': {}, 'procedures': [{'procedure': 'imported'}]}
         claim = {'code': 'D2a1', 'level': 'source-reviewed', 'revision': 'a'*40,

@@ -5,20 +5,22 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 728 repositories now have 1050 source-reviewed
+Reviewed on 2026-11-08. 751 repositories now have 1074 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
 The original broad documentation reviews remain available.
 
-## Reviewed calling interfaces
+## Reviewed public interfaces
 
-714 repository cards now identify public routines and link their usage lines
-to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
+733 repository cards now identify callable public interfaces (including the
+explicitly labeled Kronrod playground adapter) and link their usage lines
+to pinned argument declarations. Two constants-only cards and two template-instantiation cards describe public
+data/instantiation usage without inventing procedure calls. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 728 independently source-reviewed repositories now have an
+separately. All 751 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2560,3 +2562,36 @@ No new drivers were compiled or run, and existing execution verification,
 package pins and backend behavior are unchanged. Independent interface reviews
 now overlap 275 playground imports; the catalog remains at 1,000 distinct
 repositories.
+
+The final selected-package interface batch covers **all 23 remaining packages**:
+fortran-lapack, stdlib, kinds, mpfun2020-var1, lightkrylov, featom,
+fundamental_constants, kronrod, ftl, vtmop, slicot, ntpoly, gftl, gftl-shared,
+yafyaml, pflogger, libmbd, dbcsr, ddpcm, dftd4, pfunit, plplot and gtk-fortran.
+It adds **37 calling sequences** (including two explicitly labeled playground
+adapter routines), **two public-constant usage records** and **two template
+instantiation/usage records**, across 24 scoped source reviews.
+
+Kinds and CODATA constants are data, with import syntax and pinned declarations,
+not imaginary functions. gFTL instantiation inputs are linked instead of fictitious
+expanded source files; FTL's integer specialization links its real template.
+Kronrod's contained application routines are labeled as playground adapters.
+No claim is made that the upstream repository supplies that adapter module.
+
+Numerical notes cover machine-to-multiple-precision conversion, GMRES vector
+contracts, radial finite-element output arrays, Pareto callback/work budgets,
+scaled Lyapunov equations, distributed matrix-function prerequisites, sparse
+matrix ownership, Jacobi/DIIS callbacks and molecular energy/gradient units.
+Graphics notes distinguish headless file devices from interactive windows and
+Cairo C strings/error surfaces from higher-level Fortran wrappers.
+
+The public-interface feed now retains explicit data/template/adapter roles; the
+playground shows constants and instantiations under separate headings. Regression
+tests prevent those records from being rendered as ordinary calling sequences.
+License scope retains MPFUN enhancement provisions, historical notices and the
+pinned pFlogger licensing-document ambiguity instead of guessing a clear SPDX
+expression. No new drivers were compiled or run; existing numerical checks and
+backend behavior are unchanged. Exact-revision independent metadata now covers
+all 298 selected packages, with no unmatched packages or revision mismatches.
+The broader catalog remains at 1,000 distinct repositories. This completes
+representative interface coverage, not exhaustive documentation of every overload
+or every GAMS mapping in large libraries.

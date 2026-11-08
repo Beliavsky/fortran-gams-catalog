@@ -44,7 +44,7 @@ def render(local):
                     lines.extend([procedure['summary'], ''])
                 if procedure.get('signature'):
                     lines.extend(['Usage:', '', '```fortran', procedure['signature'], '```', ''])
-                for name, label in (('declarations', 'Argument declarations'), ('examples', 'Author example (not run)')):
+                for name, label in (('declarations', 'Source declarations' if procedure.get('role') in {'public-data', 'public-template'} else 'Argument declarations'), ('examples', 'Author example (not run)')):
                     for reference in procedure.get(name, []):
                         source = next(v for v in claim['evidence'] if v['path'] == reference['path'])
                         first, last = reference['line_start'], reference['line_end']

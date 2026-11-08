@@ -9,17 +9,19 @@ exact pinned revisions and preserving local overrides. This permits shared
 review maintenance without a circular playground-import/export loop.
 Uncompiled usage sketches remain explicitly unchecked; a local numerical test
 does not become a hosted playground check. Selected FPM packages with independent
-interface reviews cover 275 selected packages, including PowellOpt, MINPACK,
+interface/data reviews cover all 298 selected packages, including PowellOpt, MINPACK,
 QUADPACK, PCHIP, FFTPACK, polynomial roots and iterative linear solvers. Further
 selected packages can gain local reviews using the same evidence format as any
-other repository.
+other repository. Constants-only modules and template instantiations are explicitly
+labeled; they are not presented as callable procedures. Playground-only adapters
+are distinguished from upstream public APIs.
 
 A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
 The saved catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, alongside **977 catalog-owned
-repository reviews**. Two hundred seventy-five reviews overlap playground imports, giving 1,000
+procedure evidence and checked driver links, alongside **1000 catalog-owned
+repository reviews**. All 298 playground packages overlap catalog-owned reviews, giving 1,000
 distinct repositories. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.

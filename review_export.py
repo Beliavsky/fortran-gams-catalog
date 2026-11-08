@@ -28,7 +28,7 @@ def build_review_feed(projects):
                 'code', 'level', 'revision', 'reviewed_on', 'notes', 'evidence')})
             exported['procedures'] = []
             for procedure in claim.get('procedures', []):
-                if procedure.get('role') != 'public-entry-point':
+                if procedure.get('role') not in {'public-entry-point', 'public-data', 'public-template', 'public-adapter'}:
                     continue
                 fields = ('procedure', 'role', 'module', 'derived_type', 'summary',
                           'signature', 'path', 'line_start', 'line_end', 'declarations')

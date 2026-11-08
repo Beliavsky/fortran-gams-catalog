@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parent
 LEVELS = {'documentation-reviewed', 'source-reviewed'}
 PROCEDURE_ROLES = {
     'public-entry-point': 'Public entry point',
+    'public-data': 'Public data (not a callable procedure)',
+    'public-template': 'Public template instantiation',
+    'public-adapter': 'Playground adapter (not an upstream public procedure)',
     'implementation-helper': 'Implementation helper',
     'program-entry-point': 'Program entry point',
     'callback': 'Callback',
@@ -159,7 +162,7 @@ def validate_local(local, tree, root=ROOT):
                         raise ValueError('Invalid module name: ' + identity)
                     if 'derived_type' in procedure and not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*', procedure['derived_type']):
                         raise ValueError('Invalid derived type name: ' + identity)
-                    if procedure.get('role') == 'public-entry-point' and not procedure.get('summary'):
+                    if procedure.get('role') in {'public-entry-point', 'public-data', 'public-template', 'public-adapter'} and not procedure.get('summary'):
                         raise ValueError('Public entry points need a usage summary: ' + identity)
                     for field in ('summary', 'signature', 'usage', 'usage_notes'):
                         if field in procedure and (not isinstance(procedure[field], str) or not procedure[field].strip()):
