@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 648 repositories now have 965 source-reviewed
+Reviewed on 2026-11-08. 658 repositories now have 975 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-644 repository cards now identify public routines and link their usage lines
+654 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 648 independently source-reviewed repositories now have an
+separately. All 658 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2382,3 +2382,25 @@ upstream notice requirements and choices, including Y12M's unidentified
 library-wide grant. No new driver was compiled or run, no hosted pin changed,
 and no backend redeployment is needed. Independent interface reviews now overlap
 195 playground imports; the catalog remains at 1,000 distinct repositories.
+
+A PDE/transforms/search interface batch adds **30 calling sequences across ten
+more selected FPM packages**: fishpack, spherepack, qnstop, delaunaysparse,
+fortran-flann, metis-fpm, m_calculator, fortran-modbus, m-process and m_cli.
+Ten scoped GAMS reviews include centered/staggered elliptic grids, regular-sphere
+analysis/synthesis and both table initializers, Gaussian colatitudes, serial
+optimization and starting designs, simplex interpolation, nearest-neighbor
+search, graph partitioning/ordering, expression and command-line parsing,
+register conversions and POSIX pipe operations.
+
+Argument links retain kinds, callback declarations and optionals. Usage notes
+distinguish boundary-inclusive and cell-center storage, compatibility corrections,
+regular versus Gaussian latitudes, budget stops versus optimum guarantees,
+modified interpolation coordinates, borrowed native storage, zero-based indices,
+METIS option positions and required arrays, calculator state, offline register
+buffers and stopping command-line help. M_process notes explicitly identify the
+undefined INTENT(OUT) status read in the pinned close routine and do not claim
+reliable cleanup. License findings retain UCAR/MIT and binding/native component
+notices and manifest/root discrepancies. No new driver was compiled or run;
+package pins, hosted verification scopes and backend deployment are unchanged.
+Independent interface reviews now overlap 205 playground imports; the catalog
+remains at 1,000 distinct repositories.
