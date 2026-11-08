@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 688 repositories now have 1008 source-reviewed
+Reviewed on 2026-11-08. 698 repositories now have 1019 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-674 repository cards now identify public routines and link their usage lines
+684 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 688 independently source-reviewed repositories now have an
+separately. All 698 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2466,3 +2466,27 @@ were checked. No new main programs were compiled or run; hosted pins, existing
 numerical verification and backend behavior are unchanged. Independent reviews
 now overlap 235 playground imports; the catalog remains at 1,000 distinct
 repositories.
+
+A geometry/native-library batch adds **38 calling sequences across ten more
+selected FPM packages**: astro-fortran, fortran-astrodynamics-toolkit, tsunami,
+fmm2d, mpifx, scalapackfx, aotus, cairo-fortran, forpy and qcontainers. Eleven
+scoped reviews cover spherical directions and rotations, periodic differences
+and Gaussian initialization, Laplace kernel application, MPI/BLACS lifecycle,
+a real symmetric eigensolver, Lua configuration, PNG drawing, embedded Python
+and native byte-vector operations.
+
+Notes distinguish radians and direction vectors from physical frame models,
+raw differences from derivatives divided by grid spacing, borrowed MPI
+communicators from owned duplicates and the hosted one-process scope from
+distributed execution. ScaLAPACK signatures link upstream Fypp templates and
+precision mappings. Drawing/Python/container notes document status checks,
+terminated filenames, reference cleanup before shutdown and payload byte sizes.
+License findings retain the SOFA derived-work conditions and Cairo exception;
+FMM2D's Apache root text and GPL-or-later selected source notices are both
+recorded without assuming one supersedes the other.
+
+Pinned source hashes, formal/optional arguments, declaration ranges and rendered
+calling sequences were checked. No new drivers were compiled or run; package
+pins, existing hosted numerical checks and backend behavior are unchanged.
+Independent interface reviews now overlap 245 playground imports; the catalog
+remains at 1,000 distinct repositories.
