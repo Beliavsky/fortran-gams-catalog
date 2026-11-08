@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 708 repositories now have 1030 source-reviewed
+Reviewed on 2026-11-08. 718 repositories now have 1040 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-694 repository cards now identify public routines and link their usage lines
+704 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 708 independently source-reviewed repositories now have an
+separately. All 718 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2513,3 +2513,26 @@ checked. No new main programs were compiled or run; hosted pins, existing
 execution checks and backend behavior are unchanged. Independent interface
 reviews now overlap 255 playground imports; the catalog remains at 1,000
 distinct repositories.
+
+An FFT/inference/diagnostics batch adds **34 calling sequences across ten more
+selected FPM packages**: dtfft, 2decomp-fft, ennuf, fkb, fiats, julienne,
+veggies, m-system, m_draw and m_history. Ten scoped reviews cover complex FFT
+planning and ordered MPI-library teardown, low-level neural inference kernels,
+model loading/evaluation, test diagnosis/callback results, filesystem status,
+headless drawing and command-history editing.
+
+Notes retain zero-based FFT offsets, element-versus-byte allocation counts,
+caller-applied inverse normalization and pencil layouts. Hosted FFT checks
+remain explicitly single-process. Inference notes distinguish array/table
+construction from trained predictors and record literal/default-real precision,
+fixed-length activation selectors and padded historical Fiats parameter arrays.
+Testing notes distinguish result objects from logical flags or automatic stops.
+Filesystem calls retain differing native errno conventions; drawing coordinates
+use C_FLOAT and history editing uses the supported 1024-character buffer.
+
+Source hashes, formal/optional arguments and declaration ranges were checked at
+exact upstream pins. License findings retain Berkeley enhancement provisions
+and external native-library notices. No new main programs were compiled or run;
+package pins, existing hosted numerical checks and backend behavior are
+unchanged. Independent interface reviews now overlap 265 playground imports;
+the catalog remains at 1,000 distinct repositories.
