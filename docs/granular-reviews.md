@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-08. 718 repositories now have 1040 source-reviewed
+Reviewed on 2026-11-08. 728 repositories now have 1050 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-704 repository cards now identify public routines and link their usage lines
+714 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 718 independently source-reviewed repositories now have an
+separately. All 728 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2536,3 +2536,27 @@ and external native-library notices. No new main programs were compiled or run;
 package pins, existing hosted numerical checks and backend behavior are
 unchanged. Independent interface reviews now overlap 265 playground imports;
 the catalog remains at 1,000 distinct repositories.
+
+A units/parsing/graphs/numerics batch adds **31 calling sequences across ten
+more selected FPM packages**: quaff, parff, graphstruc, diffstruc, athena,
+coretran, formal, heatflow, raffle and gslib. Ten scoped reviews document
+fallible unit parsing, parser callbacks, graph constructors, tracked-array
+reverse differentiation, model scores, array utilities, staggered interpolation,
+sparse BiCG, Cartesian geometry and kriging-system helpers.
+
+Calling notes retain character-parser trailing-input behavior, graph feature
+allocation requirements, differentiation graph lifetimes and sum-seed semantics,
+ATHENA's one-minus-error scores, and Coretran's preallocated progression output.
+Formal entries link supported interpolation orders and boundary-array sizes,
+with its pinned private integer spacing storage noted explicitly. Heatflow
+entries describe global matrix state, integer kinds and BiCG breakdown limits;
+GSLIB entries distinguish mixed real precision, destructive packed solves and
+simple/ordinary-kriging scope. Private geometry helpers are not exposed.
+
+Exact source hashes, formal/optional arguments, declaration links and rendered
+calling sequences were checked. License findings retain original GSLIB notices,
+Berkeley enhancement provisions and scoped legacy-source provenance cautions.
+No new drivers were compiled or run, and existing execution verification,
+package pins and backend behavior are unchanged. Independent interface reviews
+now overlap 275 playground imports; the catalog remains at 1,000 distinct
+repositories.
