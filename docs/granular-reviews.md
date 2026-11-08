@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 588 repositories now have 896 source-reviewed
+Reviewed on 2026-11-07. 598 repositories now have 910 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-574 repository cards now identify public routines and link their usage lines
+584 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 588 independently source-reviewed repositories now have an
+separately. All 598 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2261,3 +2261,23 @@ Root/manifest license discrepancies remain explicit. No new driver was compiled
 or run and no hosted pin or execution-verification scope changed. Independent
 reviews now overlap 135 playground imports; the catalog remains at 1,000 distinct
 repositories.
+
+
+A numerical-interface batch adds **25 calling sequences across ten more selected
+FPM packages**: rngff, opti, fortimize, forsolver, sparse_fortran, amosf90,
+linalg_fortran, feq-parse, hrweno and diffeq. Fourteen scoped GAMS reviews cover
+owned random streams, bounded optimization, linear/nonlinear systems, sparse
+storage/products, complex Bessel sequences, symmetric eigenproblems, expression
+evaluation, WENO reconstruction and ODE integration.
+
+Notes distinguish public generics from private implementations, inherited
+passed-object methods from the LINALG singleton's NOPASS bindings, callback
+lifetimes, required initialization, caller-owned array shapes and optional
+arguments. They record discarded solver status, fixed thresholds, storage-order
+orientation, distinct Bessel scaling conventions, parser variable order, WENO's
+unsafe omitted K and fixed-step endpoint overshoot. License notes preserve
+component declarations and gaps instead of inferring grants from public access.
+All calls and declaration ranges were checked against pinned source files; no
+new numerical driver was compiled or run, and no hosted pin or verification
+scope changed. Independent reviews now overlap 145 playground imports; the
+catalog remains at 1,000 distinct repositories.
