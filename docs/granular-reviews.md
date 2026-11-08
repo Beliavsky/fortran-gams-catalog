@@ -5,7 +5,7 @@ class is the most specific classification in that GAMS branch; a long code is
 not inherently more precise than a short leaf such as G2i. Classification does
 not establish correctness or successful compilation.
 
-Reviewed on 2026-11-07. 628 repositories now have 945 source-reviewed
+Reviewed on 2026-11-07. 638 repositories now have 955 source-reviewed
 mappings. Full commit pins, file hashes, procedure names
 and inspected line ranges are in [the generated review ledger](local-reviews.md)
 and `data/local.json`.
@@ -13,12 +13,12 @@ The original broad documentation reviews remain available.
 
 ## Reviewed calling interfaces
 
-614 repository cards now identify public routines and link their usage lines
+624 repository cards now identify public routines and link their usage lines
 to pinned argument declarations. Fourteen further cards (DDFSA, CWT, polyfit, StatTools, GridSearch,
 PSOclassicG, ACFbyFFT, TREAT, main_Gaussian, LHSDRV, TiktakGlobalSearch, Sparse Fortran examples, TISEAN and ElliFEM) identify supplied program entry points and keep their internal/benchmark
 routines among implementation helpers.
 Detail pages distinguish these roles. Module names and procedure names are stored
-separately. All 628 independently source-reviewed repositories now have an
+separately. All 638 independently source-reviewed repositories now have an
 entry-point annotation and a scoped license finding. Source inspection alone establishes neither numerical correctness nor a
 complete public-API audit. Individual local driver checks are identified separately.
 
@@ -2346,3 +2346,21 @@ of an identified Huffman grant. All source hashes, calls and declaration ranges
 were checked at exact pins; no new driver was compiled or run, and no hosted
 pin or numerical verification scope changed. Independent reviews now overlap
 175 playground imports; the catalog remains at 1,000 distinct repositories.
+
+A parsing/container interface batch adds **30 calling sequences across ten more
+selected FPM packages**: argparse-f, io_utilities, rojff, sqliteff, erloff,
+smart-pointers, any, slinked-list, string-utf-8 and jeyemhex-regex. Ten scoped
+GAMS reviews cover command/configuration input, JSON, SQLite, error reporting,
+resource ownership, polymorphic storage, linked lists, UTF-8 and regular expressions.
+
+The annotations distinguish required defaults from optional arguments, parser
+STOP behavior, live TARGET associations, fallible JSON wrappers, explicit SQLite
+cleanup and non-mutating error accumulation. Counter notes identify the pinned
+last-release/finalization hazard; container notes retain exact-type/rank and
+shallow-copy restrictions. UTF-8 notes avoid claiming full validation or grapheme
+handling. Regex notes describe trimming, fixed output buffers and conflicting
+root LGPL/source MIT notices without resolving those notices automatically.
+Source hashes, formal arguments and declaration ranges were checked at exact
+pins. No new driver was compiled or run and no hosted package pin changed.
+Independent reviews now overlap 185 playground imports; the catalog remains at
+1,000 distinct repositories.

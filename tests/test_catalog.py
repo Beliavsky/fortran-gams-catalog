@@ -48,6 +48,8 @@ class CatalogTests(unittest.TestCase):
     def test_merge_is_idempotent_and_local_override_survives(self):
         local = copy.deepcopy(self.local)
         first = self.feed['projects'][0]
+        # The first imported package may already have an independent local review.
+        local['projects'] = [p for p in local['projects'] if p['id'] != first['id']]
         local['projects'].append({'id': first['id'], 'local': {'description': 'Catalog-owned wording'}, 'imports': {}})
         merged = merge_catalog(local, self.feed)
         self.assertEqual(merge_catalog(merged, self.feed), merged)
