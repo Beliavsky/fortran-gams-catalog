@@ -31,7 +31,7 @@ def build_review_feed(projects):
                 if procedure.get('role') not in {'public-entry-point', 'public-data', 'public-template', 'public-adapter'}:
                     continue
                 fields = ('procedure', 'role', 'module', 'derived_type', 'summary',
-                          'signature', 'path', 'line_start', 'line_end', 'declarations', 'arguments', 'argument_intent_review')
+                          'signature', 'path', 'line_start', 'line_end', 'declarations', 'arguments', 'argument_details', 'argument_intent_review')
                 item = copy.deepcopy({k: procedure[k] for k in fields if k in procedure})
                 # A successful local check must never become a hosted playground check.
                 if procedure.get('usage') and not procedure.get('local_driver'):

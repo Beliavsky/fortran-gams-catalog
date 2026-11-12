@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import re
 
 from argument_intents import signature_calls, usage_tokens
+from argument_declarations import declaration, comments
 
 
 def split_items(text, delimiter=','):
@@ -78,6 +79,7 @@ class Scope:
     declarations:dict=field(default_factory=dict)
     types:dict=field(default_factory=dict)
     optional:set=field(default_factory=set)
+    details:dict=field(default_factory=dict)
 
 
 class ScopeList(list):
@@ -89,7 +91,8 @@ def scopes(text,path):
     result=ScopeList();stack=[];generic=None
     if path.lower().endswith(('.md','.rst','.txt','.json','.toml','.c','.cpp','.h','.sh','.py')):
         return result
-    last_line=len(text.splitlines())
+    source_lines=text.splitlines()
+    last_line=len(source_lines)
     fixed=path.lower().endswith(('.f','.for','.ftn','.f77'))
     if fixed:
         free_heads=sum(bool(re.match(r'^ {0,5}(module|submodule|subroutine|function)\b',strip_comment(line),re.I))
@@ -98,6 +101,7 @@ def scopes(text,path):
                         for line in text.splitlines())
         if free_heads>fixed_heads:fixed=False
     for first,last,statement in statements(text,fixed):
+        source_statement=statement
         statement=re.sub(r'\$\{.*?\}\$', 'zztemplate',statement)
         statement=re.sub(r'\)(?=(?:function|subroutine)\b)',') ',statement,flags=re.I)
         lower=statement.lower().strip()
@@ -133,6 +137,16 @@ def scopes(text,path):
         if 'optional' in lower and '::' in lower:
             scope.optional.update(m[1].lower() for entity in split_items(lower.split('::',1)[1])
                                   if (m:=re.match(r'\s*(\w+)',entity)))
+        entities=declaration(source_statement)
+        if entities is not None:
+            shared=split_items(entities)
+            for entity in shared:
+                name=re.match(r'\s*([a-z][a-z0-9_]*)',entity,re.I)
+                if name and name[1].lower() in scope.dummies:
+                    scope.details.setdefault(name[1].lower(),[]).append({
+                        'text':source_statement.strip(),'path':path,'line_start':first,'line_end':last,
+                        'shared':len(shared)>1,
+                        'comments':[{**c,'path':path} for c in comments(source_lines,first,last,fixed)]})
         typed=re.match(r'^(integer\b|real\b|complex\b|logical\b|character\b|double\s+precision\b|type\s*\(|class\s*\(|procedure\s*\(|intent\s*\()',lower)
         macro=re.match(r'^[A-Z][A-Z0-9_]*\s*,',statement.strip()) or lower.startswith('zztemplate')
         if not typed and not macro:continue
@@ -179,7 +193,7 @@ def choose_scope(procedure,call,documents):
     return max(candidates,key=lambda pair:pair[0])[1]
 
 
-def inspect(procedure,documents):
+def inspect(procedure,documents,details=None):
     """Return annotations and a review result, preserving unresolved aliases."""
     signature=procedure['signature'];calls=signature_calls(signature)
     operator=procedure['procedure'].lower().startswith(('operator(', 'assignment('))
@@ -227,6 +241,12 @@ def inspect(procedure,documents):
                 # does not receive a name annotation.
                 if re.search(r'\b'+re.escape(name)+r'\s*=',signature[call['start']:call['end']],re.I):continue
                 issues.append(f"{call['name']}: displayed argument {name} not matched to a dummy");continue
+            if details is not None and scope.details.get(dummy):
+                record={'name':name,'declarations':scope.details[dummy]}
+                if scope.name != call['name'].split('%')[-1].lower():record['implementation']=scope.name
+                if len(calls)>1:record['call_index']=index
+                if dummy!=key:record['dummy']=dummy
+                if not any(a['name'].lower()==key and a.get('call_index',0)==index for a in details):details.append(record)
             declarations=scope.declarations.get(dummy,[])
             if not declarations:continue  # Unspecified stays unspecified.
             if len({d['intent'] for d in declarations})!=1:

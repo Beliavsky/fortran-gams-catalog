@@ -386,3 +386,19 @@ const restrictedIntents=intentPage(null,true);
 restrictedIntents.control.checked=true;restrictedIntents.control.handler();
 assert.equal(restrictedIntents.enabled(),true);
 console.log('Argument intents: default, stored preference, toggling and denied storage passed.');
+
+// Touch previews the argument rather than following its surrounding source link.
+const tooltipHandlers = {};
+let focused = false, blurred = false, prevented = false;
+const argument = {focus() {focused=true;}, blur() {blurred=true;}, matches() {return true;}};
+const tooltipDocument = {addEventListener(name, handler) {tooltipHandlers[name]=handler;}, activeElement:argument};
+const shippedSearch = fs.readFileSync('assets/search.js','utf8');
+vm.runInNewContext(shippedSearch.slice(shippedSearch.lastIndexOf("if (typeof document !== 'undefined')")), {document:tooltipDocument});
+tooltipHandlers.pointerdown({pointerType:'touch'});
+tooltipHandlers.click({target:{closest() {return argument;}}, preventDefault() {prevented=true;}});
+assert.equal(focused,true);assert.equal(prevented,true);
+tooltipHandlers.keydown({key:'Escape'});assert.equal(blurred,true);
+prevented=false;tooltipHandlers.pointerdown({pointerType:'mouse'});
+tooltipHandlers.click({target:{closest() {return argument;}}, preventDefault() {prevented=true;}});
+assert.equal(prevented,false);
+console.log('Argument previews: touch focus, source-link preservation for mouse and Escape dismissal passed.');

@@ -293,3 +293,15 @@ git push -u origin main
 This project has not been published merely by creating these local files.
 
 Project detail pages link to the independent [FORD documentation pilot](https://beliavsky.github.io/fortran-playground/documentation/), passing the repository and reviewed revision. Generation is optional and does not change the catalog's source-review or execution status.
+
+Argument tooltips also show pinned source declarations and clearly attached trailing
+or FORD documentation comments. Arguments without explicit INTENT remain unstyled.
+Expand **Argument declarations and source comments** on project pages for full text
+and per-declaration/comment source links. Shared declarations stay shared, template
+spellings stay unexpanded, and missing/ambiguous comments are not inferred.
+Regenerate saved details after interface updates with
+`python xargument_details.py --fetch --write`. This verifies source hashes; normal
+site builds remain offline. The pure renderer `argument_intents.py` is also used
+by the playground as `catalog_argument_intents.py`; synchronize it when changing
+rendering/schema, and refresh the revision-matched review feed. Coverage is saved
+in `docs/argument-declarations-coverage.json`.

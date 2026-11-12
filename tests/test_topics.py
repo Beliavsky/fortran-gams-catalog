@@ -96,7 +96,8 @@ class DifferentiationTopicTests(unittest.TestCase):
             self.assertTrue((destination/'calling-sequence-audit.md').is_file())
             detail_page=(destination/'projects/jacobwilliams/fparse/index.html').read_text(encoding='utf-8')
             self.assertIn('data-argument-intent="out"',detail_page)
-            self.assertIn('aria-label="VALUE: intent(out)"',detail_page)
+            self.assertRegex(detail_page, r'aria-label="VALUE: [^"]*intent\(out\)')
+            self.assertIn('Argument declarations and source comments',detail_page)
             self.assertIn('src/fparse.f90#L1391-L1397',detail_page)
             from html.parser import HTMLParser
             class Topics(HTMLParser):

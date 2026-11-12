@@ -96,6 +96,20 @@ def validate_arguments(procedure, evidence_paths):
             if (source.get('path') not in evidence_paths or type(source.get('line_start')) is not int or
                     type(source.get('line_end')) is not int or not 1<=source['line_start']<=source['line_end']):
                 raise ValueError('Argument-intent review needs pinned source ranges.')
+    details=procedure.get('argument_details',[])
+    known={(index,name.casefold()) for index,_,_,name in usage_tokens(procedure)} if procedure.get('signature') else set()
+    seen_details=set()
+    for detail in details:
+        key=(detail.get('call_index',0),detail.get('name','').casefold())
+        if key not in known or key in seen_details or not detail.get('declarations'):
+            raise ValueError('Argument details need distinct displayed arguments and declarations.')
+        seen_details.add(key)
+        for item in detail['declarations']:
+            for source in [item,*item.get('comments',[])]:
+                if (source.get('path') not in evidence_paths or not isinstance(source.get('text'),str) or not source['text'].strip()
+                        or type(source.get('line_start')) is not int or type(source.get('line_end')) is not int
+                        or not 1<=source['line_start']<=source['line_end']):
+                    raise ValueError('Argument declarations/comments need text and pinned source ranges.')
     arguments = procedure.get('arguments')
     if arguments is None:
         return
@@ -140,19 +154,57 @@ def signature_markup(procedure):
     signature = procedure['signature']
     intents = {(arg.get('call_index', 0), arg['name'].casefold()): arg
                for arg in procedure.get('arguments', [])}
+    details = {(a.get('call_index',0),a['name'].casefold()):a for a in procedure.get('argument_details',[])}
     parts, previous = [], 0
     for index, start, end, name in usage_tokens(procedure):
         argument = intents.get((index, name.casefold()))
         intent = argument['intent'] if argument else None
-        if intent not in INTENTS:
+        detail=details.get((index,name.casefold()))
+        if intent not in INTENTS and not detail:
             continue
         parts.append(escape(signature[previous:start]))
         description=('; '.join('intent('+v['intent']+') when '+v['condition'] for v in argument['variants'])
-                     if intent=='conditional' else 'intent('+intent+')')
+                     if intent=='conditional' else 'intent('+intent+')' if intent else 'No explicit INTENT recorded')
+        if detail:
+            blocks=[]
+            if detail.get('implementation'):blocks.append('Specific procedure: '+detail['implementation'])
+            for d in detail['declarations']:
+                block=d['text']
+                if d.get('shared'):block+='\n(Shared declaration; comments may describe several arguments.)'
+                block+=''.join('\n'+c['text'] for c in d.get('comments',[]))
+                blocks.append(block)
+            if detail.get('dummy'):blocks.insert(0,'Source dummy: '+detail['dummy'])
+            description='\n\n'.join(blocks)+'\n\n'+description
         label = escape(name+': '+description, quote=True)
-        parts.append(f'<span class="argument-intent" data-argument-intent="{intent}" '
+        parts.append(f'<span class="argument-intent" data-argument-intent="{intent or "unspecified"}" '
                      f'data-intent-description="{escape(description,quote=True)}" '
                      f'tabindex="0" role="note" title="{label}" aria-label="{label}">{escape(name)}</span>')
         previous = end
     parts.append(escape(signature[previous:]))
     return ''.join(parts)
+
+
+def argument_details_markup(procedure, source_url):
+    details=procedure.get('argument_details',[])
+    if not details:return ''
+    result='<details class="argument-details"><summary>Argument declarations and source comments</summary><dl>'
+    for argument in details:
+        name=argument['name']
+        if argument.get('implementation'):name+='; specific procedure '+argument['implementation']
+        if argument.get('dummy'):name+=' (source dummy: '+argument['dummy']+')'
+        if 'call_index' in argument:name+='; call '+str(argument['call_index']+1)
+        result+='<dt><code>'+escape(name)+'</code></dt><dd>'
+        for declaration in argument['declarations']:
+            result+='<pre><code>'+escape(declaration['text'])+'</code></pre>'
+            if declaration.get('shared'):result+='<p>Shared declaration; associated comments may describe several arguments.</p>'
+            for comment in declaration.get('comments',[]):
+                result+='<p class="argument-comment">'+escape(comment['text'])+' '+source_link(comment,source_url)+'</p>'
+            result+=source_link(declaration,source_url)
+        result+='</dd>'
+    return result+'</dl></details>'
+
+
+def source_link(record, source_url):
+    from urllib.parse import quote
+    url=source_url+quote(record['path'],safe='/')+'#L'+str(record['line_start'])+'-L'+str(record['line_end'])
+    return '<a href="'+escape(url,quote=True)+'">'+escape(record['path']+':'+str(record['line_start']))+'</a>'

@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import quote, urlencode
 from review_export import publish_review_feed
-from argument_intents import signature_markup
+from argument_intents import signature_markup, argument_details_markup
 from intent_coverage import records as intent_records, write_reports as write_intent_reports
 from interface_audit import STATUSES as INTERFACE_STATUSES, audit as audit_interfaces, detail as audit_detail, write_report
 from topics import (DIFFERENTIATION_TOPICS, EXPRESSION_TOPICS, DISCOVERY_TOPICS,
@@ -429,6 +429,7 @@ def build(destination, root=ROOT):
                         url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                         label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (click for argument declarations)'
                         body += '<p>'+label+':</p><pre><code><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'
+                        body += argument_details_markup(procedure, repo['url']+'/blob/'+claim['revision']+'/')
                         for declaration in procedure['declarations']:
                             source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                             body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',
