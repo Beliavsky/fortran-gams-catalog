@@ -26,6 +26,14 @@ distinct repositories. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
 
+Browse [automatic differentiation](https://beliavsky.github.io/fortran-gams-catalog/topics/automatic-differentiation/)
+or use the Differentiation selector for forward/reverse mode, higher derivatives,
+sparse Jacobians, matrix derivatives and conversion helpers. These curated facets
+combine with the other filters and can be shared with `?topic=forward-mode`.
+[Recorded capabilities and scope](docs/automatic-differentiation.md) distinguish
+documented features from narrower source reviews. AD alone does not establish
+symbolic expression manipulation: O links to the topic without blanket remapping.
+
 Select **Exclude known FPM packages** to hide repositories whose recorded build
 systems include FPM, including independently reviewed ones. GAMS category counts
 update and the selection follows catalog links; it can be shared with

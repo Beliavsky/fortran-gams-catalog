@@ -5,6 +5,9 @@ const sourceReviewed = document.getElementById('source-reviewed');
 const license = document.getElementById('license');
 const licenseReviewed = document.getElementById('license-reviewed');
 const legacyGams = document.getElementById('legacy-gams');
+const topic = document.getElementById('topic');
+const topics = new Set(['automatic-differentiation', 'forward-mode', 'reverse-mode',
+  'higher-derivatives', 'sparse-jacobians', 'matrix-derivatives', 'source-transformation']);
 if (excludeFpm) {
   const query = document.getElementById('query');
   const collection = document.getElementById('collection');
@@ -25,17 +28,20 @@ if (excludeFpm) {
   if (license && ['permissive', 'weak-copyleft', 'strong-copyleft', 'custom-mixed', 'unclear'].includes(params.get('license'))) license.value = params.get('license');
   if (licenseReviewed) licenseReviewed.checked = params.get('license_reviewed') === '1';
   if (legacyGams) legacyGams.checked = params.get('legacy_gams') === '1';
+  if (topic && topics.has(params.get('topic'))) topic.value = params.get('topic');
   function update() {
     const sourceOnly = Boolean(sourceReviewed?.checked);
     const licenseOnly = license?.value || '';
     const reviewedLicenseOnly = Boolean(licenseReviewed?.checked);
     const includeLegacy = Boolean(legacyGams?.checked);
+    const selectedTopic = topic?.value || '';
     const terms = (query?.value || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
     let count = 0;
     for (const card of cards) {
       const search = sourceOnly ? card.dataset.sourceSearch : card.dataset.search;
       card.hidden = !((!sourceOnly || card.dataset.sourceMatch === 'true') &&
         (includeLegacy || card.dataset.legacy !== 'true') &&
+        (!selectedTopic || (card.dataset.topics || '').split(/\s+/).includes(selectedTopic)) &&
         (!licenseOnly || card.dataset.license === licenseOnly) &&
         (!reviewedLicenseOnly || card.dataset.licenseReviewed === 'true') &&
         terms.every(term => search.includes(term)) &&
@@ -53,7 +59,8 @@ if (excludeFpm) {
         (excludeFpm.checked ? 'withoutFpm' : 'classCount');
       const licenseKey = [licenseOnly, Number(reviewedLicenseOnly), Number(sourceOnly), Number(excludeFpm.checked)].join('|');
       let count = label.dataset.licenseCounts ? (JSON.parse(label.dataset.licenseCounts)[licenseKey] || 0) : Number(label.dataset[key]);
-      if (includeLegacy && !sourceOnly && !reviewedLicenseOnly && (!licenseOnly || licenseOnly === 'unclear')) count += Number(label.dataset.legacyCount || 0);
+      if (selectedTopic) count = (JSON.parse(label.dataset.topicCounts || '{}')[selectedTopic] || {})[licenseKey] || 0;
+      if (!selectedTopic && includeLegacy && !sourceOnly && !reviewedLicenseOnly && (!licenseOnly || licenseOnly === 'unclear')) count += Number(label.dataset.legacyCount || 0);
       label.textContent = `(${count})`;
     }
     for (const {link, url: original} of navigation) {
@@ -68,6 +75,8 @@ if (excludeFpm) {
       else target.searchParams.delete('license_reviewed');
       if (includeLegacy) target.searchParams.set('legacy_gams', '1');
       else target.searchParams.delete('legacy_gams');
+      if (selectedTopic) target.searchParams.set('topic', selectedTopic);
+      else target.searchParams.delete('topic');
       link.href = target.href;
     }
     const url = new URL(location.href);
@@ -75,7 +84,7 @@ if (excludeFpm) {
                                  ['exclude_fpm', excludeFpm.checked ? '1' : ''],
                                  ['source_reviewed', sourceOnly ? '1' : ''],
                                  ['license', licenseOnly], ['license_reviewed', reviewedLicenseOnly ? '1' : ''],
-                                 ['legacy_gams', includeLegacy ? '1' : '']]) {
+                                 ['legacy_gams', includeLegacy ? '1' : ''], ['topic', selectedTopic]]) {
       if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
     }
     history.replaceState(null, '', url);
@@ -88,5 +97,6 @@ if (excludeFpm) {
   license?.addEventListener('change', update);
   licenseReviewed?.addEventListener('change', update);
   legacyGams?.addEventListener('change', update);
+  topic?.addEventListener('change', update);
   update();
 }

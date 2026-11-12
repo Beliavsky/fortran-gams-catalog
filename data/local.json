@@ -895,7 +895,8 @@
         "topics": [
           "automatic-differentiation",
           "sparse-jacobians",
-          "complex-derivatives"
+          "complex-derivatives",
+          "reverse-mode"
         ],
         "classifications": [
           {
@@ -1071,7 +1072,8 @@
         ],
         "topics": [
           "automatic-differentiation",
-          "higher-derivatives"
+          "higher-derivatives",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -1223,7 +1225,8 @@
         "build_systems": [],
         "topics": [
           "automatic-differentiation",
-          "dual-numbers"
+          "dual-numbers",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -1352,7 +1355,8 @@
         "topics": [
           "automatic-differentiation",
           "reverse-mode",
-          "hessian"
+          "hessian",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -14380,7 +14384,9 @@
           "automatic-differentiation",
           "gradients",
           "hessian",
-          "laplacian"
+          "laplacian",
+          "forward-mode",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -14728,7 +14734,8 @@
         "topics": [
           "automatic-differentiation",
           "dual-numbers",
-          "higher-derivatives"
+          "higher-derivatives",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -18126,7 +18133,10 @@
           "optimization",
           "nonlinear-least-squares",
           "curve-fitting",
-          "automatic-differentiation"
+          "automatic-differentiation",
+          "forward-mode",
+          "reverse-mode",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -34190,7 +34200,9 @@
         "topics": [
           "hyper-dual",
           "arithmetic",
-          "automatic-differentiation"
+          "automatic-differentiation",
+          "forward-mode",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -61539,7 +61551,9 @@
           "differentiation",
           "complex-step",
           "hyper-dual",
-          "automatic-differentiation"
+          "automatic-differentiation",
+          "forward-mode",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -87227,7 +87241,8 @@
           "automatic-differentiation",
           "likelihood",
           "derivatives",
-          "economic-models"
+          "economic-models",
+          "source-transformation"
         ],
         "classifications": [
           {
@@ -94801,7 +94816,8 @@
           "automatic-differentiation",
           "dual-numbers",
           "finite-volume",
-          "pde"
+          "pde",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -107070,7 +107086,9 @@
           "fpm"
         ],
         "topics": [
-          "numerical-methods"
+          "numerical-methods",
+          "automatic-differentiation",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -112898,7 +112916,9 @@
         ],
         "topics": [
           "fortran-library",
-          "numerical-computing"
+          "numerical-computing",
+          "automatic-differentiation",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -113042,7 +113062,10 @@
         ],
         "topics": [
           "fortran-library",
-          "numerical-computing"
+          "numerical-computing",
+          "automatic-differentiation",
+          "forward-mode",
+          "higher-derivatives"
         ],
         "classifications": [
           {
@@ -129954,7 +129977,8 @@
         "topics": [
           "fortran-library",
           "automatic-differentiation",
-          "higher-derivatives"
+          "higher-derivatives",
+          "forward-mode"
         ],
         "classifications": [
           {
@@ -136687,7 +136711,9 @@
         ],
         "topics": [
           "fortran-library",
-          "automatic-differentiation"
+          "automatic-differentiation",
+          "forward-mode",
+          "reverse-mode"
         ],
         "classifications": [
           {

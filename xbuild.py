@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import quote
 from review_export import publish_review_feed
+from topics import DIFFERENTIATION_TOPICS, differentiation_topics
 
 from catalog import ROOT, assemble, belongs, lineage, matching_drivers, procedure_label, PROCEDURE_ROLES
 
@@ -125,6 +126,7 @@ def build(destination, root=ROOT):
 <title>{e(title)}</title><link rel="stylesheet" href="{prefix}catalog.css"><script defer src="{prefix}search.js"></script></head>
 <body><a class="skip" href="#content">Skip to content</a><header>{link(prefix or './', TITLE)}
 <nav>{link(prefix+'projects/', 'Repositories')} · {link(prefix+'review/', 'Review policy')} ·
+{link(prefix+'topics/automatic-differentiation/', 'Automatic differentiation')} ·
 {link('https://beliavsky.github.io/fortran-playground/gams/', 'Playground package catalog')} ·
 {link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
@@ -135,6 +137,9 @@ def build(destination, root=ROOT):
 <option value="">All licenses</option>{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in LICENSE_GROUPS.items())}</select></label>
 <label class="checkbox-label"><input type="checkbox" id="license-reviewed"> Reviewed license evidence only</label>
 <span class="muted" id="license-filter-help">Recorded terms, not a guarantee of compatibility. Check component and dependency notices.</span></div>
+<div class="build-filter topic-filter"><label class="checkbox-label">Differentiation <select id="topic" aria-describedby="topic-filter-help">
+<option value="">All software</option>{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in DIFFERENTIATION_TOPICS.items())}</select></label>
+<span class="muted" id="topic-filter-help">Curated capabilities, not execution checks. Source-reviewed filtering applies to GAMS mappings.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
 <span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
@@ -173,6 +178,9 @@ def build(destination, root=ROOT):
 <p>{link(prefix+project_path(p), 'Provenance, source checksum and related modernizations')}</p></article>''')
                 continue
             repo = p['repository']
+            ad_topics = differentiation_topics(p)
+            method_labels = [DIFFERENTIATION_TOPICS[t] for t in ad_topics if t != 'automatic-differentiation']
+            ad_description = ('<p class="muted">AD capabilities: '+e(' · '.join(method_labels) or 'Automatic differentiation')+'</p>') if ad_topics else ''
             codes = p['codes']
             search = ' '.join([p['name'], p['description'], repo['owner'], p['owner_label'],
                                *p['topics'], *codes, *(tree[c]['label'] for c in codes),
@@ -221,9 +229,9 @@ def build(destination, root=ROOT):
                 entry_label = 'Reviewed public interfaces:' if any(v[1].get('role') in {'public-data', 'public-template', 'public-adapter'} for v in entries.values()) else 'Reviewed entry points:'
                 entry_html = '<div class="entry-points"><p>'+entry_label+'</p><ul>'+entry_html+'</ul><p>'+link(
                     prefix+project_path(p), 'Usage and full procedure evidence')+'</p></div>'
-            cards.append(f'''<article data-search="{e(search.lower())}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-license="{license_group(p)}" data-license-reviewed="{str(license_reviewed(p)).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
+            cards.append(f'''<article data-search="{e(search.lower())}" data-topics="{e(' '.join(differentiation_topics(p)))}" data-source-search="{e(source_search.lower())}" data-source-match="{str(source_match).lower()}" data-license="{license_group(p)}" data-license-reviewed="{str(license_reviewed(p)).lower()}" data-collection="{collection}" data-fpm="{str(supports_fpm(p)).lower()}">
 <h2>{link(prefix+project_path(p),p['name'])}</h2><p class="muted">{link(repo['url'],repo['owner']+'/'+repo['name'])} · {e(p['owner_label'])}</p>
-<p>{e(p['description'])}</p>{license_html(p)}<div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
+<p>{e(p['description'])}</p>{ad_description}{license_html(p)}<div data-all-mappings><p class="status">{e(status(p,code))}</p><p>{labels}</p>{driver_links}</div>
 <div data-source-mappings hidden><p class="status">Source-reviewed mapping evidence</p><p>{source_labels}</p></div>{entry_html}</article>''')
         return controls+''.join(cards)
 
@@ -235,9 +243,12 @@ def build(destination, root=ROOT):
             without_fpm = sum(not supports_fpm(p) for p in members)
             reviewed = [p for p in members if any(belongs(tree, k, c) for k in reviewed_codes[p['id']])]
             counts = license_counts(members, {p['id'] for p in reviewed})
+            topic_counts = {topic: license_counts(
+                [p for p in members if topic in differentiation_topics(p)],
+                {p['id'] for p in reviewed}) for topic in DIFFERENTIATION_TOPICS}
             legacy_count = sum(any(belongs(tree, k, c) for k in p['codes']) for p in legacy_entries)
             rows.append('<li>'+link(prefix+'classes/'+c+'/',c+' — '+tree[c]['label'])+
-                        f' <span class="muted" data-legacy-count="{legacy_count}" data-license-counts="{e(json.dumps(counts))}" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
+                        f' <span class="muted" data-topic-counts="{e(json.dumps(topic_counts))}" data-legacy-count="{legacy_count}" data-license-counts="{e(json.dumps(counts))}" data-class-count="{len(members)}" data-without-fpm="{without_fpm}" data-source-count="{len(reviewed)}" data-source-without-fpm="{sum(not supports_fpm(p) for p in reviewed)}">({len(members)})</span></li>')
         return '<ul class="classes">'+''.join(rows)+'</ul>'
 
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'
@@ -247,6 +258,22 @@ def build(destination, root=ROOT):
          'New independent entries begin with pinned documentation reviews. Source mappings and local drivers can be added as they are checked.</p>'
          '<h2>Main GAMS classes</h2>'+class_links(None, ''))
     page('projects', 'Fortran repositories', '<h1>Fortran repositories</h1>'+listing(all_entries, '../'))
+    ad_projects = [p for p in projects if 'automatic-differentiation' in differentiation_topics(p)]
+    page('topics/automatic-differentiation', 'Automatic differentiation in Fortran',
+         '<h1>Automatic differentiation in Fortran</h1>'
+         '<p>Find derivative libraries, matrix derivative primitives and source-conversion helpers. '
+         'Use the Differentiation selector to compare forward mode, reverse mode, higher derivatives and sparse Jacobians.</p>'
+         '<p>Automatic differentiation propagates derivatives through operations on values or a computational graph. '
+         'That does not by itself establish symbolic expression manipulation. Numerical differentiation belongs under '
+         +link('../../classes/H1/', 'H1 — Numerical differentiation')+'; '
+         +link('../../classes/O/', 'O — Symbolic computation')+' remains a separate capability.</p>'
+         '<p>Method facets describe recorded capabilities; source-reviewed filtering concerns the GAMS mapping, '
+         'not proof that every method or derivative order has been independently checked. '
+         'Conversion helpers and application-specific derivatives are not all general-purpose AD engines.</p>'
+         '<p>Discovery checklist: '+link('https://beliavsky.github.io/Fortran-code-on-GitHub/#automatic-differentiation',
+                                       'Fortran code on GitHub — Automatic differentiation')+'. '
+         'The listed m_ad repository link returned 404 when checked on 2026-11-12 and is not added as a verified entry.</p>'
+         +listing(ad_projects, '../../'))
     for code, info in tree.items():
         subset = [p for p in all_entries if any(belongs(tree, c, code) for c in p['codes'])]
         crumbs = ' / '.join(link('../../classes/'+c+'/', c) for c in reversed(lineage(tree, code)[1:]))
@@ -254,6 +281,10 @@ def build(destination, root=ROOT):
         intro += '<h1>'+e(code+' — '+info['label'])+'</h1><p>Includes explicitly mapped descendants. Driver links below match this class or a narrower problem.</p>'
         intro += '<p>'+link('https://gams.nist.gov/cgi-bin/serve.cgi/Class/'+quote(code, safe=''),
                            'Original GAMS classification at NIST')+'</p>'
+        if code in {'O', 'H1'}:
+            intro += '<p>Related: '+link('../../topics/automatic-differentiation/', 'Automatic differentiation')+'. '
+            intro += ('Derivative propagation alone is not symbolic expression manipulation; AD packages are not automatically mapped to O.'
+                      if code == 'O' else 'Browse AD methods separately from finite-difference and complex-step methods. This topic link does not change GAMS classifications.')+'</p>'
         page('classes/'+code, code+' — '+info['label'], intro+class_links(code, '../../')+
              (listing(subset, '../../', code) if subset else '<p>No repository is mapped here yet.</p>'))
     page('legacy', 'GAMS/Netlib source-available pilot', '<h1>GAMS/Netlib source-available pilot</h1>'

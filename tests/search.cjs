@@ -188,6 +188,64 @@ sourceReviewed.checked=false; license.value=''; collection.value='independent'; 
 assert.equal(legacyCard.hidden,true);
 collection.value=''; excludeFpm.checked=true; excludeFpm.handler();
 assert.equal(legacyCard.hidden,false); assert.equal(classCount.textContent,'(2)');
+
+// AD facets use exact curated tags, combine with existing filters, restore from
+// URLs, update hierarchy counts, and persist on pages without a search form.
+const method = {value:'',addEventListener:(event,handler)=>method.handler=handler};
+const methodExclude = {checked:false,addEventListener:(event,handler)=>methodExclude.handler=handler};
+const methodSource = {checked:false,addEventListener:(event,handler)=>methodSource.handler=handler};
+const methodLicense = {value:'',addEventListener:(event,handler)=>methodLicense.handler=handler};
+const methodLegacy = {checked:false,addEventListener:(event,handler)=>methodLegacy.handler=handler};
+const methodCards = [
+  {dataset:{search:'forward AD',topics:'automatic-differentiation forward-mode',sourceMatch:'true',sourceSearch:'forward ad',fpm:'false',license:'permissive'}},
+  {dataset:{search:'reverse AD',topics:'automatic-differentiation reverse-mode',sourceMatch:'false',sourceSearch:'',fpm:'true',license:'strong-copyleft'}},
+  {dataset:{search:'finite differences',topics:'forward-mode-ish',sourceMatch:'true',sourceSearch:'finite differences',fpm:'false',license:'permissive'}},
+  {dataset:{search:'legacy',legacy:'true',topics:'',sourceMatch:'false',sourceSearch:'',fpm:'false',license:'unclear'}}
+];
+methodCards.forEach(card=>card.querySelectorAll=()=>[]);
+const methodCount = {dataset:{classCount:'3',legacyCount:'1',sourceCount:'2',withoutFpm:'2',sourceWithoutFpm:'2',
+  licenseCounts:JSON.stringify({'permissive|0|1|0':2}),topicCounts:JSON.stringify({
+  'forward-mode':{'|0|0|0':1,'|0|1|0':1,'permissive|0|1|0':1},
+  'reverse-mode':{'|0|0|0':1},
+  'automatic-differentiation':{'|0|0|0':2}
+})}};
+const methodMatches = {};
+const methodLink = anchor('../classes/H1/');
+const methodContext = {
+  ...context,
+  document:{querySelector:()=>null,
+    querySelectorAll:selector=>({'article[data-search]':methodCards,'[data-class-count]':[methodCount],'a[href]':[methodLink]})[selector],
+    getElementById:id=>({topic:method,'exclude-fpm':methodExclude,'source-reviewed':methodSource,
+      license:methodLicense,'legacy-gams':methodLegacy,matches:methodMatches})[id]},
+  location:{href:'https://example.org/catalog/?topic=forward-mode&keep=yes&legacy_gams=1',
+    search:'?topic=forward-mode&keep=yes&legacy_gams=1'}
+};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),methodContext);
+assert.equal(method.value,'forward-mode');
+assert.deepEqual(methodCards.map(c=>c.hidden),[false,true,true,true]);
+assert.equal(methodCount.textContent,'(1)');
+assert.equal(methodMatches.textContent,'1 of 4 entries shown');
+assert.equal(saved.searchParams.get('keep'),'yes');
+assert.equal(new URL(methodLink.href).searchParams.get('topic'),'forward-mode');
+method.value='reverse-mode'; method.handler();
+assert.deepEqual(methodCards.map(c=>c.hidden),[true,false,true,true]);
+assert.equal(methodCount.textContent,'(1)');
+methodExclude.checked=true; methodExclude.handler();
+assert.equal(methodMatches.textContent,'0 of 4 entries shown');
+assert.equal(methodCount.textContent,'(0)');
+methodExclude.checked=false; methodSource.checked=true; methodSource.handler();
+assert.equal(methodCount.textContent,'(0)');
+method.value='forward-mode'; methodLicense.value='permissive'; method.handler();
+assert.deepEqual(methodCards.map(c=>c.hidden),[false,true,true,true]);
+assert.equal(methodCount.textContent,'(1)');
+method.value=''; method.handler();
+assert.equal(methodCount.textContent,'(2)');
+assert.equal(saved.searchParams.has('topic'),false);
+assert.equal(new URL(methodLink.href).searchParams.has('topic'),false);
+method.value=''; methodContext.location.search='?topic=unknown';
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),{...methodContext});
+assert.equal(method.value,''); assert.equal(saved.searchParams.has('topic'),false);
+console.log('AD topics: exact facets, combined filters, counts, URL restoration and navigation passed.');
 query.value='dqags'; query.handler(); assert.equal(matches.textContent,'1 of 4 entries shown');
 legacyToggle.checked=false; legacyToggle.handler();
 assert.equal(legacyCard.hidden,true);
