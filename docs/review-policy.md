@@ -98,8 +98,11 @@ public callable signature. Each record has `name`, `intent` (`in`, `out` or
 ```
 
 The source range must lie within a recorded argument-declaration range in the
-same hashed claim evidence. Names are unique ignoring case and must occur in
-the signature's argument list. Inspect the exact overload: a generic name can
+same hashed claim evidence. Names are unique ignoring case within each call and
+must occur in its argument list (or operand positions for an overloaded operator
+or assignment). Optional zero-based `call_index` distinguishes calls in a
+multi-call usage line; omitted means the first call. Optional `dummy` records
+the source dummy name when the displayed actual name differs. Inspect the exact overload: a generic name can
 cover declarations with different intents. Preserve explicit `inout` on work
 arrays or status flags even when their names sound like pure outputs. Do not
 infer intent from comments, variable names or assignments. Leave arguments
@@ -108,6 +111,32 @@ Function results and an implicit passed object are not displayed dummy
 arguments. Public constants, template instantiations and command usage do not
 receive Fortran argument-intent annotations. Update the claim review date when
 adding reviewed annotations.
+
+When preprocessing genuinely changes an intent, use `intent: "conditional"`
+with source-linked `variants`. Each alternative has `intent`, `condition`,
+`path`, `line_start` and `line_end`; all alternatives must fit recorded
+declaration ranges. Conditional annotations are not given a fixed italic or bold
+style. Their hover/focus text states the alternatives. Do not assume an active
+compiler definition from the filename or from a previously tested configuration.
+
+An optional `argument_intent_review` records `reviewed_on`, `status` (`checked`,
+`partial` or `not-applicable`), `sources` and `issues`. Each source names a
+procedure and a pinned file/range. A checked record has no issues and can have
+no annotations when no explicit INTENT is declared. A partial record retains
+specific issues. Not-applicable records require explanatory `notes`; a lack of
+source parsing is not a valid exemption. The full pass uses exact-pin exceptions
+in `data/argument-intent-overrides.json` for a MATLAB gateway invocation, a
+user-supplied C adapter and a preprocessing-dependent declaration.
+
+The optional `xargument_intents.py --fetch` utility verifies source hashes,
+examines scopes and logical declarations, and produces a review queue. It
+understands continuations, fixed/free source forms, separate INTENT statements,
+generic/type-bound bindings, templates, positional/keyword actuals and multiple
+calls. It is a conservative metadata-review aid, not a complete Fortran parser
+or preprocessor. Unsupported or ambiguous cases must be reviewed rather than
+silently assigned an intent. `--write` is explicit; normal site generation uses
+only saved metadata. The coverage report flags future recorded usage lines
+without an intent review.
 
 The site offers optional output highlighting and exposes explicit annotations
 on hover or keyboard focus. Raw signature text remains unchanged and its link

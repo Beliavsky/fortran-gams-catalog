@@ -73,14 +73,37 @@ click the usage link to read the source declarations. The preference is saved
 in the browser when local storage is available and does not filter results.
 Highlighting is off by default and applies to cards and project detail pages.
 
-The initial annotations cover 230 arguments in 29 usage interfaces across ten
-projects, including MINPACK, QUADPACK, PCHIP, LSMR, PowellOpt, L-BFGS-B and
-expression parsers. These are explicit declarations at the reviewed source
-revision, not inferred input/output behavior. Annotations describe the specific
-overload shown. Function results, implicit type-bound objects, callbacks without
-`INTENT` and legacy declarations without `INTENT` are not assigned an intent.
-Further reviews can add the optional `arguments` metadata described in the
-[review policy](docs/review-policy.md).
+The saved review covers every recorded usage line: 1,767 checked records and
+22 cases where Fortran argument intents do not apply. There are 6,163 argument
+annotations in 1,323 usage records across 585 projects. An interface can recur
+under multiple GAMS classifications, so these are metadata record counts, not
+counts of unique upstream routines. Unannotated arguments can legitimately
+lack explicit `INTENT`. The [argument-intent coverage page](https://beliavsky.github.io/fortran-gams-catalog/argument-intents/)
+and downloadable Markdown/JSON reports regenerate with every site build and
+identify new usages still awaiting review.
+
+Annotations retain the pinned declaration, specific overload, source dummy name
+when different from the displayed name, and call index for multi-call examples.
+Function results and implicit passed objects are not assigned an intent.
+Conditional intents remain unmarked; hover or focus to see the alternatives.
+The MATLAB gateway invocation and an interoperability adapter with an
+incompatible upstream Fortran declaration are explicitly documented exceptions.
+These are interface reviews, not new compilation or numerical checks.
+
+To check declarations again, run the conservative source-review utility:
+
+```powershell
+python xargument_intents.py --fetch
+```
+
+It retrieves missing files at pinned commits, verifies source hashes, and
+writes `_site/argument-intent-review.md` and `.json`. It leaves catalog metadata
+unchanged unless `--write` is added. Cached reruns can omit `--fetch`; ordinary
+site builds use saved metadata and never download sources. Review findings
+before using `--write`, then run `python xreviews.py` and the tests. Explicit
+exceptions in `data/argument-intent-overrides.json` must match the exact source
+revision and procedure record. See the [review policy](docs/review-policy.md)
+for the annotation format and scope limitations.
 
 Cards and detail pages also show **License**. Reviewed labels link to license
 evidence at a pinned commit; imported labels are marked as imported metadata.

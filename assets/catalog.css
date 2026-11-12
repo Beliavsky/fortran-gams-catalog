@@ -39,7 +39,7 @@ pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:.7rem; border:1px so
 .highlight-intents [data-argument-intent="inout"] { font-style:italic; font-weight:700; }
 .argument-intent { position:relative; }
 .argument-intent:focus-visible { outline:2px solid var(--link); outline-offset:2px; }
-.argument-intent:hover::after,.argument-intent:focus-visible::after { content:"intent(" attr(data-argument-intent) ")"; position:absolute; left:0; top:100%; z-index:1; padding:.15rem .4rem; border:1px solid var(--line); border-radius:.2rem; background:var(--card); color:var(--ink); white-space:nowrap; font-size:.85rem; font-weight:400; font-style:normal; }
+.argument-intent:hover::after,.argument-intent:focus-visible::after { content:attr(data-intent-description); position:absolute; left:0; top:100%; z-index:1; padding:.15rem .4rem; border:1px solid var(--line); border-radius:.2rem; background:var(--card); color:var(--ink); width:max-content; max-width:min(28rem,80vw); white-space:normal; overflow-wrap:anywhere; font-size:.85rem; font-weight:400; font-style:normal; }
 footer { border-top:1px solid var(--line); margin-top:2rem; }
 .skip { position:absolute; left:-10000px; }
 .skip:focus { position:static; }

@@ -9,6 +9,7 @@ import shutil
 from urllib.parse import quote
 from review_export import publish_review_feed
 from argument_intents import signature_markup
+from intent_coverage import records as intent_records, write_reports as write_intent_reports
 from interface_audit import STATUSES as INTERFACE_STATUSES, audit as audit_interfaces, detail as audit_detail, write_report
 from topics import (DIFFERENTIATION_TOPICS, EXPRESSION_TOPICS, DISCOVERY_TOPICS,
                     differentiation_topics, expression_topics, discovery_topics)
@@ -114,6 +115,8 @@ def build(destination, root=ROOT):
     publish_review_feed(destination, projects)
     interface_report = audit_interfaces(projects)
     write_report(destination, interface_report)
+    intent_rows=intent_records(projects)
+    intent_summary=write_intent_reports(intent_rows,destination)
     (destination/'catalog.json').write_text(json.dumps(merged, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'taxonomy.json').write_text(json.dumps(tree, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'legacy-gams.json').write_text(json.dumps(legacy, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
@@ -149,11 +152,11 @@ def build(destination, root=ROOT):
 <option value="">All software</option><optgroup label="Automatic differentiation">{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in DIFFERENTIATION_TOPICS.items())}</optgroup><optgroup label="Expression parsers">{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in EXPRESSION_TOPICS.items())}</optgroup></select></label>
 <span class="muted" id="topic-filter-help">Curated capabilities, not execution checks. Source-reviewed filtering applies to GAMS mappings.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="highlight-intents" aria-describedby="argument-intent-help"> Highlight output arguments</label>
-<span class="muted" id="argument-intent-help">Recorded intent only: <em>out</em> is italic; <strong><em>inout</em></strong> is bold italic. Input and unspecified intent stay unmarked.</span></div>
+<span class="muted" id="argument-intent-help">Recorded intent only: <em>out</em> is italic; <strong><em>inout</em></strong> is bold italic. Input, unspecified and conditional intents stay unmarked; hover or focus for details.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
 <span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></details></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
-{link(prefix+'taxonomy.json','GAMS taxonomy')} · {link(prefix+'calling-sequences/', 'Calling-sequence audit')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
+{link(prefix+'taxonomy.json','GAMS taxonomy')} · {link(prefix+'calling-sequences/', 'Calling-sequence audit')} · {link(prefix+'argument-intents/', 'Argument-intent coverage')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
 
     def status(project, code=None):
@@ -296,6 +299,18 @@ def build(destination, root=ROOT):
             audit_body += '<p>None recorded.</p>'
         audit_body += '</section>'
     page('calling-sequences', 'Calling-sequence coverage audit', audit_body)
+    intent_body='<h1>Argument-intent coverage</h1><p>Every recorded usage line is classified separately from numerical or compilation checks. '
+    intent_body+='Only explicit Fortran INTENT is annotated. A checked record may have no explicit intents. Counts refer to metadata usage records, which can repeat an interface under different GAMS classes.</p>'
+    intent_body+='<p>Enable <strong>Highlight output arguments</strong> in Filters. Conditional declarations remain unmarked; hover or focus to see the alternatives. '
+    intent_body+='The displayed names can differ from the source dummy names; each annotation retains its pinned declaration and call index.</p>'
+    intent_body+='<p>'+link('../argument-intent-review.md','Download review summary')+' · '+link('../argument-intent-review.json','Download complete review records')+'</p><ul>'
+    intent_body+=''.join('<li>'+e(key)+': '+str(value)+'</li>' for key,value in intent_summary['status_counts'].items())+'</ul>'
+    intent_body+='<p>'+str(intent_summary['annotated_argument_count'])+' argument annotations in '+str(intent_summary['annotated_usage_count'])+' usage records across '+str(intent_summary['annotated_project_count'])+' projects.</p>'
+    pending=[r for r in intent_rows if r['status'] in {'partial','unreviewed'}]
+    intent_body+='<h2>Cases needing review</h2>'
+    intent_body+=('<ul>'+''.join('<li>'+link('../projects/'+quote(r['project'][7:],safe='/')+'/',r['project'][7:])+' — '+e(r['procedure']+': '+'; '.join(r['issues']))+'</li>' for r in pending)+'</ul>') if pending else '<p>No recorded usage remains unreviewed.</p>'
+    intent_body+='<h2>Special cases</h2><ul>'+''.join('<li>'+e(r['project'][7:]+' / '+r['procedure']+': '+r['notes'])+'</li>' for r in intent_rows if r.get('notes') and r.get('sources'))+'</ul>'
+    page('argument-intents','Argument-intent coverage',intent_body)
     ad_projects = [p for p in projects if 'automatic-differentiation' in differentiation_topics(p)]
     page('topics/automatic-differentiation', 'Automatic differentiation in Fortran',
          '<h1>Automatic differentiation in Fortran</h1>'

@@ -28,6 +28,16 @@ class Links(HTMLParser):
                 self.urls.append(attrs[key])
 
 
+class TextContent(HTMLParser):
+    def __init__(self, text):
+        super().__init__()
+        self.parts=[]
+        self.feed(text)
+
+    def handle_data(self, data):
+        self.parts.append(data)
+
+
 class CatalogTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -359,7 +369,8 @@ class CatalogTests(unittest.TestCase):
             self.assertIn('#L845-L858', geometry)
             spline = (destination/'projects/ja72/fortranconsolespline/index.html').read_text(encoding='utf-8')
             self.assertIn('mod_splines::spline%value', spline)
-            self.assertIn('y = sp%value(x)', spline)
+            # Intent annotations introduce spans without changing copyable usage text.
+            self.assertIn('y = sp%value(x)', ''.join(TextContent(spline).parts))
             self.assertIn('#L105-L109', spline)
             sorting_cards = (destination/'classes/N6a2a/index.html').read_text(encoding='utf-8')
             # Only entry points for the current problem belong on a class card.

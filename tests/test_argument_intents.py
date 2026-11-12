@@ -5,6 +5,7 @@ import unittest
 from argument_intents import signature_markup, validate_arguments
 from catalog import assemble, validate_local
 from review_export import build_review_feed
+from intent_coverage import records, write_reports
 
 
 class ArgumentIntentTests(unittest.TestCase):
@@ -82,3 +83,31 @@ class ArgumentIntentTests(unittest.TestCase):
         proc['arguments'][0]['intent']='out'
         original=next(p for p in project['local']['classifications'][0]['procedures'] if p['procedure']=='get')
         self.assertEqual(original['arguments'][0]['intent'],'in')
+
+    def test_conditional_intents_show_alternatives_without_a_fixed_intent(self):
+        p=copy.deepcopy(self.procedure)
+        p['arguments']=[{'name':'X','intent':'conditional','path':'src.f90','line_start':10,'line_end':15,
+            'variants':[{'intent':'out','condition':'FEATURE is not defined','path':'src.f90','line_start':11,'line_end':11},
+                        {'intent':'inout','condition':'FEATURE is defined','path':'src.f90','line_start':14,'line_end':14}]}]
+        validate_arguments(p,{'src.f90'})
+        markup=signature_markup(p)
+        self.assertIn('data-argument-intent="conditional"',markup)
+        self.assertIn('intent(inout) when FEATURE is defined',markup)
+        p['arguments'][0]['variants'][0]['line_start']=1
+        with self.assertRaises(ValueError):validate_arguments(p,{'src.f90'})
+
+    def test_every_current_usage_has_a_review_or_an_explicit_exemption(self):
+        _,projects,_=assemble()
+        rows=records(projects)
+        self.assertFalse([r for r in rows if r['status'] in {'partial','unreviewed'}])
+        self.assertGreater(sum(bool(r['argument_count']) for r in rows),1000)
+        c=next(r for r in rows if r['project']=='github:trex-coe/sherman-morrison' and r['procedure']=='SM1_f')
+        self.assertEqual(c['status'],'not-applicable')
+        self.assertIn('six',c['notes'])
+        gateway=next(r for r in rows if r['project']=='github:slicot/slicot-systemidentification')
+        self.assertEqual(gateway['status'],'not-applicable')
+        self.assertIn('MATLAB',gateway['notes'])
+        # New records are exposed as unreviewed without a manually maintained snapshot.
+        new={'id':'github:example/new','local':{'classifications':[{'code':'N3','revision':'a'*40,
+             'procedures':[{**self.procedure,'line_start':1,'line_end':30}]}]}}
+        self.assertEqual(records([new])[0]['status'],'unreviewed')

@@ -49,9 +49,17 @@ def render(local):
                     for argument in procedure['arguments']:
                         source = next(v for v in claim['evidence'] if v['path'] == argument['path'])
                         first, last = argument['line_start'], argument['line_end']
-                        lines.append(f'- `{argument["name"]}`: `intent({argument["intent"]})` — '
+                        description=('; '.join('intent('+v['intent']+') when '+v['condition'] for v in argument['variants'])
+                                     if argument['intent']=='conditional' else 'intent('+argument['intent']+')')
+                        scope=('; call '+str(argument['call_index']+1)) if 'call_index' in argument else ''
+                        dummy=('; source dummy '+argument['dummy']) if 'dummy' in argument else ''
+                        lines.append(f'- `{argument["name"]}`: `{description}`{scope}{dummy} — '
                                      f'[{argument["path"]}:{first}]({source["url"]}#L{first}-L{last}).')
                     lines.append('')
+                review=procedure.get('argument_intent_review')
+                if review:
+                    lines.extend(['Argument-intent declarations: '+review['status']+' on '+review['reviewed_on']+'. '
+                                  +review.get('notes','Only explicit INTENT is recorded; unspecified intent is not inferred.'), ''])
                 for name, label in (('declarations', 'Source declarations' if procedure.get('role') in {'public-data', 'public-template'} else 'Argument declarations'), ('examples', 'Author example (not run)')):
                     for reference in procedure.get(name, []):
                         source = next(v for v in claim['evidence'] if v['path'] == reference['path'])

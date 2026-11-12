@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "project": "github:slicot/slicot-systemidentification",
+      "revision": "947f1c5edd3f9455577c3ac3505bdc0caa13e042",
+      "procedure": "MEXFUNCTION (sident gateway)",
+      "path": "mex_src/sident.f",
+      "line_start": 90,
+      "not_applicable": true,
+      "reason": "The usage line is MATLAB sident syntax, not a Fortran call. MEXFUNCTION's actual NLHS/PLHS/NRHS/PRHS declarations do not provide intents for the MATLAB arguments."
+    },
+    {
+      "project": "github:trex-coe/sherman-morrison",
+      "revision": "0ba978e78727cb4c70e17d50153b09b4839d5c0a",
+      "procedure": "SM1_f",
+      "path": "src/SM_Standard.cpp",
+      "line_start": 283,
+      "not_applicable": true,
+      "reason": "The usage line calls a user-supplied ISO_C_BINDING adapter to a C wrapper. The checked upstream Fortran SM1 interface has five arguments while the C wrapper has six, including breakdown. Do not transfer intents from that incompatible interface or infer Fortran INTENT from C pointer/value parameters."
+    },
+    {
+      "project": "github:venovako/kogacc",
+      "revision": "c852e6d85355b5e7f3efb58b86cbe0c043cecd7d",
+      "procedure": "DKSVD0",
+      "path": "src/blksvd/dksvd0.F90",
+      "line_start": 1,
+      "reason": "The source explicitly changes SV's intent with ANIMATE; retain both alternatives without assuming a preprocessing configuration.",
+      "arguments": [
+        {
+          "name": "SV",
+          "intent": "conditional",
+          "path": "src/blksvd/dksvd0.F90",
+          "line_start": 82,
+          "line_end": 86,
+          "variants": [
+            {"intent": "inout", "condition": "ANIMATE is defined", "path": "src/blksvd/dksvd0.F90", "line_start": 83, "line_end": 83},
+            {"intent": "out", "condition": "ANIMATE is not defined", "path": "src/blksvd/dksvd0.F90", "line_start": 85, "line_end": 85}
+          ]
+        }
+      ]
+    }
+  ]
+}
