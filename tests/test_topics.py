@@ -74,6 +74,8 @@ class DifferentiationTopicTests(unittest.TestCase):
             self.assertEqual(page.count('<article data-search='), 3)
             self.assertIn('Parser capabilities:', page)
             self.assertIn('Usage (argument declarations)', page)
+            self.assertIn('id="highlight-intents"', page)
+            self.assertIn('data-argument-intent="out"', page)
             self.assertIn('Fortran code generation', page)
             self.assertIn('not evidence of symbolic algebra',
                           (destination/'classes/O/index.html').read_text(encoding='utf-8'))
@@ -92,6 +94,10 @@ class DifferentiationTopicTests(unittest.TestCase):
             self.assertIn('../projects/sgeard/hp/', audit_page)
             self.assertIn('../calling-sequence-audit.md', audit_page)
             self.assertTrue((destination/'calling-sequence-audit.md').is_file())
+            detail_page=(destination/'projects/jacobwilliams/fparse/index.html').read_text(encoding='utf-8')
+            self.assertIn('data-argument-intent="out"',detail_page)
+            self.assertIn('aria-label="VALUE: intent(out)"',detail_page)
+            self.assertIn('src/fparse.f90#L1391-L1397',detail_page)
             from html.parser import HTMLParser
             class Topics(HTMLParser):
                 def __init__(self):

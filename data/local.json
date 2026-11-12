@@ -95230,7 +95230,7 @@
             "code": "G2h1a1",
             "level": "source-reviewed",
             "revision": "0987cd09d695cec968a3d02c8230d4ce5af33533",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "The public bobyqa_module::bobyqa minimizes a smooth real scalar function under lower/upper variable bounds without supplied derivatives. It builds quadratic interpolation models and uses a trust-region method, dispatching to private BOBYQB. The selected public interface has ten arguments: N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,CALFUN; it allocates workspace internally. This differs from older external BOBYQA interfaces with a user workspace and from other forks with status/F outputs. N must be at least 2; N+2<=NPT<=(N+1)*(N+2)/2; NPT=2*N+1 is a suggested initial choice. Provide conforming REAL(wp) vectors X/XL/XU of length at least N. wp is REAL64 in the pinned kind_module. Require positive RHOEND<=RHOBEG and each bound interval at least 2*RHOBEG wide; scale variables appropriately. The wrapper can adjust the initial X away from bounds to construct its interpolation model. CALFUN(N,X,F) is a subroutine callback with default INTEGER N, assumed-shape REAL(wp) X(:) INTENT(IN), and scalar REAL(wp) F INTENT(OUT). X is overwritten by the best estimate; neither objective value nor convergence status is an output argument. Reevaluate the callback to obtain F and independently assess the result. Invalid NPT or insufficient bound spacing prints a diagnostic and returns; normal return alone is not a success certificate. IPRINT=0 suppresses ordinary iteration output but not those wrapper diagnostics. MAXFUN limits callback evaluations; there is no public counter/status result. This review inspects the public wrapper, callback declarations and precision selection, not every private interpolation/trust-region kernel. The illustrative calling program was not compiled or run for this independent review. The existing playground box-quadratic checked driver remains separately recorded and is not reclassified as a new independent numerical test.",
             "evidence": [
               {
@@ -95282,7 +95282,72 @@
                   }
                 ],
                 "usage": "program bounded_minimum\n  use kind_module, only: wp\n  use bobyqa_module, only: bobyqa\n  implicit none\n  integer, parameter :: n=2, npt=5\n  real(wp) :: x(n), xl(n), xu(n), f\n  x=[0.5_wp,0.5_wp]\n  xl=[0.0_wp,0.0_wp]\n  xu=[1.0_wp,1.0_wp]\n  call bobyqa(n,npt,x,xl,xu,0.2_wp,1.0e-8_wp,0,1000,objective)\n  call objective(n,x,f)\n  print *, x, f\ncontains\n  subroutine objective(n,x,f)\n    integer, intent(in) :: n\n    real(wp), intent(in) :: x(:)\n    real(wp), intent(out) :: f\n    f=(x(1)-2.0_wp)**2+(x(2)+1.0_wp)**2\n  end subroutine objective\nend program bounded_minimum",
-                "usage_notes": "Illustrative complete calling program only; not compiled or run for this independent review. Provide the callback as an internal or module subroutine so its assumed-shape interface is explicit. The mathematical reference solution for this particular [0,1]^2 quadratic is X=(1,0), F=2, but no output from this illustration is claimed. This is not the separately checked playground driver. See the pinned declaration links for all inputs and callback types. Bounds, interpolation geometry, scale, evaluation budget and absence of a returned success flag remain caller responsibilities."
+                "usage_notes": "Illustrative complete calling program only; not compiled or run for this independent review. Provide the callback as an internal or module subroutine so its assumed-shape interface is explicit. The mathematical reference solution for this particular [0,1]^2 quadratic is X=(1,0), F=2, but no output from this illustration is claimed. This is not the separately checked playground driver. See the pinned declaration links for all inputs and callback types. Bounds, interpolation geometry, scale, evaluation budget and absence of a returned success flag remain caller responsibilities.",
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 81,
+                    "line_end": 81
+                  },
+                  {
+                    "name": "NPT",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 82,
+                    "line_end": 82
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 85,
+                    "line_end": 85
+                  },
+                  {
+                    "name": "XL",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 87,
+                    "line_end": 87
+                  },
+                  {
+                    "name": "XU",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 91,
+                    "line_end": 91
+                  },
+                  {
+                    "name": "RHOBEG",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 95,
+                    "line_end": 95
+                  },
+                  {
+                    "name": "RHOEND",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 99,
+                    "line_end": 99
+                  },
+                  {
+                    "name": "IPRINT",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 103,
+                    "line_end": 103
+                  },
+                  {
+                    "name": "MAXFUN",
+                    "intent": "in",
+                    "path": "src/bobyqa.f90",
+                    "line_start": 109,
+                    "line_end": 109
+                  }
+                ]
               }
             ]
           }
@@ -95338,7 +95403,7 @@
             "code": "G2h1a2",
             "level": "source-reviewed",
             "revision": "ce1a9322016d6f31b652393e000a914b63af6fef",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "The public SETULB wrapper partitions workspace and calls MAINLB for smooth bound-constrained limited-memory BFGS using user objective gradients through reverse communication. The mapping requires real finite objective/gradient values and consistent bounds. It is not a derivative-free or callback-taking entry point. The character task state, workspace lengths, optional output-file argument and preprocessed kind selection are specific to this pinned modernized interface. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95382,6 +95447,99 @@
                     "path": "src/lbfgsb_kinds_module.F90",
                     "line_start": 29,
                     "line_end": 37
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 92,
+                    "line_end": 92
+                  },
+                  {
+                    "name": "M",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 93,
+                    "line_end": 93
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 98,
+                    "line_end": 98
+                  },
+                  {
+                    "name": "L",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 103,
+                    "line_end": 103
+                  },
+                  {
+                    "name": "U",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 106,
+                    "line_end": 106
+                  },
+                  {
+                    "name": "NBD",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 109,
+                    "line_end": 109
+                  },
+                  {
+                    "name": "F",
+                    "intent": "inout",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 116,
+                    "line_end": 116
+                  },
+                  {
+                    "name": "G",
+                    "intent": "inout",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 121,
+                    "line_end": 121
+                  },
+                  {
+                    "name": "FACTR",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 126,
+                    "line_end": 126
+                  },
+                  {
+                    "name": "PGTOL",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 140,
+                    "line_end": 140
+                  },
+                  {
+                    "name": "TASK",
+                    "intent": "inout",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 150,
+                    "line_end": 150
+                  },
+                  {
+                    "name": "IPRINT",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 175,
+                    "line_end": 175
+                  },
+                  {
+                    "name": "ITERATION_FILE",
+                    "intent": "in",
+                    "path": "src/lbfgsb.f90",
+                    "line_start": 243,
+                    "line_end": 243
                   }
                 ]
               }
@@ -95439,7 +95597,7 @@
             "code": "G1a1a",
             "level": "source-reviewed",
             "revision": "3d094fba0e9b98d132414f8442c7c76d32da1d30",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "The public FMIN function performs smooth scalar minimization without user derivatives over an initial interval. It uses safeguarded parabolic interpolation with golden-section fallback and a stopping scale SQRT(EPSILON)*ABS(X)+TOL/3. This modern package places F before AX/BX, unlike some textbook interfaces of the same name. The return is only a minimizer estimate; no convergence/status output or evaluation budget is exposed. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95483,6 +95641,29 @@
                     "path": "src/fmin_module.F90",
                     "line_start": 29,
                     "line_end": 39
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "AX",
+                    "intent": "in",
+                    "path": "src/fmin_module.F90",
+                    "line_start": 90,
+                    "line_end": 90
+                  },
+                  {
+                    "name": "BX",
+                    "intent": "in",
+                    "path": "src/fmin_module.F90",
+                    "line_start": 91,
+                    "line_end": 91
+                  },
+                  {
+                    "name": "TOL",
+                    "intent": "in",
+                    "path": "src/fmin_module.F90",
+                    "line_start": 92,
+                    "line_end": 92
                   }
                 ]
               }
@@ -95540,7 +95721,7 @@
             "code": "G1b1a",
             "level": "source-reviewed",
             "revision": "c0b5aea9fcd2b83865af921a7a7e881904f8d3c2",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "LMDIF1 minimizes a sum of squared nonlinear residuals using values supplied by the caller and a finite-difference Jacobian. This derivative-free-user interface is a specialized least-squares optimizer, not a general arbitrary scalar-objective algorithm. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95585,6 +95766,71 @@
                     "line_start": 10,
                     "line_end": 20
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "M",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 2336,
+                    "line_end": 2336
+                  },
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 2338,
+                    "line_end": 2338
+                  },
+                  {
+                    "name": "INFO",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 2340,
+                    "line_end": 2340
+                  },
+                  {
+                    "name": "LWA",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 2359,
+                    "line_end": 2359
+                  },
+                  {
+                    "name": "IWA",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 2361,
+                    "line_end": 2361
+                  },
+                  {
+                    "name": "TOL",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 2362,
+                    "line_end": 2362
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 2367,
+                    "line_end": 2367
+                  },
+                  {
+                    "name": "FVEC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 2370,
+                    "line_end": 2370
+                  },
+                  {
+                    "name": "WA",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 2372,
+                    "line_end": 2372
+                  }
                 ]
               }
             ]
@@ -95593,7 +95839,7 @@
             "code": "G1b1b",
             "level": "source-reviewed",
             "revision": "c0b5aea9fcd2b83865af921a7a7e881904f8d3c2",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "LMDER1 minimizes the squared norm of caller residuals using an analytic residual Jacobian. That Jacobian provides first-derivative information for this particular scalar sum-of-squares objective; it is not a callback returning an arbitrary scalar objective gradient. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95638,6 +95884,85 @@
                     "line_start": 10,
                     "line_end": 20
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "M",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1851,
+                    "line_end": 1851
+                  },
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1853,
+                    "line_end": 1853
+                  },
+                  {
+                    "name": "LDFJAC",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1855,
+                    "line_end": 1855
+                  },
+                  {
+                    "name": "INFO",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1857,
+                    "line_end": 1857
+                  },
+                  {
+                    "name": "LWA",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1876,
+                    "line_end": 1876
+                  },
+                  {
+                    "name": "IPVT",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1877,
+                    "line_end": 1877
+                  },
+                  {
+                    "name": "TOL",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1883,
+                    "line_end": 1883
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 1888,
+                    "line_end": 1888
+                  },
+                  {
+                    "name": "FVEC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1891,
+                    "line_end": 1891
+                  },
+                  {
+                    "name": "FJAC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1893,
+                    "line_end": 1893
+                  },
+                  {
+                    "name": "WA",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 1905,
+                    "line_end": 1905
+                  }
                 ]
               }
             ]
@@ -95646,7 +95971,7 @@
             "code": "F2",
             "level": "source-reviewed",
             "revision": "c0b5aea9fcd2b83865af921a7a7e881904f8d3c2",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "HYBRD1 and HYBRJ1 solve square nonlinear systems using finite-difference or supplied Jacobians respectively. Both simplified wrappers fix internal scaling, budget and printing controls. Their INFO fields describe algorithmic stopping and failures rather than a proof that the returned residual is small. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95691,6 +96016,57 @@
                     "line_start": 10,
                     "line_end": 20
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 964,
+                    "line_end": 964
+                  },
+                  {
+                    "name": "INFO",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 966,
+                    "line_end": 966
+                  },
+                  {
+                    "name": "TOL",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 979,
+                    "line_end": 979
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 982,
+                    "line_end": 982
+                  },
+                  {
+                    "name": "FVEC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 985,
+                    "line_end": 985
+                  },
+                  {
+                    "name": "LWA",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 987,
+                    "line_end": 987
+                  },
+                  {
+                    "name": "WA",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 989,
+                    "line_end": 989
+                  }
                 ]
               },
               {
@@ -95717,6 +96093,71 @@
                     "path": "src/minpack.f90",
                     "line_start": 10,
                     "line_end": 20
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1407,
+                    "line_end": 1407
+                  },
+                  {
+                    "name": "LDFJAC",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1409,
+                    "line_end": 1409
+                  },
+                  {
+                    "name": "INFO",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1411,
+                    "line_end": 1411
+                  },
+                  {
+                    "name": "LWA",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1424,
+                    "line_end": 1424
+                  },
+                  {
+                    "name": "TOL",
+                    "intent": "in",
+                    "path": "src/minpack.f90",
+                    "line_start": 1426,
+                    "line_end": 1426
+                  },
+                  {
+                    "name": "X",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 1429,
+                    "line_end": 1429
+                  },
+                  {
+                    "name": "FVEC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1432,
+                    "line_end": 1432
+                  },
+                  {
+                    "name": "FJAC",
+                    "intent": "out",
+                    "path": "src/minpack.f90",
+                    "line_start": 1434,
+                    "line_end": 1434
+                  },
+                  {
+                    "name": "WA",
+                    "intent": "inout",
+                    "path": "src/minpack.f90",
+                    "line_start": 1437,
+                    "line_end": 1437
                   }
                 ]
               }
@@ -95774,7 +96215,7 @@
             "code": "H2a1a1",
             "level": "source-reviewed",
             "revision": "ab42d50794280a8e7996f2ee4cda1f8753dfde5b",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "DQAG is the general adaptive finite-interval callback integrator; KEY selects its Gauss-Kronrod rule. The public declarations expose workspace/control arguments rather than automatic allocation. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95834,6 +96275,92 @@
                     "line_start": 24,
                     "line_end": 24
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 102,
+                    "line_end": 102
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 103,
+                    "line_end": 103
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 105,
+                    "line_end": 105
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 106,
+                    "line_end": 106
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 107,
+                    "line_end": 107
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 111,
+                    "line_end": 111
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 112,
+                    "line_end": 112
+                  },
+                  {
+                    "name": "LIMIT",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 116,
+                    "line_end": 116
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 138,
+                    "line_end": 138
+                  },
+                  {
+                    "name": "KEY",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 180,
+                    "line_end": 180
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 189,
+                    "line_end": 189
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 193,
+                    "line_end": 193
+                  }
                 ]
               }
             ]
@@ -95842,7 +96369,7 @@
             "code": "H2a2a1",
             "level": "source-reviewed",
             "revision": "ab42d50794280a8e7996f2ee4cda1f8753dfde5b",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "These separate interfaces handle special finite-interval problems: DQAGS singularity-oriented extrapolation, DQAGP prescribed interior breakpoints, DQAWC Cauchy principal values, DQAWO sine/cosine weights and DQAWS algebraic/logarithmic endpoint weights. Callback meaning and work-array sizing differ; their signatures must not be substituted for one another. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -95902,6 +96429,85 @@
                     "line_start": 24,
                     "line_end": 24
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1717,
+                    "line_end": 1717
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1718,
+                    "line_end": 1718
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1719,
+                    "line_end": 1719
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1720,
+                    "line_end": 1720
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1724,
+                    "line_end": 1724
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1725,
+                    "line_end": 1725
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1727,
+                    "line_end": 1727
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1728,
+                    "line_end": 1728
+                  },
+                  {
+                    "name": "LIMIT",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1781,
+                    "line_end": 1781
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1786,
+                    "line_end": 1786
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1790,
+                    "line_end": 1790
+                  }
                 ]
               },
               {
@@ -95933,6 +96539,99 @@
                     "path": "src/quadpack.F90",
                     "line_start": 24,
                     "line_end": 24
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1063,
+                    "line_end": 1063
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1064,
+                    "line_end": 1064
+                  },
+                  {
+                    "name": "NPTS2",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1065,
+                    "line_end": 1065
+                  },
+                  {
+                    "name": "POINTS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1069,
+                    "line_end": 1069
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1074,
+                    "line_end": 1074
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1075,
+                    "line_end": 1075
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1079,
+                    "line_end": 1079
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1080,
+                    "line_end": 1080
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1082,
+                    "line_end": 1082
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1083,
+                    "line_end": 1083
+                  },
+                  {
+                    "name": "LENIW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1139,
+                    "line_end": 1139
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1146,
+                    "line_end": 1146
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 1150,
+                    "line_end": 1150
                   }
                 ]
               },
@@ -95966,6 +96665,92 @@
                     "line_start": 24,
                     "line_end": 24
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2238,
+                    "line_end": 2238
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2239,
+                    "line_end": 2239
+                  },
+                  {
+                    "name": "C",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2240,
+                    "line_end": 2240
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2243,
+                    "line_end": 2243
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2244,
+                    "line_end": 2244
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2248,
+                    "line_end": 2248
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2249,
+                    "line_end": 2249
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2251,
+                    "line_end": 2251
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2252,
+                    "line_end": 2252
+                  },
+                  {
+                    "name": "LIMIT",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2290,
+                    "line_end": 2290
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2295,
+                    "line_end": 2295
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 2299,
+                    "line_end": 2299
+                  }
                 ]
               },
               {
@@ -95997,6 +96782,106 @@
                     "path": "src/quadpack.F90",
                     "line_start": 24,
                     "line_end": 24
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3112,
+                    "line_end": 3112
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3113,
+                    "line_end": 3113
+                  },
+                  {
+                    "name": "OMEGA",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3114,
+                    "line_end": 3114
+                  },
+                  {
+                    "name": "INTEGR",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3115,
+                    "line_end": 3115
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3122,
+                    "line_end": 3122
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3123,
+                    "line_end": 3123
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3127,
+                    "line_end": 3127
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3128,
+                    "line_end": 3128
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3130,
+                    "line_end": 3130
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3131,
+                    "line_end": 3131
+                  },
+                  {
+                    "name": "LENIW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3188,
+                    "line_end": 3188
+                  },
+                  {
+                    "name": "MAXP1",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3193,
+                    "line_end": 3193
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3198,
+                    "line_end": 3198
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3202,
+                    "line_end": 3202
                   }
                 ]
               },
@@ -96030,6 +96915,106 @@
                     "line_start": 24,
                     "line_end": 24
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3762,
+                    "line_end": 3762
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3763,
+                    "line_end": 3763
+                  },
+                  {
+                    "name": "ALFA",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3765,
+                    "line_end": 3765
+                  },
+                  {
+                    "name": "BETA",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3768,
+                    "line_end": 3768
+                  },
+                  {
+                    "name": "INTEGR",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3771,
+                    "line_end": 3771
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3780,
+                    "line_end": 3780
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3781,
+                    "line_end": 3781
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3785,
+                    "line_end": 3785
+                  },
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3786,
+                    "line_end": 3786
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3788,
+                    "line_end": 3788
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3789,
+                    "line_end": 3789
+                  },
+                  {
+                    "name": "LIMIT",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3831,
+                    "line_end": 3831
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3836,
+                    "line_end": 3836
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 3840,
+                    "line_end": 3840
+                  }
                 ]
               }
             ]
@@ -96038,7 +97023,7 @@
             "code": "H2a3a1",
             "level": "source-reviewed",
             "revision": "ab42d50794280a8e7996f2ee4cda1f8753dfde5b",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "DQAGI transforms improper half-line integrals and adaptively subdivides the transformed interval. INF chooses the direction; whole-line support is visible in the interface but is not a new hosted check in this review. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.",
             "evidence": [
               {
@@ -96098,6 +97083,85 @@
                     "line_start": 24,
                     "line_end": 24
                   }
+                ],
+                "arguments": [
+                  {
+                    "name": "ABSERR",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 519,
+                    "line_end": 519
+                  },
+                  {
+                    "name": "BOUND",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 521,
+                    "line_end": 521
+                  },
+                  {
+                    "name": "EPSABS",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 523,
+                    "line_end": 523
+                  },
+                  {
+                    "name": "EPSREL",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 524,
+                    "line_end": 524
+                  },
+                  {
+                    "name": "RESULT",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 528,
+                    "line_end": 528
+                  },
+                  {
+                    "name": "LENW",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 529,
+                    "line_end": 529
+                  },
+                  {
+                    "name": "LIMIT",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 533,
+                    "line_end": 533
+                  },
+                  {
+                    "name": "IER",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 549,
+                    "line_end": 549
+                  },
+                  {
+                    "name": "INF",
+                    "intent": "in",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 601,
+                    "line_end": 601
+                  },
+                  {
+                    "name": "LAST",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 612,
+                    "line_end": 612
+                  },
+                  {
+                    "name": "NEVAL",
+                    "intent": "out",
+                    "path": "src/quadpack_generic.F90",
+                    "line_start": 616,
+                    "line_end": 616
+                  }
                 ]
               }
             ]
@@ -96154,7 +97218,7 @@
             "code": "E1a",
             "level": "source-reviewed",
             "revision": "8f5350565072622a2344dd0ec75193832b31eb10",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "DPCHIM constructs monotone piecewise cubic Hermite derivatives and DPCHFE evaluates that interpolant. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.",
             "evidence": [
               {
@@ -96184,7 +97248,51 @@
                     "line_end": 32
                   }
                 ],
-                "summary": "Construct shape-preserving Hermite nodal derivatives D from X and F. Require N>=2, strictly increasing X(N), INCFD>=1 and F/D storage with leading dimension INCFD and N columns; ordinary scalar data use INCFD=1. Only the first row of D is written. IERR=0 is normal, positive values count monotonicity direction switches rather than failure, and negative values report invalid N/stride/abscissae. All real arguments are REAL64. Call DPCHFE next to evaluate the constructed interpolant."
+                "summary": "Construct shape-preserving Hermite nodal derivatives D from X and F. Require N>=2, strictly increasing X(N), INCFD>=1 and F/D storage with leading dimension INCFD and N columns; ordinary scalar data use INCFD=1. Only the first row of D is written. IERR=0 is normal, positive values count monotonicity direction switches rather than failure, and negative values report invalid N/stride/abscissae. All real arguments are REAL64. Call DPCHFE next to evaluate the constructed interpolant.",
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2218,
+                    "line_end": 2218
+                  },
+                  {
+                    "name": "INCFD",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2220,
+                    "line_end": 2220
+                  },
+                  {
+                    "name": "IERR",
+                    "intent": "out",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2223,
+                    "line_end": 2223
+                  },
+                  {
+                    "name": "X",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2239,
+                    "line_end": 2239
+                  },
+                  {
+                    "name": "F",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2243,
+                    "line_end": 2243
+                  },
+                  {
+                    "name": "D",
+                    "intent": "out",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 2249,
+                    "line_end": 2249
+                  }
+                ]
               },
               {
                 "procedure": "dpchfe",
@@ -96206,7 +97314,79 @@
                     "line_end": 32
                   }
                 ],
-                "summary": "Evaluate a previously defined Hermite interpolant at XE(NE), returning FE(NE). Supply N/X/F/D/INCFD consistently with DPCHIM (or supplied Hermite derivatives), NE>=1, and REAL64 arrays. Initialize SKIP=.FALSE. for validation; it becomes .TRUE. on normal return. Reset it if the data/controls change. IERR>0 counts extrapolated evaluation points; negative values indicate invalid input. Extrapolation uses the nearest endpoint cubic and is not a bound on approximation error."
+                "summary": "Evaluate a previously defined Hermite interpolant at XE(NE), returning FE(NE). Supply N/X/F/D/INCFD consistently with DPCHIM (or supplied Hermite derivatives), NE>=1, and REAL64 arrays. Initialize SKIP=.FALSE. for validation; it becomes .TRUE. on normal return. Reset it if the data/controls change. IERR>0 counts extrapolated evaluation points; negative values indicate invalid input. Extrapolation uses the nearest endpoint cubic and is not a bound on approximation error.",
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1448,
+                    "line_end": 1448
+                  },
+                  {
+                    "name": "INCFD",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1449,
+                    "line_end": 1449
+                  },
+                  {
+                    "name": "NE",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1451,
+                    "line_end": 1451
+                  },
+                  {
+                    "name": "IERR",
+                    "intent": "out",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1452,
+                    "line_end": 1452
+                  },
+                  {
+                    "name": "X",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1467,
+                    "line_end": 1467
+                  },
+                  {
+                    "name": "F",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1471,
+                    "line_end": 1471
+                  },
+                  {
+                    "name": "D",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1473,
+                    "line_end": 1473
+                  },
+                  {
+                    "name": "XE",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1475,
+                    "line_end": 1475
+                  },
+                  {
+                    "name": "FE",
+                    "intent": "out",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1487,
+                    "line_end": 1487
+                  },
+                  {
+                    "name": "SKIP",
+                    "intent": "inout",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1489,
+                    "line_end": 1489
+                  }
+                ]
               }
             ]
           },
@@ -96214,7 +97394,7 @@
             "code": "E3a3",
             "level": "source-reviewed",
             "revision": "8f5350565072622a2344dd0ec75193832b31eb10",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "DPCHIA analytically integrates the supplied piecewise cubic Hermite representation. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.",
             "evidence": [
               {
@@ -96244,7 +97424,72 @@
                     "line_end": 32
                   }
                 ],
-                "summary": "Return the signed integral of the stored REAL64 cubic Hermite interpolant from A to B, using the same N/X/F/D/INCFD convention as DPCHIM/DPCHFE. Initialize SKIP=.FALSE. unless data have already been validated. IERR=0 is normal, 1/2/3 flag A/B/both endpoints outside the interpolation interval, and negative values signal input/internal errors. Extrapolated integrals may be unreliable. This integrates the fitted piecewise cubic, not an arbitrary function callback."
+                "summary": "Return the signed integral of the stored REAL64 cubic Hermite interpolant from A to B, using the same N/X/F/D/INCFD convention as DPCHIM/DPCHFE. Initialize SKIP=.FALSE. unless data have already been validated. IERR=0 is normal, 1/2/3 flag A/B/both endpoints outside the interpolation interval, and negative values signal input/internal errors. Extrapolated integrals may be unreliable. This integrates the fitted piecewise cubic, not an arbitrary function callback.",
+                "arguments": [
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1654,
+                    "line_end": 1654
+                  },
+                  {
+                    "name": "INCFD",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1655,
+                    "line_end": 1655
+                  },
+                  {
+                    "name": "IERR",
+                    "intent": "inout",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1657,
+                    "line_end": 1657
+                  },
+                  {
+                    "name": "X",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1676,
+                    "line_end": 1676
+                  },
+                  {
+                    "name": "F",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1680,
+                    "line_end": 1680
+                  },
+                  {
+                    "name": "D",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1682,
+                    "line_end": 1682
+                  },
+                  {
+                    "name": "A",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1684,
+                    "line_end": 1684
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1688,
+                    "line_end": 1688
+                  },
+                  {
+                    "name": "SKIP",
+                    "intent": "inout",
+                    "path": "src/pchip_module.f90",
+                    "line_start": 1692,
+                    "line_end": 1692
+                  }
+                ]
               }
             ]
           }
@@ -97134,7 +98379,7 @@
             "code": "D9a1",
             "level": "source-reviewed",
             "revision": "12611e2299c5188441b097437695a66c85369e76",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "LSMR accepts rectangular matrix operators and seeks real linear least-squares solutions, optionally damped. Callback accumulation and actual executable stopping codes are essential parts of the contract. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.",
             "evidence": [
               {
@@ -97189,7 +98434,135 @@
                     "line_end": 558
                   }
                 ],
-                "summary": "Iterative real least squares with optional Tikhonov damping through mandatory DAMP (set zero for undamped). Aprod1(M,N,X,Y) must accumulate Y += A*X without altering X; Aprod2 must accumulate X += TRANSPOSE(A)*Y without altering Y. These callbacks add to, rather than replace, the output buffers. B(M) is input and X(N) output, not an initial guess. Match LSMR_WP and LSMR_IP from lsmrDataModule. ATOL/BTOL set matrix/RHS error tolerances; CONLIM controls the condition estimate, ITNLIM the budget, LOCALSIZE local reorthogonalization and NOUT<=0 suppresses logging. Inspect ISTOP and estimates NORMA/CONDA/NORMR/NORMAR/NORMX with ITN. The executable code uses 0 for zero solution, 1/2 residual/least-squares tests, 3 conditioning limit, 4/5 machine-precision tests, 6 machine conditioning and 7 iteration limit: some older declaration comments have different codes, so the linked executable termination tests are authoritative."
+                "summary": "Iterative real least squares with optional Tikhonov damping through mandatory DAMP (set zero for undamped). Aprod1(M,N,X,Y) must accumulate Y += A*X without altering X; Aprod2 must accumulate X += TRANSPOSE(A)*Y without altering Y. These callbacks add to, rather than replace, the output buffers. B(M) is input and X(N) output, not an initial guess. Match LSMR_WP and LSMR_IP from lsmrDataModule. ATOL/BTOL set matrix/RHS error tolerances; CONLIM controls the condition estimate, ITNLIM the budget, LOCALSIZE local reorthogonalization and NOUT<=0 suppresses logging. Inspect ISTOP and estimates NORMA/CONDA/NORMR/NORMAR/NORMX with ITN. The executable code uses 0 for zero solution, 1/2 residual/least-squares tests, 3 conditioning limit, 4/5 machine-precision tests, 6 machine conditioning and 7 iteration limit: some older declaration comments have different codes, so the linked executable termination tests are authoritative.",
+                "arguments": [
+                  {
+                    "name": "M",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 179,
+                    "line_end": 179
+                  },
+                  {
+                    "name": "N",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 180,
+                    "line_end": 180
+                  },
+                  {
+                    "name": "ITNLIM",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 181,
+                    "line_end": 181
+                  },
+                  {
+                    "name": "LOCALSIZE",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 187,
+                    "line_end": 187
+                  },
+                  {
+                    "name": "NOUT",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 195,
+                    "line_end": 195
+                  },
+                  {
+                    "name": "ISTOP",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 197,
+                    "line_end": 197
+                  },
+                  {
+                    "name": "ITN",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 215,
+                    "line_end": 215
+                  },
+                  {
+                    "name": "B",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 216,
+                    "line_end": 216
+                  },
+                  {
+                    "name": "X",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 217,
+                    "line_end": 217
+                  },
+                  {
+                    "name": "ATOL",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 218,
+                    "line_end": 218
+                  },
+                  {
+                    "name": "BTOL",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 221,
+                    "line_end": 221
+                  },
+                  {
+                    "name": "CONLIM",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 224,
+                    "line_end": 224
+                  },
+                  {
+                    "name": "DAMP",
+                    "intent": "in",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 242,
+                    "line_end": 242
+                  },
+                  {
+                    "name": "NORMA",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 253,
+                    "line_end": 253
+                  },
+                  {
+                    "name": "CONDA",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 261,
+                    "line_end": 261
+                  },
+                  {
+                    "name": "NORMR",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 264,
+                    "line_end": 264
+                  },
+                  {
+                    "name": "NORMAR",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 268,
+                    "line_end": 268
+                  },
+                  {
+                    "name": "NORMX",
+                    "intent": "out",
+                    "path": "src/lsmrModule.f90",
+                    "line_start": 274,
+                    "line_end": 274
+                  }
+                ]
               }
             ]
           }
@@ -102199,7 +103572,7 @@
             "code": "N3",
             "level": "source-reviewed",
             "revision": "4c977c925506bea3fb1ee44aac08114c5fa68a71",
-            "reviewed_on": "2026-11-07",
+            "reviewed_on": "2026-11-12",
             "notes": "The scalar parser compiles an expression, evaluates ordered variable values, and exposes stored-error status. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.",
             "evidence": [
               {
@@ -102235,7 +103608,30 @@
                   }
                 ],
                 "summary": "Declare TYPE(fparser) :: solver from function_parser. Compile scalar expression FUNCSTR using CHARACTER array VAR as the ordered variable-name list. Optional CASE_SENSITIVE defaults false. PARSE resets previous parser state; inspect solver%error() before evaluation and use solver%print_errors() for diagnostics. There is no parse status argument in this binding. The passed object ME is implicit in solver%; do not pass it again. Optional actuals shown in brackets can be supplied by keyword.",
-                "derived_type": "fparser"
+                "derived_type": "fparser",
+                "arguments": [
+                  {
+                    "name": "FUNCSTR",
+                    "intent": "in",
+                    "path": "src/function_parser.F90",
+                    "line_start": 459,
+                    "line_end": 459
+                  },
+                  {
+                    "name": "VAR",
+                    "intent": "in",
+                    "path": "src/function_parser.F90",
+                    "line_start": 460,
+                    "line_end": 460
+                  },
+                  {
+                    "name": "CASE_SENSITIVE",
+                    "intent": "in",
+                    "path": "src/function_parser.F90",
+                    "line_start": 461,
+                    "line_end": 461
+                  }
+                ]
               },
               {
                 "procedure": "evaluate",
@@ -102265,7 +103661,23 @@
                 "summary": "Declare TYPE(fparser) :: solver from function_parser. After successful PARSE, supply REAL(FPARSER_RK) VAL(:) values in exactly the same order as VAR and receive scalar RES. FPARSER_RK defaults REAL64. The bytecode accesses VAL by stored indices, so the caller must supply enough values. Inspect solver%error() after evaluation: an evaluation error can return RES=0, which must not be confused with a valid zero. The passed object ME is implicit in solver%; do not pass it again. Optional actuals shown in brackets can be supplied by keyword.",
                 "derived_type": "fparser",
                 "usage": "use function_parser, only: fparser, fparser_rk\ntype(fparser) :: p\nreal(fparser_rk) :: value\ncall p%parse(\"sin(x)+x**2\", [\"x\"])\nif (p%error()) error stop \"parse failed\"\ncall p%evaluate([2.0_fparser_rk], value)\nif (p%error()) error stop \"evaluation failed\"\nprint *, value",
-                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state."
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state.",
+                "arguments": [
+                  {
+                    "name": "VAL",
+                    "intent": "in",
+                    "path": "src/function_parser.F90",
+                    "line_start": 518,
+                    "line_end": 518
+                  },
+                  {
+                    "name": "RES",
+                    "intent": "out",
+                    "path": "src/function_parser.F90",
+                    "line_start": 519,
+                    "line_end": 519
+                  }
+                ]
               },
               {
                 "procedure": "error",
@@ -140722,7 +142134,23 @@
                     "line_end": 126
                   }
                 ],
-                "summary": "Module generic constructor returning TYPE(EquationParser); it is called as a function, not p%EquationParser. Copies expression and variable names to fixed 1024-character buffers, parses and compiles. Names are case sensitive; unsupported syntax may terminate the process. This is distinct from FEQParse::EquationParser."
+                "summary": "Module generic constructor returning TYPE(EquationParser); it is called as a function, not p%EquationParser. Copies expression and variable names to fixed 1024-character buffers, parses and compiles. Names are case sensitive; unsupported syntax may terminate the process. This is distinct from FEQParse::EquationParser.",
+                "arguments": [
+                  {
+                    "name": "FUNCSTR",
+                    "intent": "in",
+                    "path": "src/FortranParser.f90",
+                    "line_start": 125,
+                    "line_end": 125
+                  },
+                  {
+                    "name": "VAR",
+                    "intent": "in",
+                    "path": "src/FortranParser.f90",
+                    "line_start": 126,
+                    "line_end": 126
+                  }
+                ]
               },
               {
                 "procedure": "evaluate",
@@ -140742,7 +142170,16 @@
                 ],
                 "summary": "VAL(:) and scalar result use the rn kind from FortranParser_parameters. Supply variable values in constructor order and matching count. Bytecode evaluation uses the parser working stack. Errors can print diagnostics and return zero; no success flag is supplied. Domain checks do not establish arbitrary-input safety.",
                 "usage": "use FortranParser, only: EquationParser\nuse FortranParser_parameters, only: rn\ntype(EquationParser) :: p\nreal(rn) :: value\np = EquationParser(\"sin(x)+x**2\", [\"x\"])\nvalue = p%evaluate([2.0_rn])\nprint *, value",
-                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Uses a valid expression and the library real kind. The constructor can STOP on invalid syntax; evaluate has no returned status flag. A zero result does not establish success."
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Uses a valid expression and the library real kind. The constructor can STOP on invalid syntax; evaluate has no returned status flag. A zero result does not establish success.",
+                "arguments": [
+                  {
+                    "name": "VAL",
+                    "intent": "in",
+                    "path": "src/FortranParser.f90",
+                    "line_start": 158,
+                    "line_end": 158
+                  }
+                ]
               }
             ]
           }
@@ -140939,7 +142376,44 @@
                     "line_end": 435
                   }
                 ],
-                "summary": "Declare TYPE(fparser) from fparse. Supply arrays of input names and expression strings, optionally output names. Names are case insensitive; dependencies determine evaluation order. Replaces old expression state while retaining custom functions/options. STATUS=0 means success and ERRMSG is allocatable CHARACTER."
+                "summary": "Declare TYPE(fparser) from fparse. Supply arrays of input names and expression strings, optionally output names. Names are case insensitive; dependencies determine evaluation order. Replaces old expression state while retaining custom functions/options. STATUS=0 means success and ERRMSG is allocatable CHARACTER.",
+                "arguments": [
+                  {
+                    "name": "VARIABLES",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 431,
+                    "line_end": 431
+                  },
+                  {
+                    "name": "EXPRESSIONS",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 432,
+                    "line_end": 432
+                  },
+                  {
+                    "name": "NAMES",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 433,
+                    "line_end": 433
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 434,
+                    "line_end": 434
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 435,
+                    "line_end": 435
+                  }
+                ]
               },
               {
                 "procedure": "set_variable",
@@ -140957,7 +142431,37 @@
                     "line_end": 875
                   }
                 ],
-                "summary": "Scalar-by-name overload of the public set_variable generic: VALUE is REAL(wp), NAME is an input variable. Separate overloads accept rank-one vectors or an integer variable index. Supply every required input before evaluate; setting values does not evaluate expressions."
+                "summary": "Scalar-by-name overload of the public set_variable generic: VALUE is REAL(wp), NAME is an input variable. Separate overloads accept rank-one vectors or an integer variable index. Supply every required input before evaluate; setting values does not evaluate expressions.",
+                "arguments": [
+                  {
+                    "name": "NAME",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 872,
+                    "line_end": 872
+                  },
+                  {
+                    "name": "VALUE",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 873,
+                    "line_end": 873
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 874,
+                    "line_end": 874
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 875,
+                    "line_end": 875
+                  }
+                ]
               },
               {
                 "procedure": "evaluate",
@@ -140975,7 +142479,30 @@
                     "line_end": 1010
                   }
                 ],
-                "summary": "Evaluate the parsed expression system with previously set scalar/vector inputs. Optional WRT(:) requests first derivatives for named inputs; omitting it avoids derivative computation. Read outputs separately with get. Inspect STATUS immediately: subsequent operations clear stored errors. Custom functions lacking a supplied derivative can use finite differences."
+                "summary": "Evaluate the parsed expression system with previously set scalar/vector inputs. Optional WRT(:) requests first derivatives for named inputs; omitting it avoids derivative computation. Read outputs separately with get. Inspect STATUS immediately: subsequent operations clear stored errors. Custom functions lacking a supplied derivative can use finite differences.",
+                "arguments": [
+                  {
+                    "name": "WRT",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 1007,
+                    "line_end": 1007
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1009,
+                    "line_end": 1009
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1010,
+                    "line_end": 1010
+                  }
+                ]
               },
               {
                 "procedure": "get",
@@ -140995,7 +142522,37 @@
                 ],
                 "summary": "Scalar-by-name overload of get, returning REAL(wp). Separate overloads return allocatable vectors or use an output index. Call after successful evaluate; returned zero can be an error placeholder, so inspect STATUS.",
                 "usage": "use fparse, only: fparser, wp\ntype(fparser) :: p\nreal(wp) :: value\ninteger :: status\ncharacter(:), allocatable :: message\ncall p%parse([\"x\"], [\"sin(x)+x**2\"], names=[\"f\"], status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%set_variable(\"x\", 2.0_wp, status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%evaluate(status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%get(\"f\", value, status=status, errmsg=message)\nif (status /= 0) error stop message\nprint *, value",
-                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state."
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state.",
+                "arguments": [
+                  {
+                    "name": "NAME",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 1394,
+                    "line_end": 1394
+                  },
+                  {
+                    "name": "VALUE",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1395,
+                    "line_end": 1395
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1396,
+                    "line_end": 1396
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1397,
+                    "line_end": 1397
+                  }
+                ]
               },
               {
                 "procedure": "get_derivative",
@@ -141013,7 +142570,44 @@
                     "line_end": 1633
                   }
                 ],
-                "summary": "Scalar-by-name overload of the derivative query: REAL(wp) DERIV is d(NAME)/d(WRT). First evaluate with WRT requested, then retrieve its derivative, checking STATUS after each call. The matrix overload returns an allocatable Jacobian for vector values. This interface review does not verify every derivative formula."
+                "summary": "Scalar-by-name overload of the derivative query: REAL(wp) DERIV is d(NAME)/d(WRT). First evaluate with WRT requested, then retrieve its derivative, checking STATUS after each call. The matrix overload returns an allocatable Jacobian for vector values. This interface review does not verify every derivative formula.",
+                "arguments": [
+                  {
+                    "name": "NAME",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 1629,
+                    "line_end": 1629
+                  },
+                  {
+                    "name": "WRT",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 1630,
+                    "line_end": 1630
+                  },
+                  {
+                    "name": "DERIV",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1631,
+                    "line_end": 1631
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1632,
+                    "line_end": 1632
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 1633,
+                    "line_end": 1633
+                  }
+                ]
               },
               {
                 "procedure": "add_function",
@@ -141031,7 +142625,44 @@
                     "line_end": 381
                   }
                 ],
-                "summary": "Register a callback conforming to fparse_func before parsing expressions that use it. IS_PURE describes whether its result and derivative depend only on arguments and affects caching. Optional DF conforms to fparse_dfunc; absent DF can trigger finite differences for derivatives. This API does not load arbitrary Fortran source text."
+                "summary": "Register a callback conforming to fparse_func before parsing expressions that use it. IS_PURE describes whether its result and derivative depend only on arguments and affects caching. Optional DF conforms to fparse_dfunc; absent DF can trigger finite differences for derivatives. This API does not load arbitrary Fortran source text.",
+                "arguments": [
+                  {
+                    "name": "NAME",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 374,
+                    "line_end": 374
+                  },
+                  {
+                    "name": "IS_PURE",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 376,
+                    "line_end": 376
+                  },
+                  {
+                    "name": "NARGS",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 378,
+                    "line_end": 378
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 380,
+                    "line_end": 380
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 381,
+                    "line_end": 381
+                  }
+                ]
               },
               {
                 "procedure": "generate_fortran",
@@ -141049,7 +142680,44 @@
                     "line_end": 2019
                   }
                 ],
-                "summary": "Return generated module text in allocatable CHARACTER CODE; this call does not compile or run it. Parse and set all input values first, since their sizes are required. MODULE_NAME defaults fparse_generated. Optional WRT requests generated first-derivative code. Check status; supported expression/custom-function restrictions belong to the generator, not to this interface review."
+                "summary": "Return generated module text in allocatable CHARACTER CODE; this call does not compile or run it. Parse and set all input values first, since their sizes are required. MODULE_NAME defaults fparse_generated. Optional WRT requests generated first-derivative code. Check status; supported expression/custom-function restrictions belong to the generator, not to this interface review.",
+                "arguments": [
+                  {
+                    "name": "CODE",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 2013,
+                    "line_end": 2013
+                  },
+                  {
+                    "name": "MODULE_NAME",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 2014,
+                    "line_end": 2014
+                  },
+                  {
+                    "name": "WRT",
+                    "intent": "in",
+                    "path": "src/fparse.f90",
+                    "line_start": 2016,
+                    "line_end": 2016
+                  },
+                  {
+                    "name": "STATUS",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 2018,
+                    "line_end": 2018
+                  },
+                  {
+                    "name": "ERRMSG",
+                    "intent": "out",
+                    "path": "src/fparse.f90",
+                    "line_start": 2019,
+                    "line_end": 2019
+                  }
+                ]
               }
             ]
           },

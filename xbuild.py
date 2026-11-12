@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import quote
 from review_export import publish_review_feed
+from argument_intents import signature_markup
 from interface_audit import STATUSES as INTERFACE_STATUSES, audit as audit_interfaces, detail as audit_detail, write_report
 from topics import (DIFFERENTIATION_TOPICS, EXPRESSION_TOPICS, DISCOVERY_TOPICS,
                     differentiation_topics, expression_topics, discovery_topics)
@@ -147,6 +148,8 @@ def build(destination, root=ROOT):
 <div class="build-filter topic-filter"><label class="checkbox-label">Topic <select id="topic" aria-describedby="topic-filter-help">
 <option value="">All software</option><optgroup label="Automatic differentiation">{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in DIFFERENTIATION_TOPICS.items())}</optgroup><optgroup label="Expression parsers">{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in EXPRESSION_TOPICS.items())}</optgroup></select></label>
 <span class="muted" id="topic-filter-help">Curated capabilities, not execution checks. Source-reviewed filtering applies to GAMS mappings.</span></div>
+<div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="highlight-intents" aria-describedby="argument-intent-help"> Highlight output arguments</label>
+<span class="muted" id="argument-intent-help">Recorded intent only: <em>out</em> is italic; <strong><em>inout</em></strong> is bold italic. Input and unspecified intent stay unmarked.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
 <span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></details></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
@@ -233,7 +236,7 @@ def build(destination, root=ROOT):
                     source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                     url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                     label = 'Usage (source declarations)' if proc.get('role') in {'public-data', 'public-template'} else 'Usage (argument declarations)'
-                    entry_html += '<p>'+label+':</p><pre><code>'+link(url, proc['signature'])+'</code></pre>'
+                    entry_html += '<p>'+label+':</p><pre><code><a href="'+e(url)+'">'+signature_markup(proc)+'</a></code></pre>'
                 entry_html += '</li>'
             if entries:
                 entry_label = 'Reviewed public interfaces:' if any(v[1].get('role') in {'public-data', 'public-template', 'public-adapter'} for v in entries.values()) else 'Reviewed entry points:'
@@ -406,7 +409,7 @@ def build(destination, root=ROOT):
                         source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                         url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                         label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (click for argument declarations)'
-                        body += '<p>'+label+':</p><pre><code>'+link(url, procedure['signature'])+'</code></pre>'
+                        body += '<p>'+label+':</p><pre><code><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'
                         for declaration in procedure['declarations']:
                             source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                             body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',

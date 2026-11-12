@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlsplit
 
 from vendor.catalog_export import merge_catalog, owner_display_name
+from argument_intents import validate_arguments
 
 ROOT = Path(__file__).resolve().parent
 LEVELS = {'documentation-reviewed', 'source-reviewed'}
@@ -176,6 +177,7 @@ def validate_local(local, tree, root=ROOT):
                             raise ValueError('Procedure links need pinned evidence and valid ranges: ' + identity)
                     if 'signature' in procedure and not procedure.get('declarations'):
                         raise ValueError('Usage signatures need pinned argument declarations: ' + identity)
+                    validate_arguments(procedure, paths)
                     if 'local_driver' in procedure:
                         validate_local_driver(procedure['local_driver'], procedure, claim, root)
     return local

@@ -355,3 +355,34 @@ for (const topic of ['expression-parser','scalar-evaluation','array-evaluation',
   assert.equal(compactPage('?topic='+topic).controls.topic.value,topic);
 }
 console.log('Expression parsers: exact membership, mixed AD membership, URL facets, counts and combined filters passed.');
+
+// Presentation preference is independent of filtering and tolerates denied storage.
+function intentPage(initial, denyStorage=false) {
+  const control={checked:false,addEventListener:(event,fn)=>control.handler=fn};
+  let enabled; const storage=new Map(initial ? [['fortran-catalog-highlight-intents',initial]] : []);
+  const localStorage={
+    getItem:key=>{if(denyStorage)throw Error('storage denied');return storage.get(key);},
+    setItem:(key,value)=>{if(denyStorage)throw Error('storage denied');storage.set(key,value);}
+  };
+  vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),{
+    document:{getElementById:id=>id==='highlight-intents' ? control : null,
+      querySelector:()=>null,documentElement:{classList:{toggle:(name,value)=>{
+        assert.equal(name,'highlight-intents');enabled=value;
+      }}}},localStorage
+  });
+  return {control,storage,enabled:()=>enabled};
+}
+const defaultIntentPage=intentPage();
+assert.equal(defaultIntentPage.enabled(),false);
+defaultIntentPage.control.checked=true;defaultIntentPage.control.handler();
+assert.equal(defaultIntentPage.enabled(),true);
+assert.equal(defaultIntentPage.storage.get('fortran-catalog-highlight-intents'),'1');
+const restoredIntents=intentPage('1');
+assert.equal(restoredIntents.control.checked,true);assert.equal(restoredIntents.enabled(),true);
+restoredIntents.control.checked=false;restoredIntents.control.handler();
+assert.equal(restoredIntents.enabled(),false);
+assert.equal(restoredIntents.storage.get('fortran-catalog-highlight-intents'),'0');
+const restrictedIntents=intentPage(null,true);
+restrictedIntents.control.checked=true;restrictedIntents.control.handler();
+assert.equal(restrictedIntents.enabled(),true);
+console.log('Argument intents: default, stored preference, toggling and denied storage passed.');

@@ -44,6 +44,14 @@ def render(local):
                     lines.extend([procedure['summary'], ''])
                 if procedure.get('signature'):
                     lines.extend(['Usage:', '', '```fortran', procedure['signature'], '```', ''])
+                if procedure.get('arguments'):
+                    lines.extend(['Recorded argument intents (unspecified arguments are not inferred):', ''])
+                    for argument in procedure['arguments']:
+                        source = next(v for v in claim['evidence'] if v['path'] == argument['path'])
+                        first, last = argument['line_start'], argument['line_end']
+                        lines.append(f'- `{argument["name"]}`: `intent({argument["intent"]})` — '
+                                     f'[{argument["path"]}:{first}]({source["url"]}#L{first}-L{last}).')
+                    lines.append('')
                 for name, label in (('declarations', 'Source declarations' if procedure.get('role') in {'public-data', 'public-template'} else 'Argument declarations'), ('examples', 'Author example (not run)')):
                     for reference in procedure.get(name, []):
                         source = next(v for v in claim['evidence'] if v['path'] == reference['path'])

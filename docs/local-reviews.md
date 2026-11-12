@@ -25071,7 +25071,7 @@ SHA-256 (normalized UTF-8/LF): `71245e1d75087143160ae600a3baa831e284f1537b2cf435
 
 The public FMIN function performs smooth scalar minimization without user derivatives over an initial interval. It uses safeguarded parabolic interpolation with golden-section fallback and a stopping scale SQRT(EPSILON)*ABS(X)+TOL/3. This modern package places F before AX/BX, unlike some textbook interfaces of the same name. The return is only a minimizer estimate; no convergence/status output or evaluation budget is exposed. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `3d094fba0e9b98d132414f8442c7c76d32da1d30`.
+Reviewed 2026-11-12 at `3d094fba0e9b98d132414f8442c7c76d32da1d30`.
 
 [src/fmin_module.F90](https://github.com/jacobwilliams/fmin/blob/3d094fba0e9b98d132414f8442c7c76d32da1d30/src/fmin_module.F90)
 SHA-256 (normalized UTF-8/LF): `d63cd59c63c3be05d2f73bdacbf53acef42a70ecef893da770b6a3d087d32182`.
@@ -25091,6 +25091,12 @@ Usage:
 ```fortran
 XMIN = fmin(F,AX,BX,TOL)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `AX`: `intent(in)` — [src/fmin_module.F90:90](https://github.com/jacobwilliams/fmin/blob/3d094fba0e9b98d132414f8442c7c76d32da1d30/src/fmin_module.F90#L90-L90).
+- `BX`: `intent(in)` — [src/fmin_module.F90:91](https://github.com/jacobwilliams/fmin/blob/3d094fba0e9b98d132414f8442c7c76d32da1d30/src/fmin_module.F90#L91-L91).
+- `TOL`: `intent(in)` — [src/fmin_module.F90:92](https://github.com/jacobwilliams/fmin/blob/3d094fba0e9b98d132414f8442c7c76d32da1d30/src/fmin_module.F90#L92-L92).
 
 Argument declarations: [src/fmin_module.F90:89–95](https://github.com/jacobwilliams/fmin/blob/3d094fba0e9b98d132414f8442c7c76d32da1d30/src/fmin_module.F90#L89-L95).
 
@@ -33605,7 +33611,7 @@ SHA-256 (normalized UTF-8/LF): `e66c9eeb438265c3a3137236036120965ea50d079004e215
 
 The scalar parser compiles an expression, evaluates ordered variable values, and exposes stored-error status. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.
 
-Reviewed 2026-11-07 at `4c977c925506bea3fb1ee44aac08114c5fa68a71`.
+Reviewed 2026-11-12 at `4c977c925506bea3fb1ee44aac08114c5fa68a71`.
 
 [src/function_parser.F90](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90)
 SHA-256 (normalized UTF-8/LF): `e66c9eeb438265c3a3137236036120965ea50d079004e2150c278108a2c56202`.
@@ -33619,6 +33625,12 @@ Usage:
 ```fortran
 CALL solver%parse(FUNCSTR,VAR,[CASE_SENSITIVE])
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `FUNCSTR`: `intent(in)` — [src/function_parser.F90:459](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L459-L459).
+- `VAR`: `intent(in)` — [src/function_parser.F90:460](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L460-L460).
+- `CASE_SENSITIVE`: `intent(in)` — [src/function_parser.F90:461](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L461-L461).
 
 Argument declarations: [src/function_parser.F90:458–462](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L458-L462).
 
@@ -33635,6 +33647,11 @@ Usage:
 ```fortran
 CALL solver%evaluate(VAL,RES)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `VAL`: `intent(in)` — [src/function_parser.F90:518](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L518-L518).
+- `RES`: `intent(out)` — [src/function_parser.F90:519](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L519-L519).
 
 Argument declarations: [src/function_parser.F90:517–519](https://github.com/jacobwilliams/fortran_function_parser/blob/4c977c925506bea3fb1ee44aac08114c5fa68a71/src/function_parser.F90#L517-L519).
 
@@ -34733,6 +34750,11 @@ Usage:
 P = EquationParser(FUNCSTR, VAR)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `FUNCSTR`: `intent(in)` — [src/FortranParser.f90:125](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L125-L125).
+- `VAR`: `intent(in)` — [src/FortranParser.f90:126](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L126-L126).
+
 Argument declarations: [src/FortranParser.f90:123–126](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L123-L126).
 
 Public entry point `FortranParser::EquationParser%evaluate`: [src/FortranParser.f90:155–270](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L155-L270).
@@ -34744,6 +34766,10 @@ Usage:
 ```fortran
 VALUE = p%evaluate(VAL)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `VAL`: `intent(in)` — [src/FortranParser.f90:158](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L158-L158).
 
 Argument declarations: [src/FortranParser.f90:155–164](https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90#L155-L164).
 
@@ -35583,6 +35609,14 @@ Usage:
 CALL p%parse(VARIABLES, EXPRESSIONS, [NAMES], [STATUS], [ERRMSG])
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `VARIABLES`: `intent(in)` — [src/fparse.f90:431](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L431-L431).
+- `EXPRESSIONS`: `intent(in)` — [src/fparse.f90:432](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L432-L432).
+- `NAMES`: `intent(in)` — [src/fparse.f90:433](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L433-L433).
+- `STATUS`: `intent(out)` — [src/fparse.f90:434](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L434-L434).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:435](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L435-L435).
+
 Argument declarations: [src/fparse.f90:428–435](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L428-L435).
 
 Public entry point `fparse::fparser%set_variable`: [src/fparse.f90:869–879](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L869-L879).
@@ -35594,6 +35628,13 @@ Usage:
 ```fortran
 CALL p%set_variable(NAME, VALUE, [STATUS], [ERRMSG])
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `NAME`: `intent(in)` — [src/fparse.f90:872](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L872-L872).
+- `VALUE`: `intent(in)` — [src/fparse.f90:873](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L873-L873).
+- `STATUS`: `intent(out)` — [src/fparse.f90:874](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L874-L874).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:875](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L875-L875).
 
 Argument declarations: [src/fparse.f90:869–875](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L869-L875).
 
@@ -35607,6 +35648,12 @@ Usage:
 CALL p%evaluate([WRT], [STATUS], [ERRMSG])
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `WRT`: `intent(in)` — [src/fparse.f90:1007](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1007-L1007).
+- `STATUS`: `intent(out)` — [src/fparse.f90:1009](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1009-L1009).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:1010](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1010-L1010).
+
 Argument declarations: [src/fparse.f90:1004–1010](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1004-L1010).
 
 Public entry point `fparse::fparser%get`: [src/fparse.f90:1391–1407](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1391-L1407).
@@ -35618,6 +35665,13 @@ Usage:
 ```fortran
 CALL p%get(NAME, VALUE, [STATUS], [ERRMSG])
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `NAME`: `intent(in)` — [src/fparse.f90:1394](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1394-L1394).
+- `VALUE`: `intent(out)` — [src/fparse.f90:1395](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1395-L1395).
+- `STATUS`: `intent(out)` — [src/fparse.f90:1396](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1396-L1396).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:1397](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1397-L1397).
 
 Argument declarations: [src/fparse.f90:1391–1397](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1391-L1397).
 
@@ -35652,6 +35706,14 @@ Usage:
 CALL p%get_derivative(NAME, WRT, DERIV, [STATUS], [ERRMSG])
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `NAME`: `intent(in)` — [src/fparse.f90:1629](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1629-L1629).
+- `WRT`: `intent(in)` — [src/fparse.f90:1630](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1630-L1630).
+- `DERIV`: `intent(out)` — [src/fparse.f90:1631](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1631-L1631).
+- `STATUS`: `intent(out)` — [src/fparse.f90:1632](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1632-L1632).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:1633](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1633-L1633).
+
 Argument declarations: [src/fparse.f90:1626–1633](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L1626-L1633).
 
 Public entry point `fparse::fparser%add_function`: [src/fparse.f90:371–411](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L371-L411).
@@ -35664,6 +35726,14 @@ Usage:
 CALL p%add_function(NAME, F, IS_PURE, [NARGS], [DF], [STATUS], [ERRMSG])
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `NAME`: `intent(in)` — [src/fparse.f90:374](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L374-L374).
+- `IS_PURE`: `intent(in)` — [src/fparse.f90:376](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L376-L376).
+- `NARGS`: `intent(in)` — [src/fparse.f90:378](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L378-L378).
+- `STATUS`: `intent(out)` — [src/fparse.f90:380](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L380-L380).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:381](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L381-L381).
+
 Argument declarations: [src/fparse.f90:371–381](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L371-L381).
 
 Public entry point `fparse::fparser%generate_fortran`: [src/fparse.f90:2010–2065](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2010-L2065).
@@ -35675,6 +35745,14 @@ Usage:
 ```fortran
 CALL p%generate_fortran(CODE, [MODULE_NAME], [WRT], [STATUS], [ERRMSG])
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `CODE`: `intent(out)` — [src/fparse.f90:2013](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2013-L2013).
+- `MODULE_NAME`: `intent(in)` — [src/fparse.f90:2014](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2014-L2014).
+- `WRT`: `intent(in)` — [src/fparse.f90:2016](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2016-L2016).
+- `STATUS`: `intent(out)` — [src/fparse.f90:2018](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2018-L2018).
+- `ERRMSG`: `intent(out)` — [src/fparse.f90:2019](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2019-L2019).
 
 Argument declarations: [src/fparse.f90:2010–2019](https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90#L2010-L2019).
 
@@ -46041,7 +46119,7 @@ SHA-256 (normalized UTF-8/LF): `4e25d914ee548e51155413920ae34f09dc6ccdcb72ca3aec
 
 The public SETULB wrapper partitions workspace and calls MAINLB for smooth bound-constrained limited-memory BFGS using user objective gradients through reverse communication. The mapping requires real finite objective/gradient values and consistent bounds. It is not a derivative-free or callback-taking entry point. The character task state, workspace lengths, optional output-file argument and preprocessed kind selection are specific to this pinned modernized interface. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `ce1a9322016d6f31b652393e000a914b63af6fef`.
+Reviewed 2026-11-12 at `ce1a9322016d6f31b652393e000a914b63af6fef`.
 
 [src/lbfgsb.f90](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90)
 SHA-256 (normalized UTF-8/LF): `8562cf29648293f653355e2ebbbab58559b60bce4ad976076e48ebe73a23981e`.
@@ -46064,6 +46142,22 @@ Usage:
 ```fortran
 CALL setulb(N,M,X,L,U,NBD,F,G,FACTR,PGTOL,WA,IWA,TASK,IPRINT,CSAVE,LSAVE,ISAVE,DSAVE[,ITERATION_FILE])
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/lbfgsb.f90:92](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L92-L92).
+- `M`: `intent(in)` — [src/lbfgsb.f90:93](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L93-L93).
+- `X`: `intent(inout)` — [src/lbfgsb.f90:98](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L98-L98).
+- `L`: `intent(in)` — [src/lbfgsb.f90:103](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L103-L103).
+- `U`: `intent(in)` — [src/lbfgsb.f90:106](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L106-L106).
+- `NBD`: `intent(in)` — [src/lbfgsb.f90:109](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L109-L109).
+- `F`: `intent(inout)` — [src/lbfgsb.f90:116](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L116-L116).
+- `G`: `intent(inout)` — [src/lbfgsb.f90:121](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L121-L121).
+- `FACTR`: `intent(in)` — [src/lbfgsb.f90:126](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L126-L126).
+- `PGTOL`: `intent(in)` — [src/lbfgsb.f90:140](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L140-L140).
+- `TASK`: `intent(inout)` — [src/lbfgsb.f90:150](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L150-L150).
+- `IPRINT`: `intent(in)` — [src/lbfgsb.f90:175](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L175-L175).
+- `ITERATION_FILE`: `intent(in)` — [src/lbfgsb.f90:243](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L243-L243).
 
 Argument declarations: [src/lbfgsb.f90:92–244](https://github.com/jacobwilliams/lbfgsb/blob/ce1a9322016d6f31b652393e000a914b63af6fef/src/lbfgsb.f90#L92-L244).
 
@@ -48742,7 +48836,7 @@ SHA-256 (normalized UTF-8/LF): `6a1cb9be406e8e1a62350468a3b355509ca3240bc0654303
 
 LSMR accepts rectangular matrix operators and seeks real linear least-squares solutions, optionally damped. Callback accumulation and actual executable stopping codes are essential parts of the contract. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.
 
-Reviewed 2026-11-07 at `12611e2299c5188441b097437695a66c85369e76`.
+Reviewed 2026-11-12 at `12611e2299c5188441b097437695a66c85369e76`.
 
 [src/lsmrModule.f90](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90)
 SHA-256 (normalized UTF-8/LF): `6a1cb9be406e8e1a62350468a3b355509ca3240bc06543038ae6452a2dd9aeda`.
@@ -48762,6 +48856,27 @@ Usage:
 ```fortran
 CALL lsmr(M,N,APROD1,APROD2,B,DAMP,ATOL,BTOL,CONLIM,ITNLIM,LOCALSIZE,NOUT,X,ISTOP,ITN,NORMA,CONDA,NORMR,NORMAR,NORMX)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `M`: `intent(in)` — [src/lsmrModule.f90:179](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L179-L179).
+- `N`: `intent(in)` — [src/lsmrModule.f90:180](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L180-L180).
+- `ITNLIM`: `intent(in)` — [src/lsmrModule.f90:181](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L181-L181).
+- `LOCALSIZE`: `intent(in)` — [src/lsmrModule.f90:187](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L187-L187).
+- `NOUT`: `intent(in)` — [src/lsmrModule.f90:195](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L195-L195).
+- `ISTOP`: `intent(out)` — [src/lsmrModule.f90:197](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L197-L197).
+- `ITN`: `intent(out)` — [src/lsmrModule.f90:215](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L215-L215).
+- `B`: `intent(in)` — [src/lsmrModule.f90:216](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L216-L216).
+- `X`: `intent(out)` — [src/lsmrModule.f90:217](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L217-L217).
+- `ATOL`: `intent(in)` — [src/lsmrModule.f90:218](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L218-L218).
+- `BTOL`: `intent(in)` — [src/lsmrModule.f90:221](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L221-L221).
+- `CONLIM`: `intent(in)` — [src/lsmrModule.f90:224](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L224-L224).
+- `DAMP`: `intent(in)` — [src/lsmrModule.f90:242](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L242-L242).
+- `NORMA`: `intent(out)` — [src/lsmrModule.f90:253](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L253-L253).
+- `CONDA`: `intent(out)` — [src/lsmrModule.f90:261](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L261-L261).
+- `NORMR`: `intent(out)` — [src/lsmrModule.f90:264](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L264-L264).
+- `NORMAR`: `intent(out)` — [src/lsmrModule.f90:268](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L268-L268).
+- `NORMX`: `intent(out)` — [src/lsmrModule.f90:274](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L274-L274).
 
 Argument declarations: [src/lsmrModule.f90:179–276](https://github.com/jacobwilliams/LSMR/blob/12611e2299c5188441b097437695a66c85369e76/src/lsmrModule.f90#L179-L276).
 
@@ -52716,7 +52831,7 @@ SHA-256 (normalized UTF-8/LF): `6f7cf13990461e4bb664f0b89292e47993fa468434b0ea26
 
 LMDIF1 minimizes a sum of squared nonlinear residuals using values supplied by the caller and a finite-difference Jacobian. This derivative-free-user interface is a specialized least-squares optimizer, not a general arbitrary scalar-objective algorithm. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
+Reviewed 2026-11-12 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
 
 [src/minpack.f90](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90)
 SHA-256 (normalized UTF-8/LF): `44ff6b6482af824875c3af49feb4bfe9b63933cd3cf5ecf05159f931353cbe27`.
@@ -52737,6 +52852,18 @@ Usage:
 CALL lmdif1(FCN,M,N,X,FVEC,TOL,INFO,IWA,WA,LWA)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `M`: `intent(in)` — [src/minpack.f90:2336](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2336-L2336).
+- `N`: `intent(in)` — [src/minpack.f90:2338](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2338-L2338).
+- `INFO`: `intent(out)` — [src/minpack.f90:2340](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2340-L2340).
+- `LWA`: `intent(in)` — [src/minpack.f90:2359](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2359-L2359).
+- `IWA`: `intent(inout)` — [src/minpack.f90:2361](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2361-L2361).
+- `TOL`: `intent(in)` — [src/minpack.f90:2362](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2362-L2362).
+- `X`: `intent(inout)` — [src/minpack.f90:2367](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2367-L2367).
+- `FVEC`: `intent(out)` — [src/minpack.f90:2370](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2370-L2370).
+- `WA`: `intent(inout)` — [src/minpack.f90:2372](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2372-L2372).
+
 Argument declarations: [src/minpack.f90:2334–2372](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L2334-L2372).
 
 Argument declarations: [src/minpack.f90:35–46](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L35-L46).
@@ -52747,7 +52874,7 @@ Argument declarations: [src/minpack.f90:10–20](https://github.com/jacobwilliam
 
 LMDER1 minimizes the squared norm of caller residuals using an analytic residual Jacobian. That Jacobian provides first-derivative information for this particular scalar sum-of-squares objective; it is not a callback returning an arbitrary scalar objective gradient. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
+Reviewed 2026-11-12 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
 
 [src/minpack.f90](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90)
 SHA-256 (normalized UTF-8/LF): `44ff6b6482af824875c3af49feb4bfe9b63933cd3cf5ecf05159f931353cbe27`.
@@ -52768,6 +52895,20 @@ Usage:
 CALL lmder1(FCN,M,N,X,FVEC,FJAC,LDFJAC,TOL,INFO,IPVT,WA,LWA)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `M`: `intent(in)` — [src/minpack.f90:1851](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1851-L1851).
+- `N`: `intent(in)` — [src/minpack.f90:1853](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1853-L1853).
+- `LDFJAC`: `intent(in)` — [src/minpack.f90:1855](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1855-L1855).
+- `INFO`: `intent(out)` — [src/minpack.f90:1857](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1857-L1857).
+- `LWA`: `intent(in)` — [src/minpack.f90:1876](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1876-L1876).
+- `IPVT`: `intent(out)` — [src/minpack.f90:1877](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1877-L1877).
+- `TOL`: `intent(in)` — [src/minpack.f90:1883](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1883-L1883).
+- `X`: `intent(inout)` — [src/minpack.f90:1888](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1888-L1888).
+- `FVEC`: `intent(out)` — [src/minpack.f90:1891](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1891-L1891).
+- `FJAC`: `intent(out)` — [src/minpack.f90:1893](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1893-L1893).
+- `WA`: `intent(inout)` — [src/minpack.f90:1905](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1905-L1905).
+
 Argument declarations: [src/minpack.f90:1849–1905](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1849-L1905).
 
 Argument declarations: [src/minpack.f90:67–85](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L67-L85).
@@ -52778,7 +52919,7 @@ Argument declarations: [src/minpack.f90:10–20](https://github.com/jacobwilliam
 
 HYBRD1 and HYBRJ1 solve square nonlinear systems using finite-difference or supplied Jacobians respectively. Both simplified wrappers fix internal scaling, budget and printing controls. Their INFO fields describe algorithmic stopping and failures rather than a proof that the returned residual is small. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
+Reviewed 2026-11-12 at `c0b5aea9fcd2b83865af921a7a7e881904f8d3c2`.
 
 [src/minpack.f90](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90)
 SHA-256 (normalized UTF-8/LF): `44ff6b6482af824875c3af49feb4bfe9b63933cd3cf5ecf05159f931353cbe27`.
@@ -52799,6 +52940,16 @@ Usage:
 CALL hybrd1(FCN,N,X,FVEC,TOL,INFO,WA,LWA)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/minpack.f90:964](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L964-L964).
+- `INFO`: `intent(out)` — [src/minpack.f90:966](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L966-L966).
+- `TOL`: `intent(in)` — [src/minpack.f90:979](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L979-L979).
+- `X`: `intent(inout)` — [src/minpack.f90:982](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L982-L982).
+- `FVEC`: `intent(out)` — [src/minpack.f90:985](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L985-L985).
+- `LWA`: `intent(in)` — [src/minpack.f90:987](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L987-L987).
+- `WA`: `intent(inout)` — [src/minpack.f90:989](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L989-L989).
+
 Argument declarations: [src/minpack.f90:963–989](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L963-L989).
 
 Argument declarations: [src/minpack.f90:25–33](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L25-L33).
@@ -52814,6 +52965,18 @@ Usage:
 ```fortran
 CALL hybrj1(FCN,N,X,FVEC,FJAC,LDFJAC,TOL,INFO,WA,LWA)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/minpack.f90:1407](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1407-L1407).
+- `LDFJAC`: `intent(in)` — [src/minpack.f90:1409](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1409-L1409).
+- `INFO`: `intent(out)` — [src/minpack.f90:1411](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1411-L1411).
+- `LWA`: `intent(in)` — [src/minpack.f90:1424](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1424-L1424).
+- `TOL`: `intent(in)` — [src/minpack.f90:1426](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1426-L1426).
+- `X`: `intent(inout)` — [src/minpack.f90:1429](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1429-L1429).
+- `FVEC`: `intent(out)` — [src/minpack.f90:1432](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1432-L1432).
+- `FJAC`: `intent(out)` — [src/minpack.f90:1434](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1434-L1434).
+- `WA`: `intent(inout)` — [src/minpack.f90:1437](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1437-L1437).
 
 Argument declarations: [src/minpack.f90:1405–1437](https://github.com/jacobwilliams/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1405-L1437).
 
@@ -62023,7 +62186,7 @@ SHA-256 (normalized UTF-8/LF): `d92e5471b464d79b742256fd611c1f12ce294bffaac5d864
 
 DPCHIM constructs monotone piecewise cubic Hermite derivatives and DPCHFE evaluates that interpolant. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.
 
-Reviewed 2026-11-07 at `8f5350565072622a2344dd0ec75193832b31eb10`.
+Reviewed 2026-11-12 at `8f5350565072622a2344dd0ec75193832b31eb10`.
 
 [src/pchip_module.f90](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90)
 SHA-256 (normalized UTF-8/LF): `d92e5471b464d79b742256fd611c1f12ce294bffaac5d864d1d9163784d1fb32`.
@@ -62037,6 +62200,15 @@ Usage:
 ```fortran
 CALL dpchim(N,X,F,D,INCFD,IERR)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/pchip_module.f90:2218](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2218-L2218).
+- `INCFD`: `intent(in)` — [src/pchip_module.f90:2220](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2220-L2220).
+- `IERR`: `intent(out)` — [src/pchip_module.f90:2223](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2223-L2223).
+- `X`: `intent(in)` — [src/pchip_module.f90:2239](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2239-L2239).
+- `F`: `intent(in)` — [src/pchip_module.f90:2243](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2243-L2243).
+- `D`: `intent(out)` — [src/pchip_module.f90:2249](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2249-L2249).
 
 Argument declarations: [src/pchip_module.f90:2218–2254](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L2218-L2254).
 
@@ -62052,6 +62224,19 @@ Usage:
 CALL dpchfe(N,X,F,D,INCFD,SKIP,NE,XE,FE,IERR)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/pchip_module.f90:1448](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1448-L1448).
+- `INCFD`: `intent(in)` — [src/pchip_module.f90:1449](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1449-L1449).
+- `NE`: `intent(in)` — [src/pchip_module.f90:1451](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1451-L1451).
+- `IERR`: `intent(out)` — [src/pchip_module.f90:1452](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1452-L1452).
+- `X`: `intent(in)` — [src/pchip_module.f90:1467](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1467-L1467).
+- `F`: `intent(in)` — [src/pchip_module.f90:1471](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1471-L1471).
+- `D`: `intent(in)` — [src/pchip_module.f90:1473](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1473-L1473).
+- `XE`: `intent(in)` — [src/pchip_module.f90:1475](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1475-L1475).
+- `FE`: `intent(out)` — [src/pchip_module.f90:1487](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1487-L1487).
+- `SKIP`: `intent(inout)` — [src/pchip_module.f90:1489](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1489-L1489).
+
 Argument declarations: [src/pchip_module.f90:1448–1494](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1448-L1494).
 
 Argument declarations: [src/pchip_module.f90:10–32](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L10-L32).
@@ -62060,7 +62245,7 @@ Argument declarations: [src/pchip_module.f90:10–32](https://github.com/jacobwi
 
 DPCHIA analytically integrates the supplied piecewise cubic Hermite representation. This is a pinned public-interface/source review, not a new numerical execution check or complete API audit. Existing hosted drivers and their verified problem scope are recorded separately.
 
-Reviewed 2026-11-07 at `8f5350565072622a2344dd0ec75193832b31eb10`.
+Reviewed 2026-11-12 at `8f5350565072622a2344dd0ec75193832b31eb10`.
 
 [src/pchip_module.f90](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90)
 SHA-256 (normalized UTF-8/LF): `d92e5471b464d79b742256fd611c1f12ce294bffaac5d864d1d9163784d1fb32`.
@@ -62074,6 +62259,18 @@ Usage:
 ```fortran
 VALUE = dpchia(N,X,F,D,INCFD,SKIP,A,B,IERR)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/pchip_module.f90:1654](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1654-L1654).
+- `INCFD`: `intent(in)` — [src/pchip_module.f90:1655](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1655-L1655).
+- `IERR`: `intent(inout)` — [src/pchip_module.f90:1657](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1657-L1657).
+- `X`: `intent(in)` — [src/pchip_module.f90:1676](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1676-L1676).
+- `F`: `intent(in)` — [src/pchip_module.f90:1680](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1680-L1680).
+- `D`: `intent(in)` — [src/pchip_module.f90:1682](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1682-L1682).
+- `A`: `intent(in)` — [src/pchip_module.f90:1684](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1684-L1684).
+- `B`: `intent(in)` — [src/pchip_module.f90:1688](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1688-L1688).
+- `SKIP`: `intent(inout)` — [src/pchip_module.f90:1692](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1692-L1692).
 
 Argument declarations: [src/pchip_module.f90:1654–1698](https://github.com/jacobwilliams/PCHIP/blob/8f5350565072622a2344dd0ec75193832b31eb10/src/pchip_module.f90#L1654-L1698).
 
@@ -64816,7 +65013,7 @@ SHA-256 (normalized UTF-8/LF): `90ed90ed85bab6888e6dad845216b67292a2c2bcc54af72f
 
 The public bobyqa_module::bobyqa minimizes a smooth real scalar function under lower/upper variable bounds without supplied derivatives. It builds quadratic interpolation models and uses a trust-region method, dispatching to private BOBYQB. The selected public interface has ten arguments: N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,CALFUN; it allocates workspace internally. This differs from older external BOBYQA interfaces with a user workspace and from other forks with status/F outputs. N must be at least 2; N+2<=NPT<=(N+1)*(N+2)/2; NPT=2*N+1 is a suggested initial choice. Provide conforming REAL(wp) vectors X/XL/XU of length at least N. wp is REAL64 in the pinned kind_module. Require positive RHOEND<=RHOBEG and each bound interval at least 2*RHOBEG wide; scale variables appropriately. The wrapper can adjust the initial X away from bounds to construct its interpolation model. CALFUN(N,X,F) is a subroutine callback with default INTEGER N, assumed-shape REAL(wp) X(:) INTENT(IN), and scalar REAL(wp) F INTENT(OUT). X is overwritten by the best estimate; neither objective value nor convergence status is an output argument. Reevaluate the callback to obtain F and independently assess the result. Invalid NPT or insufficient bound spacing prints a diagnostic and returns; normal return alone is not a success certificate. IPRINT=0 suppresses ordinary iteration output but not those wrapper diagnostics. MAXFUN limits callback evaluations; there is no public counter/status result. This review inspects the public wrapper, callback declarations and precision selection, not every private interpolation/trust-region kernel. The illustrative calling program was not compiled or run for this independent review. The existing playground box-quadratic checked driver remains separately recorded and is not reclassified as a new independent numerical test.
 
-Reviewed 2026-11-07 at `0987cd09d695cec968a3d02c8230d4ce5af33533`.
+Reviewed 2026-11-12 at `0987cd09d695cec968a3d02c8230d4ce5af33533`.
 
 [src/bobyqa.f90](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90)
 SHA-256 (normalized UTF-8/LF): `6fe1483b9f0c45961289b2b8c9276293b5378d79771d0bb4a230460b71a2eebe`.
@@ -64839,6 +65036,18 @@ Usage:
 ```fortran
 CALL bobyqa(N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,CALFUN)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `N`: `intent(in)` — [src/bobyqa.f90:81](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L81-L81).
+- `NPT`: `intent(in)` — [src/bobyqa.f90:82](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L82-L82).
+- `X`: `intent(inout)` — [src/bobyqa.f90:85](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L85-L85).
+- `XL`: `intent(in)` — [src/bobyqa.f90:87](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L87-L87).
+- `XU`: `intent(in)` — [src/bobyqa.f90:91](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L91-L91).
+- `RHOBEG`: `intent(in)` — [src/bobyqa.f90:95](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L95-L95).
+- `RHOEND`: `intent(in)` — [src/bobyqa.f90:99](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L99-L99).
+- `IPRINT`: `intent(in)` — [src/bobyqa.f90:103](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L103-L103).
+- `MAXFUN`: `intent(in)` — [src/bobyqa.f90:109](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L109-L109).
 
 Argument declarations: [src/bobyqa.f90:81–113](https://github.com/jacobwilliams/PowellOpt/blob/0987cd09d695cec968a3d02c8230d4ce5af33533/src/bobyqa.f90#L81-L113).
 
@@ -67596,7 +67805,7 @@ SHA-256 (normalized UTF-8/LF): `57a6a7643e9fda85f8c0fc5c7021f7a8117e07d09006349f
 
 DQAG is the general adaptive finite-interval callback integrator; KEY selects its Gauss-Kronrod rule. The public declarations expose workspace/control arguments rather than automatic allocation. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
+Reviewed 2026-11-12 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
 
 [src/quadpack_generic.F90](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90)
 SHA-256 (normalized UTF-8/LF): `c99ab78b9639e4c66c82ae3acd56efcd53a50026d3b8993ce4737fbaa91e88e8`.
@@ -67623,6 +67832,21 @@ Usage:
 CALL dqag(F,A,B,EPSABS,EPSREL,KEY,RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,LAST,IWORK,WORK)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:102](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L102-L102).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:103](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L103-L103).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:105](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L105-L105).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:106](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L106-L106).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:107](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L107-L107).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:111](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L111-L111).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:112](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L112-L112).
+- `LIMIT`: `intent(in)` — [src/quadpack_generic.F90:116](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L116-L116).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:138](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L138-L138).
+- `KEY`: `intent(in)` — [src/quadpack_generic.F90:180](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L180-L180).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:189](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L189-L189).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:193](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L193-L193).
+
 Argument declarations: [src/quadpack_generic.F90:101–193](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L101-L193).
 
 Argument declarations: [src/quadpack_generic.F90:47–54](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L47-L54).
@@ -67635,7 +67859,7 @@ Argument declarations: [src/quadpack.F90:24–24](https://github.com/jacobwillia
 
 These separate interfaces handle special finite-interval problems: DQAGS singularity-oriented extrapolation, DQAGP prescribed interior breakpoints, DQAWC Cauchy principal values, DQAWO sine/cosine weights and DQAWS algebraic/logarithmic endpoint weights. Callback meaning and work-array sizing differ; their signatures must not be substituted for one another. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
+Reviewed 2026-11-12 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
 
 [src/quadpack_generic.F90](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90)
 SHA-256 (normalized UTF-8/LF): `c99ab78b9639e4c66c82ae3acd56efcd53a50026d3b8993ce4737fbaa91e88e8`.
@@ -67662,6 +67886,20 @@ Usage:
 CALL dqags(F,A,B,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,LAST,IWORK,WORK)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:1717](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1717-L1717).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:1718](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1718-L1718).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:1719](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1719-L1719).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:1720](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1720-L1720).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:1724](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1724-L1724).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:1725](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1725-L1725).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:1727](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1727-L1727).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:1728](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1728-L1728).
+- `LIMIT`: `intent(in)` — [src/quadpack_generic.F90:1781](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1781-L1781).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:1786](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1786-L1786).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:1790](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1790-L1790).
+
 Argument declarations: [src/quadpack_generic.F90:1715–1811](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1715-L1811).
 
 Argument declarations: [src/quadpack_generic.F90:47–54](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L47-L54).
@@ -67679,6 +67917,22 @@ Usage:
 ```fortran
 CALL dqagp(F,A,B,NPTS2,POINTS,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LENIW,LENW,LAST,IWORK,WORK)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:1063](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1063-L1063).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:1064](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1064-L1064).
+- `NPTS2`: `intent(in)` — [src/quadpack_generic.F90:1065](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1065-L1065).
+- `POINTS`: `intent(in)` — [src/quadpack_generic.F90:1069](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1069-L1069).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:1074](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1074-L1074).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:1075](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1075-L1075).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:1079](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1079-L1079).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:1080](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1080-L1080).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:1082](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1082-L1082).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:1083](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1083-L1083).
+- `LENIW`: `intent(in)` — [src/quadpack_generic.F90:1139](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1139-L1139).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:1146](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1146-L1146).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:1150](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1150-L1150).
 
 Argument declarations: [src/quadpack_generic.F90:1062–1187](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L1062-L1187).
 
@@ -67698,6 +67952,21 @@ Usage:
 CALL dqawc(F,A,B,C,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,LAST,IWORK,WORK)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:2238](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2238-L2238).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:2239](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2239-L2239).
+- `C`: `intent(in)` — [src/quadpack_generic.F90:2240](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2240-L2240).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:2243](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2243-L2243).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:2244](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2244-L2244).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:2248](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2248-L2248).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:2249](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2249-L2249).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:2251](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2251-L2251).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:2252](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2252-L2252).
+- `LIMIT`: `intent(in)` — [src/quadpack_generic.F90:2290](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2290-L2290).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:2295](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2295-L2295).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:2299](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2299-L2299).
+
 Argument declarations: [src/quadpack_generic.F90:2237–2320](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L2237-L2320).
 
 Argument declarations: [src/quadpack_generic.F90:47–54](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L47-L54).
@@ -67715,6 +67984,23 @@ Usage:
 ```fortran
 CALL dqawo(F,A,B,OMEGA,INTEGR,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LENIW,MAXP1,LENW,LAST,IWORK,WORK)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:3112](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3112-L3112).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:3113](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3113-L3113).
+- `OMEGA`: `intent(in)` — [src/quadpack_generic.F90:3114](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3114-L3114).
+- `INTEGR`: `intent(in)` — [src/quadpack_generic.F90:3115](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3115-L3115).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:3122](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3122-L3122).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:3123](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3123-L3123).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:3127](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3127-L3127).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:3128](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3128-L3128).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:3130](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3130-L3130).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:3131](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3131-L3131).
+- `LENIW`: `intent(in)` — [src/quadpack_generic.F90:3188](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3188-L3188).
+- `MAXP1`: `intent(in)` — [src/quadpack_generic.F90:3193](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3193-L3193).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:3198](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3198-L3198).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:3202](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3202-L3202).
 
 Argument declarations: [src/quadpack_generic.F90:3111–3236](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3111-L3236).
 
@@ -67734,6 +68020,23 @@ Usage:
 CALL dqaws(F,A,B,ALFA,BETA,INTEGR,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,LAST,IWORK,WORK)
 ```
 
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `A`: `intent(in)` — [src/quadpack_generic.F90:3762](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3762-L3762).
+- `B`: `intent(in)` — [src/quadpack_generic.F90:3763](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3763-L3763).
+- `ALFA`: `intent(in)` — [src/quadpack_generic.F90:3765](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3765-L3765).
+- `BETA`: `intent(in)` — [src/quadpack_generic.F90:3768](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3768-L3768).
+- `INTEGR`: `intent(in)` — [src/quadpack_generic.F90:3771](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3771-L3771).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:3780](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3780-L3780).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:3781](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3781-L3781).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:3785](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3785-L3785).
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:3786](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3786-L3786).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:3788](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3788-L3788).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:3789](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3789-L3789).
+- `LIMIT`: `intent(in)` — [src/quadpack_generic.F90:3831](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3831-L3831).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:3836](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3836-L3836).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:3840](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3840-L3840).
+
 Argument declarations: [src/quadpack_generic.F90:3761–3862](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L3761-L3862).
 
 Argument declarations: [src/quadpack_generic.F90:47–54](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L47-L54).
@@ -67746,7 +68049,7 @@ Argument declarations: [src/quadpack.F90:24–24](https://github.com/jacobwillia
 
 DQAGI transforms improper half-line integrals and adaptively subdivides the transformed interval. INF chooses the direction; whole-line support is visible in the interface but is not a new hosted check in this review. This independent review records the public interfaces, dispatch and caller contracts, not a new numerical execution check or audit of every dependency/kernel. The existing problem-specific hosted drivers remain separate. No upstream numerical source is bundled.
 
-Reviewed 2026-11-07 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
+Reviewed 2026-11-12 at `ab42d50794280a8e7996f2ee4cda1f8753dfde5b`.
 
 [src/quadpack_generic.F90](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90)
 SHA-256 (normalized UTF-8/LF): `c99ab78b9639e4c66c82ae3acd56efcd53a50026d3b8993ce4737fbaa91e88e8`.
@@ -67772,6 +68075,20 @@ Usage:
 ```fortran
 CALL dqagi(F,BOUND,INF,EPSABS,EPSREL,RESULT,ABSERR,NEVAL,IER,LIMIT,LENW,LAST,IWORK,WORK)
 ```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `ABSERR`: `intent(out)` — [src/quadpack_generic.F90:519](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L519-L519).
+- `BOUND`: `intent(in)` — [src/quadpack_generic.F90:521](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L521-L521).
+- `EPSABS`: `intent(in)` — [src/quadpack_generic.F90:523](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L523-L523).
+- `EPSREL`: `intent(in)` — [src/quadpack_generic.F90:524](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L524-L524).
+- `RESULT`: `intent(out)` — [src/quadpack_generic.F90:528](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L528-L528).
+- `LENW`: `intent(in)` — [src/quadpack_generic.F90:529](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L529-L529).
+- `LIMIT`: `intent(in)` — [src/quadpack_generic.F90:533](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L533-L533).
+- `IER`: `intent(out)` — [src/quadpack_generic.F90:549](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L549-L549).
+- `INF`: `intent(in)` — [src/quadpack_generic.F90:601](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L601-L601).
+- `LAST`: `intent(out)` — [src/quadpack_generic.F90:612](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L612-L612).
+- `NEVAL`: `intent(out)` — [src/quadpack_generic.F90:616](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L616-L616).
 
 Argument declarations: [src/quadpack_generic.F90:518–616](https://github.com/jacobwilliams/quadpack/blob/ab42d50794280a8e7996f2ee4cda1f8753dfde5b/src/quadpack_generic.F90#L518-L616).
 

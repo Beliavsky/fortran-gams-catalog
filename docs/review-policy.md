@@ -89,6 +89,32 @@ use the same format to link author usage. `usage` supplies a calling sketch and
 requires `usage_notes` explaining initialization, dependencies and limits. These
 sketches and linked author examples are not checked drivers.
 
+Optional `arguments` records annotate explicit Fortran intents for a particular
+public callable signature. Each record has `name`, `intent` (`in`, `out` or
+`inout`), `path`, `line_start` and `line_end`. For example:
+
+```json
+{"name": "INFO", "intent": "out", "path": "src/solver.f90", "line_start": 42, "line_end": 42}
+```
+
+The source range must lie within a recorded argument-declaration range in the
+same hashed claim evidence. Names are unique ignoring case and must occur in
+the signature's argument list. Inspect the exact overload: a generic name can
+cover declarations with different intents. Preserve explicit `inout` on work
+arrays or status flags even when their names sound like pure outputs. Do not
+infer intent from comments, variable names or assignments. Leave arguments
+without explicit declarations unannotated; no `intent(in)` default is assumed.
+Function results and an implicit passed object are not displayed dummy
+arguments. Public constants, template instantiations and command usage do not
+receive Fortran argument-intent annotations. Update the claim review date when
+adding reviewed annotations.
+
+The site offers optional output highlighting and exposes explicit annotations
+on hover or keyboard focus. Raw signature text remains unchanged and its link
+still opens the declaration source. Metadata exports retain these optional
+records; receiving catalogs may choose whether to display them. This is
+interface documentation, not a numerical or compilation verification claim.
+
 Cards show at most three reviewed public/program entry points that match the
 current GAMS scope, with module names, source paths, line numbers and clickable
 usage lines where recorded. Details retain helper and callback evidence alongside

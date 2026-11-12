@@ -1,4 +1,16 @@
 'use strict';
+const intentControl = document.getElementById('highlight-intents');
+if (intentControl) {
+  try { intentControl.checked = localStorage.getItem('fortran-catalog-highlight-intents') === '1'; }
+  catch (_) { /* Storage may be unavailable; the toggle still works. */ }
+  const applyIntents = () => document.documentElement.classList.toggle('highlight-intents', intentControl.checked);
+  intentControl.addEventListener('change', () => {
+    applyIntents();
+    try { localStorage.setItem('fortran-catalog-highlight-intents', intentControl.checked ? '1' : '0'); }
+    catch (_) { /* Keep the preference for this page only. */ }
+  });
+  applyIntents();
+}
 const form = document.querySelector('.search');
 const excludeFpm = document.getElementById('exclude-fpm');
 const sourceReviewed = document.getElementById('source-reviewed');

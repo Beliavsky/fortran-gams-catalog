@@ -65,6 +65,23 @@ declarations. Detail pages distinguish public generics, private helpers,
 callbacks and standalone programs, and include calling sketches or author
 examples where recorded. These are usage references, not new execution checks.
 
+In **Filters**, select **Highlight output arguments** to italicize recorded
+`intent(out)` arguments and show `intent(inout)` arguments in bold italic.
+Input arguments and arguments without recorded intent remain unmarked.
+Hover over or keyboard-focus an annotated argument to see its explicit intent;
+click the usage link to read the source declarations. The preference is saved
+in the browser when local storage is available and does not filter results.
+Highlighting is off by default and applies to cards and project detail pages.
+
+The initial annotations cover 230 arguments in 29 usage interfaces across ten
+projects, including MINPACK, QUADPACK, PCHIP, LSMR, PowellOpt, L-BFGS-B and
+expression parsers. These are explicit declarations at the reviewed source
+revision, not inferred input/output behavior. Annotations describe the specific
+overload shown. Function results, implicit type-bound objects, callbacks without
+`INTENT` and legacy declarations without `INTENT` are not assigned an intent.
+Further reviews can add the optional `arguments` metadata described in the
+[review policy](docs/review-policy.md).
+
 Cards and detail pages also show **License**. Reviewed labels link to license
 evidence at a pinned commit; imported labels are marked as imported metadata.
 Entries without recorded terms say "License not yet reviewed". The review ledger
