@@ -100322,6 +100322,221 @@
             ],
             "notes": "The README documents integer, real and non-number helpers and separate FPM/fypp branches. These are numerical support utilities rather than a complete numerical-analysis library; floating-point exception detection does not establish simulation correctness.",
             "reviewed_on": "2026-11-04"
+          },
+          {
+            "code": "N",
+            "level": "source-reviewed",
+            "revision": "94eab76fa156923e80697cca91cd3c51097d234b",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "src/real/real.f90",
+                "url": "https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90",
+                "sha256": "2f5cb027f9bde8935d4826f573c0c70b5e627b9641449076deb623e2e35b9a32"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "to_string",
+                "module": "numeric_real",
+                "role": "public-entry-point",
+                "path": "src/real/real.f90",
+                "line_start": 96,
+                "line_end": 121,
+                "summary": "Public generic; this calling sequence describes its REAL(real64) scalar overload. USE numeric_real, ONLY: to_string and iso_fortran_env, ONLY: real64. format is an optional character format, default (e30.19E4). Returns an allocatable character string. An internal formatted-write error is printed to error_unit and yields an empty string. The temporary output buffer is limited to 255 characters.",
+                "signature": "str = to_string(r64, format)",
+                "declarations": [
+                  {
+                    "path": "src/real/real.f90",
+                    "line_start": 96,
+                    "line_end": 104
+                  },
+                  {
+                    "path": "src/real/real.f90",
+                    "line_start": 48,
+                    "line_end": 51
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "r64",
+                    "intent": "in",
+                    "path": "src/real/real.f90",
+                    "line_start": 99,
+                    "line_end": 99
+                  },
+                  {
+                    "name": "format",
+                    "intent": "in",
+                    "path": "src/real/real.f90",
+                    "line_start": 101,
+                    "line_end": 101
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/real/real.f90",
+                      "procedure": "real64_to_string",
+                      "line_start": 96,
+                      "line_end": 121
+                    }
+                  ],
+                  "issues": []
+                }
+              }
+            ]
+          },
+          {
+            "code": "A",
+            "level": "source-reviewed",
+            "revision": "94eab76fa156923e80697cca91cd3c51097d234b",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "src/nonNumber/nonNumber.f90",
+                "url": "https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90",
+                "sha256": "cb3e0a736e3e1e5e7dc9f1345d1f942cc4589542414626529a216bfae16957fe"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "has_nan",
+                "module": "numeric_nonNumber",
+                "role": "public-entry-point",
+                "path": "src/nonNumber/nonNumber.f90",
+                "line_start": 167,
+                "line_end": 176,
+                "summary": "USE numeric_nonNumber, ONLY: has_nan. REAL(real64) rank-one array overload; returns a scalar logical using ANY(ieee_is_nan(array)). The generic also supplies real32 and ranks two and three.",
+                "signature": "is_nan_contained = has_nan(array)",
+                "declarations": [
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 167,
+                    "line_end": 170
+                  },
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 77,
+                    "line_end": 84
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "array",
+                    "intent": "in",
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 170,
+                    "line_end": 170
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/nonNumber/nonNumber.f90",
+                      "procedure": "has_nan_real64_rank1",
+                      "line_start": 167,
+                      "line_end": 176
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "is_inf",
+                "module": "numeric_nonNumber",
+                "role": "public-entry-point",
+                "path": "src/nonNumber/nonNumber.f90",
+                "line_start": 341,
+                "line_end": 354,
+                "summary": "USE numeric_nonNumber, ONLY: is_inf. Elemental REAL(real64) overload returning logical for positive or negative infinity. IEEE floating-point assumptions and the source bit-pattern constants apply.",
+                "signature": "is_infinity = is_inf(r64)",
+                "declarations": [
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 341,
+                    "line_end": 344
+                  },
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 99,
+                    "line_end": 102
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "r64",
+                    "intent": "in",
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 344,
+                    "line_end": 344
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/nonNumber/nonNumber.f90",
+                      "procedure": "is_inf_real64",
+                      "line_start": 341,
+                      "line_end": 354
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "is_non_number",
+                "module": "numeric_nonNumber",
+                "role": "public-entry-point",
+                "path": "src/nonNumber/nonNumber.f90",
+                "line_start": 447,
+                "line_end": 460,
+                "summary": "USE numeric_nonNumber, ONLY: is_non_number. Elemental REAL(real64) overload returning logical for NaN or either sign of infinity; this is a predicate, not an exception handler or numerical-validity guarantee.",
+                "signature": "flag = is_non_number(r64)",
+                "declarations": [
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 447,
+                    "line_end": 450
+                  },
+                  {
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 115,
+                    "line_end": 118
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "r64",
+                    "intent": "in",
+                    "path": "src/nonNumber/nonNumber.f90",
+                    "line_start": 450,
+                    "line_end": 450
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/nonNumber/nonNumber.f90",
+                      "procedure": "is_non_number_real64",
+                      "line_start": 447,
+                      "line_end": 460
+                    }
+                  ],
+                  "issues": []
+                }
+              }
+            ]
           }
         ],
         "notes": "Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.",
@@ -209734,6 +209949,119 @@
                 "sha256": "48cec388218b9f919710686530ec59a52da28c8f36df93724581b06768059b81"
               }
             ]
+          },
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "f4f3a40911af2f0a34f3e4d930c912fc0362f908",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "src/Calmat.f90",
+                "url": "https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90",
+                "sha256": "f8006e0091d2915d469a166f28305f67251eed7fa091153251cfd42760437f74"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "calmat",
+                "module": "Calmat_m",
+                "role": "public-entry-point",
+                "path": "src/Calmat.f90",
+                "line_start": 47,
+                "line_end": 260,
+                "summary": "All nine arguments are optional; use keywords when omitting them. fileIn and exprIn are character inputs and mutually exclusive. parseOnly returns an INTEGER(Ikind) flow identifier; evaluate accepts a previously parsed identifier. warning, welcome and dispRes are logical inputs, unitOut an INTEGER(Ikind) output unit. stat is TYPE(err_t), INTENT(INOUT); supply it to retain caller control of errors. Without stat an error can stop execution. No file/expression input selects interactive or command-line batch behavior. Interpreter variables persist across calls.",
+                "signature": "CALL calmat(fileIn, exprIn, parseOnly, evaluate, warning, welcome, dispRes, stat, unitOut)",
+                "declarations": [
+                  {
+                    "path": "src/Calmat.f90",
+                    "line_start": 47,
+                    "line_end": 55
+                  }
+                ],
+                "usage": "use Calmat_m\ntype(err_t) :: stat\ncall calmat(exprIn='x = 0:0.2:1; y = sin(%pi*x)', &\n            dispRes=.true., stat=stat)\ncall stat%display()",
+                "usage_notes": "Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.",
+                "arguments": [
+                  {
+                    "name": "fileIn",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 51,
+                    "line_end": 51
+                  },
+                  {
+                    "name": "exprIn",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 51,
+                    "line_end": 51
+                  },
+                  {
+                    "name": "parseOnly",
+                    "intent": "out",
+                    "path": "src/Calmat.f90",
+                    "line_start": 55,
+                    "line_end": 55
+                  },
+                  {
+                    "name": "evaluate",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 52,
+                    "line_end": 52
+                  },
+                  {
+                    "name": "warning",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 53,
+                    "line_end": 53
+                  },
+                  {
+                    "name": "welcome",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 53,
+                    "line_end": 53
+                  },
+                  {
+                    "name": "dispRes",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 53,
+                    "line_end": 53
+                  },
+                  {
+                    "name": "stat",
+                    "intent": "inout",
+                    "path": "src/Calmat.f90",
+                    "line_start": 54,
+                    "line_end": 54
+                  },
+                  {
+                    "name": "unitOut",
+                    "intent": "in",
+                    "path": "src/Calmat.f90",
+                    "line_start": 52,
+                    "line_end": 52
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/Calmat.f90",
+                      "procedure": "calmat",
+                      "line_start": 47,
+                      "line_end": 260
+                    }
+                  ],
+                  "issues": []
+                }
+              }
+            ]
           }
         ]
       }
@@ -209866,6 +210194,185 @@
                 "sha256": "752e6c9ef0d39c1dbefede6247050ce31164c028d091b44a1cade316dea146f2"
               }
             ]
+          },
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "9d644395c979a837e5cb5bfc6ece664c9b1c7e42",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "interpreter.f90",
+                "url": "https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90",
+                "sha256": "9a4c19f5eefd7cdd557c8a98d4bf0335b4dad0b605696c53a2646fdb2d4c6917"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 67,
+                "line_end": 101,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Prepare a writable expression string and a rank-one CHARACTER(LEN=10) variable-name array. Both are INTENT(INOUT); the expression is normalized. Check the five-character statusflag for ok before evaluation. No numeric accuracy or thread-safety guarantee is inferred.",
+                "signature": "CALL init(func, variablenames, statusflag)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 72,
+                    "line_end": 77
+                  }
+                ],
+                "usage": "use interpreter, only: init, evaluate, destroyfunc\nuse precision, only: realkind\ncharacter(80) :: func\ncharacter(10) :: variablenames(1)\ncharacter(5) :: statusflag\nreal(realkind) :: answer\nfunc = 'sin(x)'\nvariablenames = 'x'\ncall init(func, variablenames, statusflag)\nif (trim(statusflag) == 'ok') answer = evaluate([0.5_realkind])\ncall destroyfunc()",
+                "usage_notes": "Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.",
+                "arguments": [
+                  {
+                    "name": "func",
+                    "intent": "inout",
+                    "path": "interpreter.f90",
+                    "line_start": 72,
+                    "line_end": 72
+                  },
+                  {
+                    "name": "variablenames",
+                    "intent": "inout",
+                    "path": "interpreter.f90",
+                    "line_start": 73,
+                    "line_end": 73
+                  },
+                  {
+                    "name": "statusflag",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 77,
+                    "line_end": 77
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "init",
+                      "line_start": 67,
+                      "line_end": 101
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "evaluate",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 586,
+                "line_end": 673,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. After successful init, supply a rank-one REAL(realkind) value array in the declared variable order. Returns one REAL(realkind) value. It uses the cached expression and shared evaluation workspace; it does not parse a new expression.",
+                "signature": "answer = evaluate(vars)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 591,
+                    "line_end": 592
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "vars",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 591,
+                    "line_end": 591
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "evaluate",
+                      "line_start": 586,
+                      "line_end": 673
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "evaluate_details",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 676,
+                "line_end": 852,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Alternative evaluator with additional domain/error checks in its operation cases. The spelling shown is the actual public name at this pin. Supply REAL(realkind) values in variable order after init; inspect statusflagparser for parser error state rather than assuming the function result alone proves success.",
+                "signature": "answer = evaluate_details(vars)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 681,
+                    "line_end": 682
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "vars",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 681,
+                    "line_end": 681
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "evaluate_details",
+                      "line_start": 676,
+                      "line_end": 852
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "destroyfunc",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 855,
+                "line_end": 880,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Release cached tokens, operations, names and pointer work arrays after using the initialized parser and reset statusflagparser. There are no dummy arguments; the declaration link is the no-argument procedure header. Do not infer safe finalization of an uninitialized parser.",
+                "signature": "CALL destroyfunc()",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 855,
+                    "line_end": 856
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "destroyfunc",
+                      "line_start": 855,
+                      "line_end": 880
+                    }
+                  ],
+                  "issues": []
+                }
+              }
+            ]
           }
         ],
         "license": {
@@ -209917,6 +210424,185 @@
                 "path": "README.md",
                 "url": "https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/README.md",
                 "sha256": "3d4c38dbd9b15f62b17a2481858cb899251f514dbf6cd307203276647d5c8967"
+              }
+            ]
+          },
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "e675c699db56aeb90fec35c2be5d9c4792946d37",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "src/interpreter.f90",
+                "url": "https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90",
+                "sha256": "9d2d36de0c4204464c0bf70228ec6ac0a8210b16d810cdb662ab76e9b7c97f4f"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "init",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "src/interpreter.f90",
+                "line_start": 35,
+                "line_end": 69,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Prepare a writable expression string and a rank-one CHARACTER(LEN=10) variable-name array. Both are INTENT(INOUT); the expression is normalized. Check the five-character statusflag for ok before evaluation. No numeric accuracy or thread-safety guarantee is inferred.",
+                "signature": "CALL init(func, variablenames, statusflag)",
+                "declarations": [
+                  {
+                    "path": "src/interpreter.f90",
+                    "line_start": 40,
+                    "line_end": 45
+                  }
+                ],
+                "usage": "use interpreter, only: init, evaluate, destroyfunc\nuse precision, only: realkind\ncharacter(80) :: func\ncharacter(10) :: variablenames(1)\ncharacter(5) :: statusflag\nreal(realkind) :: answer\nfunc = 'sin(x)'\nvariablenames = 'x'\ncall init(func, variablenames, statusflag)\nif (trim(statusflag) == 'ok') answer = evaluate([0.5_realkind])\ncall destroyfunc()",
+                "usage_notes": "Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.",
+                "arguments": [
+                  {
+                    "name": "func",
+                    "intent": "inout",
+                    "path": "src/interpreter.f90",
+                    "line_start": 40,
+                    "line_end": 40
+                  },
+                  {
+                    "name": "variablenames",
+                    "intent": "inout",
+                    "path": "src/interpreter.f90",
+                    "line_start": 41,
+                    "line_end": 41
+                  },
+                  {
+                    "name": "statusflag",
+                    "intent": "out",
+                    "path": "src/interpreter.f90",
+                    "line_start": 45,
+                    "line_end": 45
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/interpreter.f90",
+                      "procedure": "init",
+                      "line_start": 35,
+                      "line_end": 69
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "evaluate",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "src/interpreter.f90",
+                "line_start": 554,
+                "line_end": 641,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. After successful init, supply a rank-one REAL(realkind) value array in the declared variable order. Returns one REAL(realkind) value. It uses the cached expression and shared evaluation workspace; it does not parse a new expression.",
+                "signature": "answer = evaluate(vars)",
+                "declarations": [
+                  {
+                    "path": "src/interpreter.f90",
+                    "line_start": 559,
+                    "line_end": 560
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "vars",
+                    "intent": "in",
+                    "path": "src/interpreter.f90",
+                    "line_start": 559,
+                    "line_end": 559
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/interpreter.f90",
+                      "procedure": "evaluate",
+                      "line_start": 554,
+                      "line_end": 641
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "evaluate_detalhes",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "src/interpreter.f90",
+                "line_start": 644,
+                "line_end": 820,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Alternative evaluator with additional domain/error checks in its operation cases. The spelling shown is the actual public name at this pin. Supply REAL(realkind) values in variable order after init; inspect statusflagparser for parser error state rather than assuming the function result alone proves success.",
+                "signature": "answer = evaluate_detalhes(vars)",
+                "declarations": [
+                  {
+                    "path": "src/interpreter.f90",
+                    "line_start": 649,
+                    "line_end": 650
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "vars",
+                    "intent": "in",
+                    "path": "src/interpreter.f90",
+                    "line_start": 649,
+                    "line_end": 649
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/interpreter.f90",
+                      "procedure": "evaluate_detalhes",
+                      "line_start": 644,
+                      "line_end": 820
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "destroyfunc",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "src/interpreter.f90",
+                "line_start": 823,
+                "line_end": 848,
+                "summary": "USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Release cached tokens, operations, names and pointer work arrays after using the initialized parser and reset statusflagparser. There are no dummy arguments; the declaration link is the no-argument procedure header. Do not infer safe finalization of an uninitialized parser.",
+                "signature": "CALL destroyfunc()",
+                "declarations": [
+                  {
+                    "path": "src/interpreter.f90",
+                    "line_start": 823,
+                    "line_end": 824
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/interpreter.f90",
+                      "procedure": "destroyfunc",
+                      "line_start": 823,
+                      "line_end": 848
+                    }
+                  ],
+                  "issues": []
+                }
               }
             ]
           }
@@ -210169,6 +210855,188 @@
                 "path": "README",
                 "url": "https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/README",
                 "sha256": "4af7c3fb17e532d7bda26326cdbc0cdfb628e2ed29cd47895570236fc524974a"
+              }
+            ]
+          },
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "dde08ec09417f92a42ca4159294c999edd94a464",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "interpreter.f90",
+                "url": "https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90",
+                "sha256": "70a137a24989fe04cac4194a0d2d6f11e5161c5414220138fe0d5b81cae84f82"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "s_createfn",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 1264,
+                "line_end": 1329,
+                "summary": "USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Parse a character expression with a space-separated character variable list, returning an integer cache handle. The final character error message is optional; check it for OK before evaluation. Variable order determines the later numeric value array.",
+                "signature": "CALL s_createfn(func, vars, funcnumber, t_error)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 1264,
+                    "line_end": 1267
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "func",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 1265,
+                    "line_end": 1265
+                  },
+                  {
+                    "name": "vars",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 1265,
+                    "line_end": 1265
+                  },
+                  {
+                    "name": "funcnumber",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 1266,
+                    "line_end": 1266
+                  },
+                  {
+                    "name": "t_error",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 1267,
+                    "line_end": 1267
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "s_createfn",
+                      "line_start": 1264,
+                      "line_end": 1329
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "s_evaluatefn",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 1356,
+                "line_end": 1387,
+                "summary": "USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Evaluate a valid cached handle with a rank-one REAL(fdp) array in variable order. number is a scalar REAL(fdp) output. The character error message is optional; a zero number alone does not indicate success.",
+                "signature": "CALL s_evaluatefn(funcnumber, varvals, number, t_error)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 1356,
+                    "line_end": 1360
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "funcnumber",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 1357,
+                    "line_end": 1357
+                  },
+                  {
+                    "name": "varvals",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 1358,
+                    "line_end": 1358
+                  },
+                  {
+                    "name": "number",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 1359,
+                    "line_end": 1359
+                  },
+                  {
+                    "name": "t_error",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 1360,
+                    "line_end": 1360
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "s_evaluatefn",
+                      "line_start": 1356,
+                      "line_end": 1387
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "s_destroyfn",
+                "module": "interpreter",
+                "role": "public-entry-point",
+                "path": "interpreter.f90",
+                "line_start": 1333,
+                "line_end": 1352,
+                "summary": "USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Release storage for one cached handle. The integer handle is INTENT(IN), not cleared by this call; do not reuse it as a valid expression. The optional character error message reports invalid or already released handles.",
+                "signature": "CALL s_destroyfn(funcnumber, t_error)",
+                "declarations": [
+                  {
+                    "path": "interpreter.f90",
+                    "line_start": 1333,
+                    "line_end": 1335
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "funcnumber",
+                    "intent": "in",
+                    "path": "interpreter.f90",
+                    "line_start": 1334,
+                    "line_end": 1334
+                  },
+                  {
+                    "name": "t_error",
+                    "intent": "out",
+                    "path": "interpreter.f90",
+                    "line_start": 1335,
+                    "line_end": 1335
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "interpreter.f90",
+                      "procedure": "s_destroyfn",
+                      "line_start": 1333,
+                      "line_end": 1352
+                    }
+                  ],
+                  "issues": []
+                }
               }
             ]
           }
@@ -210796,6 +211664,175 @@
                 "path": "README.md",
                 "url": "https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/README.md",
                 "sha256": "a651ca785f1a377e50646ccfce83845f01339130e2fbccea47e3071170a05e71"
+              }
+            ]
+          },
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "3450ca5585ada2d12942b91a6a50ebc8524a6199",
+            "reviewed_on": "2026-11-12",
+            "notes": "Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.",
+            "evidence": [
+              {
+                "path": "src/M_matrix.F90",
+                "url": "https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90",
+                "sha256": "ad26051794bb08fd4a891f2ea0299c174e4a32c033cd969a1bc6a565f9ce7612"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "lala",
+                "module": "M_matrix",
+                "role": "public-entry-point",
+                "path": "src/M_matrix.F90",
+                "line_start": 1353,
+                "line_end": 1449,
+                "summary": "USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Integer initialization overload. init sizes the internal real and imaginary work arrays; a negative size selects 400000. This resets interpreter state. echo is an optional logical input. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.",
+                "signature": "CALL lala(init, echo)",
+                "declarations": [
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1353,
+                    "line_end": 1358
+                  },
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 545,
+                    "line_end": 549
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "init",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1357,
+                    "line_end": 1357
+                  },
+                  {
+                    "name": "echo",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1358,
+                    "line_end": 1358
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/M_matrix.F90",
+                      "procedure": "lala_init",
+                      "line_start": 1353,
+                      "line_end": 1449
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "lala",
+                "module": "M_matrix",
+                "role": "public-entry-point",
+                "path": "src/M_matrix.F90",
+                "line_start": 1451,
+                "line_end": 1460,
+                "summary": "USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Scalar character-command overload. input_string contains a matrix-language command; echo is an optional logical input. Execution delegates to the command-array overload and returns to the caller. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.",
+                "signature": "CALL lala(input_string, echo)",
+                "declarations": [
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1451,
+                    "line_end": 1456
+                  },
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 545,
+                    "line_end": 549
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "input_string",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1455,
+                    "line_end": 1455
+                  },
+                  {
+                    "name": "echo",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1456,
+                    "line_end": 1456
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/M_matrix.F90",
+                      "procedure": "lala_cmd",
+                      "line_start": 1451,
+                      "line_end": 1460
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "lala",
+                "module": "M_matrix",
+                "role": "public-entry-point",
+                "path": "src/M_matrix.F90",
+                "line_start": 1462,
+                "line_end": 1507,
+                "summary": "USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Command-array overload. pseudo_file is an optional rank-one character array; echo is an optional logical input. Commands receive a terminating quit command automatically. Omitting pseudo_file enters interactive input. It initializes workspace automatically if needed. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.",
+                "signature": "CALL lala(pseudo_file, echo)",
+                "declarations": [
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1462,
+                    "line_end": 1467
+                  },
+                  {
+                    "path": "src/M_matrix.F90",
+                    "line_start": 545,
+                    "line_end": 549
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "pseudo_file",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1466,
+                    "line_end": 1466
+                  },
+                  {
+                    "name": "echo",
+                    "intent": "in",
+                    "path": "src/M_matrix.F90",
+                    "line_start": 1467,
+                    "line_end": 1467
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/M_matrix.F90",
+                      "procedure": "lala_cmds",
+                      "line_start": 1462,
+                      "line_end": 1507
+                    }
+                  ],
+                  "issues": []
+                }
               }
             ]
           }

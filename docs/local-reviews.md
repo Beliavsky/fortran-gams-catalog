@@ -8422,6 +8422,53 @@ Reviewed 2026-11-12 at `f4f3a40911af2f0a34f3e4d930c912fc0362f908`.
 [README.md](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/README.md)
 SHA-256 (normalized UTF-8/LF): `48cec388218b9f919710686530ec59a52da28c8f36df93724581b06768059b81`.
 
+**N3 — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `f4f3a40911af2f0a34f3e4d930c912fc0362f908`.
+
+[src/Calmat.f90](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90)
+SHA-256 (normalized UTF-8/LF): `f8006e0091d2915d469a166f28305f67251eed7fa091153251cfd42760437f74`.
+
+Public entry point `Calmat_m::calmat`: [src/Calmat.f90:47–260](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L47-L260).
+
+All nine arguments are optional; use keywords when omitting them. fileIn and exprIn are character inputs and mutually exclusive. parseOnly returns an INTEGER(Ikind) flow identifier; evaluate accepts a previously parsed identifier. warning, welcome and dispRes are logical inputs, unitOut an INTEGER(Ikind) output unit. stat is TYPE(err_t), INTENT(INOUT); supply it to retain caller control of errors. Without stat an error can stop execution. No file/expression input selects interactive or command-line batch behavior. Interpreter variables persist across calls.
+
+Usage:
+
+```fortran
+CALL calmat(fileIn, exprIn, parseOnly, evaluate, warning, welcome, dispRes, stat, unitOut)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `fileIn`: `intent(in)` — [src/Calmat.f90:51](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L51-L51).
+- `exprIn`: `intent(in)` — [src/Calmat.f90:51](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L51-L51).
+- `parseOnly`: `intent(out)` — [src/Calmat.f90:55](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L55-L55).
+- `evaluate`: `intent(in)` — [src/Calmat.f90:52](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L52-L52).
+- `warning`: `intent(in)` — [src/Calmat.f90:53](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L53-L53).
+- `welcome`: `intent(in)` — [src/Calmat.f90:53](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L53-L53).
+- `dispRes`: `intent(in)` — [src/Calmat.f90:53](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L53-L53).
+- `stat`: `intent(inout)` — [src/Calmat.f90:54](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L54-L54).
+- `unitOut`: `intent(in)` — [src/Calmat.f90:52](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L52-L52).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/Calmat.f90:47–55](https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/src/Calmat.f90#L47-L55).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use Calmat_m
+type(err_t) :: stat
+call calmat(exprIn='x = 0:0.2:1; y = sin(%pi*x)', &
+            dispRes=.true., stat=stat)
+call stat%display()
+```
+
+Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.
+
 
 ## Calypso
 
@@ -25149,6 +25196,103 @@ Reviewed 2026-11-12 at `e675c699db56aeb90fec35c2be5d9c4792946d37`.
 [README.md](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/README.md)
 SHA-256 (normalized UTF-8/LF): `3d4c38dbd9b15f62b17a2481858cb899251f514dbf6cd307203276647d5c8967`.
 
+**N3 — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `e675c699db56aeb90fec35c2be5d9c4792946d37`.
+
+[src/interpreter.f90](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90)
+SHA-256 (normalized UTF-8/LF): `9d2d36de0c4204464c0bf70228ec6ac0a8210b16d810cdb662ab76e9b7c97f4f`.
+
+Public entry point `interpreter::init`: [src/interpreter.f90:35–69](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L35-L69).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Prepare a writable expression string and a rank-one CHARACTER(LEN=10) variable-name array. Both are INTENT(INOUT); the expression is normalized. Check the five-character statusflag for ok before evaluation. No numeric accuracy or thread-safety guarantee is inferred.
+
+Usage:
+
+```fortran
+CALL init(func, variablenames, statusflag)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `func`: `intent(inout)` — [src/interpreter.f90:40](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L40-L40).
+- `variablenames`: `intent(inout)` — [src/interpreter.f90:41](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L41-L41).
+- `statusflag`: `intent(out)` — [src/interpreter.f90:45](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L45-L45).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/interpreter.f90:40–45](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L40-L45).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use interpreter, only: init, evaluate, destroyfunc
+use precision, only: realkind
+character(80) :: func
+character(10) :: variablenames(1)
+character(5) :: statusflag
+real(realkind) :: answer
+func = 'sin(x)'
+variablenames = 'x'
+call init(func, variablenames, statusflag)
+if (trim(statusflag) == 'ok') answer = evaluate([0.5_realkind])
+call destroyfunc()
+```
+
+Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.
+
+Public entry point `interpreter::evaluate`: [src/interpreter.f90:554–641](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L554-L641).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. After successful init, supply a rank-one REAL(realkind) value array in the declared variable order. Returns one REAL(realkind) value. It uses the cached expression and shared evaluation workspace; it does not parse a new expression.
+
+Usage:
+
+```fortran
+answer = evaluate(vars)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `vars`: `intent(in)` — [src/interpreter.f90:559](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L559-L559).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/interpreter.f90:559–560](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L559-L560).
+
+Public entry point `interpreter::evaluate_detalhes`: [src/interpreter.f90:644–820](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L644-L820).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Alternative evaluator with additional domain/error checks in its operation cases. The spelling shown is the actual public name at this pin. Supply REAL(realkind) values in variable order after init; inspect statusflagparser for parser error state rather than assuming the function result alone proves success.
+
+Usage:
+
+```fortran
+answer = evaluate_detalhes(vars)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `vars`: `intent(in)` — [src/interpreter.f90:649](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L649-L649).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/interpreter.f90:649–650](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L649-L650).
+
+Public entry point `interpreter::destroyfunc`: [src/interpreter.f90:823–848](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L823-L848).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Release cached tokens, operations, names and pointer work arrays after using the initialized parser and reset statusflagparser. There are no dummy arguments; the declaration link is the no-argument procedure header. Do not infer safe finalization of an uninitialized parser.
+
+Usage:
+
+```fortran
+CALL destroyfunc()
+```
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/interpreter.f90:823–824](https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/src/interpreter.f90#L823-L824).
+
 
 ## FFT overlap experiments
 
@@ -36182,6 +36326,103 @@ Reviewed 2026-11-12 at `9d644395c979a837e5cb5bfc6ece664c9b1c7e42`.
 [README.md](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/README.md)
 SHA-256 (normalized UTF-8/LF): `752e6c9ef0d39c1dbefede6247050ce31164c028d091b44a1cade316dea146f2`.
 
+**N3 — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `9d644395c979a837e5cb5bfc6ece664c9b1c7e42`.
+
+[interpreter.f90](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90)
+SHA-256 (normalized UTF-8/LF): `9a4c19f5eefd7cdd557c8a98d4bf0335b4dad0b605696c53a2646fdb2d4c6917`.
+
+Public entry point `interpreter::init`: [interpreter.f90:67–101](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L67-L101).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Prepare a writable expression string and a rank-one CHARACTER(LEN=10) variable-name array. Both are INTENT(INOUT); the expression is normalized. Check the five-character statusflag for ok before evaluation. No numeric accuracy or thread-safety guarantee is inferred.
+
+Usage:
+
+```fortran
+CALL init(func, variablenames, statusflag)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `func`: `intent(inout)` — [interpreter.f90:72](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L72-L72).
+- `variablenames`: `intent(inout)` — [interpreter.f90:73](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L73-L73).
+- `statusflag`: `intent(out)` — [interpreter.f90:77](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L77-L77).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:72–77](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L72-L77).
+
+Calling sketch (not a checked driver):
+
+```fortran
+use interpreter, only: init, evaluate, destroyfunc
+use precision, only: realkind
+character(80) :: func
+character(10) :: variablenames(1)
+character(5) :: statusflag
+real(realkind) :: answer
+func = 'sin(x)'
+variablenames = 'x'
+call init(func, variablenames, statusflag)
+if (trim(statusflag) == 'ok') answer = evaluate([0.5_realkind])
+call destroyfunc()
+```
+
+Calling sketch only; not compiled or run. Follow the pinned upstream build and dependency instructions.
+
+Public entry point `interpreter::evaluate`: [interpreter.f90:586–673](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L586-L673).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. After successful init, supply a rank-one REAL(realkind) value array in the declared variable order. Returns one REAL(realkind) value. It uses the cached expression and shared evaluation workspace; it does not parse a new expression.
+
+Usage:
+
+```fortran
+answer = evaluate(vars)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `vars`: `intent(in)` — [interpreter.f90:591](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L591-L591).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:591–592](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L591-L592).
+
+Public entry point `interpreter::evaluate_details`: [interpreter.f90:676–852](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L676-L852).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Alternative evaluator with additional domain/error checks in its operation cases. The spelling shown is the actual public name at this pin. Supply REAL(realkind) values in variable order after init; inspect statusflagparser for parser error state rather than assuming the function result alone proves success.
+
+Usage:
+
+```fortran
+answer = evaluate_details(vars)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `vars`: `intent(in)` — [interpreter.f90:681](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L681-L681).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:681–682](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L681-L682).
+
+Public entry point `interpreter::destroyfunc`: [interpreter.f90:855–880](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L855-L880).
+
+USE interpreter (and precision::realkind for numeric declarations). The parser stores one expression in module-global state; this is not a reentrant independent-parser-object interface. Release cached tokens, operations, names and pointer work arrays after using the initialized parser and reset statusflagparser. There are no dummy arguments; the declaration link is the no-argument procedure header. Do not infer safe finalization of an uninitialized parser.
+
+Usage:
+
+```fortran
+CALL destroyfunc()
+```
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:855–856](https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/interpreter.f90#L855-L856).
+
 
 ## fortran-fast-float
 
@@ -39199,6 +39440,76 @@ Reviewed 2026-11-12 at `dde08ec09417f92a42ca4159294c999edd94a464`.
 
 [README](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/README)
 SHA-256 (normalized UTF-8/LF): `4af7c3fb17e532d7bda26326cdbc0cdfb628e2ed29cd47895570236fc524974a`.
+
+**N3 — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `dde08ec09417f92a42ca4159294c999edd94a464`.
+
+[interpreter.f90](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90)
+SHA-256 (normalized UTF-8/LF): `70a137a24989fe04cac4194a0d2d6f11e5161c5414220138fe0d5b81cae84f82`.
+
+Public entry point `interpreter::s_createfn`: [interpreter.f90:1264–1329](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1264-L1329).
+
+USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Parse a character expression with a space-separated character variable list, returning an integer cache handle. The final character error message is optional; check it for OK before evaluation. Variable order determines the later numeric value array.
+
+Usage:
+
+```fortran
+CALL s_createfn(func, vars, funcnumber, t_error)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `func`: `intent(in)` — [interpreter.f90:1265](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1265-L1265).
+- `vars`: `intent(in)` — [interpreter.f90:1265](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1265-L1265).
+- `funcnumber`: `intent(out)` — [interpreter.f90:1266](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1266-L1266).
+- `t_error`: `intent(out)` — [interpreter.f90:1267](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1267-L1267).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:1264–1267](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1264-L1267).
+
+Public entry point `interpreter::s_evaluatefn`: [interpreter.f90:1356–1387](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1356-L1387).
+
+USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Evaluate a valid cached handle with a rank-one REAL(fdp) array in variable order. number is a scalar REAL(fdp) output. The character error message is optional; a zero number alone does not indicate success.
+
+Usage:
+
+```fortran
+CALL s_evaluatefn(funcnumber, varvals, number, t_error)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `funcnumber`: `intent(in)` — [interpreter.f90:1357](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1357-L1357).
+- `varvals`: `intent(in)` — [interpreter.f90:1358](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1358-L1358).
+- `number`: `intent(out)` — [interpreter.f90:1359](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1359-L1359).
+- `t_error`: `intent(out)` — [interpreter.f90:1360](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1360-L1360).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:1356–1360](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1356-L1360).
+
+Public entry point `interpreter::s_destroyfn`: [interpreter.f90:1333–1352](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1333-L1352).
+
+USE interpreter; REAL(fdp) kinds are defined by module params. This interface keeps cached expressions in module-global storage. Release storage for one cached handle. The integer handle is INTENT(IN), not cleared by this call; do not reuse it as a valid expression. The optional character error message reports invalid or already released handles.
+
+Usage:
+
+```fortran
+CALL s_destroyfn(funcnumber, t_error)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `funcnumber`: `intent(in)` — [interpreter.f90:1334](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1334-L1334).
+- `t_error`: `intent(out)` — [interpreter.f90:1335](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1335-L1335).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [interpreter.f90:1333–1335](https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/interpreter.f90#L1333-L1335).
 
 
 ## fortran_rng
@@ -58562,6 +58873,78 @@ Reviewed 2026-11-12 at `3450ca5585ada2d12942b91a6a50ebc8524a6199`.
 [README.md](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/README.md)
 SHA-256 (normalized UTF-8/LF): `a651ca785f1a377e50646ccfce83845f01339130e2fbccea47e3071170a05e71`.
 
+**N3 — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `3450ca5585ada2d12942b91a6a50ebc8524a6199`.
+
+[src/M_matrix.F90](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90)
+SHA-256 (normalized UTF-8/LF): `ad26051794bb08fd4a891f2ea0299c174e4a32c033cd969a1bc6a565f9ce7612`.
+
+Public entry point `M_matrix::lala`: [src/M_matrix.F90:1353–1449](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1353-L1449).
+
+USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Integer initialization overload. init sizes the internal real and imaginary work arrays; a negative size selects 400000. This resets interpreter state. echo is an optional logical input. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.
+
+Usage:
+
+```fortran
+CALL lala(init, echo)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `init`: `intent(in)` — [src/M_matrix.F90:1357](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1357-L1357).
+- `echo`: `intent(in)` — [src/M_matrix.F90:1358](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1358-L1358).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/M_matrix.F90:1353–1358](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1353-L1358).
+
+Argument declarations: [src/M_matrix.F90:545–549](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L545-L549).
+
+Public entry point `M_matrix::lala`: [src/M_matrix.F90:1451–1460](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1451-L1460).
+
+USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Scalar character-command overload. input_string contains a matrix-language command; echo is an optional logical input. Execution delegates to the command-array overload and returns to the caller. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.
+
+Usage:
+
+```fortran
+CALL lala(input_string, echo)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `input_string`: `intent(in)` — [src/M_matrix.F90:1455](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1455-L1455).
+- `echo`: `intent(in)` — [src/M_matrix.F90:1456](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1456-L1456).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/M_matrix.F90:1451–1456](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1451-L1456).
+
+Argument declarations: [src/M_matrix.F90:545–549](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L545-L549).
+
+Public entry point `M_matrix::lala`: [src/M_matrix.F90:1462–1507](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1462-L1507).
+
+USE M_matrix, ONLY: lala. Public generic resolved by argument type/rank. Command-array overload. pseudo_file is an optional rank-one character array; echo is an optional logical input. Commands receive a terminating quit command automatically. Omitting pseudo_file enters interactive input. It initializes workspace automatically if needed. Matrix variables and interpreter workspace persist in module-global state; this is not an independent parser object.
+
+Usage:
+
+```fortran
+CALL lala(pseudo_file, echo)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `pseudo_file`: `intent(in)` — [src/M_matrix.F90:1466](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1466-L1466).
+- `echo`: `intent(in)` — [src/M_matrix.F90:1467](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1467-L1467).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/M_matrix.F90:1462–1467](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L1462-L1467).
+
+Argument declarations: [src/M_matrix.F90:545–549](https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/src/M_matrix.F90#L545-L549).
+
 
 ## M_random
 
@@ -67591,6 +67974,105 @@ Reviewed 2026-11-04 at `94eab76fa156923e80697cca91cd3c51097d234b`.
 
 [README.md](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/README.md)
 SHA-256 (normalized UTF-8/LF): `125adb49e61355ae026fc53d87451822251eb57eb3829893aeee5aa4add64674`.
+
+**N — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `94eab76fa156923e80697cca91cd3c51097d234b`.
+
+[src/real/real.f90](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90)
+SHA-256 (normalized UTF-8/LF): `2f5cb027f9bde8935d4826f573c0c70b5e627b9641449076deb623e2e35b9a32`.
+
+Public entry point `numeric_real::to_string`: [src/real/real.f90:96–121](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90#L96-L121).
+
+Public generic; this calling sequence describes its REAL(real64) scalar overload. USE numeric_real, ONLY: to_string and iso_fortran_env, ONLY: real64. format is an optional character format, default (e30.19E4). Returns an allocatable character string. An internal formatted-write error is printed to error_unit and yields an empty string. The temporary output buffer is limited to 255 characters.
+
+Usage:
+
+```fortran
+str = to_string(r64, format)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `r64`: `intent(in)` — [src/real/real.f90:99](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90#L99-L99).
+- `format`: `intent(in)` — [src/real/real.f90:101](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90#L101-L101).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/real/real.f90:96–104](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90#L96-L104).
+
+Argument declarations: [src/real/real.f90:48–51](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/real/real.f90#L48-L51).
+
+**A — source-reviewed**
+
+Public library entry points and argument declarations reviewed at the pinned revision. Calling sketches are illustrative; no compilation, execution or numerical validation was performed.
+
+Reviewed 2026-11-12 at `94eab76fa156923e80697cca91cd3c51097d234b`.
+
+[src/nonNumber/nonNumber.f90](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90)
+SHA-256 (normalized UTF-8/LF): `cb3e0a736e3e1e5e7dc9f1345d1f942cc4589542414626529a216bfae16957fe`.
+
+Public entry point `numeric_nonNumber::has_nan`: [src/nonNumber/nonNumber.f90:167–176](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L167-L176).
+
+USE numeric_nonNumber, ONLY: has_nan. REAL(real64) rank-one array overload; returns a scalar logical using ANY(ieee_is_nan(array)). The generic also supplies real32 and ranks two and three.
+
+Usage:
+
+```fortran
+is_nan_contained = has_nan(array)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `array`: `intent(in)` — [src/nonNumber/nonNumber.f90:170](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L170-L170).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/nonNumber/nonNumber.f90:167–170](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L167-L170).
+
+Argument declarations: [src/nonNumber/nonNumber.f90:77–84](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L77-L84).
+
+Public entry point `numeric_nonNumber::is_inf`: [src/nonNumber/nonNumber.f90:341–354](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L341-L354).
+
+USE numeric_nonNumber, ONLY: is_inf. Elemental REAL(real64) overload returning logical for positive or negative infinity. IEEE floating-point assumptions and the source bit-pattern constants apply.
+
+Usage:
+
+```fortran
+is_infinity = is_inf(r64)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `r64`: `intent(in)` — [src/nonNumber/nonNumber.f90:344](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L344-L344).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/nonNumber/nonNumber.f90:341–344](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L341-L344).
+
+Argument declarations: [src/nonNumber/nonNumber.f90:99–102](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L99-L102).
+
+Public entry point `numeric_nonNumber::is_non_number`: [src/nonNumber/nonNumber.f90:447–460](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L447-L460).
+
+USE numeric_nonNumber, ONLY: is_non_number. Elemental REAL(real64) overload returning logical for NaN or either sign of infinity; this is a predicate, not an exception handler or numerical-validity guarantee.
+
+Usage:
+
+```fortran
+flag = is_non_number(r64)
+```
+
+Recorded argument intents (unspecified arguments are not inferred):
+
+- `r64`: `intent(in)` — [src/nonNumber/nonNumber.f90:450](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L450-L450).
+
+Argument-intent declarations: checked on 2026-11-12. Only explicit INTENT is recorded; unspecified intent is not inferred.
+
+Argument declarations: [src/nonNumber/nonNumber.f90:447–450](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L447-L450).
+
+Argument declarations: [src/nonNumber/nonNumber.f90:115–118](https://github.com/degawa/fortran-numeric/blob/94eab76fa156923e80697cca91cd3c51097d234b/src/nonNumber/nonNumber.f90#L115-L118).
 
 Not built or run for this catalog. Broad GAMS divisions are assigned first; granular classes and procedure mappings require a later individual review. Build systems are recorded only where reviewed documentation identifies them; an empty list means not yet reviewed.
 

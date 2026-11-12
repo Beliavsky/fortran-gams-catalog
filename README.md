@@ -73,9 +73,9 @@ click the usage link to read the source declarations. The preference is saved
 in the browser when local storage is available and does not filter results.
 Highlighting is off by default and applies to cards and project detail pages.
 
-The saved review covers every recorded usage line: 1,767 checked records and
-22 cases where Fortran argument intents do not apply. There are 6,163 argument
-annotations in 1,323 usage records across 585 projects. An interface can recur
+The saved review covers every recorded usage line: 1,786 checked records and
+22 cases where Fortran argument intents do not apply. There are 6,203 argument
+annotations in 1,340 usage records across 591 projects. An interface can recur
 under multiple GAMS classifications, so these are metadata record counts, not
 counts of unique upstream routines. Unannotated arguments can legitimately
 lack explicit `INTENT`. The [argument-intent coverage page](https://beliavsky.github.io/fortran-gams-catalog/argument-intents/)
