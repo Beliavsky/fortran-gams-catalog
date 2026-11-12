@@ -6,6 +6,7 @@ const license = document.getElementById('license');
 const licenseReviewed = document.getElementById('license-reviewed');
 const legacyGams = document.getElementById('legacy-gams');
 const topic = document.getElementById('topic');
+const filtersPanel = document.getElementById('filters');
 const topics = new Set(['automatic-differentiation', 'forward-mode', 'reverse-mode',
   'higher-derivatives', 'sparse-jacobians', 'matrix-derivatives', 'source-transformation']);
 if (excludeFpm) {
@@ -29,6 +30,10 @@ if (excludeFpm) {
   if (licenseReviewed) licenseReviewed.checked = params.get('license_reviewed') === '1';
   if (legacyGams) legacyGams.checked = params.get('legacy_gams') === '1';
   if (topic && topics.has(params.get('topic'))) topic.value = params.get('topic');
+  if (filtersPanel && (excludeFpm.checked || sourceReviewed?.checked || license?.value ||
+      licenseReviewed?.checked || legacyGams?.checked || topic?.value || collection?.value)) {
+    filtersPanel.open = true;
+  }
   function update() {
     const sourceOnly = Boolean(sourceReviewed?.checked);
     const licenseOnly = license?.value || '';
@@ -89,7 +94,15 @@ if (excludeFpm) {
     }
     history.replaceState(null, '', url);
   }
-  form?.addEventListener('submit', event => { event.preventDefault(); update(); });
+  form?.addEventListener('submit', event => {
+    event.preventDefault();
+    update();
+    if (form.dataset?.destination) {
+      const target = new URL(form.dataset.destination, location.href);
+      target.search = new URL(location.href).search;
+      location.assign(target.href);
+    }
+  });
   query?.addEventListener('input', update);
   collection?.addEventListener('change', update);
   excludeFpm.addEventListener('change', update);

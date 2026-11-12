@@ -255,3 +255,50 @@ legacyContext.location={href:'https://example.org/catalog/projects/?legacy_gams=
 vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),{...legacyContext});
 assert.equal(legacyToggle.checked,true); assert.equal(legacyCard.hidden,false);
 console.log('Legacy GAMS: hidden default, URL restore, search, combined filters, counts and navigation passed.');
+
+// Compact header: only valid optional filters expand the panel. Home searches
+// route to the repository listing, retaining the current query and filters.
+function compactPage(search = '', home = false) {
+  const controls = Object.fromEntries(['query', 'collection', 'exclude-fpm',
+    'source-reviewed', 'license', 'license-reviewed', 'legacy-gams', 'topic'].map(id => {
+    const control = {value:'', checked:false, addEventListener:(event, fn)=>control.handler=fn};
+    return [id, control];
+  }));
+  controls.filters = {open:false};
+  const searchForm = {dataset:home ? {destination:'projects/'} : {},
+    addEventListener:(event, fn)=>searchForm.handler=fn};
+  let destination;
+  const pageLocation = {href:`https://example.org/catalog/${home ? '' : 'projects/'}${search}`,
+    search, assign:url=>destination=url};
+  vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'), {
+    document:{querySelector:()=>searchForm, querySelectorAll:()=>[], getElementById:id=>controls[id]},
+    location:pageLocation, history:{replaceState:(state, title, url)=>{
+      pageLocation.href=String(url); pageLocation.search=new URL(url).search;
+    }}, URL, URLSearchParams
+  });
+  return {controls, searchForm, location:pageLocation, destination:()=>destination};
+}
+for (const search of ['', '?q=solver', '?topic=unknown&license=unknown&collection=unknown', '?exclude_fpm=0']) {
+  assert.equal(compactPage(search).controls.filters.open, false, search);
+}
+for (const filter of ['exclude_fpm=1', 'source_reviewed=1', 'license=permissive',
+  'license_reviewed=1', 'legacy_gams=1', 'topic=forward-mode', 'collection=independent']) {
+  const page = compactPage(`?${filter}`);
+  assert.equal(page.controls.filters.open, true, filter);
+  page.controls.filters.open=false;
+  page.controls.query.value='solver'; page.controls.query.handler();
+  assert.equal(page.controls.filters.open, false);
+}
+const compactHome = compactPage('?license=permissive&collection=imported&keep=yes', true);
+compactHome.controls.query.value='  nonlinear solver  ';
+compactHome.searchForm.handler({preventDefault:()=>{}});
+const homeDestination = new URL(compactHome.destination());
+assert.equal(homeDestination.pathname, '/catalog/projects/');
+assert.equal(homeDestination.searchParams.get('q'), 'nonlinear solver');
+assert.equal(homeDestination.searchParams.get('license'), 'permissive');
+assert.equal(homeDestination.searchParams.get('collection'), 'imported');
+assert.equal(homeDestination.searchParams.get('keep'), 'yes');
+const compactListing = compactPage('?q=solver');
+compactListing.searchForm.handler({preventDefault:()=>{}});
+assert.equal(compactListing.destination(), undefined);
+console.log('Compact header: filter expansion and home/listing search behavior passed.');

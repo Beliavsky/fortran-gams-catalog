@@ -58,6 +58,14 @@ class DifferentiationTopicTests(unittest.TestCase):
                 self.assertIn('../../topics/automatic-differentiation/', page)
                 self.assertIn('Related:', page)
             home = (destination/'index.html').read_text(encoding='utf-8')
+            self.assertIn('>Fortran software catalog</a>', home)
+            self.assertEqual(home.count('<h1>Fortran software by GAMS classification</h1>'), 1)
+            self.assertNotIn('>Fortran software by GAMS classification</a>', home)
+            self.assertIn('<details id="filters" class="filters-panel">', home)
+            self.assertNotIn('<details id="filters" class="filters-panel" open', home)
+            self.assertIn('action="projects/" data-destination="projects/"', home)
+            self.assertEqual(home.count('id="collection"'), 1)
+            self.assertLess(home.index('id="collection"'), home.index('</details>'))
             # Extract the H hierarchy counts without depending on attribute ordering.
             from html.parser import HTMLParser
             class Counts(HTMLParser):

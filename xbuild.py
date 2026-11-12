@@ -124,11 +124,13 @@ def build(destination, root=ROOT):
 <meta name="description" content="Browse Fortran numerical software by mathematical problem, with pinned review evidence and driver references.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'">
 <title>{e(title)}</title><link rel="stylesheet" href="{prefix}catalog.css"><script defer src="{prefix}search.js"></script></head>
-<body><a class="skip" href="#content">Skip to content</a><header>{link(prefix or './', TITLE)}
+<body><a class="skip" href="#content">Skip to content</a><header>{link(prefix or './', 'Fortran software catalog')}
 <nav>{link(prefix+'projects/', 'Repositories')} · {link(prefix+'review/', 'Review policy')} ·
 {link(prefix+'topics/automatic-differentiation/', 'Automatic differentiation')} ·
 {link('https://beliavsky.github.io/fortran-playground/gams/', 'Playground package catalog')} ·
 {link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav>
+<details id="filters" class="filters-panel"><summary>Filters</summary>
+<div class="build-filter"><label class="checkbox-label">Collection <select id="collection" name="collection"><option value="">All repositories</option><option value="independent">Independent reviews</option><option value="imported">Playground imports</option></select></label></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
 <span class="muted" id="fpm-filter-help">Repositories with unreviewed build support remain included.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="source-reviewed" aria-describedby="source-filter-help"> Only source-reviewed mappings</label>
@@ -141,7 +143,7 @@ def build(destination, root=ROOT):
 <option value="">All software</option>{''.join('<option value="'+key+'">'+e(label)+'</option>' for key, label in DIFFERENTIATION_TOPICS.items())}</select></label>
 <span class="muted" id="topic-filter-help">Curated capabilities, not execution checks. Source-reviewed filtering applies to GAMS mappings.</span></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
-<span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></header>
+<span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></details></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
 {link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
@@ -164,7 +166,7 @@ def build(destination, root=ROOT):
 
     def listing(items, prefix, code=None):
         controls = '''<form class="search" role="search"><label>Find software <input id="query" name="q" type="search" placeholder="Name, author, topic or procedure"></label>
-<label>Collection <select id="collection" name="collection"><option value="">All repositories</option><option value="independent">Independent reviews</option><option value="imported">Playground imports</option></select></label><button type="submit">Search</button></form>
+<button type="submit">Search</button></form>
 <p id="matches" aria-live="polite"></p><noscript>Repository entries are listed below. Use your browser’s Find command to search. Optional GAMS/Netlib listings require JavaScript.</noscript>'''
         cards = []
         for p in items:
@@ -254,6 +256,9 @@ def build(destination, root=ROOT):
     page('', TITLE, f'<h1>{TITLE}</h1><p class="lede">Find numerical methods and supporting software, including repositories that do not use FPM.</p>'
          f'<p>{len(projects)} repositories: {sum(bool(p.get("playground")) for p in projects)} imported playground packages and '
          f'{sum(not bool(p.get("playground")) for p in projects)} independent repository reviews.</p>'
+         '<form class="search" role="search" action="projects/" data-destination="projects/">'
+         '<label>Find software <input id="query" name="q" type="search" placeholder="Name, author, topic or procedure"></label>'
+         '<button type="submit">Search</button></form>'
          '<p>Browse by problem below, or '+link('projects/', 'search all repositories')+'. '
          'New independent entries begin with pinned documentation reviews. Source mappings and local drivers can be added as they are checked.</p>'
          '<h2>Main GAMS classes</h2>'+class_links(None, ''))
