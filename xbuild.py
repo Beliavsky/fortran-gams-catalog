@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import quote
 from review_export import publish_review_feed
+from interface_audit import STATUSES as INTERFACE_STATUSES, audit as audit_interfaces, detail as audit_detail, write_report
 from topics import (DIFFERENTIATION_TOPICS, EXPRESSION_TOPICS, DISCOVERY_TOPICS,
                     differentiation_topics, expression_topics, discovery_topics)
 
@@ -110,6 +111,8 @@ def build(destination, root=ROOT):
                             copied.add(artifact)
     (destination/'.nojekyll').touch()
     publish_review_feed(destination, projects)
+    interface_report = audit_interfaces(projects)
+    write_report(destination, interface_report)
     (destination/'catalog.json').write_text(json.dumps(merged, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'taxonomy.json').write_text(json.dumps(tree, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
     (destination/'legacy-gams.json').write_text(json.dumps(legacy, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
@@ -147,7 +150,7 @@ def build(destination, root=ROOT):
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="legacy-gams" aria-describedby="legacy-filter-help"> Include original GAMS/Netlib entries</label>
 <span class="muted" id="legacy-filter-help">Source-available pilot; imported classifications, not independent source reviews. {link(prefix+'legacy/', 'About these entries')}</span></div></details></header>
 <main id="content">{body}</main><footer>{link(prefix+'catalog.json','Download layered metadata')} ·
-{link(prefix+'taxonomy.json','GAMS taxonomy')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
+{link(prefix+'taxonomy.json','GAMS taxonomy')} · {link(prefix+'calling-sequences/', 'Calling-sequence audit')}<p>Classification describes documented functionality. A checked driver verifies only its recorded problem and configuration.</p></footer></body></html>
 ''', encoding='utf-8')
 
     def status(project, code=None):
@@ -268,6 +271,28 @@ def build(destination, root=ROOT):
          'New independent entries begin with pinned documentation reviews. Source mappings and local drivers can be added as they are checked.</p>'
          '<h2>Main GAMS classes</h2>'+class_links(None, ''))
     page('projects', 'Fortran repositories', '<h1>Fortran repositories</h1>'+listing(all_entries, '../'))
+    audit_body = '<h1>Calling-sequence coverage audit</h1><p>'+e(interface_report['scope'])+'</p>'
+    audit_body += '<p>This report covers all '+str(interface_report['project_count'])+' saved repositories, regardless of discovery filters. '
+    audit_body += 'Missing documentation does not mean a repository lacks a usable API. '
+    audit_body += 'A driver or calling sketch alone is not a source-linked calling sequence. '
+    audit_body += 'Program, data and template entries need separate applicability review.</p>'
+    audit_body += '<p>'+link('../calling-sequence-audit.md', 'Download Markdown report')+' · '+link('../calling-sequence-audit.json', 'Download JSON report')+'</p>'
+    audit_body += '<ul>'+''.join('<li>'+e(label)+': '+str(interface_report['status_counts'][status])+'</li>'
+                               for status, label in INTERFACE_STATUSES.items())+'</ul>'
+    for audit_status, label in INTERFACE_STATUSES.items():
+        if audit_status == 'callable-covered':
+            continue
+        rows = [row for row in interface_report['projects'] if row['status'] == audit_status]
+        audit_body += '<section><h2>'+e(label)+'</h2>'
+        if rows:
+            audit_body += '<ul>'
+            for row in rows:
+                audit_body += '<li>'+link('../'+row['catalog_path'], row['id'][7:])+' — '+e(audit_detail(row))+'</li>'
+            audit_body += '</ul>'
+        else:
+            audit_body += '<p>None recorded.</p>'
+        audit_body += '</section>'
+    page('calling-sequences', 'Calling-sequence coverage audit', audit_body)
     ad_projects = [p for p in projects if 'automatic-differentiation' in differentiation_topics(p)]
     page('topics/automatic-differentiation', 'Automatic differentiation in Fortran',
          '<h1>Automatic differentiation in Fortran</h1>'

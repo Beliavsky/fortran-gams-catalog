@@ -191,6 +191,35 @@ After editing `data/local.json`, regenerate the review ledger:
 python xreviews.py
 ```
 
+## Audit calling-sequence coverage
+
+Run the offline audit to find repositories needing interface documentation:
+
+```powershell
+python xinterface_audit.py
+```
+
+This writes `_site/calling-sequence-audit.md` and
+`_site/calling-sequence-audit.json`. Use `--output DIRECTORY` for another
+destination. Every `python xbuild.py` also regenerates these reports and the
+[calling-sequence audit page](https://beliavsky.github.io/fortran-gams-catalog/calling-sequences/),
+linked from the site footer. Reports use the current saved catalog metadata;
+there is no separate committed snapshot to refresh after each review.
+
+The audit distinguishes missing public calling sequences, missing argument
+declaration links, and projects whose public API has not yet been identified.
+Command usage, public data, templates and playground adapters are reported
+separately. Private helper signatures and checked drivers do not count as
+upstream public calling sequences. Identical procedure records attached to
+multiple GAMS classes count once; distinct overloads remain separate.
+
+Coverage means that the **recorded** public interfaces have signatures and
+declaration links. It does not establish coverage of every upstream procedure
+or GAMS class. A project with no recorded callable interface may be a library
+awaiting review, an application, or another kind of tool; the report does not
+automatically declare it unsuitable. The audit makes no network requests,
+scans no upstream source and compiles nothing. Findings do not block publishing.
+
 Discovery begins with [Fortran code on GitHub](https://beliavsky.github.io/Fortran-code-on-GitHub/).
 Entries are reviewed before classification; its section headings are not imported
 as claims of verified numerical functionality.

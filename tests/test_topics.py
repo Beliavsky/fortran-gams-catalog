@@ -83,6 +83,15 @@ class DifferentiationTopicTests(unittest.TestCase):
             home = (destination/'index.html').read_text(encoding='utf-8')
             self.assertIn('topics/expression-parsers/', home)
             self.assertIn('&quot;expression-parser&quot;', home)
+            self.assertIn('calling-sequences/', home)
+            report = json.loads((destination/'calling-sequence-audit.json').read_text(encoding='utf-8'))
+            self.assertEqual(report['project_count'], 4)
+            self.assertEqual(report['status_counts']['program-entry-points'], 0)
+            self.assertEqual(report['status_counts']['no-public-interface-reviewed'], 1)  # hp: docs only
+            audit_page = (destination/'calling-sequences/index.html').read_text(encoding='utf-8')
+            self.assertIn('../projects/sgeard/hp/', audit_page)
+            self.assertIn('../calling-sequence-audit.md', audit_page)
+            self.assertTrue((destination/'calling-sequence-audit.md').is_file())
             from html.parser import HTMLParser
             class Topics(HTMLParser):
                 def __init__(self):
