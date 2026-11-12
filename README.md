@@ -291,3 +291,5 @@ git push -u origin main
 ```
 
 This project has not been published merely by creating these local files.
+
+Project detail pages link to the independent [FORD documentation pilot](https://beliavsky.github.io/fortran-playground/documentation/), passing the repository and reviewed revision. Generation is optional and does not change the catalog's source-review or execution status.

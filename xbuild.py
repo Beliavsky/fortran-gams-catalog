@@ -6,7 +6,7 @@ from licenses import license_group, license_reviewed, LICENSE_GROUPS
 from legacy_gams import load as load_legacy, listing_records
 from pathlib import Path
 import shutil
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from review_export import publish_review_feed
 from argument_intents import signature_markup
 from intent_coverage import records as intent_records, write_reports as write_intent_reports
@@ -391,6 +391,10 @@ def build(destination, root=ROOT):
         body = '<h1>'+e(p['name'])+'</h1><p class="lede">'+e(p['description'])+'</p>'
         body += '<p>'+link(repo['url'], repo['owner']+'/'+repo['name'])+' · '+e(p['origin'])+'</p>'
         body += '<p>Repository owner: '+e(p['owner_label'])+'</p><p>Build systems: '+e(', '.join(p.get('build_systems', [])) or 'Not yet reviewed')+'</p>'
+        claims = p['local'].get('classifications', [])
+        revision = claims[0]['revision'] if claims else ''
+        documentation = 'https://beliavsky.github.io/fortran-playground/documentation/?' + urlencode({'url': repo['url'], 'revision': revision})
+        body += '<p>'+link(documentation, 'Generate API documentation with FORD')+' (experimental; upstream source)</p>'
         body += license_html(p, detailed=True)
         body += '<p>Topics: '+e(', '.join(p['topics']))+'</p>'
         if any(proc.get('role') for proc in p['procedures']):
