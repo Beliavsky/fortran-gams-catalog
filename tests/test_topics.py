@@ -5,7 +5,8 @@ import unittest
 from unittest.mock import patch
 
 from catalog import assemble
-from topics import DIFFERENTIATION_TOPICS, differentiation_topics
+from topics import (DIFFERENTIATION_TOPICS, EXPRESSION_TOPICS, DISCOVERY_TOPICS,
+                    differentiation_topics, expression_topics, discovery_topics)
 from xbuild import build
 
 
@@ -23,7 +24,7 @@ class DifferentiationTopicTests(unittest.TestCase):
 
     def test_existing_ad_entries_are_discoverable_without_symbolic_remapping(self):
         ad = {p['id']: p for p in self.projects if differentiation_topics(p)}
-        self.assertEqual(len(ad), 19)
+        self.assertEqual(len(ad), 20)
         expected = {
             'github:lauvergn/ad_dnsvm': {'forward-mode', 'higher-derivatives'},
             'github:pv/adjac': {'reverse-mode', 'sparse-jacobians'},
@@ -38,6 +39,67 @@ class DifferentiationTopicTests(unittest.TestCase):
         numdiff = next(p for p in self.projects if p['id'] == 'github:jacobwilliams/numdiff')
         self.assertEqual(differentiation_topics(numdiff), [])
         self.assertNotIn('github:octoflar/m_ad', ad)
+
+    def test_expression_membership_capabilities_and_review_scope(self):
+        parsers = {p['id']: p for p in self.projects if expression_topics(p)}
+        self.assertEqual(len(parsers), 15)
+        self.assertEqual(expression_topics({'topics': ['expression-parser']}), [])
+        self.assertEqual(expression_topics({'local': {'topics': ['complex-evaluation']}}), [])
+        for p in parsers.values():
+            self.assertIn('N3', p['codes'])
+            self.assertNotIn('O', p['codes'])
+        fparse = parsers['github:jacobwilliams/fparse']
+        self.assertIn('parser-derivatives', expression_topics(fparse))
+        self.assertIn('expression-code-generation', expression_topics(fparse))
+        self.assertIn('automatic-differentiation', discovery_topics(fparse))
+        self.assertEqual(next(c for c in fparse['local']['classifications'] if c['code']=='H1')['level'],
+                         'documentation-reviewed')
+        names = {p['procedure'] for p in fparse['local']['classifications'][0]['procedures']}
+        self.assertTrue({'parse', 'set_variable', 'evaluate', 'get', 'get_derivative',
+                         'add_function', 'generate_fortran'} <= names)
+        self.assertNotIn('array-evaluation', expression_topics(parsers['github:jacobwilliams/fortran_function_parser']))
+        self.assertNotIn('complex-evaluation', expression_topics(parsers['github:muhammad-fiaz/fortran-calc']))
+        self.assertNotIn('reusable-parser', expression_topics(parsers['github:sgeard/hp']))
+
+    def test_expression_page_links_counts_and_combined_capabilities(self):
+        ids = {'github:jacobwilliams/fparse', 'github:fluidnumerics/feq-parse',
+               'github:sgeard/hp', 'github:jacobwilliams/numdiff'}
+        selected = [p for p in self.projects if p['id'] in ids]
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch('xbuild.assemble', return_value=(self.tree, selected, self.merged)), \
+                patch('xbuild.load_legacy', return_value={'entries': []}):
+            destination = Path(tmp)
+            build(destination)
+            page = (destination/'topics/expression-parsers/index.html').read_text(encoding='utf-8')
+            self.assertEqual(page.count('<article data-search='), 3)
+            self.assertIn('Parser capabilities:', page)
+            self.assertIn('Usage (argument declarations)', page)
+            self.assertIn('Fortran code generation', page)
+            self.assertIn('not evidence of symbolic algebra',
+                          (destination/'classes/O/index.html').read_text(encoding='utf-8'))
+            for code in ('N3','O'):
+                self.assertIn('../../topics/expression-parsers/',
+                              (destination/f'classes/{code}/index.html').read_text(encoding='utf-8'))
+            home = (destination/'index.html').read_text(encoding='utf-8')
+            self.assertIn('topics/expression-parsers/', home)
+            self.assertIn('&quot;expression-parser&quot;', home)
+            from html.parser import HTMLParser
+            class Topics(HTMLParser):
+                def __init__(self):
+                    super().__init__(); self.cards=[]; self.options=[]; self.counts=[]
+                def handle_starttag(self, tag, attrs):
+                    attrs = dict(attrs)
+                    if tag=='article': self.cards.append(attrs.get('data-topics','').split())
+                    if tag=='option': self.options.append(attrs.get('value'))
+                    if 'data-topic-counts' in attrs:
+                        self.counts.append(json.loads(attrs['data-topic-counts']))
+            parsed=Topics(); parsed.feed(page)
+            self.assertTrue(set(DISCOVERY_TOPICS) <= set(parsed.options))
+            self.assertTrue(any({'automatic-differentiation','expression-parser','parser-derivatives'} <= set(c)
+                                for c in parsed.cards))
+            counts=Topics(); counts.feed(home)
+            self.assertTrue(any(c['expression-parser'].get('|0|0|0')==3 for c in counts.counts))
+            self.assertTrue(any(c['expression-parser'].get('|0|1|0')==2 for c in counts.counts))
 
     def test_topic_page_related_links_and_filter_counts_are_generated(self):
         selected = [p for p in self.projects if p['id'] in {

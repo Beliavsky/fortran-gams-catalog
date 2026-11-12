@@ -302,3 +302,56 @@ const compactListing = compactPage('?q=solver');
 compactListing.searchForm.handler({preventDefault:()=>{}});
 assert.equal(compactListing.destination(), undefined);
 console.log('Compact header: filter expansion and home/listing search behavior passed.');
+
+// Parser facets use the same URL/filter/count machinery as AD, including cards
+// with membership in both topics. Similar tag substrings must not match.
+const parserControls = Object.fromEntries(['query','topic','collection','exclude-fpm',
+  'source-reviewed','license','license-reviewed','legacy-gams'].map(id=>{
+  const control={value:'',checked:false,addEventListener:(event,fn)=>control.handler=fn};
+  return [id,control];
+}));
+parserControls.filters={open:false}; parserControls.matches={};
+const parserCards=[
+  {dataset:{search:'fparse',sourceSearch:'fparse',sourceMatch:'true',fpm:'true',license:'permissive',
+    topics:'expression-parser scalar-evaluation parser-derivatives automatic-differentiation forward-mode'}},
+  {dataset:{search:'calculator',sourceSearch:'',sourceMatch:'false',fpm:'false',license:'strong-copyleft',
+    topics:'expression-parser scalar-evaluation calculator-cli'}},
+  {dataset:{search:'unrelated',sourceSearch:'unrelated',sourceMatch:'true',fpm:'false',license:'permissive',
+    topics:'expression-parser-ish'}}
+];
+parserCards.forEach(card=>card.querySelectorAll=()=>[]);
+const parserCount={dataset:{classCount:'3',topicCounts:JSON.stringify({
+  'expression-parser':{'|0|0|0':2,'|0|1|0':1,'permissive|0|0|0':1},
+  'parser-derivatives':{'|0|0|0':1,'permissive|0|0|0':1}
+})}};
+const parserLink=anchor('../classes/N3/');
+const parserLocation={href:'https://example.org/catalog/projects/?topic=expression-parser&keep=yes',
+  search:'?topic=expression-parser&keep=yes'};
+vm.runInNewContext(fs.readFileSync('assets/search.js','utf8'),{
+  document:{querySelector:()=>null,getElementById:id=>parserControls[id],
+    querySelectorAll:selector=>({'article[data-search]':parserCards,
+      '[data-class-count]':[parserCount],'a[href]':[parserLink]})[selector]},
+  location:parserLocation, history:{replaceState:(state,title,url)=>{
+    parserLocation.href=String(url);parserLocation.search=new URL(url).search;
+  }},URL,URLSearchParams
+});
+assert.deepEqual(parserCards.map(c=>c.hidden),[false,false,true]);
+assert.equal(parserCount.textContent,'(2)');
+assert.equal(parserControls.filters.open,true);
+assert.equal(new URL(parserLink.href).searchParams.get('topic'),'expression-parser');
+parserControls['source-reviewed'].checked=true;parserControls['source-reviewed'].handler();
+assert.deepEqual(parserCards.map(c=>c.hidden),[false,true,true]);
+assert.equal(parserCount.textContent,'(1)');
+parserControls['source-reviewed'].checked=false;parserControls.license.value='permissive';parserControls.license.handler();
+assert.deepEqual(parserCards.map(c=>c.hidden),[false,true,true]);
+parserControls.topic.value='parser-derivatives';parserControls.topic.handler();
+assert.equal(parserCount.textContent,'(1)');
+assert.equal(new URL(parserLocation.href).searchParams.get('topic'),'parser-derivatives');
+parserControls['exclude-fpm'].checked=true;parserControls['exclude-fpm'].handler();
+assert.deepEqual(parserCards.map(c=>c.hidden),[true,true,true]);
+assert.equal(parserControls.matches.textContent,'0 of 3 repositories shown');
+for (const topic of ['expression-parser','scalar-evaluation','array-evaluation','complex-evaluation',
+  'custom-functions','parser-derivatives','expression-code-generation','reusable-parser','calculator-cli']) {
+  assert.equal(compactPage('?topic='+topic).controls.topic.value,topic);
+}
+console.log('Expression parsers: exact membership, mixed AD membership, URL facets, counts and combined filters passed.');

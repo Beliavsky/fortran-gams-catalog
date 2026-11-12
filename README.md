@@ -20,19 +20,29 @@ A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
 The saved catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, alongside **1000 catalog-owned
-repository reviews**. All 298 playground packages overlap catalog-owned reviews, giving 1,000
+procedure evidence and checked driver links, alongside **1011 catalog-owned
+repository reviews**. All 298 playground packages overlap catalog-owned reviews, giving 1,011
 distinct repositories. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
 
 Browse [automatic differentiation](https://beliavsky.github.io/fortran-gams-catalog/topics/automatic-differentiation/)
-or use the Differentiation selector for forward/reverse mode, higher derivatives,
+or use the Topic selector for forward/reverse mode, higher derivatives,
 sparse Jacobians, matrix derivatives and conversion helpers. These curated facets
 combine with the other filters and can be shared with `?topic=forward-mode`.
 [Recorded capabilities and scope](docs/automatic-differentiation.md) distinguish
 documented features from narrower source reviews. AD alone does not establish
 symbolic expression manipulation: O links to the topic without blanket remapping.
+
+Browse [expression parsers](https://beliavsky.github.io/fortran-gams-catalog/topics/expression-parsers/)
+for 15 callable evaluators, calculators and embedded interpreters. The Topic
+selector also supports scalar, array and complex evaluation, custom functions,
+derivatives and Fortran code generation. Share, for example,
+`?topic=expression-parser` or `?topic=parser-derivatives`. These filters combine
+with license, source-review and FPM exclusions. [Capabilities and review scope](docs/expression-parsers.md)
+identify pinned evidence, parser families, error-handling limitations and
+documentation-only claims. Expression evaluation alone does not establish
+symbolic algebra, arbitrary precision or a verified numerical result.
 
 Select **Exclude known FPM packages** to hide repositories whose recorded build
 systems include FPM, including independently reviewed ones. GAMS category counts

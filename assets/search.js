@@ -8,7 +8,10 @@ const legacyGams = document.getElementById('legacy-gams');
 const topic = document.getElementById('topic');
 const filtersPanel = document.getElementById('filters');
 const topics = new Set(['automatic-differentiation', 'forward-mode', 'reverse-mode',
-  'higher-derivatives', 'sparse-jacobians', 'matrix-derivatives', 'source-transformation']);
+  'higher-derivatives', 'sparse-jacobians', 'matrix-derivatives', 'source-transformation',
+  'expression-parser', 'scalar-evaluation', 'array-evaluation', 'complex-evaluation',
+  'custom-functions', 'parser-derivatives', 'expression-code-generation',
+  'reusable-parser', 'calculator-cli']);
 if (excludeFpm) {
   const query = document.getElementById('query');
   const collection = document.getElementById('collection');

@@ -102189,7 +102189,10 @@
           "fpm"
         ],
         "topics": [
-          "numerical-methods"
+          "expression-parser",
+          "numerical-methods",
+          "reusable-parser",
+          "scalar-evaluation"
         ],
         "classifications": [
           {
@@ -102260,7 +102263,9 @@
                   }
                 ],
                 "summary": "Declare TYPE(fparser) :: solver from function_parser. After successful PARSE, supply REAL(FPARSER_RK) VAL(:) values in exactly the same order as VAR and receive scalar RES. FPARSER_RK defaults REAL64. The bytecode accesses VAL by stored indices, so the caller must supply enough values. Inspect solver%error() after evaluation: an evaluation error can return RES=0, which must not be confused with a valid zero. The passed object ME is implicit in solver%; do not pass it again. Optional actuals shown in brackets can be supplied by keyword.",
-                "derived_type": "fparser"
+                "derived_type": "fparser",
+                "usage": "use function_parser, only: fparser, fparser_rk\ntype(fparser) :: p\nreal(fparser_rk) :: value\ncall p%parse(\"sin(x)+x**2\", [\"x\"])\nif (p%error()) error stop \"parse failed\"\ncall p%evaluate([2.0_fparser_rk], value)\nif (p%error()) error stop \"evaluation failed\"\nprint *, value",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state."
               },
               {
                 "procedure": "error",
@@ -116097,8 +116102,12 @@
           "fpm"
         ],
         "topics": [
+          "array-evaluation",
+          "expression-parser",
           "fortran-library",
-          "numerical-computing"
+          "numerical-computing",
+          "reusable-parser",
+          "scalar-evaluation"
         ],
         "classifications": [
           {
@@ -125422,9 +125431,12 @@
           "fpm"
         ],
         "topics": [
-          "fortran-library",
+          "calculator",
+          "calculator-cli",
           "expression-parser",
-          "calculator"
+          "fortran-library",
+          "reusable-parser",
+          "scalar-evaluation"
         ],
         "classifications": [
           {
@@ -130207,8 +130219,10 @@
           "fpm"
         ],
         "topics": [
-          "fortran-library",
+          "custom-functions",
           "expression-parser",
+          "fortran-library",
+          "reusable-parser",
           "shunting-yard"
         ],
         "classifications": [
@@ -140417,6 +140431,754 @@
           ]
         },
         "notes": "Independent calling-interface review at the exact upstream revision selected by the FPM playground. Signatures and declaration links describe the scoped entry points below. No new main programs were compiled or run for this review; numerical verification remains attached to existing checked drivers."
+      }
+    },
+    {
+      "id": "github:hassaniriad/calmat",
+      "local": {
+        "name": "calmat",
+        "description": "Callable and interactive Matlab/Scilab-like interpreter for scalar, vector and matrix expressions.",
+        "repository": {
+          "owner": "hassaniriad",
+          "name": "calmat",
+          "url": "https://github.com/hassaniriad/calmat"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make"
+        ],
+        "topics": [
+          "array-evaluation",
+          "calculator-cli",
+          "complex-evaluation",
+          "custom-functions",
+          "expression-parser",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "f4f3a40911af2f0a34f3e4d930c912fc0362f908",
+            "reviewed_on": "2026-11-12",
+            "notes": "README describes the calmat subroutine and interactive/batch application, pk2 arrays, user-function hooks and parse-once/evaluate paths. It is an embedded mathematical language with loops and branches, not evidence of symbolic algebra. Numerical kernels and their accuracy have not been audited. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/hassaniriad/calmat/blob/f4f3a40911af2f0a34f3e4d930c912fc0362f908/README.md",
+                "sha256": "48cec388218b9f919710686530ec59a52da28c8f36df93724581b06768059b81"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "github:fortrangoingonforty/fortbite",
+      "local": {
+        "name": "fortbite",
+        "description": "Command-line mathematical calculator with variables, complex values and matrix expressions.",
+        "repository": {
+          "owner": "FortranGoingOnForty",
+          "name": "fortbite",
+          "url": "https://github.com/FortranGoingOnForty/fortbite"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make",
+          "fpm"
+        ],
+        "topics": [
+          "array-evaluation",
+          "calculator-cli",
+          "complex-evaluation",
+          "expression-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "a9a7856383a5b46ae172e490d376bfbf1c8f5591",
+            "reviewed_on": "2026-11-12",
+            "notes": "README documents calculator syntax and says computations use double precision: ::digits affects output formatting only. The introductory arbitrary-precision claim is not adopted. No reusable library interface or accuracy claim is established. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/FortranGoingOnForty/fortbite/blob/a9a7856383a5b46ae172e490d376bfbf1c8f5591/README.md",
+                "sha256": "9a42b1ac0d9e0d2cf1731262ef464e9a3f38872d928fd1dae103a19dcf27b273"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "github:muhammad-fiaz/fortran-calc",
+      "local": {
+        "name": "fortran-calc",
+        "description": "Command-line evaluator for scalar arithmetic, constants and elementary functions.",
+        "repository": {
+          "owner": "muhammad-fiaz",
+          "name": "fortran-calc",
+          "url": "https://github.com/muhammad-fiaz/fortran-calc"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make"
+        ],
+        "topics": [
+          "calculator-cli",
+          "expression-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "fa8adacd038a60fff77e20ea93910b3c9582cc04",
+            "reviewed_on": "2026-11-12",
+            "notes": "README documents quoted command-line expressions, parentheses, unary minus and operator precedence. Its phrase complex expressions describes nested arithmetic, not a claim of complex-number arithmetic. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/muhammad-fiaz/fortran-calc/blob/fa8adacd038a60fff77e20ea93910b3c9582cc04/README.md",
+                "sha256": "90fbd500ce4bfd4c3d640bbc41ee46ada4a1bb6a98ec160a86ea32e199afb11c"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "fa8adacd038a60fff77e20ea93910b3c9582cc04",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/muhammad-fiaz/fortran-calc/blob/fa8adacd038a60fff77e20ea93910b3c9582cc04/LICENSE",
+              "sha256": "c58fe77764f844597d39afe811a91196459975b0963a34e1070d426443b448b3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:ivomarb/fortran-expression-evaluator",
+      "local": {
+        "name": "Fortran-Expression-Evaluator",
+        "description": "Mathematical expression interpreter from the LAB Fit parser authors, with a Fortran module and examples.",
+        "repository": {
+          "owner": "ivomarb",
+          "name": "Fortran-Expression-Evaluator",
+          "url": "https://github.com/ivomarb/Fortran-Expression-Evaluator"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [],
+        "topics": [
+          "expression-parser",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "9d644395c979a837e5cb5bfc6ece664c9b1c7e42",
+            "reviewed_on": "2026-11-12",
+            "notes": "README describes recursive-descent mathematical expression evaluation, interpreter.f90 and author examples. Historical timing comparisons are author results on their configuration, not current catalog benchmarks. Related to the older LAB Fit ffp distribution; do not count these as independent algorithm families. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/README.md",
+                "sha256": "752e6c9ef0d39c1dbefede6247050ce31164c028d091b44a1cade316dea146f2"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "9d644395c979a837e5cb5bfc6ece664c9b1c7e42",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/ivomarb/Fortran-Expression-Evaluator/blob/9d644395c979a837e5cb5bfc6ece664c9b1c7e42/LICENSE",
+              "sha256": "a6ddfb75716197965c39224a894c45cef55cbe0cd9651edee5e6261deabb6ba3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:jacobwilliams/ffp",
+      "local": {
+        "name": "ffp",
+        "description": "Unofficial mirror of the LAB Fit Fortran Function Parser version 3.2.",
+        "repository": {
+          "owner": "jacobwilliams",
+          "name": "ffp",
+          "url": "https://github.com/jacobwilliams/ffp"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "expression-parser",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "e675c699db56aeb90fec35c2be5d9c4792946d37",
+            "reviewed_on": "2026-11-12",
+            "notes": "README identifies an unofficial 2007 parser mirror, interpreter.f90 and test.f90. Its License: Free label is not treated as a specific reuse grant. The related Fortran-Expression-Evaluator project is separately recorded; no source-equivalence or independent-algorithm claim is made. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacobwilliams/ffp/blob/e675c699db56aeb90fec35c2be5d9c4792946d37/README.md",
+                "sha256": "3d4c38dbd9b15f62b17a2481858cb899251f514dbf6cd307203276647d5c8967"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "github:jacopo-chevallard/fortranparser",
+      "local": {
+        "name": "FortranParser",
+        "description": "Object-oriented Fortran parser compiling mathematical expressions to bytecode.",
+        "repository": {
+          "owner": "jacopo-chevallard",
+          "name": "FortranParser",
+          "url": "https://github.com/jacopo-chevallard/FortranParser"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "CMake"
+        ],
+        "topics": [
+          "expression-parser",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "ead4ea2a5f20ce62c86427b9319e4a383672dd2e",
+            "reviewed_on": "2026-11-12",
+            "notes": "Reviewed the constructor, bytecode evaluation and error-handling source paths. The public interface has fixed text buffers and process-terminating parse errors; this is not a drop-in error-status API. No new program was compiled or run; this is a scoped source/interface review.",
+            "evidence": [
+              {
+                "path": "src/FortranParser.f90",
+                "url": "https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser.f90",
+                "sha256": "35c6ebf40138a836b0d5d4bd46f3ffc69f1413f2872d721e82069b8e5e95fe3d"
+              },
+              {
+                "path": "src/FortranParser_parameters.f90",
+                "url": "https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/src/FortranParser_parameters.f90",
+                "sha256": "d92135a9b855b3c487ec5fa096feb7dcc0924ba560ede0d604180bc7dbb36da9"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/README.md",
+                "sha256": "f6d062ecf6eb4eb5fe2b616b16b9e656eda53d4c9767993d8b44c86fe571ffe1"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "EquationParser",
+                "module": "FortranParser",
+                "role": "public-entry-point",
+                "path": "src/FortranParser.f90",
+                "line_start": 123,
+                "line_end": 137,
+                "signature": "P = EquationParser(FUNCSTR, VAR)",
+                "declarations": [
+                  {
+                    "path": "src/FortranParser.f90",
+                    "line_start": 123,
+                    "line_end": 126
+                  }
+                ],
+                "summary": "Module generic constructor returning TYPE(EquationParser); it is called as a function, not p%EquationParser. Copies expression and variable names to fixed 1024-character buffers, parses and compiles. Names are case sensitive; unsupported syntax may terminate the process. This is distinct from FEQParse::EquationParser."
+              },
+              {
+                "procedure": "evaluate",
+                "module": "FortranParser",
+                "derived_type": "EquationParser",
+                "role": "public-entry-point",
+                "path": "src/FortranParser.f90",
+                "line_start": 155,
+                "line_end": 270,
+                "signature": "VALUE = p%evaluate(VAL)",
+                "declarations": [
+                  {
+                    "path": "src/FortranParser.f90",
+                    "line_start": 155,
+                    "line_end": 164
+                  }
+                ],
+                "summary": "VAL(:) and scalar result use the rn kind from FortranParser_parameters. Supply variable values in constructor order and matching count. Bytecode evaluation uses the parser working stack. Errors can print diagnostics and return zero; no success flag is supplied. Domain checks do not establish arbitrary-input safety.",
+                "usage": "use FortranParser, only: EquationParser\nuse FortranParser_parameters, only: rn\ntype(EquationParser) :: p\nreal(rn) :: value\np = EquationParser(\"sin(x)+x**2\", [\"x\"])\nvalue = p%evaluate([2.0_rn])\nprint *, value",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Uses a valid expression and the library real kind. The constructor can STOP on invalid syntax; evaluate has no returned status flag. A zero result does not establish success."
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "BSD-3-Clause",
+          "spdx_expression": "BSD-3-Clause",
+          "revision": "ead4ea2a5f20ce62c86427b9319e4a383672dd2e",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jacopo-chevallard/FortranParser/blob/ead4ea2a5f20ce62c86427b9319e4a383672dd2e/LICENSE",
+              "sha256": "42de9d52449e2446ff10d9bfaabadf110c5976b4b269d0081175e7ece0d0b0ad"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:sdm900/fortran_script",
+      "local": {
+        "name": "fortran_script",
+        "description": "Small Fortran-like interpreter with double-precision expressions, arrays, loops and user routines.",
+        "repository": {
+          "owner": "sdm900",
+          "name": "fortran_script",
+          "url": "https://github.com/sdm900/fortran_script"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make"
+        ],
+        "topics": [
+          "calculator-cli",
+          "custom-functions",
+          "expression-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "fd8efe16e23e20b919edadfea0b1ad1e42c686ab",
+            "reviewed_on": "2026-11-12",
+            "notes": "README calls this an incomplete scripting language. GUIDE describes double-precision expression evaluation, arrays, user-defined functions, case rules and line-oriented errors; arrays alone do not establish vectorized arithmetic. No general-purpose compiler or reusable parser API is claimed. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/sdm900/fortran_script/blob/fd8efe16e23e20b919edadfea0b1ad1e42c686ab/README.md",
+                "sha256": "9bd026f7f7a2a275eab0aca52a2542fcb0db99dd0ad8d849ca460ba7c624cbcb"
+              },
+              {
+                "path": "GUIDE.md",
+                "url": "https://github.com/sdm900/fortran_script/blob/fd8efe16e23e20b919edadfea0b1ad1e42c686ab/GUIDE.md",
+                "sha256": "6a1a2dced20b92f34771b53d36a0cfa5e9e01bcf421fc4db2d276450ba4da390"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "fd8efe16e23e20b919edadfea0b1ad1e42c686ab",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sdm900/fortran_script/blob/fd8efe16e23e20b919edadfea0b1ad1e42c686ab/LICENSE",
+              "sha256": "5cf0a5f533c9a6ff5b95f9917db93125faade2b0b1fe3c9ca79596a9816b90b1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:sdm900/fortran_parser",
+      "local": {
+        "name": "fortran_parser",
+        "description": "Mathematical function-string interpreter with named variables and documented error-limit propagation.",
+        "repository": {
+          "owner": "sdm900",
+          "name": "fortran_parser",
+          "url": "https://github.com/sdm900/fortran_parser"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make"
+        ],
+        "topics": [
+          "expression-parser",
+          "parser-derivatives",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "dde08ec09417f92a42ca4159294c999edd94a464",
+            "reviewed_on": "2026-11-12",
+            "notes": "README describes scalar double-precision expressions, many elementary/special functions, optional error text, and first-order error-limit propagation for uncertain variables. This facet is not a reviewed general Jacobian API. H1 or special-function subclasses require a separate source review; none are inferred from the function menu. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README",
+                "url": "https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/README",
+                "sha256": "4af7c3fb17e532d7bda26326cdbc0cdfb628e2ed29cd47895570236fc524974a"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "dde08ec09417f92a42ca4159294c999edd94a464",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/sdm900/fortran_parser/blob/dde08ec09417f92a42ca4159294c999edd94a464/LICENSE",
+              "sha256": "5cf0a5f533c9a6ff5b95f9917db93125faade2b0b1fe3c9ca79596a9816b90b1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:jacobwilliams/fparse",
+      "local": {
+        "name": "fparse",
+        "description": "Function-expression parser with scalar/vector evaluation, custom functions, first derivatives and Fortran code generation.",
+        "repository": {
+          "owner": "jacobwilliams",
+          "name": "fparse",
+          "url": "https://github.com/jacobwilliams/fparse"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "array-evaluation",
+          "automatic-differentiation",
+          "custom-functions",
+          "expression-code-generation",
+          "expression-parser",
+          "forward-mode",
+          "parser-derivatives",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "source-reviewed",
+            "revision": "5fdd81f5680ab7b46ba4910165544c18365f2b67",
+            "reviewed_on": "2026-11-12",
+            "notes": "Reviewed parse, scalar input assignment, expression evaluation and scalar output retrieval. Vector overloads and generation capabilities are documented separately; the basic calling sketch is not a checked driver. No new program was compiled or run; this is a scoped source/interface review.",
+            "evidence": [
+              {
+                "path": "src/fparse.f90",
+                "url": "https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/src/fparse.f90",
+                "sha256": "8b1e70b41bf739f9bb02f7d8f8bf93d24100a11acd3d7587916c1b0f3649a88c"
+              },
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/README.md",
+                "sha256": "9e2a29e688e7cb4fc2bc8f5f0a24d31f9791c2307ab4aa68fae398d2ea54a560"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "parse",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 428,
+                "line_end": 562,
+                "signature": "CALL p%parse(VARIABLES, EXPRESSIONS, [NAMES], [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 428,
+                    "line_end": 435
+                  }
+                ],
+                "summary": "Declare TYPE(fparser) from fparse. Supply arrays of input names and expression strings, optionally output names. Names are case insensitive; dependencies determine evaluation order. Replaces old expression state while retaining custom functions/options. STATUS=0 means success and ERRMSG is allocatable CHARACTER."
+              },
+              {
+                "procedure": "set_variable",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 869,
+                "line_end": 879,
+                "signature": "CALL p%set_variable(NAME, VALUE, [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 869,
+                    "line_end": 875
+                  }
+                ],
+                "summary": "Scalar-by-name overload of the public set_variable generic: VALUE is REAL(wp), NAME is an input variable. Separate overloads accept rank-one vectors or an integer variable index. Supply every required input before evaluate; setting values does not evaluate expressions."
+              },
+              {
+                "procedure": "evaluate",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 1004,
+                "line_end": 1219,
+                "signature": "CALL p%evaluate([WRT], [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 1004,
+                    "line_end": 1010
+                  }
+                ],
+                "summary": "Evaluate the parsed expression system with previously set scalar/vector inputs. Optional WRT(:) requests first derivatives for named inputs; omitting it avoids derivative computation. Read outputs separately with get. Inspect STATUS immediately: subsequent operations clear stored errors. Custom functions lacking a supplied derivative can use finite differences."
+              },
+              {
+                "procedure": "get",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 1391,
+                "line_end": 1407,
+                "signature": "CALL p%get(NAME, VALUE, [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 1391,
+                    "line_end": 1397
+                  }
+                ],
+                "summary": "Scalar-by-name overload of get, returning REAL(wp). Separate overloads return allocatable vectors or use an output index. Call after successful evaluate; returned zero can be an error placeholder, so inspect STATUS.",
+                "usage": "use fparse, only: fparser, wp\ntype(fparser) :: p\nreal(wp) :: value\ninteger :: status\ncharacter(:), allocatable :: message\ncall p%parse([\"x\"], [\"sin(x)+x**2\"], names=[\"f\"], status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%set_variable(\"x\", 2.0_wp, status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%evaluate(status=status, errmsg=message)\nif (status /= 0) error stop message\ncall p%get(\"f\", value, status=status, errmsg=message)\nif (status /= 0) error stop message\nprint *, value",
+                "usage_notes": "Calling sketch only; not compiled or run for this catalog. Check errors immediately after each operation; later calls can reset stored error state."
+              },
+              {
+                "procedure": "get_derivative",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 1626,
+                "line_end": 1643,
+                "signature": "CALL p%get_derivative(NAME, WRT, DERIV, [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 1626,
+                    "line_end": 1633
+                  }
+                ],
+                "summary": "Scalar-by-name overload of the derivative query: REAL(wp) DERIV is d(NAME)/d(WRT). First evaluate with WRT requested, then retrieve its derivative, checking STATUS after each call. The matrix overload returns an allocatable Jacobian for vector values. This interface review does not verify every derivative formula."
+              },
+              {
+                "procedure": "add_function",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 371,
+                "line_end": 411,
+                "signature": "CALL p%add_function(NAME, F, IS_PURE, [NARGS], [DF], [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 371,
+                    "line_end": 381
+                  }
+                ],
+                "summary": "Register a callback conforming to fparse_func before parsing expressions that use it. IS_PURE describes whether its result and derivative depend only on arguments and affects caching. Optional DF conforms to fparse_dfunc; absent DF can trigger finite differences for derivatives. This API does not load arbitrary Fortran source text."
+              },
+              {
+                "procedure": "generate_fortran",
+                "module": "fparse",
+                "derived_type": "fparser",
+                "role": "public-entry-point",
+                "path": "src/fparse.f90",
+                "line_start": 2010,
+                "line_end": 2065,
+                "signature": "CALL p%generate_fortran(CODE, [MODULE_NAME], [WRT], [STATUS], [ERRMSG])",
+                "declarations": [
+                  {
+                    "path": "src/fparse.f90",
+                    "line_start": 2010,
+                    "line_end": 2019
+                  }
+                ],
+                "summary": "Return generated module text in allocatable CHARACTER CODE; this call does not compile or run it. Parse and set all input values first, since their sizes are required. MODULE_NAME defaults fparse_generated. Optional WRT requests generated first-derivative code. Check status; supported expression/custom-function restrictions belong to the generator, not to this interface review."
+              }
+            ]
+          },
+          {
+            "code": "H1",
+            "level": "documentation-reviewed",
+            "revision": "5fdd81f5680ab7b46ba4910165544c18365f2b67",
+            "reviewed_on": "2026-11-12",
+            "notes": "README documents optional forward-mode first derivatives and Jacobian retrieval, with finite-difference fallback for custom functions without derivative callbacks. Documentation review only; no derivative kernel audit or new numerical test.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/README.md",
+                "sha256": "9e2a29e688e7cb4fc2bc8f5f0a24d31f9791c2307ab4aa68fae398d2ea54a560"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "MIT",
+          "spdx_expression": "MIT",
+          "revision": "5fdd81f5680ab7b46ba4910165544c18365f2b67",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/jacobwilliams/fparse/blob/5fdd81f5680ab7b46ba4910165544c18365f2b67/LICENSE",
+              "sha256": "194cf1b4fcacd245eb331ad88ebefdefe0311cec8018d0d7ee9f83f4b19644bc"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "github:sgeard/hp",
+      "local": {
+        "name": "hp",
+        "description": "Five-level reverse Polish notation calculator for real/complex arithmetic and summary statistics.",
+        "repository": {
+          "owner": "sgeard",
+          "name": "hp",
+          "url": "https://github.com/sgeard/hp"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "Make",
+          "fpm"
+        ],
+        "topics": [
+          "calculator-cli",
+          "complex-evaluation",
+          "expression-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "1fc3efba12ac3f1fd9769aef0544b08c327887da",
+            "reviewed_on": "2026-11-12",
+            "notes": "README describes a token-separated RPN calculator with a five-value stack, real/complex modes and statistics. Its build notes identify compiler restrictions; listing it is not a claim that gfortran builds it. Precision-control wording is not interpreted as arbitrary-precision computation. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/sgeard/hp/blob/1fc3efba12ac3f1fd9769aef0544b08c327887da/README.md",
+                "sha256": "2d9d056f61f28c71ba93bf9891dda23026ef7b510b7dd2a599b419afb66db799"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "github:urbanjost/m_matrix",
+      "local": {
+        "name": "M_matrix",
+        "description": "Fortran-callable Matlab-like interpreter for matrix expressions, configuration and interactive data inspection.",
+        "repository": {
+          "owner": "urbanjost",
+          "name": "M_matrix",
+          "url": "https://github.com/urbanjost/M_matrix"
+        },
+        "languages": [
+          "Fortran"
+        ],
+        "build_systems": [
+          "fpm"
+        ],
+        "topics": [
+          "array-evaluation",
+          "calculator-cli",
+          "custom-functions",
+          "expression-parser",
+          "reusable-parser",
+          "scalar-evaluation"
+        ],
+        "classifications": [
+          {
+            "code": "N3",
+            "level": "documentation-reviewed",
+            "revision": "3450ca5585ada2d12942b91a6a50ebc8524a6199",
+            "reviewed_on": "2026-11-12",
+            "notes": "README describes the embedded lala procedure, matrix commands, loops/branches, variable transfer and a custom user-function hook. This scope concerns expression-language support, not verification of every linear algebra kernel or matrix type. Documentation review only; no compilation, execution or performance comparison was performed.",
+            "evidence": [
+              {
+                "path": "README.md",
+                "url": "https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/README.md",
+                "sha256": "a651ca785f1a377e50646ccfce83845f01339130e2fbccea47e3071170a05e71"
+              }
+            ]
+          }
+        ],
+        "license": {
+          "label": "Unlicense",
+          "spdx_expression": "Unlicense",
+          "revision": "3450ca5585ada2d12942b91a6a50ebc8524a6199",
+          "reviewed_on": "2026-11-12",
+          "notes": "Pinned root LICENSE supplies the recorded terms. Component and dependency notices remain separate; this is not a blanket compatibility assessment.",
+          "evidence": [
+            {
+              "path": "LICENSE",
+              "url": "https://github.com/urbanjost/M_matrix/blob/3450ca5585ada2d12942b91a6a50ebc8524a6199/LICENSE",
+              "sha256": "08545fc081dff33847b16ae512a5722e1327f7d93a85c128cb0003c7354b8734"
+            }
+          ]
+        }
       }
     }
   ]
