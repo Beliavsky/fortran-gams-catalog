@@ -46,8 +46,6 @@ footer { border-top:1px solid var(--line); margin-top:2rem; }
 [hidden] { display:none !important; }
 @media(max-width:600px) { header,main,footer { padding:1.1rem; } article,section { padding:1rem; } }
 
-.argument-details dt { font-weight:600; margin-top:.8rem; }
-.argument-details dd { margin-left:1rem; }
 .argument-comment { white-space:pre-wrap; }
 
 .optional-notation { color:var(--muted); font-size:.85rem; }

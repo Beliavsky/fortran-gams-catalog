@@ -37,7 +37,10 @@ end subroutine
         self.assertNotIn('<script>',markup)
         self.assertIn('&lt;script&gt;',markup)
         expanded=argument_details_markup(p,'https://github.com/a/b/blob/'+'a'*40+'/')
-        self.assertIn('<details',expanded);self.assertIn('#L2-L2',expanded)
+        self.assertIn('<details',expanded);self.assertEqual(expanded.count('<pre>'),1)
+        self.assertIn('</span> ! Solution matrix.',expanded)
+        self.assertNotIn('Shared declaration',expanded)
+        self.assertNotIn('<dt>',expanded)
         self.assertIn('Input shift.',expanded)
 
     def test_unspecified_intent_shared_declaration_and_unrelated_comments(self):
@@ -169,5 +172,23 @@ end subroutine
         p['argument_details'][0]['declarations'][0]['comments']=[{'text':'bad','path':'elsewhere','line_start':1,'line_end':1}]
         with self.assertRaises(ValueError):validate_arguments(p,{'src.f90'})
 
+
+    def test_declarations_share_one_box_with_trailing_comments_in_call_order(self):
+        procedure={'signature':'call solve(n, x, l)', 'argument_details':[
+            {'name':'l','declarations':[{'text':'REAL(8) :: X(N), L(N)','shared':True}]},
+            {'name':'n','declarations':[{'text':'INTEGER :: N','comments':[
+                {'text':'!> Number of entries.\n!! Must be positive.'}]}]},
+            {'name':'x','declarations':[{'text':'REAL(8) :: X(N), L(N)','shared':True,
+                'comments':[{'text':'Input <values>.'}]}]}]}
+        rendered=argument_details_markup(procedure,'https://example.test/')
+        self.assertEqual(rendered.count('<pre>'),1)
+        self.assertEqual(rendered.count('<code>'),1)
+        self.assertNotIn('<dl>',rendered)
+        self.assertNotIn('Shared declaration',rendered)
+        self.assertNotIn('<a ',rendered)
+        self.assertIn('</span> ! Number of entries. Must be positive.',rendered)
+        self.assertIn('</span> ! Input &lt;values&gt;.',rendered)
+        self.assertLess(rendered.index('INTEGER :: N'),rendered.index('data-normalized-code="REAL(8) :: X(N)"'))
+        self.assertLess(rendered.index('data-normalized-code="REAL(8) :: X(N)"'),rendered.index('data-normalized-code="REAL(8) :: L(N)"'))
 
 if __name__=='__main__':unittest.main()
