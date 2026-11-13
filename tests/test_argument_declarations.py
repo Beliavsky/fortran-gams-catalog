@@ -1,6 +1,6 @@
 ﻿import unittest
 from html.parser import HTMLParser
-from argument_intents import signature_markup, argument_details_markup, validate_arguments
+from argument_intents import signature_markup, argument_details_markup, validate_arguments, individual_declaration
 from intent_sources import scopes, inspect
 
 
@@ -55,7 +55,11 @@ end subroutine
         markup=signature_markup(p)
         self.assertIn('data-argument-intent="unspecified"',markup)
         self.assertNotIn('Explanation of a local',markup)
-        self.assertIn('Shared declaration',markup)
+        self.assertNotIn('Shared declaration',markup)
+        self.assertIn('Shared comment: Both use the same unit.',markup)
+        self.assertIn('x: real x',markup)
+        self.assertNotIn('real x,y',markup)
+        self.assertIn('real x,y',argument_details_markup(p,'https://example.test/'))
 
     def test_continuations_quoted_bang_fixed_form_and_raw_templates(self):
         p=self.capture('''subroutine solve(x,y)
@@ -79,6 +83,29 @@ end subroutine
 ''')
         self.assertEqual(p['argument_details'][0]['declarations'][0]['text'],'${TYPE}$, intent(in) :: x')
         self.assertNotIn('zztemplate',signature_markup(p))
+
+    def test_individual_projection_preserves_shapes_attributes_and_literals(self):
+        cases=[
+            ('real(wp), intent(in) :: x(n), y(n)', 'x', 'real(wp), intent(in) :: x(n)'),
+            ('real, dimension(n,m), allocatable :: x, y(:,:)', 'y', 'real, dimension(n,m), allocatable :: y(:,:)'),
+            ('integer :: x=1, y=f(2,3)', 'y', 'integer :: y=f(2,3)'),
+            ("character(*) :: x='a,b', y='::'", 'y', "character(*) :: y='::'"),
+            ('double precision x(n,m),y(*)', 'y', 'double precision y(*)'),
+            ('real*8 X,Y', 'x', 'real*8 X'),
+            ('TYPE ( FM ) MA,MB,FMBETA_FM', 'ma', 'TYPE ( FM ) MA'),
+            ('intent(in) x,y', 'y', 'intent(in) y'),
+            ('character(len=max(1,n)) :: x,y', 'x', 'character(len=max(1,n)) :: x'),
+            ('${TYPE}$, intent(in) :: x,y', 'x', '${TYPE}$, intent(in) :: x')]
+        for text,name,expected in cases:
+            with self.subTest(text=text):self.assertEqual(individual_declaration(text,name),expected)
+        self.assertIsNone(individual_declaration('unfamiliar x,y','x'))
+        self.assertIsNone(individual_declaration('real :: x,y','z'))
+        p=self.capture('subroutine solve(left,right)\nreal :: left(2,2),right(2,2)\nend subroutine')
+        markup=signature_markup(p)
+        self.assertIn('real :: left(2,2)',markup)
+        self.assertIn('real :: right(2,2)',markup)
+        self.assertNotIn('left(2,2),right',markup)
+        self.assertNotIn('Shared comment',markup)
 
     def test_alias_and_multicall_ranges_validation(self):
         p=self.capture('''subroutine solve(left,right)

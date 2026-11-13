@@ -297,8 +297,10 @@ Project detail pages link to the independent [FORD documentation pilot](https://
 Argument tooltips also show pinned source declarations and clearly attached trailing
 or FORD documentation comments. Arguments without explicit INTENT remain unstyled.
 Expand **Argument declarations and source comments** on project pages for full text
-and per-declaration/comment source links. Shared declarations stay shared, template
-spellings stay unexpanded, and missing/ambiguous comments are not inferred.
+and per-declaration/comment source links. Tooltips isolate the hovered variable;
+source details retain the original shared declaration. Group comments are labeled
+Shared comment in tooltips. Template spellings stay unexpanded, and
+missing/ambiguous comments are not inferred.
 Regenerate saved details after interface updates with
 `python xargument_details.py --fetch --write`. This verifies source hashes; normal
 site builds remain offline. The pure renderer `argument_intents.py` is also used
