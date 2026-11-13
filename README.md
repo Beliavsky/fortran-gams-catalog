@@ -321,3 +321,5 @@ argument notation. The preference is saved across pages (and both catalogs when
 served from the same origin). It changes display only; source links, metadata and
 runnable examples are untouched. Without JavaScript the original text remains.
 `assets/formatting.js` is shared with the playground's `site/gams/formatting.js`.
+
+Argument declarations can be expanded with **Show declarations** beside Usage. The default view isolates each argument and uses lowercase code with ` :: ` between attributes and the declared entity, including older declarations that omit the separator. Arguments appear in calling-sequence order. Missing `intent` clauses remain absent; none are inferred. The **Original formatting** preference restores source declaration text, including shared declarations. Source comments and pinned source links remain available.

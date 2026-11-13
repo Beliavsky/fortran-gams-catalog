@@ -242,7 +242,7 @@ def build(destination, root=ROOT):
                     source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                     url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                     label = 'Usage (source declarations)' if proc.get('role') in {'public-data', 'public-template'} else 'Usage (argument declarations)'
-                    entry_html += '<p>'+label+':</p><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(proc)+'</a></code></pre>'+optional_notation_markup(proc)
+                    entry_html += '<div class="usage-heading"><p>'+label+':</p>'+argument_details_markup(proc, p['repository']['url']+'/blob/'+claim['revision']+'/')+'</div><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(proc)+'</a></code></pre>'+optional_notation_markup(proc)
                 entry_html += '</li>'
             if entries:
                 entry_label = 'Reviewed public interfaces:' if any(v[1].get('role') in {'public-data', 'public-template', 'public-adapter'} for v in entries.values()) else 'Reviewed entry points:'
@@ -430,9 +430,8 @@ def build(destination, root=ROOT):
                         declaration = procedure['declarations'][0]
                         source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                         url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
-                        label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (click for argument declarations)'
-                        body += '<p>'+label+':</p><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'+optional_notation_markup(procedure)
-                        body += argument_details_markup(procedure, repo['url']+'/blob/'+claim['revision']+'/')
+                        label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (argument declarations)'
+                        body += '<div class="usage-heading"><p>'+label+':</p>'+argument_details_markup(procedure, repo['url']+'/blob/'+claim['revision']+'/')+'</div><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'+optional_notation_markup(procedure)
                         for declaration in procedure['declarations']:
                             source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                             body += '<p>'+link(source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}',

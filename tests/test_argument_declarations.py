@@ -147,6 +147,18 @@ end subroutine
         self.assertEqual(span['data-argument-label'],'x')
         self.assertIn('class="declaration-code"',argument_details_markup(p,'https://example.test/'))
 
+    def test_declaration_without_intent_and_disclosure(self):
+        p=self.capture('subroutine solve(x,y)\nREAL X,Y\nend subroutine')
+        markup=signature_markup(p)
+        self.assertNotIn('No explicit INTENT',markup)
+        self.assertNotIn('Declaration unavailable',markup)
+        details=argument_details_markup(p,'https://example.test/')
+        self.assertIn('Show declarations',details)
+        self.assertIn('Hide declarations',details)
+        self.assertIn('data-normalized-code="REAL X"',details)
+        self.assertIn('REAL X,Y',details)
+        self.assertNotIn(' open',details)
+
     def test_alias_and_multicall_ranges_validation(self):
         p=self.capture('''subroutine solve(left,right)
 real,intent(in)::left
