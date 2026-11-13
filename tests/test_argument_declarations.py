@@ -107,6 +107,30 @@ end subroutine
         self.assertNotIn('left(2,2),right',markup)
         self.assertNotIn('Shared comment',markup)
 
+    def test_intent_is_not_repeated_when_the_displayed_declaration_has_it(self):
+        def tooltip(procedure):
+            class P(HTMLParser):
+                def __init__(self):super().__init__();self.values=[]
+                def handle_starttag(self,tag,attrs):
+                    attrs=dict(attrs)
+                    if tag=='span':self.values.append(attrs['title'])
+            parser=P();parser.feed(signature_markup(procedure));return parser.values[0]
+        p=self.capture('subroutine solve(x,y)\nreal,intent(out)::x\nreal::y\nend subroutine')
+        self.assertEqual(tooltip(p).count('intent(out)'),1)
+        p['argument_details'][0]['declarations'][0]['text']='real :: x'
+        self.assertIn('\n\nintent(out)',tooltip(p))
+        p['argument_details'][0]['declarations'][0]['text']='real :: x'
+        p['argument_details'][0]['declarations'][0]['comments']=[{'text':'Example: intent(out)'}]
+        self.assertTrue(tooltip(p).endswith('\n\nintent(out)'))
+        p['argument_details'][0]['declarations'][0]['text']="character(*) :: x='intent(out)'"
+        self.assertTrue(tooltip(p).endswith('\n\nintent(out)'))
+        p['arguments'][0].update(intent='conditional',variants=[
+            {'intent':'out','condition':'FEATURE is off'}, {'intent':'inout','condition':'FEATURE is on'}])
+        p['argument_details'][0]['declarations'][0]['text']='real,intent(out)::x'
+        self.assertIn('intent(inout) when FEATURE is on',tooltip(p))
+        p.pop('argument_details')
+        self.assertIn('intent(out) when FEATURE is off',tooltip(p))
+
     def test_alias_and_multicall_ranges_validation(self):
         p=self.capture('''subroutine solve(left,right)
 real,intent(in)::left
