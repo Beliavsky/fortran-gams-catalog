@@ -307,3 +307,8 @@ site builds remain offline. The pure renderer `argument_intents.py` is also used
 by the playground as `catalog_argument_intents.py`; synchronize it when changing
 rendering/schema, and refresh the revision-matched review feed. Coverage is saved
 in `docs/argument-declarations-coverage.json`.
+
+Calling-sequence displays put explicitly OPTIONAL named arguments in square brackets.
+This is documentation notation, not Fortran syntax; runnable examples and saved
+signatures are unchanged. Existing bracket groups are preserved. Optionality is
+read only from pinned declarations, never from argument names or prose.

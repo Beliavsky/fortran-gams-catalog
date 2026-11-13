@@ -49,3 +49,5 @@ footer { border-top:1px solid var(--line); margin-top:2rem; }
 .argument-details dt { font-weight:600; margin-top:.8rem; }
 .argument-details dd { margin-left:1rem; }
 .argument-comment { white-space:pre-wrap; }
+
+.optional-notation { color:var(--muted); font-size:.85rem; }
