@@ -207864,6 +207864,118 @@
                 ]
               }
             ]
+          },
+          {
+            "code": "L8e1b1",
+            "level": "source-reviewed",
+            "revision": "1f2b8991900dda36b40d997da77d287c25541bac",
+            "reviewed_on": "2026-11-13",
+            "notes": "NEURALNET%TRAIN defaults to MSE, which returns 2*(PRED-ACTUAL), the derivative of a squared residual. BACKPROP averages contributions across observations and TRAIN supplies its own gradient to SGD. This supports unweighted nonlinear least-squares parameter estimation without a user-supplied regression Jacobian; internal backpropagation does not establish L8e1b2. Scope: omit LOSS and REG, initialize a scalar-output network and supply DATA with predictors above the last row and responses in the last row. A custom LOSS is a derivative callback despite its name, and REG changes the objective; those cases are outside this mapping. Bias-free training passes an unallocated CURR_BIAS to BACKPROP in this pin; an allocated biased architecture avoids that branch, whose safety is not established. The linked author example uses linear activations and compares against DGELS; it is a special case, not a checked nonlinear-regression driver. BLAS dependencies, convergence, final fitted coefficients and prediction accuracy were not tested. No statistical uncertainty estimates or global-minimum guarantee are implied.",
+            "evidence": [
+              {
+                "path": "src/neuralnet.f90",
+                "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/src/neuralnet.f90",
+                "sha256": "2f4a6364565cd9419d16d21b44e876bcd2c9abd741a376c1fb9658179c4cc720"
+              },
+              {
+                "path": "test/test_reg_ls.f90",
+                "url": "https://github.com/thchang/NN_MOD/blob/1f2b8991900dda36b40d997da77d287c25541bac/test/test_reg_ls.f90",
+                "sha256": "824871573ac206d29ab99f39d0b9a3e1a980688381813f14a6e0a5565069c9ad"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "TRAIN",
+                "module": "NEURALNET_MOD",
+                "derived_type": "NEURALNET",
+                "path": "src/neuralnet.f90",
+                "line_start": 360,
+                "line_end": 440,
+                "role": "public-entry-point",
+                "summary": "Fit a scalar-response network using its default squared-error gradient and internal SGD; omit custom loss and regularization callbacks for this classification.",
+                "signature": "CALL net%TRAIN(DATA, IERR)",
+                "declarations": [
+                  {
+                    "path": "src/neuralnet.f90",
+                    "line_start": 365,
+                    "line_end": 382
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "test/test_reg_ls.f90",
+                    "line_start": 33,
+                    "line_end": 58
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "DATA",
+                    "intent": "in",
+                    "path": "src/neuralnet.f90",
+                    "line_start": 366,
+                    "line_end": 366
+                  },
+                  {
+                    "name": "IERR",
+                    "intent": "out",
+                    "path": "src/neuralnet.f90",
+                    "line_start": 367,
+                    "line_end": 367
+                  }
+                ],
+                "argument_details": [
+                  {
+                    "name": "DATA",
+                    "declarations": [
+                      {
+                        "text": "REAL(KIND=R8), INTENT(IN) :: DATA(:,:)",
+                        "path": "src/neuralnet.f90",
+                        "line_start": 366,
+                        "line_end": 366,
+                        "shared": false,
+                        "comments": []
+                      }
+                    ]
+                  },
+                  {
+                    "name": "IERR",
+                    "declarations": [
+                      {
+                        "text": "INTEGER, INTENT(OUT) :: IERR",
+                        "path": "src/neuralnet.f90",
+                        "line_start": 367,
+                        "line_end": 367,
+                        "shared": false,
+                        "comments": []
+                      }
+                    ]
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-13",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/neuralnet.f90",
+                      "procedure": "train",
+                      "line_start": 360,
+                      "line_end": 440
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "MSE",
+                "module": "NEURALNET_MOD",
+                "path": "src/neuralnet.f90",
+                "line_start": 504,
+                "line_end": 513,
+                "role": "implementation-evidence",
+                "summary": "Default residual-loss derivative 2*(prediction-response), used by internal backpropagation."
+              }
+            ]
           }
         ],
         "notes": "Not built or run for this catalog. Source-reviewed mappings identify inspected driver/implementation paths and calling interfaces, not complete dependency audits or numerical verification. The earlier documentation review remains available.",
@@ -352474,6 +352586,235 @@
                 ]
               }
             ]
+          },
+          {
+            "code": "L8e1b1",
+            "level": "source-reviewed",
+            "revision": "b2073fa542c8dcdf9466d1a192d2888b628a5df3",
+            "reviewed_on": "2026-11-13",
+            "notes": "network%train defaults to quadratic(), whose objective is SUM((predicted-true)**2)/2. Training forwards sampled columns, backpropagates residual gradients and updates model parameters internally. This is unweighted nonlinear least-squares fitting without a user-supplied regression Jacobian, not L8e1b2 merely because the network uses backpropagation. Scope: initialized dense continuous-response networks, default quadratic loss and default SGD, excluding dropout, custom losses and penalized optimizer configurations. Default-real input/output arrays store samples in columns and must match the input/output layer sizes. Batch size must be positive and no larger than the dataset. This pin draws random contiguous mini-batches and performs integer dataset_size/batch_size updates per epoch; it is not a deterministic pass through every observation. Existing prediction training-mode side effects remain applicable. No new numerical driver was compiled or run; convergence, global optimality and statistical uncertainty were not verified.",
+            "evidence": [
+              {
+                "path": "src/nf/nf_network.f90",
+                "url": "https://github.com/modern-fortran/neural-fortran/blob/b2073fa542c8dcdf9466d1a192d2888b628a5df3/src/nf/nf_network.f90",
+                "sha256": "52a5650685f3b959be16e6fdc458c48889adde993374b2f727053162dab71b68"
+              },
+              {
+                "path": "src/nf/nf_network_submodule.f90",
+                "url": "https://github.com/modern-fortran/neural-fortran/blob/b2073fa542c8dcdf9466d1a192d2888b628a5df3/src/nf/nf_network_submodule.f90",
+                "sha256": "dd9a175a466549de3365c05e99c0c84930f3ef87aa617f21911e773fa25012c7"
+              },
+              {
+                "path": "src/nf/nf_loss.f90",
+                "url": "https://github.com/modern-fortran/neural-fortran/blob/b2073fa542c8dcdf9466d1a192d2888b628a5df3/src/nf/nf_loss.f90",
+                "sha256": "f55cd317b8eaa228c8eaf7b7a2a6318a73edee3ef981fe6c2f71de5dc2f752eb"
+              },
+              {
+                "path": "src/nf/nf_loss_submodule.f90",
+                "url": "https://github.com/modern-fortran/neural-fortran/blob/b2073fa542c8dcdf9466d1a192d2888b628a5df3/src/nf/nf_loss_submodule.f90",
+                "sha256": "dee4068f4d49300dfa37043ac1b2de2f8b2b8cb2739d2c826ceb3a54bfb4457b"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "train",
+                "module": "nf",
+                "derived_type": "network",
+                "path": "src/nf/nf_network.f90",
+                "line_start": 247,
+                "line_end": 270,
+                "role": "public-entry-point",
+                "summary": "Fit initialized network parameters with default quadratic loss and SGD; predictor and response samples occupy columns.",
+                "signature": "CALL solver%train(INPUT_DATA, OUTPUT_DATA, BATCH_SIZE, EPOCHS)",
+                "declarations": [
+                  {
+                    "path": "src/nf/nf_network.f90",
+                    "line_start": 247,
+                    "line_end": 270
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "INPUT_DATA",
+                    "intent": "in",
+                    "path": "src/nf/nf_network.f90",
+                    "line_start": 252,
+                    "line_end": 252
+                  },
+                  {
+                    "name": "OUTPUT_DATA",
+                    "intent": "in",
+                    "path": "src/nf/nf_network.f90",
+                    "line_start": 256,
+                    "line_end": 256
+                  },
+                  {
+                    "name": "BATCH_SIZE",
+                    "intent": "in",
+                    "path": "src/nf/nf_network.f90",
+                    "line_start": 260,
+                    "line_end": 260
+                  },
+                  {
+                    "name": "EPOCHS",
+                    "intent": "in",
+                    "path": "src/nf/nf_network.f90",
+                    "line_start": 264,
+                    "line_end": 264
+                  }
+                ],
+                "argument_details": [
+                  {
+                    "name": "INPUT_DATA",
+                    "declarations": [
+                      {
+                        "text": "real, intent(in) :: input_data(:,:)",
+                        "path": "src/nf/nf_network.f90",
+                        "line_start": 252,
+                        "line_end": 252,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Input data to train on;",
+                            "kind": "following",
+                            "line_start": 253,
+                            "line_end": 253,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "first dimension contains a single sample",
+                            "kind": "following",
+                            "line_start": 254,
+                            "line_end": 254,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "and its size must match the size of the input layer.",
+                            "kind": "following",
+                            "line_start": 255,
+                            "line_end": 255,
+                            "path": "src/nf/nf_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "OUTPUT_DATA",
+                    "declarations": [
+                      {
+                        "text": "real, intent(in) :: output_data(:,:)",
+                        "path": "src/nf/nf_network.f90",
+                        "line_start": 256,
+                        "line_end": 256,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Output data to train on;",
+                            "kind": "following",
+                            "line_start": 257,
+                            "line_end": 257,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "first dimension contains a single sample",
+                            "kind": "following",
+                            "line_start": 258,
+                            "line_end": 258,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "and its size must match the size of the input layer.",
+                            "kind": "following",
+                            "line_start": 259,
+                            "line_end": 259,
+                            "path": "src/nf/nf_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "BATCH_SIZE",
+                    "declarations": [
+                      {
+                        "text": "integer, intent(in) :: batch_size",
+                        "path": "src/nf/nf_network.f90",
+                        "line_start": 260,
+                        "line_end": 260,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Batch size to use.",
+                            "kind": "following",
+                            "line_start": 261,
+                            "line_end": 261,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "Set to 1 for a pure stochastic gradient descent.",
+                            "kind": "following",
+                            "line_start": 262,
+                            "line_end": 262,
+                            "path": "src/nf/nf_network.f90"
+                          },
+                          {
+                            "text": "Set to `size(input_data, dim=2)` for a batch gradient descent.",
+                            "kind": "following",
+                            "line_start": 263,
+                            "line_end": 263,
+                            "path": "src/nf/nf_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "EPOCHS",
+                    "declarations": [
+                      {
+                        "text": "integer, intent(in) :: epochs",
+                        "path": "src/nf/nf_network.f90",
+                        "line_start": 264,
+                        "line_end": 264,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Number of epochs to run",
+                            "kind": "following",
+                            "line_start": 265,
+                            "line_end": 265,
+                            "path": "src/nf/nf_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-13",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/nf/nf_network.f90",
+                      "procedure": "train",
+                      "line_start": 248,
+                      "line_end": 270
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "quadratic_eval",
+                "module": "nf_loss",
+                "path": "src/nf/nf_loss_submodule.f90",
+                "line_start": 7,
+                "line_end": 12,
+                "role": "implementation-evidence",
+                "summary": "Half the unweighted sum of squared output residuals; the adjacent derivative supplies predicted minus true."
+              }
+            ]
           }
         ],
         "license": {
@@ -356681,6 +357022,92 @@
                 ]
               }
             ]
+          },
+          {
+            "code": "L8e",
+            "level": "source-reviewed",
+            "revision": "a1c97d4d66431df87662b59fe8e8a24feaf28a3a",
+            "reviewed_on": "2026-11-13",
+            "notes": "network_type%output evaluates stored dense-network coefficients and nonlinear activations. With a compatible model trained for a continuous response, this evaluates a nonlinear regression function F(X,b). Scope is inference with already initialized or loaded compatible parameters, layer dimensions and build-selected real kind; classification-only configurations are not the basis of the mapping. Existing stateful-evaluation and model-file compatibility restrictions remain applicable. This inference-only L8e review does not classify or verify the native training facilities, least-squares optimization, uncertainty estimates or Python-model equivalence. No new numerical driver was compiled or run.",
+            "evidence": [
+              {
+                "path": "src/lib/mod_network.F90",
+                "url": "https://github.com/scientific-computing/FKB/blob/a1c97d4d66431df87662b59fe8e8a24feaf28a3a/src/lib/mod_network.F90",
+                "sha256": "a79b92aa54dd8e0e11009da9ecb09fce9b114d3cb6fa406b9d7e5ddfc17a3951"
+              },
+              {
+                "path": "src/lib/mod_kinds.F90",
+                "url": "https://github.com/scientific-computing/FKB/blob/a1c97d4d66431df87662b59fe8e8a24feaf28a3a/src/lib/mod_kinds.F90",
+                "sha256": "335e69ad07fdc3cc9ff79fa2c74a0ce05d868377507479052c3ef7fbbe530482"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "output",
+                "module": "mod_network",
+                "role": "public-entry-point",
+                "path": "src/lib/mod_network.F90",
+                "line_start": 244,
+                "line_end": 264,
+                "signature": "VALUE = solver%output(INPUT)",
+                "declarations": [
+                  {
+                    "path": "src/lib/mod_network.F90",
+                    "line_start": 246,
+                    "line_end": 248
+                  },
+                  {
+                    "path": "src/lib/mod_network.F90",
+                    "line_start": 1,
+                    "line_end": 46
+                  },
+                  {
+                    "path": "src/lib/mod_kinds.F90",
+                    "line_start": 1,
+                    "line_end": 26
+                  }
+                ],
+                "summary": "Declare TYPE(network_type) :: solver from mod_network. Evaluate a loaded/initialized network with REAL(RK) INPUT(:) matching the first layer width; return an allocatable REAL(RK) output vector. This forwards through mutable layer state, so the passed object is INOUT despite inference terminology. The scoped hosted model contains dense/ReLU operations; all possible dropout/batch-normalization or trained-model behaviors are not established. No independent accuracy/error-status result is supplied. The passed object SELF is implicit in solver%; do not pass it again. Optional actuals shown in brackets can be supplied by keyword.",
+                "derived_type": "network_type",
+                "arguments": [
+                  {
+                    "name": "INPUT",
+                    "intent": "in",
+                    "path": "src/lib/mod_network.F90",
+                    "line_start": 247,
+                    "line_end": 247
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/lib/mod_network.F90",
+                      "procedure": "output",
+                      "line_start": 244,
+                      "line_end": 264
+                    }
+                  ],
+                  "issues": []
+                },
+                "argument_details": [
+                  {
+                    "name": "INPUT",
+                    "declarations": [
+                      {
+                        "text": "real(rk), intent(in) :: input(:)",
+                        "path": "src/lib/mod_network.F90",
+                        "line_start": 247,
+                        "line_end": 247,
+                        "shared": false,
+                        "comments": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         ],
         "license": {
@@ -357101,6 +357528,132 @@
                   ],
                   "issues": []
                 }
+              }
+            ]
+          },
+          {
+            "code": "L8e",
+            "level": "source-reviewed",
+            "revision": "7d564b86389460555d6f7d9b7a6b5198588af9df",
+            "reviewed_on": "2026-11-13",
+            "notes": "inference_engine_t%infer applies stored affine layer coefficients and activation strategies and maps normalized outputs to the recorded response range. For a compatible continuous-response model this evaluates a nonlinear regression function F(X,b). Scope is initialized tensor inference with matching node counts, padded coefficients, activation metadata and normalization ranges; the chosen activation/output range limits representable responses. Existing historical precision and metadata restrictions remain applicable. This inference-only L8e mapping does not establish a training algorithm, ordinary-least-squares optimization, statistical uncertainty or categorical probability calibration. No new numerical driver was compiled or run.",
+            "evidence": [
+              {
+                "path": "src/inference_engine/inference_engine_m_.f90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine/inference_engine_m_.f90",
+                "sha256": "c986dc7b0a35b42dbdc302214eb268cccc17def4a562d94792dd4b61eeee1618"
+              },
+              {
+                "path": "src/inference_engine/inference_engine_s.F90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine/inference_engine_s.F90",
+                "sha256": "2cf4a15d555dba4a8bea68d12b9dd654ba1477e8df22ba0e9d2da0eda506427c"
+              },
+              {
+                "path": "src/inference_engine_m.f90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine_m.f90",
+                "sha256": "b2ba7fdc07b1c120e1fb102c2323cb7dc18b6f7236b80322d787cdd07ad408de"
+              },
+              {
+                "path": "src/inference_engine/metadata_m.f90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine/metadata_m.f90",
+                "sha256": "c3f03908d45cfe236e26e331d84da18ced2f9c7c241b29e45ecf562346cfe68a"
+              },
+              {
+                "path": "src/inference_engine/tensor_m.f90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine/tensor_m.f90",
+                "sha256": "7f1f18090e50f687f939607fac8147f342212c9dedbbc6b293d5f05ec9d300a5"
+              },
+              {
+                "path": "src/inference_engine/kind_parameters_m.f90",
+                "url": "https://github.com/BerkeleyLab/fiats/blob/7d564b86389460555d6f7d9b7a6b5198588af9df/src/inference_engine/kind_parameters_m.f90",
+                "sha256": "b59bad0a8689c70a6ff8c09a3036348725c725c36200b96db9a2d978076a39bb"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "infer",
+                "module": "inference_engine_m",
+                "role": "public-entry-point",
+                "path": "src/inference_engine/inference_engine_m_.f90",
+                "line_start": 130,
+                "line_end": 135,
+                "signature": "VALUE = solver%infer(INPUTS)",
+                "declarations": [
+                  {
+                    "path": "src/inference_engine/inference_engine_m_.f90",
+                    "line_start": 132,
+                    "line_end": 134
+                  },
+                  {
+                    "path": "src/inference_engine_m.f90",
+                    "line_start": 3,
+                    "line_end": 25
+                  },
+                  {
+                    "path": "src/inference_engine/inference_engine_m_.f90",
+                    "line_start": 20,
+                    "line_end": 43
+                  },
+                  {
+                    "path": "src/inference_engine/metadata_m.f90",
+                    "line_start": 18,
+                    "line_end": 33
+                  },
+                  {
+                    "path": "src/inference_engine/tensor_m.f90",
+                    "line_start": 18,
+                    "line_end": 34
+                  },
+                  {
+                    "path": "src/inference_engine/kind_parameters_m.f90",
+                    "line_start": 3,
+                    "line_end": 9
+                  },
+                  {
+                    "path": "src/inference_engine/inference_engine_s.F90",
+                    "line_start": 43,
+                    "line_end": 90
+                  }
+                ],
+                "summary": "Declare TYPE(inference_engine_t) :: solver from inference_engine_m. Evaluate an initialized inference engine with TYPE(TENSOR_T) INPUTS of the configured input length and return TYPE(TENSOR_T), not a raw array. Construct tensor inputs from REAL(RKIND) values and obtain output values through its VALUES binding. The implementation maps input range, applies the configured activation at every layer, then maps output range. This call neither trains weights nor certifies approximation quality. The hosted example uses fixed ReLU weights and one image; broader parallel/model-file behavior is outside that check. The passed object SELF is implicit in solver%; do not pass it again. Optional actuals shown in brackets can be supplied by keyword.",
+                "derived_type": "inference_engine_t",
+                "arguments": [
+                  {
+                    "name": "INPUTS",
+                    "intent": "in",
+                    "path": "src/inference_engine/inference_engine_m_.f90",
+                    "line_start": 133,
+                    "line_end": 133
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-12",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/inference_engine/inference_engine_m_.f90",
+                      "procedure": "infer",
+                      "line_start": 130,
+                      "line_end": 135
+                    }
+                  ],
+                  "issues": []
+                },
+                "argument_details": [
+                  {
+                    "name": "INPUTS",
+                    "declarations": [
+                      {
+                        "text": "type(tensor_t), intent(in) :: inputs",
+                        "path": "src/inference_engine/inference_engine_m_.f90",
+                        "line_start": 133,
+                        "line_end": 133,
+                        "shared": false,
+                        "comments": []
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -360353,6 +360906,177 @@
                     ]
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "code": "L8e1b1",
+            "level": "source-reviewed",
+            "revision": "4b81aeac07113628c2c9a476648d5ac2a91b7c91",
+            "reviewed_on": "2026-11-13",
+            "notes": "network_type%train supports unweighted nonlinear least-squares regression when a compiled continuous-response model selects loss_method=\"mse\" or set_loss(\"mse\") and an unpenalized optimizer. set_loss selects mse_loss_type; compute_mse constructs means of squared residuals divided by two, and training differentiates the loss graph and updates model parameters internally. No user regression Jacobian is required, so this is not L8e1b2. Cross-entropy classification, robust losses, PINN composite objectives and regularization are outside this mapping. Use compatible real(real32) predictor/response arrays, an initialized and compiled network/batch configuration and positive NUM_EPOCHS. The linked author sine example uses tanh hidden layers, a sigmoid response and MSE with Adam. Its Weights & Biases wrapper is application infrastructure, not required by the base train interface; the example was not run. Existing mse_score is a reporting metric (one minus an error), not the fitting entry point. Training accuracy, convergence and uncertainty estimates were not verified.",
+            "evidence": [
+              {
+                "path": "src/athena/athena_network.f90",
+                "url": "https://github.com/nedtaylor/athena/blob/4b81aeac07113628c2c9a476648d5ac2a91b7c91/src/athena/athena_network.f90",
+                "sha256": "9055932a377fc185a41a83a690af6359a1dc8821c7624dd6ca51912418c2f2ad"
+              },
+              {
+                "path": "src/athena/athena_network_sub.f90",
+                "url": "https://github.com/nedtaylor/athena/blob/4b81aeac07113628c2c9a476648d5ac2a91b7c91/src/athena/athena_network_sub.f90",
+                "sha256": "f5a3af47964dc314533973d00f96408cc57bdda978e2433e532497e012d0e69c"
+              },
+              {
+                "path": "src/athena/athena_loss.f90",
+                "url": "https://github.com/nedtaylor/athena/blob/4b81aeac07113628c2c9a476648d5ac2a91b7c91/src/athena/athena_loss.f90",
+                "sha256": "91c35ed25235bdbc7653a32aa37f42b0a66574860b995099122b8ad9dedc8c12"
+              },
+              {
+                "path": "example/wandb_network_sine/src/main.F90",
+                "url": "https://github.com/nedtaylor/athena/blob/4b81aeac07113628c2c9a476648d5ac2a91b7c91/example/wandb_network_sine/src/main.F90",
+                "sha256": "e801d67a259333b83d87f0e8accb99845a0e3b4f9ee3fb566de33a0f88ecc3ad"
+              }
+            ],
+            "procedures": [
+              {
+                "procedure": "train",
+                "module": "athena__network",
+                "derived_type": "network_type",
+                "path": "src/athena/athena_network.f90",
+                "line_start": 467,
+                "line_end": 502,
+                "role": "public-entry-point",
+                "summary": "Fit an initialized, compiled regression network configured with MSE loss; parameter gradients and updates are computed internally.",
+                "signature": "CALL solver%train(INPUT, OUTPUT, NUM_EPOCHS)",
+                "declarations": [
+                  {
+                    "path": "src/athena/athena_network.f90",
+                    "line_start": 467,
+                    "line_end": 502
+                  }
+                ],
+                "examples": [
+                  {
+                    "path": "example/wandb_network_sine/src/main.F90",
+                    "line_start": 67,
+                    "line_end": 96
+                  },
+                  {
+                    "path": "example/wandb_network_sine/src/main.F90",
+                    "line_start": 126,
+                    "line_end": 138
+                  }
+                ],
+                "arguments": [
+                  {
+                    "name": "INPUT",
+                    "intent": "in",
+                    "path": "src/athena/athena_network.f90",
+                    "line_start": 476,
+                    "line_end": 476
+                  },
+                  {
+                    "name": "OUTPUT",
+                    "intent": "in",
+                    "path": "src/athena/athena_network.f90",
+                    "line_start": 478,
+                    "line_end": 478
+                  },
+                  {
+                    "name": "NUM_EPOCHS",
+                    "intent": "in",
+                    "path": "src/athena/athena_network.f90",
+                    "line_start": 480,
+                    "line_end": 480
+                  }
+                ],
+                "argument_details": [
+                  {
+                    "name": "INPUT",
+                    "declarations": [
+                      {
+                        "text": "class(*), dimension(..), intent(in) :: input",
+                        "path": "src/athena/athena_network.f90",
+                        "line_start": 476,
+                        "line_end": 476,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Input data",
+                            "kind": "following",
+                            "line_start": 477,
+                            "line_end": 477,
+                            "path": "src/athena/athena_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "OUTPUT",
+                    "declarations": [
+                      {
+                        "text": "class(*), dimension(:,:), intent(in) :: output",
+                        "path": "src/athena/athena_network.f90",
+                        "line_start": 478,
+                        "line_end": 478,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Expected output data (data labels)",
+                            "kind": "following",
+                            "line_start": 479,
+                            "line_end": 479,
+                            "path": "src/athena/athena_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "NUM_EPOCHS",
+                    "declarations": [
+                      {
+                        "text": "integer, intent(in) :: num_epochs",
+                        "path": "src/athena/athena_network.f90",
+                        "line_start": 480,
+                        "line_end": 480,
+                        "shared": false,
+                        "comments": [
+                          {
+                            "text": "Number of epochs to train for",
+                            "kind": "following",
+                            "line_start": 481,
+                            "line_end": 481,
+                            "path": "src/athena/athena_network.f90"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "argument_intent_review": {
+                  "reviewed_on": "2026-11-13",
+                  "status": "checked",
+                  "sources": [
+                    {
+                      "path": "src/athena/athena_network.f90",
+                      "procedure": "train",
+                      "line_start": 467,
+                      "line_end": 502
+                    }
+                  ],
+                  "issues": []
+                }
+              },
+              {
+                "procedure": "compute_mse",
+                "module": "athena__loss",
+                "path": "src/athena/athena_loss.f90",
+                "line_start": 393,
+                "line_end": 430,
+                "role": "implementation-evidence",
+                "summary": "Construct the squared-residual loss graph used by MSE-configured training."
               }
             ]
           }

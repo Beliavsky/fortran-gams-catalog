@@ -160,6 +160,10 @@ Detailed numerical-method reviews include source-linked
 classifications and explicit limits where no leaf fits; see
 [the review progress](docs/granular-reviews.md).
 
+[Neural-network regression mappings](docs/neural-regression.md) distinguish
+squared-error parameter fitting from evaluation of already trained models,
+with source-pinned calling sequences and configuration limits.
+
 The existing [playground package catalog](https://beliavsky.github.io/fortran-playground/gams/)
 continues to focus on selected packages and runnable examples. This broader
 catalog starts with documentation reviews and can grow into granular procedure

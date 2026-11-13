@@ -948,6 +948,12 @@
       "parent": "I2a",
       "source": "https://netlib.org/bib/gams.html",
       "reviewed_on": "2026-11-06"
+    },
+    "L8e1b1": {
+      "label": "Unweighted data, user provides no derivatives",
+      "parent": "L8e1b",
+      "source": "https://netlib.org/bib/gams.html",
+      "reviewed_on": "2026-11-13"
     }
   }
 }
