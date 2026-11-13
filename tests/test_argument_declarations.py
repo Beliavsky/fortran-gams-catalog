@@ -1,4 +1,5 @@
 ﻿import unittest
+import json
 from html.parser import HTMLParser
 from argument_intents import signature_markup, argument_details_markup, validate_arguments, individual_declaration
 from intent_sources import scopes, inspect
@@ -130,6 +131,21 @@ end subroutine
         self.assertIn('intent(inout) when FEATURE is on',tooltip(p))
         p.pop('argument_details')
         self.assertIn('intent(out) when FEATURE is off',tooltip(p))
+
+    def test_tooltip_format_ranges_cover_code_without_comments(self):
+        p=self.capture('subroutine solve(x,y)\nREAL :: x\n!! Keep UPPER, COMMENT ??\nOPTIONAL :: x\nREAL :: y\nend subroutine')
+        p['argument_details'][0]['dummy']='X'
+        class Spans(HTMLParser):
+            def __init__(self):super().__init__();self.spans=[]
+            def handle_starttag(self,tag,attrs):
+                if tag=='span':self.spans.append(dict(attrs))
+        parser=Spans();parser.feed(signature_markup(p))
+        span=parser.spans[0];description=span['data-intent-description']
+        fragments=[description[first:last] for first,last in json.loads(span['data-code-ranges'])]
+        self.assertEqual(fragments,['REAL :: x','OPTIONAL :: x'])
+        self.assertIn('Keep UPPER, COMMENT ??',description)
+        self.assertEqual(span['data-argument-label'],'x')
+        self.assertIn('class="declaration-code"',argument_details_markup(p,'https://example.test/'))
 
     def test_alias_and_multicall_ranges_validation(self):
         p=self.capture('''subroutine solve(left,right)

@@ -312,3 +312,12 @@ Calling-sequence displays put explicitly OPTIONAL named arguments in square brac
 This is documentation notation, not Fortran syntax; runnable examples and saved
 signatures are unchanged. Existing bracket groups are preserved. Optionality is
 read only from pinned declarations, never from argument names or prose.
+
+Calling sequences, declaration previews and expanded declarations are normalized
+in the browser by default: Fortran code is lowercase with one space after commas
+on the same line. Quoted strings, comments and line breaks are preserved.
+The **Original formatting** checkbox restores author formatting, retaining optional
+argument notation. The preference is saved across pages (and both catalogs when
+served from the same origin). It changes display only; source links, metadata and
+runnable examples are untouched. Without JavaScript the original text remains.
+`assets/formatting.js` is shared with the playground's `site/gams/formatting.js`.

@@ -28,6 +28,8 @@ jobs:
       - if: ${{ github.event_name == 'workflow_dispatch' && inputs.refresh }}
         run: python xrefresh.py
       - run: python -m unittest discover -s tests
+      - run: node tests/search.cjs
+      - run: node tests/formatting.cjs
       - run: python xbuild.py
       - uses: actions/upload-pages-artifact@v4
         with:

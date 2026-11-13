@@ -96,7 +96,7 @@ def build(destination, root=ROOT):
     all_entries = projects + legacy_entries
     reviewed_codes = {p['id']: source_codes(p) for p in all_entries}
     destination.mkdir(parents=True, exist_ok=True)
-    for asset in ('catalog.css', 'search.js'):
+    for asset in ('catalog.css', 'search.js', 'formatting.js'):
         shutil.copy2(root/'assets'/asset, destination/asset)
     copied = set()
     for project in projects:
@@ -131,13 +131,16 @@ def build(destination, root=ROOT):
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Browse Fortran numerical software by mathematical problem, with pinned review evidence and driver references.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'">
-<title>{e(title)}</title><link rel="stylesheet" href="{prefix}catalog.css"><script defer src="{prefix}search.js"></script></head>
+<title>{e(title)}</title><link rel="stylesheet" href="{prefix}catalog.css"><script defer src="{prefix}formatting.js"></script><script defer src="{prefix}search.js"></script></head>
 <body><a class="skip" href="#content">Skip to content</a><header>{link(prefix or './', 'Fortran software catalog')}
 <nav>{link(prefix+'projects/', 'Repositories')} · {link(prefix+'review/', 'Review policy')} ·
 {link(prefix+'topics/automatic-differentiation/', 'Automatic differentiation')} ·
 {link(prefix+'topics/expression-parsers/', 'Expression parsers')} ·
 {link('https://beliavsky.github.io/fortran-playground/gams/', 'Playground package catalog')} ·
 {link('https://gams.nist.gov/cgi-bin/serve.cgi', 'About GAMS')}</nav>
+<div class="formatting-controls"><label class="checkbox-label"><input type="checkbox" id="original-formatting" aria-describedby="formatting-help"> Original formatting</label>
+<span class="muted" id="formatting-help">Default: lowercase code and one space after commas. Display only; comments, strings and examples keep their original text.</span></div>
+<noscript>Display formatting requires JavaScript; original text is shown.</noscript>
 <details id="filters" class="filters-panel"><summary>Filters</summary>
 <div class="build-filter"><label class="checkbox-label">Collection <select id="collection" name="collection"><option value="">All repositories</option><option value="independent">Independent reviews</option><option value="imported">Playground imports</option></select></label></div>
 <div class="build-filter"><label class="checkbox-label"><input type="checkbox" id="exclude-fpm" aria-describedby="fpm-filter-help"> Exclude known FPM packages</label>
@@ -239,7 +242,7 @@ def build(destination, root=ROOT):
                     source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                     url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                     label = 'Usage (source declarations)' if proc.get('role') in {'public-data', 'public-template'} else 'Usage (argument declarations)'
-                    entry_html += '<p>'+label+':</p><pre><code><a href="'+e(url)+'">'+signature_markup(proc)+'</a></code></pre>'+optional_notation_markup(proc)
+                    entry_html += '<p>'+label+':</p><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(proc)+'</a></code></pre>'+optional_notation_markup(proc)
                 entry_html += '</li>'
             if entries:
                 entry_label = 'Reviewed public interfaces:' if any(v[1].get('role') in {'public-data', 'public-template', 'public-adapter'} for v in entries.values()) else 'Reviewed entry points:'
@@ -428,7 +431,7 @@ def build(destination, root=ROOT):
                         source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])
                         url = source['url']+f'#L{declaration["line_start"]}-L{declaration["line_end"]}'
                         label = 'Usage (click for constant declarations)' if procedure.get('role') == 'public-data' else 'Usage (click for template instantiation)' if procedure.get('role') == 'public-template' else 'Usage (click for argument declarations)'
-                        body += '<p>'+label+':</p><pre><code><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'+optional_notation_markup(procedure)
+                        body += '<p>'+label+':</p><pre><code class="calling-sequence"><a href="'+e(url)+'">'+signature_markup(procedure)+'</a></code></pre>'+optional_notation_markup(procedure)
                         body += argument_details_markup(procedure, repo['url']+'/blob/'+claim['revision']+'/')
                         for declaration in procedure['declarations']:
                             source = next(v for v in claim['evidence'] if v['path'] == declaration['path'])

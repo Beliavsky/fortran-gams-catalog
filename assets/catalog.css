@@ -51,3 +51,5 @@ footer { border-top:1px solid var(--line); margin-top:2rem; }
 .argument-comment { white-space:pre-wrap; }
 
 .optional-notation { color:var(--muted); font-size:.85rem; }
+
+.formatting-controls { display:flex; align-items:center; flex-wrap:wrap; gap:.3rem 1rem; margin-top:.8rem; }
