@@ -20,8 +20,8 @@ A static catalog for finding Fortran numerical software by mathematical problem.
 It includes repositories that do not use FPM or run in an online playground.
 
 The saved catalog imports **298 playground packages** and their classifications,
-procedure evidence and checked driver links, alongside **1011 catalog-owned
-repository reviews**. All 298 playground packages overlap catalog-owned reviews, giving 1,011
+procedure evidence and checked driver links, alongside **1012 catalog-owned
+repository reviews**. All 298 playground packages overlap catalog-owned reviews, giving 1,012
 distinct repositories. Counts describe the saved snapshot and change on refresh.
 Browse the GAMS hierarchy, search names/authors/topics/procedures, or filter for
 independent reviews. Each repository has a detail page with evidence links.
@@ -159,6 +159,11 @@ and procedure mappings are added through later reviews of individual repositorie
 Detailed numerical-method reviews include source-linked
 classifications and explicit limits where no leaf fits; see
 [the review progress](docs/granular-reviews.md).
+
+[Burkardt collection coverage](docs/burkardt-coverage.md) records an initial
+30 source-reviewed components under one repository identity, with 26 GAMS
+mappings, callable interfaces, a separate standalone FFT program, and explicit
+component-specific licensing and numerical limitations.
 
 [Neural-network regression mappings](docs/neural-regression.md) distinguish
 squared-error parameter fitting from evaluation of already trained models,
